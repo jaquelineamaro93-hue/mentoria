@@ -161,11 +161,21 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 // No final da função POST:
 await sgMail.send({
   to: email,
-  from: 'mentoria@seu-dominio.com',
+  from: 'consultoria@camarocrm.com',
   subject: 'Seu link de acesso - Mentoria+',
-  html: `<a href="${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?token=${token}">Acessar Portal</a>`,
+  html: `
+    <h2>Bem-vindo à Mentoria de Carreira!</h2>
+    <p>Clique no link abaixo para acessar seu portal:</p>
+    <a href="${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?token=${token}" 
+       style="display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">
+      Acessar Portal
+    </a>
+    <p>Este link expira em 24 horas.</p>
+  `,
 });
 ```
+
+**⚠️ Importante**: Verifique que `consultoria@camarocrm.com` está verificado como domínio de envio no SendGrid.
 
 ## 8️⃣ Configurar Domínio Customizado (Vercel)
 

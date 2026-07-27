@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
       { expiresIn: '24h' }
     );
 
-    // TODO: Enviar email com link contendo o token
+    // TODO: Integrar SendGrid para enviar email
+    // Email será enviado de: consultoria@camarocrm.com
     // Por enquanto, retornar o token para desenvolvimento
 
     return NextResponse.json({
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
       // IMPORTANTE: Remover isso em produção - apenas para desenvolvimento
       token,
       link: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?token=${token}`,
+      devNote: 'Em produção, um email será enviado de consultoria@camarocrm.com',
     });
   } catch (error) {
     console.error('Auth error:', error);
