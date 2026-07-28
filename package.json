@@ -1,38 +1,40 @@
 {
-  "name": "mentoria-carreira",
-  "version": "1.0.0",
-  "description": "Portal de mentoria de carreira profissional",
+  "name": "mentoria",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:push": "drizzle-kit push:pg",
-    "db:studio": "drizzle-kit studio",
-    "db:seed": "node scripts/seed.js"
+    "lint": "eslint",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@neondatabase/serverless": "latest",
-    "drizzle-orm": "latest",
-    "drizzle-kit": "latest",
-    "jsonwebtoken": "latest",
-    "@types/jsonwebtoken": "latest",
-    "openai": "latest",
-    "zod": "latest",
-    "lucide-react": "latest",
-    "recharts": "latest"
+    "@neondatabase/serverless": "^1.1.0",
+    "@sendgrid/mail": "^8.1.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.27.0",
+    "next": "16.2.12",
+    "openai": "^7.0.0",
+    "pg": "^8.22.0",
+    "postgres": "^3.4.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.10.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "tailwindcss": "latest",
-    "@tailwindcss/postcss": "latest",
-    "eslint": "latest",
-    "eslint-config-next": "latest"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.12",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
