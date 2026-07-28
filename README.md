@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎯 Portal de Mentoria de Carreira
 
-## Getting Started
+Portal completo de desenvolvimento profissional e carreira com gamificação, exercícios interativos e rastreamento de progresso.
 
-First, run the development server:
+## ✨ Funcionalidades
 
+- ✅ **Autenticação Magic Link** - Login seguro via email
+- ✅ **7 Seções Principais**:
+  1. Dashboard - Visão geral do progresso
+  2. Encontros - Agendamento de sessões presenciais/online
+  3. Exercícios - Mapa de Quem Sou Eu (9 blocos SOMA) + Testes de Personalidade
+  4. Diário de Bordo - Log de insights com análise IA
+  5. Evolução - Gráficos de desenvolvimento de skills
+  6. Passaporte - Sistema de achievements e badges
+  7. Loja - Marketplace de pontos e recompensas
+
+- 🎮 **Gamificação** - Pontos, achievements, sistema de recompensas
+- 📊 **Visualizações** - Gráficos de progresso e evolução
+- 📧 **Email** - Integração SendGrid para magic links
+- 🤖 **IA** - Análise de insights do diário com OpenAI
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 16, React 19, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: Neon (PostgreSQL Serverless)
+- **ORM**: Drizzle ORM
+- **Email**: SendGrid
+- **IA**: OpenAI
+- **Deploy**: Vercel
+
+## 📋 Pré-requisitos
+
+- Node.js 18+
+- Conta Neon (banco de dados)
+- Conta SendGrid (emails)
+- Conta OpenAI (análise IA)
+- Conta Vercel (deploy)
+
+## 🛠️ Setup Local
+
+### 1. Clonar e instalar
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo>
+cd mentoria
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configurar `.env.local`
+```env
+# Database (Neon)
+DATABASE_URL=postgresql://user:password@ep-xxxx.us-east-2.neon.tech/neondb
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# SendGrid
+SENDGRID_API_KEY=SG.xxxxxxxxxxxxx
+SENDGRID_FROM_EMAIL=consultoria@camarocrm.com
+SENDGRID_FROM_NAME=Mentoria Câmaro
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# OpenAI
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxx
 
-## Learn More
+# App Config
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+JWT_SECRET=seu-secret-aleatorio-forte-32-caracteres-minimo
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Criar tabelas do banco
+```bash
+npm run db:push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Rodar em desenvolvimento
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Acesse: http://localhost:3000/auth
 
-## Deploy on Vercel
+## 🚀 Deploy no Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. Fazer push para GitHub
+```bash
+git push origin claude/mentorship-portal-exercises-rvccah
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Conectar ao Vercel
+1. Acesse [vercel.com](https://vercel.com)
+2. Clique "New Project"
+3. Selecione seu repositório GitHub
+4. Clique "Import"
+
+### 3. Adicionar variáveis de ambiente
+No dashboard Vercel, vá para **Settings → Environment Variables** e adicione:
+- `DATABASE_URL` - Connection string do Neon
+- `SENDGRID_API_KEY` - API Key do SendGrid
+- `SENDGRID_FROM_EMAIL` - consultoria@camarocrm.com
+- `SENDGRID_FROM_NAME` - Mentoria Câmaro
+- `OPENAI_API_KEY` - API Key do OpenAI
+- `NEXT_PUBLIC_APP_URL` - URL do seu app no Vercel
+- `JWT_SECRET` - Secret para tokens JWT
+
+### 4. Deploy
+Clique "Deploy" - Vercel fará tudo automaticamente!
+
+## 📚 Documentação
+
+- `SETUP.md` - Guia completo de setup
+- `SENDGRID_SETUP.md` - Configuração de emails
+- `DNS_RECORDS.md` - Registros DNS para camarocrm.com
+- `ROADMAP.md` - Roadmap de desenvolvimento
+
+## 👤 Mentorados
+
+Os mentorados precisam ser cadastrados manualmente no banco:
+```sql
+INSERT INTO users (email, name, package, session_type, start_date, end_date)
+VALUES ('mentorado@email.com', 'Nome Completo', 'standard', 'hibrido', NOW(), NOW() + INTERVAL '90 days');
+```
+
+## 🔐 Segurança
+
+- ✅ Autenticação JWT com expiração
+- ✅ Senhas hasheadas (via Neon Auth)
+- ✅ HTTPS em produção (Vercel)
+- ✅ SSL na conexão com banco
+- ✅ Variáveis sensíveis em .env.local (não commitadas)
+
+## 📞 Suporte
+
+Email: consultoria@camarocrm.com
+
+---
+
+**Desenvolvido com ❤️ por Câmaro CRM**

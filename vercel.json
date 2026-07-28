@@ -1,0 +1,16 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad"],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "SENDGRID_API_KEY": "@sendgrid_api_key",
+    "SENDGRID_FROM_EMAIL": "consultoria@camarocrm.com",
+    "SENDGRID_FROM_NAME": "Mentoria Câmaro",
+    "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
+    "JWT_SECRET": "@jwt_secret",
+    "OPENAI_API_KEY": "@openai_api_key"
+  }
+}
