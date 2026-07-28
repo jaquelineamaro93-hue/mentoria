@@ -1,7 +1,8 @@
-import { redirect } from 'next/navigation';
-
-export const dynamic = 'force-dynamic';
-
 export default function Home() {
-  redirect('/auth');
+  return (
+    <div style={{ textAlign: 'center', paddingTop: '50vh' }}>
+      <h1>Redirecionando...</h1>
+      <script>{`window.location.href = '/auth'`}</script>
+    </div>
+  );
 }
