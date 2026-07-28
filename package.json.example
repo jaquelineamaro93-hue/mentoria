@@ -1,0 +1,38 @@
+{
+  "name": "mentoria-carreira",
+  "version": "1.0.0",
+  "description": "Portal de mentoria de carreira profissional",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@neondatabase/serverless": "latest",
+    "drizzle-orm": "latest",
+    "drizzle-kit": "latest",
+    "jsonwebtoken": "latest",
+    "@types/jsonwebtoken": "latest",
+    "openai": "latest",
+    "zod": "latest",
+    "lucide-react": "latest",
+    "recharts": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "@tailwindcss/postcss": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest"
+  }
+}
