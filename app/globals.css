@@ -1,27 +1,85 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: 'Times New Roman', Georgia, serif;
+  --font-body: 'Poppins', system-ui, -apple-system, sans-serif;
+
+  --color-ink: #1a1410;
+  --color-panel: #2a2217;
+  --color-panel-raised: #3a3220;
+  --color-line: #4a4230;
+  --color-line-soft: #3a3220;
+
+  --color-sky-100: #e7eff6;
+  --color-sky-300: #7ea0c4;
+  --color-sky-400: #6ba3b8;
+  --color-sky-500: #4f7196;
+  --color-sky-600: #3d5a7a;
+
+  --color-brown-100: #e6d9c8;
+  --color-brown-300: #9b8372;
+  --color-brown-400: #6b4a35;
+  --color-brown-500: #5a3f2b;
+  --color-brown-600: #3c2c1f;
+
+  --color-cream: #f6f2e9;
+  --color-cream-dim: #c4b8a8;
+  --color-cream-faint: #8b7d6b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #87CEEB 0%, #D2B48C 100%);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  font-weight: 300;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+::selection {
+  background: rgba(107, 163, 184, 0.3);
+  color: var(--color-sky-100);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-panel);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sky-500);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-sky-400);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,510 +1,304 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 
-type AuthTab = 'login' | 'signup';
+type Modo = 'entrar' | 'cadastrar';
 
 export default function AuthPage() {
-  const [tab, setTab] = useState<AuthTab>('login');
+  const [modo, setModo] = useState<Modo>('entrar');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [erro, setErro] = useState<string | null>(null);
+  const [sucesso, setSucesso] = useState<string | null>(null);
 
-  // Login state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [nome, setNome] = useState('');
+  const [tipoPacote, setTipoPacote] = useState('online');
 
-  // Signup state
-  const [signupName, setSignupName] = useState('');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupConfirm, setSignupConfirm] = useState('');
-
-  const handleLogin = async (e: FormEvent) => {
+  async function handleEntrar(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setErro(null);
     setLoading(true);
 
     try {
       const response = await fetch('/api/auth/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail }),
+        body: JSON.stringify({ email }),
       });
 
       if (!response.ok) throw new Error('Erro ao enviar link');
-      setSuccess('Link de acesso enviado para seu email');
-      setLoginEmail('');
+      setSucesso('Link de acesso enviado para seu email. Verifique sua caixa de entrada.');
+      setEmail('');
     } catch (err) {
-      setError('Não conseguimos enviar o link. Tente novamente.');
+      setErro('Não conseguimos enviar o link. Verifique o email e tente novamente.');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleSignup = async (e: FormEvent) => {
+  async function handleCadastrar(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (signupPassword !== signupConfirm) {
-      setError('As senhas não conferem');
-      return;
-    }
-
+    setErro(null);
+    setSucesso(null);
     setLoading(true);
 
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: signupName,
-          email: signupEmail,
-          password: signupPassword,
-        }),
+        body: JSON.stringify({ nome, email, senha, tipo_pacote: tipoPacote }),
       });
 
       if (!response.ok) throw new Error('Erro ao criar conta');
-      setSuccess('Conta criada! Verifique seu email para ativar.');
-      setSignupName('');
-      setSignupEmail('');
-      setSignupPassword('');
-      setSignupConfirm('');
+      setSucesso('Conta criada com sucesso! Verifique seu email para ativar o acesso.');
+      setNome('');
+      setEmail('');
+      setSenha('');
     } catch (err) {
-      setError('Não conseguimos criar a conta. Tente novamente.');
+      setErro('Não conseguimos criar a conta. Tente novamente em alguns instantes.');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #87CEEB 0%, #D2B48C 100%)' }}
-    >
+    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden">
       <div
-        className="w-full max-w-md"
+        className="pointer-events-none absolute inset-0 opacity-30"
         style={{
-          background: '#FFFAF0',
-          borderRadius: '16px',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
-          overflow: 'hidden',
+          backgroundImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(75, 160, 180, 0.15), transparent)',
         }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            background: 'linear-gradient(135deg, #4A90A4 0%, #6BA3B8 100%)',
-            padding: '32px 24px',
-            textAlign: 'center',
-            color: 'white',
-          }}
-        >
-          <h1 style={{ fontSize: '28px', fontWeight: '700', margin: '0 0 8px 0', fontFamily: 'Poppins, sans-serif' }}>
+      />
+
+      <div className="w-full max-w-sm relative">
+        {/* Brand */}
+        <div className="text-center mb-12">
+          <p className="font-display text-5xl tracking-wide text-amber-900" style={{ color: '#6b4a35', fontStyle: 'italic' }}>
             Mentoria
-          </h1>
-          <p style={{ fontSize: '13px', margin: '0', opacity: '0.9', fontFamily: 'Times New Roman, serif', fontStyle: 'italic' }}>
-            Seu desenvolvimento profissional começa aqui
           </p>
+          <div className="h-px w-16 bg-blue-300 mx-auto my-4" style={{ backgroundColor: '#4A90A4' }} />
+          <p className="text-xs uppercase tracking-widest text-gray-600">Portal de Desenvolvimento Profissional</p>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #D2B48C' }}>
-          <button
-            onClick={() => setTab('login')}
-            style={{
-              flex: 1,
-              padding: '16px',
-              background: tab === 'login' ? '#F5F5F5' : 'transparent',
-              border: 'none',
-              borderBottom: tab === 'login' ? '3px solid #4A90A4' : 'none',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: tab === 'login' ? '#4A90A4' : '#8B7355',
-              cursor: 'pointer',
-              fontFamily: 'Poppins, sans-serif',
-              transition: 'all 0.3s',
-            }}
-          >
-            Entrar
-          </button>
-          <button
-            onClick={() => setTab('signup')}
-            style={{
-              flex: 1,
-              padding: '16px',
-              background: tab === 'signup' ? '#F5F5F5' : 'transparent',
-              border: 'none',
-              borderBottom: tab === 'signup' ? '3px solid #4A90A4' : 'none',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: tab === 'signup' ? '#4A90A4' : '#8B7355',
-              cursor: 'pointer',
-              fontFamily: 'Poppins, sans-serif',
-              transition: 'all 0.3s',
-            }}
-          >
-            Criar Conta
-          </button>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: '32px 24px' }}>
-          {/* Alerts */}
-          {error && (
-            <div
+        {/* Card */}
+        <div className="rounded-2xl border border-gray-200 bg-white/95 backdrop-blur-sm overflow-hidden shadow-lg">
+          {/* Tabs */}
+          <div className="grid grid-cols-2 border-b border-gray-200">
+            <button
+              onClick={() => {
+                setModo('entrar');
+                setErro(null);
+                setSucesso(null);
+              }}
+              className={`py-4 px-6 text-sm font-medium tracking-wider transition-all ${
+                modo === 'entrar'
+                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                  : 'text-gray-500 border-b border-gray-200 hover:text-gray-700'
+              }`}
               style={{
-                background: '#FFF5F5',
-                border: '1px solid #FC8181',
-                borderRadius: '8px',
-                padding: '12px',
-                marginBottom: '16px',
-                fontSize: '13px',
-                color: '#742A2A',
-                fontFamily: 'Times New Roman, serif',
-                lineHeight: '1.5',
+                color: modo === 'entrar' ? '#4A90A4' : '#999',
+                borderBottomColor: modo === 'entrar' ? '#4A90A4' : '#ddd',
+                backgroundColor: modo === 'entrar' ? '#f0f7fc' : 'transparent',
               }}
             >
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div
+              Entrar
+            </button>
+            <button
+              onClick={() => {
+                setModo('cadastrar');
+                setErro(null);
+                setSucesso(null);
+              }}
+              className={`py-4 px-6 text-sm font-medium tracking-wider transition-all ${
+                modo === 'cadastrar'
+                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                  : 'text-gray-500 border-b border-gray-200 hover:text-gray-700'
+              }`}
               style={{
-                background: '#F0FFF4',
-                border: '1px solid #9AE6B4',
-                borderRadius: '8px',
-                padding: '12px',
-                marginBottom: '16px',
-                fontSize: '13px',
-                color: '#22543D',
-                fontFamily: 'Times New Roman, serif',
-                lineHeight: '1.5',
+                color: modo === 'cadastrar' ? '#4A90A4' : '#999',
+                borderBottomColor: modo === 'cadastrar' ? '#4A90A4' : '#ddd',
+                backgroundColor: modo === 'cadastrar' ? '#f0f7fc' : 'transparent',
               }}
             >
-              {success}
-            </div>
-          )}
+              Criar Conta
+            </button>
+          </div>
 
-          {/* Login Tab */}
-          {tab === 'login' && (
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#4A90A4',
-                    marginBottom: '6px',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
-                >
-                  Email
+          {/* Content */}
+          <div className="p-8">
+            {/* Entrar */}
+            {modo === 'entrar' && (
+              <form onSubmit={handleEntrar} className="flex flex-col gap-5">
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-widest text-gray-600" style={{ color: '#4A90A4', fontWeight: '500' }}>
+                    Email
+                  </span>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="voce@email.com"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm font-normal focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all"
+                    style={{ borderColor: '#D2B48C', color: '#333' }}
+                  />
                 </label>
-                <input
-                  type="email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="voce@email.com"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #D2B48C',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#4A90A4')}
-                  onBlur={(e) => (e.target.style.borderColor = '#D2B48C')}
-                />
-              </div>
 
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#4A90A4',
-                    marginBottom: '6px',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
-                >
-                  Senha
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-widest text-gray-600" style={{ color: '#4A90A4', fontWeight: '500' }}>
+                    Senha
+                  </span>
+                  <input
+                    type="password"
+                    required
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm font-normal focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all"
+                    style={{ borderColor: '#D2B48C', color: '#333' }}
+                  />
                 </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
+
+                {erro && (
+                  <div className="text-sm rounded-lg px-4 py-3 border bg-red-50 border-red-200 text-red-700">
+                    {erro}
+                  </div>
+                )}
+
+                {sucesso && (
+                  <div className="text-sm rounded-lg px-4 py-3 border bg-green-50 border-green-200 text-green-700">
+                    {sucesso}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full mt-2 py-3 px-4 rounded-lg font-medium text-white text-sm tracking-wide transition-all"
                   style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #D2B48C',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
+                    background: '#4A90A4',
+                    opacity: loading ? 0.7 : 1,
+                    cursor: loading ? 'not-allowed' : 'pointer',
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = '#4A90A4')}
-                  onBlur={(e) => (e.target.style.borderColor = '#D2B48C')}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  padding: '11px',
-                  background: '#4A90A4',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  fontFamily: 'Poppins, sans-serif',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? '0.7' : '1',
-                  transition: 'background 0.2s',
-                }}
-                onMouseEnter={(e) =>
-                  !loading && (e.currentTarget.style.background = '#3A7A94')
-                }
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#4A90A4')}
-              >
-                {loading ? 'Entrando...' : 'Entrar'}
-              </button>
-
-              <button
-                type="button"
-                style={{
-                  padding: '10px',
-                  background: 'transparent',
-                  color: '#4A90A4',
-                  border: '1px solid #D2B48C',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  fontFamily: 'Poppins, sans-serif',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#F5F5F5';
-                  e.currentTarget.style.borderColor = '#4A90A4';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.borderColor = '#D2B48C';
-                }}
-              >
-                Esqueci a senha
-              </button>
-
-              <p
-                style={{
-                  fontSize: '12px',
-                  color: '#8B7355',
-                  textAlign: 'center',
-                  margin: '8px 0 0 0',
-                  fontFamily: 'Times New Roman, serif',
-                  lineHeight: '1.5',
-                }}
-              >
-                Você receberá um link seguro para acessar o portal
-              </p>
-            </form>
-          )}
-
-          {/* Signup Tab */}
-          {tab === 'signup' && (
-            <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#4A90A4',
-                    marginBottom: '6px',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
+                  onMouseEnter={(e) => !loading && (e.currentTarget.style.background = '#3A7A94')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#4A90A4')}
                 >
-                  Nome completo
-                </label>
-                <input
-                  type="text"
-                  value={signupName}
-                  onChange={(e) => setSignupName(e.target.value)}
-                  placeholder="Seu nome"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #D2B48C',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#4A90A4')}
-                  onBlur={(e) => (e.target.style.borderColor = '#D2B48C')}
-                />
-              </div>
+                  {loading ? 'Entrando...' : 'Entrar'}
+                </button>
 
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#4A90A4',
-                    marginBottom: '6px',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
+                <button
+                  type="button"
+                  className="text-xs text-gray-500 hover:text-blue-600 transition-colors text-center mt-2 font-light"
+                  style={{ color: '#8B7355' }}
+                  onClick={() => setErro('Recuperação de senha será implementada em breve.')}
                 >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={signupEmail}
-                  onChange={(e) => setSignupEmail(e.target.value)}
-                  placeholder="voce@email.com"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #D2B48C',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#4A90A4')}
-                  onBlur={(e) => (e.target.style.borderColor = '#D2B48C')}
-                />
-              </div>
+                  Esqueci a senha
+                </button>
 
-              <div>
-                <label
+                <p className="text-xs text-gray-500 text-center mt-4" style={{ color: '#8B7355', fontFamily: 'Times New Roman, serif', fontStyle: 'italic' }}>
+                  Você receberá um link seguro para acessar o portal
+                </p>
+              </form>
+            )}
+
+            {/* Cadastrar */}
+            {modo === 'cadastrar' && (
+              <form onSubmit={handleCadastrar} className="flex flex-col gap-5">
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-widest text-gray-600" style={{ color: '#4A90A4', fontWeight: '500' }}>
+                    Nome completo
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    placeholder="Seu nome"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm font-normal focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all"
+                    style={{ borderColor: '#D2B48C', color: '#333' }}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-widest text-gray-600" style={{ color: '#4A90A4', fontWeight: '500' }}>
+                    Email
+                  </span>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="voce@email.com"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm font-normal focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all"
+                    style={{ borderColor: '#D2B48C', color: '#333' }}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-widest text-gray-600" style={{ color: '#4A90A4', fontWeight: '500' }}>
+                    Tipo de pacote
+                  </span>
+                  <select
+                    value={tipoPacote}
+                    onChange={(e) => setTipoPacote(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm font-normal focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all"
+                    style={{ borderColor: '#D2B48C', color: '#333' }}
+                  >
+                    <option value="online">Online</option>
+                    <option value="presencial">Presencial</option>
+                  </select>
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-widest text-gray-600" style={{ color: '#4A90A4', fontWeight: '500' }}>
+                    Senha
+                  </span>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm font-normal focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all"
+                    style={{ borderColor: '#D2B48C', color: '#333' }}
+                  />
+                </label>
+
+                {erro && (
+                  <div className="text-sm rounded-lg px-4 py-3 border bg-red-50 border-red-200 text-red-700">
+                    {erro}
+                  </div>
+                )}
+
+                {sucesso && (
+                  <div className="text-sm rounded-lg px-4 py-3 border bg-green-50 border-green-200 text-green-700">
+                    {sucesso}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full mt-2 py-3 px-4 rounded-lg font-medium text-white text-sm tracking-wide transition-all"
                   style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#4A90A4',
-                    marginBottom: '6px',
-                    fontFamily: 'Poppins, sans-serif',
+                    background: '#4A90A4',
+                    opacity: loading ? 0.7 : 1,
+                    cursor: loading ? 'not-allowed' : 'pointer',
                   }}
+                  onMouseEnter={(e) => !loading && (e.currentTarget.style.background = '#3A7A94')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#4A90A4')}
                 >
-                  Senha
-                </label>
-                <input
-                  type="password"
-                  value={signupPassword}
-                  onChange={(e) => setSignupPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #D2B48C',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#4A90A4')}
-                  onBlur={(e) => (e.target.style.borderColor = '#D2B48C')}
-                />
-              </div>
+                  {loading ? 'Criando conta...' : 'Cadastrar'}
+                </button>
 
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#4A90A4',
-                    marginBottom: '6px',
-                    fontFamily: 'Poppins, sans-serif',
-                  }}
-                >
-                  Confirme a senha
-                </label>
-                <input
-                  type="password"
-                  value={signupConfirm}
-                  onChange={(e) => setSignupConfirm(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #D2B48C',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    fontFamily: 'Poppins, sans-serif',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#4A90A4')}
-                  onBlur={(e) => (e.target.style.borderColor = '#D2B48C')}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  padding: '11px',
-                  background: '#4A90A4',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  fontFamily: 'Poppins, sans-serif',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? '0.7' : '1',
-                  transition: 'background 0.2s',
-                }}
-                onMouseEnter={(e) =>
-                  !loading && (e.currentTarget.style.background = '#3A7A94')
-                }
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#4A90A4')}
-              >
-                {loading ? 'Criando conta...' : 'Cadastrar'}
-              </button>
-
-              <p
-                style={{
-                  fontSize: '12px',
-                  color: '#8B7355',
-                  textAlign: 'center',
-                  margin: '4px 0 0 0',
-                  fontFamily: 'Times New Roman, serif',
-                  lineHeight: '1.5',
-                }}
-              >
-                Suas informações são protegidas e confidenciais
-              </p>
-            </form>
-          )}
+                <p className="text-xs text-gray-500 text-center mt-4" style={{ color: '#8B7355', fontFamily: 'Times New Roman, serif', fontStyle: 'italic' }}>
+                  Suas informações são protegidas e confidenciais
+                </p>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>
