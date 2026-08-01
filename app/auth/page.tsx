@@ -1,12 +1,8 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 export default function AuthPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,75 +21,106 @@ export default function AuthPage() {
       });
 
       if (!response.ok) throw new Error('Erro ao enviar link');
-
       setSent(true);
     } catch (err) {
-      setError('Erro ao processar. Tente novamente.');
+      setError('Não conseguimos enviar o link. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Mentoria+
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #87CEEB 0%, #D2B48C 100%)' }}>
+      <div className="w-full max-w-md" style={{ background: '#FFFAF0', borderRadius: '12px', padding: '48px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
+
+        <div className="text-center mb-12">
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#4A90A4', fontFamily: 'Poppins, sans-serif', margin: '0 0 16px 0' }}>
+            Mentoria
           </h1>
-          <p className="text-gray-600 mt-2">Seu portal de desenvolvimento profissional</p>
+          <p style={{ fontSize: '14px', color: '#8B7355', fontFamily: 'Times New Roman, serif', fontStyle: 'italic', margin: '0', lineHeight: '1.6' }}>
+            Seu desenvolvimento profissional começa aqui
+          </p>
         </div>
 
         {sent ? (
           <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-green-900 font-semibold">Link enviado!</p>
-              <p className="text-green-800 text-sm mt-2">
-                Verifique seu email <span className="font-bold">{email}</span> para acessar o portal.
+            <div style={{ background: '#F0FFF4', border: '1px solid #9AE6B4', borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
+              <p style={{ fontSize: '14px', fontWeight: '600', color: '#22543D', fontFamily: 'Poppins, sans-serif', margin: '0 0 8px 0' }}>
+                Link enviado
+              </p>
+              <p style={{ fontSize: '13px', color: '#2F855A', fontFamily: 'Times New Roman, serif', margin: '0', lineHeight: '1.5' }}>
+                Verifique seu email <strong>{email}</strong> e clique no link para continuar
               </p>
             </div>
-            <p className="text-gray-600 text-sm text-center">
-              O link expira em 24 horas.
+            <p style={{ fontSize: '12px', color: '#8B7355', fontFamily: 'Times New Roman, serif', textAlign: 'center', margin: '16px 0 0 0' }}>
+              O link funciona por 24 horas
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
-                Email
+              <label htmlFor="email" style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#4A90A4', fontFamily: 'Poppins, sans-serif', marginBottom: '8px' }}>
+                Seu email
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder="voce@email.com"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #D2B48C',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontFamily: 'Poppins, sans-serif',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#4A90A4'}
+                onBlur={(e) => e.target.style.borderColor = '#D2B48C'}
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-red-900 text-sm">{error}</p>
+              <div style={{ background: '#FFF5F5', border: '1px solid #FC8181', borderRadius: '6px', padding: '12px', textAlign: 'center' }}>
+                <p style={{ fontSize: '13px', color: '#742A2A', fontFamily: 'Times New Roman, serif', margin: '0', lineHeight: '1.4' }}>
+                  {error}
+                </p>
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              className="w-full"
               disabled={isLoading}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#4A90A4',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'Poppins, sans-serif',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? '0.7' : '1',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => !isLoading && (e.currentTarget.style.background = '#3A7A94')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#4A90A4')}
             >
-              {isLoading ? 'Enviando...' : 'Receber Link de Acesso'}
-            </Button>
+              {isLoading ? 'Enviando...' : 'Enviar link'}
+            </button>
 
-            <p className="text-center text-gray-600 text-sm">
-              Você receberá um link de acesso seguro no seu email.
+            <p style={{ fontSize: '12px', color: '#8B7355', fontFamily: 'Times New Roman, serif', textAlign: 'center', margin: '0', lineHeight: '1.5' }}>
+              Você receberá um link seguro para acessar o portal
             </p>
           </form>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
