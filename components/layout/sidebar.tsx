@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import posthog from 'posthog-js';
 import {
   Home,
   Calendar,
@@ -27,7 +28,8 @@ export function Sidebar() {
   const pathname = usePathname();
 
   const handleLogout = () => {
-    localStorage.removeItem('auth_token');
+    posthog.reset();
+    document.cookie = 'auth_user_id=; Max-Age=0; path=/';
     window.location.href = '/auth';
   };
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { ShoppingBag, Lock } from 'lucide-react';
+import posthog from 'posthog-js';
 
 export default function LojaPage() {
   const [userPoints] = useState(210);
@@ -61,6 +62,11 @@ export default function LojaPage() {
   const handleRedeem = (reward: any) => {
     if (userPoints >= reward.cost) {
       alert(`✓ Resgaste de "${reward.name}" processado!\n\nVocê receberá em breve!`);
+      posthog.capture('reward_redeemed', {
+        reward_id: reward.id,
+        reward_category: reward.category,
+        points_spent: reward.cost,
+      });
     }
   };
 

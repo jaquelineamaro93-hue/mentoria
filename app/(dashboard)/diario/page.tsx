@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Zap, Plus } from 'lucide-react';
+import posthog from 'posthog-js';
 
 export default function DiarioPage() {
   const [entries, setEntries] = useState<any[]>([
@@ -35,6 +36,7 @@ export default function DiarioPage() {
       }, ...entries]);
       setNewEntry('');
       setIsCreating(false);
+      posthog.capture('journal_entry_created');
     }
   };
 

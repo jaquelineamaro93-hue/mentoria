@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { MapPin, Zap, ArrowRight } from 'lucide-react';
+import posthog from 'posthog-js';
 
 export default function ExerciciosPage() {
   const exercises = [
@@ -63,7 +64,13 @@ export default function ExerciciosPage() {
               )}
             </div>
 
-            <Link href={`/exercicios/${exercise.id}`}>
+            <Link
+              href={`/exercicios/${exercise.id}`}
+              onClick={() => posthog.capture('exercise_opened', {
+                exercise_id: exercise.id,
+                exercise_status: exercise.status,
+              })}
+            >
               <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center space-x-2 group">
                 <span>{exercise.status === 'completed' ? 'Revisar' : 'Começar'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
