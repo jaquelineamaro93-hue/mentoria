@@ -1,134 +1,77 @@
-# 🎯 Portal de Mentoria de Carreira
+# Portal do Mentorado — Mentoria SOMA
 
-Portal completo de desenvolvimento profissional e carreira com gamificação, exercícios interativos e rastreamento de progresso.
+MVP construído em Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + Supabase.
 
-## ✨ Funcionalidades
+## O que já está pronto
 
-- ✅ **Autenticação Magic Link** - Login seguro via email
-- ✅ **7 Seções Principais**:
-  1. Dashboard - Visão geral do progresso
-  2. Encontros - Agendamento de sessões presenciais/online
-  3. Exercícios - Mapa de Quem Sou Eu (9 blocos SOMA) + Testes de Personalidade
-  4. Diário de Bordo - Log de insights com análise IA
-  5. Evolução - Gráficos de desenvolvimento de skills
-  6. Passaporte - Sistema de achievements e badges
-  7. Loja - Marketplace de pontos e recompensas
+- **Autenticação** (`/login`): abas Entrar / Criar Conta, com Supabase Auth
+- **Dashboard** (`/dashboard`): header de boas-vindas, mural de avisos, trilha de aprendizado
+- **Diagnóstico & Perfil** (`/exercicios`): mapa "Quem Sou", pontos fortes, linha de evolução
+- **Diário de Bordo** (`/diario`): anotações por encontro, com botão pronto para plugar um resumo via IA
+- Banco de dados Supabase já criado e com RLS configurado (ver abaixo)
+- Analytics real com PostHog: login, cadastro, logout, preenchimento de diagnóstico e de anotações do diário já disparam eventos (ver abaixo)
 
-- 🎮 **Gamificação** - Pontos, achievements, sistema de recompensas
-- 📊 **Visualizações** - Gráficos de progresso e evolução
-- 📧 **Email** - Integração SendGrid para magic links
-- 🤖 **IA** - Análise de insights do diário com OpenAI
+## Analytics (PostHog)
 
-## 🚀 Tech Stack
+Projeto PostHog: **Soma mentoria** (project id `538119`)
 
-- **Frontend**: Next.js 16, React 19, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: Neon (PostgreSQL Serverless)
-- **ORM**: Drizzle ORM
-- **Email**: SendGrid
-- **IA**: OpenAI
-- **Deploy**: Vercel
+Eventos já instrumentados no código:
 
-## 📋 Pré-requisitos
+| Evento | Onde dispara |
+| --- | --- |
+| `cadastro_realizado` / `cadastro_falhou` | Tela de login, aba Criar Conta |
+| `login_realizado` / `login_falhou` | Tela de login, aba Entrar |
+| `logout_realizado` | Botão Sair (sidebar, em qualquer tela) |
+| `diagnostico_preenchido` / `diagnostico_falhou` | Ao salvar o mapa Quem Sou em Diagnóstico & Perfil |
+| `anotacao_diario_criada` / `anotacao_diario_falhou` | Ao salvar uma anotação no Diário de Bordo |
+| `$pageview` | Automático, em toda navegação |
 
-- Node.js 18+
-- Conta Neon (banco de dados)
-- Conta SendGrid (emails)
-- Conta OpenAI (análise IA)
-- Conta Vercel (deploy)
+Cada mentorado é identificado no PostHog (`identify`) assim que faz login ou se cadastra, então dá para abrir o PostHog e filtrar por pessoa específica, não só ver números agregados. Para pedir esses insights pela conversa com o Claude, basta perguntar (ex: "quantos mentorados preencheram o diagnóstico essa semana").
 
-## 🛠️ Setup Local
+Para adicionar novos eventos, importe `posthog` de `@/lib/posthog` e chame `posthog.capture('nome_do_evento', { propriedades })`.
 
-### 1. Clonar e instalar
+## Banco de dados (já criado)
+
+Projeto Supabase: `mentoria-soma` (`nqmnszottjkmolatzxwt`, região `sa-east-1`)
+
+Tabelas: `profiles`, `diagnostics`, `journal_notes`, `announcements`, todas com Row Level Security habilitado (cada mentorado só acessa os próprios dados).
+
+As credenciais já estão no arquivo `.env.local` incluído neste zip. Se você preferir usar seu próprio projeto Supabase, troque os valores desse arquivo pelos do seu projeto e recrie o schema lá (é só pedir o SQL completo de novo que eu te mando).
+
+## Como rodar localmente
+
 ```bash
-git clone <repo>
-cd mentoria
 npm install
-```
-
-### 2. Configurar `.env.local`
-```env
-# Database (Neon)
-DATABASE_URL=postgresql://user:password@ep-xxxx.us-east-2.neon.tech/neondb
-
-# SendGrid
-SENDGRID_API_KEY=SG.xxxxxxxxxxxxx
-SENDGRID_FROM_EMAIL=consultoria@camarocrm.com
-SENDGRID_FROM_NAME=Mentoria Câmaro
-
-# OpenAI
-OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxx
-
-# App Config
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-JWT_SECRET=seu-secret-aleatorio-forte-32-caracteres-minimo
-```
-
-### 3. Criar tabelas do banco
-```bash
-npm run db:push
-```
-
-### 4. Rodar em desenvolvimento
-```bash
 npm run dev
 ```
 
-Acesse: http://localhost:3000/auth
+Acesse `http://localhost:3000`. A raiz (`/`) redireciona automaticamente para `/login` ou `/dashboard`, dependendo se você está autenticada.
 
-## 🚀 Deploy no Vercel
+## Como subir para o seu repositório GitHub
 
-### 1. Fazer push para GitHub
 ```bash
-git push origin claude/mentorship-portal-exercises-rvccah
+git init
+git add .
+git commit -m "Portal do Mentorado - MVP inicial"
+git remote add origin <URL_DO_SEU_REPOSITORIO>
+git push -u origin main
 ```
 
-### 2. Conectar ao Vercel
-1. Acesse [vercel.com](https://vercel.com)
-2. Clique "New Project"
-3. Selecione seu repositório GitHub
-4. Clique "Import"
+## Deploy na Vercel
 
-### 3. Adicionar variáveis de ambiente
-No dashboard Vercel, vá para **Settings → Environment Variables** e adicione:
-- `DATABASE_URL` - Connection string do Neon
-- `SENDGRID_API_KEY` - API Key do SendGrid
-- `SENDGRID_FROM_EMAIL` - consultoria@camarocrm.com
-- `SENDGRID_FROM_NAME` - Mentoria Câmaro
-- `OPENAI_API_KEY` - API Key do OpenAI
-- `NEXT_PUBLIC_APP_URL` - URL do seu app no Vercel
-- `JWT_SECRET` - Secret para tokens JWT
+1. Importe o repositório na Vercel
+2. Nas configurações do projeto, adicione as variáveis de ambiente (mesmas do `.env.local`):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_POSTHOG_KEY`
+   - `NEXT_PUBLIC_POSTHOG_HOST`
+3. Deploy
 
-### 4. Deploy
-Clique "Deploy" - Vercel fará tudo automaticamente!
+Não precisa mexer em `next.config.ts`, já está configurado corretamente (sem `output: 'export'`, compatível com Server Components e o proxy de sessão).
 
-## 📚 Documentação
+## Próximos passos sugeridos
 
-- `SETUP.md` - Guia completo de setup
-- `SENDGRID_SETUP.md` - Configuração de emails
-- `DNS_RECORDS.md` - Registros DNS para camarocrm.com
-- `ROADMAP.md` - Roadmap de desenvolvimento
-
-## 👤 Mentorados
-
-Os mentorados precisam ser cadastrados manualmente no banco:
-```sql
-INSERT INTO users (email, name, package, session_type, start_date, end_date)
-VALUES ('mentorado@email.com', 'Nome Completo', 'standard', 'hibrido', NOW(), NOW() + INTERVAL '90 days');
-```
-
-## 🔐 Segurança
-
-- ✅ Autenticação JWT com expiração
-- ✅ Senhas hasheadas (via Neon Auth)
-- ✅ HTTPS em produção (Vercel)
-- ✅ SSL na conexão com banco
-- ✅ Variáveis sensíveis em .env.local (não commitadas)
-
-## 📞 Suporte
-
-Email: consultoria@camarocrm.com
-
----
-
-**Desenvolvido com ❤️ por Câmaro CRM**
+- Trocar o link fixo do Google Drive no dashboard pelo link real da pasta de materiais
+- Popular a tabela `announcements` com os avisos reais (via SQL Editor do Supabase ou uma tela de admin)
+- Conectar o botão "Gerar resumo com IA" no diário a uma chamada real (Anthropic API, por exemplo) em vez do resumo simulado atual
+- Ativar confirmação de e-mail e fluxo de recuperação de senha no Supabase Auth (hoje o botão "Esqueci a senha" é só um aviso)
