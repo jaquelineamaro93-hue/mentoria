@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: 'Cormorant Garamond', 'Georgia', serif;
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Times New Roman', Times, serif;
+  --font-body: 'Poppins', sans-serif;
 
-  --color-ink: #08070a;
-  --color-panel: #100d12;
-  --color-panel-raised: #17131a;
-  --color-line: #2a2430;
-  --color-line-soft: #1d1922;
+  --color-cream: #f6f2e9;
+  --color-paper: #fbf8f2;
+  --color-ink: #362b21;
+  --color-ink-soft: #6b5d4f;
+  --color-ink-faint: #9c8f7e;
 
-  --color-gold-100: #f4e4bc;
-  --color-gold-300: #e0c179;
-  --color-gold-400: #cda75c;
-  --color-gold-500: #b8924a;
-  --color-gold-600: #8f7038;
+  --color-brown: #6b4a35;
+  --color-brown-deep: #3c2c1f;
 
-  --color-cream: #f2ede4;
-  --color-cream-dim: #b8b0a3;
-  --color-cream-faint: #746c62;
+  --color-sky: #7ea0c4;
+  --color-sky-deep: #4f7196;
+  --color-sky-tint: #e7eff6;
+
+  --color-line: #ded4c3;
+  --color-line-soft: #ded4c3;
 }
 
 html {
@@ -26,35 +26,34 @@ html {
 }
 
 body {
-  background: var(--color-ink);
-  color: var(--color-cream);
+  background: var(--color-cream);
+  color: var(--color-ink);
   font-family: var(--font-body);
-  background-image:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(184, 146, 74, 0.08), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 10%, rgba(184, 146, 74, 0.05), transparent);
+  font-weight: 300;
 }
 
 .font-display {
   font-family: var(--font-display);
+  font-style: italic;
 }
 
 ::selection {
-  background: rgba(205, 167, 92, 0.3);
-  color: var(--color-gold-100);
+  background: rgba(126, 160, 196, 0.3);
+  color: var(--color-brown-deep);
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-ink);
+  background: var(--color-cream);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-line);
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gold-600);
+  background: var(--color-brown);
 }
 
 a:focus-visible,
@@ -62,7 +61,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-gold-400);
+  outline: 2px solid var(--color-sky-deep);
   outline-offset: 2px;
 }
 

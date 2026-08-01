@@ -6,10 +6,25 @@ MVP construído em Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + Supa
 
 - **Autenticação** (`/login`): abas Entrar / Criar Conta, com Supabase Auth
 - **Dashboard** (`/dashboard`): header de boas-vindas, mural de avisos, trilha de aprendizado
-- **Diagnóstico & Perfil** (`/exercicios`): mapa "Quem Sou", pontos fortes, linha de evolução
+- **Mapa Quem Sou Eu** (`/quem-sou-eu`): fluxo guiado em 9 blocos, um por vez, gera Mapa de Essência e Bússola de Posicionamento via IA
+- **Diagnóstico & Perfil** (`/exercicios`): mapa "Quem Sou" simplificado, VIA Character Strengths (24 forças + análise de IA), linha de evolução
 - **Diário de Bordo** (`/diario`): anotações por encontro, com botão pronto para plugar um resumo via IA
 - Banco de dados Supabase já criado e com RLS configurado (ver abaixo)
-- Analytics real com PostHog: login, cadastro, logout, preenchimento de diagnóstico e de anotações do diário já disparam eventos (ver abaixo)
+- Analytics real com PostHog: login, cadastro, logout, preenchimento de diagnóstico, anotações do diário, blocos do Quem Sou Eu, geração de Mapa/Bússola/VIA (ver abaixo)
+
+## Insights de IA (Anthropic)
+
+Três fluxos chamam a API da Anthropic (Claude) no servidor, protegendo a chave:
+
+| Rota | O que faz |
+| --- | --- |
+| `/api/gerar-mapa-essencia` | Lê as 9 respostas do Quem Sou Eu e gera uma síntese em Markdown |
+| `/api/gerar-bussola` | A partir das mesmas respostas, gera os 5 pontos cardeais (Norte, Sul, Leste, Oeste, Centro) |
+| `/api/gerar-analise-via` | Recebe as 24 forças do VIA em ordem e gera uma análise de dinâmica de energia, incluindo o "lado sombra" das forças de assinatura |
+
+Os prompts exatos estão em `lib/prompts.ts`, prontos pra você ajustar o tom se quiser.
+
+**Para ativar**: cole sua chave da Anthropic (começa com `sk-ant-`) na variável `ANTHROPIC_API_KEY` do `.env.local` (local) e também nas Environment Variables do projeto na Vercel (produção). Sem essa chave, os botões de gerar insight aparecem mas retornam erro amigável explicando que a chave não está configurada.
 
 ## Analytics (PostHog)
 
@@ -65,6 +80,7 @@ git push -u origin main
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `NEXT_PUBLIC_POSTHOG_KEY`
    - `NEXT_PUBLIC_POSTHOG_HOST`
+   - `ANTHROPIC_API_KEY`
 3. Deploy
 
 Não precisa mexer em `next.config.ts`, já está configurado corretamente (sem `output: 'export'`, compatível com Server Components e o proxy de sessão).

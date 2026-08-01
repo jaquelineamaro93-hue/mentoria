@@ -3,16 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Compass, Sparkles, TrendingUp, Save, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
-import type { Diagnostic, Profile } from '@/lib/types';
+import { VIA_FORCAS } from '@/lib/prompts';
+import type { Diagnostic, Profile, ViaResultado } from '@/lib/types';
 
 interface Props {
   profile: Profile | null;
   diagnostics: Diagnostic[];
   userId: string;
+  viaResultadoInicial?: ViaResultado | null;
 }
 
 const FORCAS = [
@@ -26,7 +29,12 @@ const FORCAS = [
   'Execução',
 ];
 
-export default function ExerciciosClient({ profile, diagnostics, userId }: Props) {
+export default function ExerciciosClient({
+  profile,
+  diagnostics,
+  userId,
+  viaResultadoInicial = null,
+}: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -42,6 +50,31 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
   const [forcasSelecionadas, setForcasSelecionadas] = useState<string[]>(
     (diagnostics[diagnostics.length - 1]?.habilidades?.forcas as string[]) ?? []
   );
+
+  const [viaResultado, setViaResultado] = useState<ViaResultado | null>(viaResultadoInicial);
+  const [viaForcas, setViaForcas] = useState<string[]>(Array(24).fill(''));
+  const [viaData, setViaData] = useState('');
+  const [enviandoVia, setEnviandoVia] = useState(false);
+  const [erroVia, setErroVia] = useState<string | null>(null);
+
+  async function enviarVia() {
+    setEnviandoVia(true);
+    setErroVia(null);
+    try {
+      const res = await fetch('/api/gerar-analise-via', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ forcas: viaForcas, data_teste: viaData }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setViaResultado(data.resultado);
+      posthog.capture('via_analise_gerada');
+    } catch (e) {
+      setErroVia(e instanceof Error ? e.message : 'Não foi possível gerar a análise agora.');
+    }
+    setEnviandoVia(false);
+  }
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -96,11 +129,11 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
         <div className="mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-brown mb-2">
             Área de diagnóstico
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl text-cream">Diagnóstico & Perfil</h1>
-          <p className="text-sm text-cream-faint mt-2">
+          <h1 className="font-display text-3xl sm:text-4xl text-ink">Diagnóstico & Perfil</h1>
+          <p className="text-sm text-ink-faint mt-2">
             Entenda onde você está agora e acompanhe como isso muda ao longo da mentoria.
           </p>
         </div>
@@ -113,7 +146,7 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
           <Panel className="p-6">
             <div className="flex flex-col gap-5">
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs uppercase tracking-wide text-cream-faint">
+                <span className="text-xs uppercase tracking-wide text-ink-faint">
                   Momento atual de carreira
                 </span>
                 <textarea
@@ -121,12 +154,12 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
                   onChange={(e) => setMomentoCarreira(e.target.value)}
                   rows={3}
                   placeholder="Descreva onde você está profissionalmente agora..."
-                  className="bg-panel border border-line rounded-lg px-4 py-3 text-sm text-cream focus:border-gold-500 resize-none"
+                  className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
                 />
               </label>
 
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs uppercase tracking-wide text-cream-faint">
+                <span className="text-xs uppercase tracking-wide text-ink-faint">
                   Objetivos com a mentoria
                 </span>
                 <textarea
@@ -134,12 +167,12 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
                   onChange={(e) => setObjetivos(e.target.value)}
                   rows={3}
                   placeholder="O que você quer alcançar até o fim do programa?"
-                  className="bg-panel border border-line rounded-lg px-4 py-3 text-sm text-cream focus:border-gold-500 resize-none"
+                  className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
                 />
               </label>
 
               <div>
-                <span className="text-xs uppercase tracking-wide text-cream-faint block mb-2">
+                <span className="text-xs uppercase tracking-wide text-ink-faint block mb-2">
                   Pontos fortes (selecione quantos quiser)
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -152,8 +185,8 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
                         onClick={() => toggleForca(forca)}
                         className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                           ativo
-                            ? 'bg-gold-500/15 border-gold-500/50 text-gold-300'
-                            : 'bg-panel border-line text-cream-faint hover:border-line-soft hover:text-cream-dim'
+                            ? 'bg-sky-tint border-sky text-brown-deep'
+                            : 'bg-cream border-line text-ink-faint hover:border-line hover:text-ink-soft'
                         }`}
                       >
                         {forca}
@@ -164,7 +197,7 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
               </div>
 
               {mensagem && (
-                <p className="text-sm text-gold-300 bg-gold-500/10 border border-gold-500/30 rounded-md px-4 py-2.5">
+                <p className="text-sm text-brown-deep bg-sky-tint border border-sky rounded-md px-4 py-2.5">
                   {mensagem}
                 </p>
               )}
@@ -172,7 +205,7 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
               <button
                 onClick={handleSalvarDiagnostico}
                 disabled={salvando}
-                className="self-start flex items-center gap-2 bg-gold-400 hover:bg-gold-300 disabled:opacity-60 text-[#100d12] text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+                className="self-start flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
               >
                 {salvando ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -185,28 +218,114 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
           </Panel>
         </section>
 
-        {/* Teste de personalidade */}
+        {/* VIA Character Strengths */}
         <section className="mb-10">
           <Eyebrow>
-            <Sparkles size={13} /> Teste de personalidade & habilidades
+            <Sparkles size={13} /> VIA Character Strengths
           </Eyebrow>
-          <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-cream mb-1">Avaliação individual guiada</p>
-              <p className="text-sm text-cream-faint">
-                Módulo de avaliação para mapear pontos fortes e áreas de desenvolvimento com
-                a Gabi.
+
+          {viaResultado ? (
+            <Panel className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-ink-faint">
+                  Feito em{' '}
+                  {new Date(viaResultado.data_teste + 'T00:00:00').toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {viaResultado.forcas.slice(0, 5).map((f, i) => (
+                  <span
+                    key={f}
+                    className="text-[11px] px-2.5 py-1 rounded-full bg-sky-tint border border-sky text-sky-deep"
+                  >
+                    {i + 1}º {f}
+                  </span>
+                ))}
+              </div>
+              {viaResultado.analise_ia && (
+                <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
+                  <ReactMarkdown>{viaResultado.analise_ia}</ReactMarkdown>
+                </div>
+              )}
+            </Panel>
+          ) : (
+            <Panel className="p-6">
+              <p className="text-sm text-ink mb-1">
+                Você já fez o VIA em{' '}
+                <a
+                  href="https://www.viacharacter.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-deep underline"
+                >
+                  viacharacter.org
+                </a>
+                ?
               </p>
-            </div>
-            <button
-              type="button"
-              disabled
-              className="shrink-0 text-sm px-5 py-2.5 rounded-lg border border-line text-cream-faint cursor-not-allowed"
-              title="Em breve: será liberado durante sua jornada"
-            >
-              Em breve
-            </button>
-          </Panel>
+              <p className="text-sm text-ink-faint mb-5">
+                Cole abaixo as 24 forças na ordem exata do seu resultado, da 1ª (mais natural)
+                à 24ª (mais escondida). A Jaque vai receber uma análise gerada a partir da sua
+                combinação única.
+              </p>
+
+              <label className="flex flex-col gap-1.5 mb-4 max-w-[220px]">
+                <span className="text-xs uppercase tracking-wide text-ink-faint">
+                  Data em que fez o teste
+                </span>
+                <input
+                  type="date"
+                  value={viaData}
+                  onChange={(e) => setViaData(e.target.value)}
+                  className="bg-cream border border-line rounded-lg px-4 py-2.5 text-sm text-ink focus:border-sky-deep"
+                />
+              </label>
+
+              <div className="grid sm:grid-cols-2 gap-2.5 mb-5">
+                {viaForcas.map((valor, i) => (
+                  <label key={i} className="flex items-center gap-2.5">
+                    <span className="text-xs text-ink-faint w-6 text-right shrink-0">
+                      {i + 1}º
+                    </span>
+                    <select
+                      value={valor}
+                      onChange={(e) => {
+                        const novo = [...viaForcas];
+                        novo[i] = e.target.value;
+                        setViaForcas(novo);
+                      }}
+                      className="flex-1 bg-cream border border-line rounded-lg px-3 py-2 text-sm text-ink focus:border-sky-deep"
+                    >
+                      <option value="">Selecione...</option>
+                      {VIA_FORCAS.map((f) => (
+                        <option key={f} value={f}>
+                          {f}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </div>
+
+              {erroVia && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-4 py-2.5 mb-4">
+                  {erroVia}
+                </p>
+              )}
+
+              <button
+                onClick={enviarVia}
+                disabled={enviandoVia || viaForcas.some((f) => !f) || !viaData}
+                className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+              >
+                {enviandoVia ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Sparkles size={15} />
+                )}
+                {enviandoVia ? 'Gerando análise...' : 'Salvar e gerar análise'}
+              </button>
+            </Panel>
+          )}
         </section>
 
         {/* Evolução do mentorado */}
@@ -216,24 +335,24 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
           </Eyebrow>
 
           {diagnostics.length === 0 ? (
-            <Panel className="p-6 text-sm text-cream-faint">
+            <Panel className="p-6 text-sm text-ink-faint">
               Salve seu primeiro diagnóstico acima para começar sua linha de evolução.
             </Panel>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               <Panel className="p-6">
-                <p className="text-[11px] uppercase tracking-wide text-cream-faint mb-3">
+                <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-3">
                   Diagnóstico inicial ·{' '}
                   {new Date(primeiro.created_at).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm text-cream leading-relaxed">
+                <p className="text-sm text-ink leading-relaxed">
                   {primeiro.momento_carreira || 'Sem registro de momento de carreira.'}
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {((primeiro.habilidades?.forcas as string[]) ?? []).map((f) => (
                     <span
                       key={f}
-                      className="text-[11px] px-2 py-1 rounded-full bg-panel border border-line text-cream-faint"
+                      className="text-[11px] px-2 py-1 rounded-full bg-cream border border-line text-ink-faint"
                     >
                       {f}
                     </span>
@@ -241,19 +360,19 @@ export default function ExerciciosClient({ profile, diagnostics, userId }: Props
                 </div>
               </Panel>
 
-              <Panel className="p-6 border-gold-500/30">
-                <p className="text-[11px] uppercase tracking-wide text-gold-400 mb-3">
+              <Panel className="p-6 border-sky">
+                <p className="text-[11px] uppercase tracking-wide text-brown mb-3">
                   Momento atual ·{' '}
                   {new Date(ultimo.created_at).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm text-cream leading-relaxed">
+                <p className="text-sm text-ink leading-relaxed">
                   {ultimo.momento_carreira || 'Sem registro de momento de carreira.'}
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {((ultimo.habilidades?.forcas as string[]) ?? []).map((f) => (
                     <span
                       key={f}
-                      className="text-[11px] px-2 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300"
+                      className="text-[11px] px-2 py-1 rounded-full bg-sky-tint border border-sky text-brown-deep"
                     >
                       {f}
                     </span>

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ExerciciosClient from './ExerciciosClient';
-import type { Diagnostic, Profile } from '@/lib/types';
+import type { Diagnostic, Profile, ViaResultado } from '@/lib/types';
 
 export default async function ExerciciosPage() {
   const supabase = await createClient();
@@ -26,5 +26,20 @@ export default async function ExerciciosPage() {
     .order('created_at', { ascending: true })
     .returns<Diagnostic[]>();
 
-  return <ExerciciosClient profile={profile} diagnostics={diagnostics ?? []} userId={user.id} />;
+  const { data: viaResultados } = await supabase
+    .from('via_resultados')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .returns<ViaResultado[]>();
+
+  return (
+    <ExerciciosClient
+      profile={profile}
+      diagnostics={diagnostics ?? []}
+      userId={user.id}
+      viaResultadoInicial={viaResultados?.[0] ?? null}
+    />
+  );
 }

@@ -80,24 +80,18 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(184,146,74,0.12), transparent)',
-        }}
-      />
-
       <div className="w-full max-w-md relative">
         <div className="text-center mb-10">
-          <p className="font-display text-4xl tracking-wide text-gold-300">SOMA</p>
-          <div className="h-px w-12 bg-gold-500/60 mx-auto my-3" />
-          <p className="text-xs uppercase tracking-[0.25em] text-cream-faint">
+          <p className="font-display text-4xl tracking-wide text-brown-deep">
+            SOMA <span className="text-sky-deep">MENTORIA</span>
+          </p>
+          <div className="h-px w-12 bg-brown mx-auto my-3" />
+          <p className="text-xs uppercase tracking-[0.25em] text-ink-faint">
             Portal do Mentorado
           </p>
         </div>
 
-        <div className="rounded-xl border border-line-soft bg-panel-raised/70 backdrop-blur-sm overflow-hidden">
+        <div className="rounded-xl border border-line bg-paper overflow-hidden">
           <div className="grid grid-cols-2">
             <button
               onClick={() => {
@@ -107,8 +101,8 @@ export default function LoginPage() {
               }}
               className={`py-4 text-sm tracking-wide transition-colors ${
                 modo === 'entrar'
-                  ? 'text-gold-300 border-b-2 border-gold-400 bg-gold-500/5'
-                  : 'text-cream-faint border-b border-line-soft hover:text-cream-dim'
+                  ? 'text-brown-deep border-b-2 border-brown bg-sky-tint'
+                  : 'text-ink-faint border-b border-line hover:text-ink-soft'
               }`}
             >
               Entrar
@@ -121,8 +115,8 @@ export default function LoginPage() {
               }}
               className={`py-4 text-sm tracking-wide transition-colors ${
                 modo === 'cadastrar'
-                  ? 'text-gold-300 border-b-2 border-gold-400 bg-gold-500/5'
-                  : 'text-cream-faint border-b border-line-soft hover:text-cream-dim'
+                  ? 'text-brown-deep border-b-2 border-brown bg-sky-tint'
+                  : 'text-ink-faint border-b border-line hover:text-ink-soft'
               }`}
             >
               Criar Conta
@@ -161,7 +155,7 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  className="text-xs text-cream-faint hover:text-gold-300 transition-colors text-center mt-1"
+                  className="text-xs text-ink-faint hover:text-brown transition-colors text-center mt-1"
                   onClick={() => setErro('Envio de recuperação de senha ainda não configurado neste MVP.')}
                 >
                   Esqueci a senha
@@ -226,20 +220,20 @@ export default function LoginPage() {
       <style>{`
         .input {
           width: 100%;
-          background: var(--color-panel);
+          background: var(--color-cream);
           border: 1px solid var(--color-line);
           border-radius: 8px;
           padding: 10px 14px;
           font-size: 14px;
-          color: var(--color-cream);
+          color: var(--color-ink);
         }
         .input:focus {
-          border-color: var(--color-gold-500);
+          border-color: var(--color-sky-deep);
         }
         .btn-primary {
           width: 100%;
-          background: var(--color-gold-400);
-          color: #100d12;
+          background: var(--color-brown);
+          color: var(--color-paper);
           font-weight: 600;
           font-size: 14px;
           padding: 11px 16px;
@@ -247,7 +241,7 @@ export default function LoginPage() {
           transition: background 0.15s ease;
         }
         .btn-primary:hover {
-          background: var(--color-gold-300);
+          background: var(--color-brown-deep);
         }
         .btn-primary:disabled {
           opacity: 0.6;
@@ -260,7 +254,7 @@ export default function LoginPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-xs uppercase tracking-wide text-cream-faint">{label}</span>
+      <span className="text-xs uppercase tracking-wide text-ink-faint">{label}</span>
       {children}
     </label>
   );

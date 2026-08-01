@@ -36,6 +36,43 @@ export interface JournalNote {
   updated_at: string;
 }
 
+export interface QuemSouEuResposta {
+  id: string;
+  user_id: string;
+  bloco: string;
+  resposta: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MapaEssencia {
+  id: string;
+  user_id: string;
+  conteudo_markdown: string;
+  gerado_em: string;
+}
+
+export interface BussolaPosicionamento {
+  id: string;
+  user_id: string;
+  norte: string | null;
+  sul: string | null;
+  leste: string | null;
+  oeste: string | null;
+  centro: string | null;
+  gerado_em: string;
+}
+
+export interface ViaResultado {
+  id: string;
+  user_id: string;
+  forcas: string[];
+  data_teste: string;
+  analise_ia: string | null;
+  arquivo_original_url: string | null;
+  created_at: string;
+}
+
 export interface Announcement {
   id: string;
   titulo: string;

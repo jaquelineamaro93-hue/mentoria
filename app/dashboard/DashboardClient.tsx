@@ -47,7 +47,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-5xl mx-auto w-full">
         {/* Header de boas-vindas */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-10">
-          <div className="w-16 h-16 rounded-full bg-gold-500/15 border border-gold-500/40 flex items-center justify-center text-gold-300 text-xl font-display shrink-0">
+          <div className="w-16 h-16 rounded-full bg-sky-tint border border-sky flex items-center justify-center text-brown-deep text-xl font-display shrink-0">
             {profile?.nome
               ?.split(' ')
               .slice(0, 2)
@@ -56,12 +56,12 @@ export default function DashboardClient({ profile, announcements }: Props) {
               .toUpperCase() ?? <UserIcon size={24} />}
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cream-faint mb-1">
+            <p className="text-xs uppercase tracking-[0.2em] text-ink-faint mb-1">
               Bem-vinda de volta
             </p>
-            <h1 className="font-display text-3xl sm:text-4xl text-cream">{primeiroNome}</h1>
+            <h1 className="font-display text-3xl sm:text-4xl text-ink">{primeiroNome}</h1>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-[11px] uppercase tracking-wide bg-gold-500/10 border border-gold-500/30 text-gold-300 px-2.5 py-1 rounded-full">
+              <span className="text-[11px] uppercase tracking-wide bg-sky-tint border border-sky text-brown-deep px-2.5 py-1 rounded-full">
                 Pacote {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
               </span>
               <span
@@ -89,7 +89,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
           </Eyebrow>
 
           {announcements.length === 0 ? (
-            <Panel className="p-6 text-sm text-cream-faint">
+            <Panel className="p-6 text-sm text-ink-faint">
               Nenhum aviso no momento. Fica de olho: novidades sobre encontros aparecem aqui.
             </Panel>
           ) : (
@@ -100,10 +100,10 @@ export default function DashboardClient({ profile, announcements }: Props) {
                     <span
                       className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide px-2 py-1 rounded-full border shrink-0 ${
                         a.tipo === 'individual'
-                          ? 'bg-gold-500/10 border-gold-500/30 text-gold-300'
+                          ? 'bg-sky-tint border-sky text-brown-deep'
                           : a.tipo === 'grupo'
                             ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
-                            : 'bg-panel border-line text-cream-faint'
+                            : 'bg-cream border-line text-ink-faint'
                       }`}
                     >
                       {a.tipo === 'individual' ? (
@@ -118,12 +118,12 @@ export default function DashboardClient({ profile, announcements }: Props) {
                           : 'Geral'}
                     </span>
                   </div>
-                  <p className="text-sm text-cream mb-1">{a.titulo}</p>
+                  <p className="text-sm text-ink mb-1">{a.titulo}</p>
                   {a.descricao && (
-                    <p className="text-sm text-cream-faint mb-2">{a.descricao}</p>
+                    <p className="text-sm text-ink-faint mb-2">{a.descricao}</p>
                   )}
                   <div className="flex items-center justify-between mt-3">
-                    <span className="text-xs text-cream-faint">
+                    <span className="text-xs text-ink-faint">
                       {a.data_evento
                         ? new Date(a.data_evento).toLocaleDateString('pt-BR', {
                             day: '2-digit',
@@ -138,7 +138,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
                         href={a.link_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-gold-300 hover:text-gold-100 transition-colors"
+                        className="flex items-center gap-1 text-xs text-brown-deep hover:text-brown-deep transition-colors"
                       >
                         Acessar <ExternalLink size={12} />
                       </a>
@@ -157,8 +157,8 @@ export default function DashboardClient({ profile, announcements }: Props) {
           </Eyebrow>
           <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-cream mb-1">Materiais da Mentoria SOMA</p>
-              <p className="text-sm text-cream-faint">
+              <p className="text-ink mb-1">Materiais da Mentoria SOMA</p>
+              <p className="text-sm text-ink-faint">
                 Todo o conteúdo, gravações e templates do programa, centralizados em um só lugar.
               </p>
             </div>
@@ -166,7 +166,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
               href={DRIVE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 flex items-center gap-2 bg-gold-400 hover:bg-gold-300 text-[#100d12] text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+              className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep text-paper text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
             >
               Abrir Drive <ExternalLink size={14} />
             </a>
@@ -178,23 +178,23 @@ export default function DashboardClient({ profile, announcements }: Props) {
           <Eyebrow>Continue sua jornada</Eyebrow>
           <div className="grid sm:grid-cols-2 gap-4">
             <Link href="/exercicios">
-              <Panel className="p-6 h-full hover:border-gold-500/40 transition-colors group">
-                <Compass className="text-gold-400 mb-3" size={22} strokeWidth={1.75} />
-                <p className="text-cream mb-1 group-hover:text-gold-200 transition-colors">
+              <Panel className="p-6 h-full hover:border-sky transition-colors group">
+                <Compass className="text-brown mb-3" size={22} strokeWidth={1.75} />
+                <p className="text-ink mb-1 group-hover:text-brown-deep transition-colors">
                   Diagnóstico & Perfil
                 </p>
-                <p className="text-sm text-cream-faint">
+                <p className="text-sm text-ink-faint">
                   Preencha seu mapa &quot;Quem Sou&quot; e acompanhe sua evolução.
                 </p>
               </Panel>
             </Link>
             <Link href="/diario">
-              <Panel className="p-6 h-full hover:border-gold-500/40 transition-colors group">
-                <NotebookPen className="text-gold-400 mb-3" size={22} strokeWidth={1.75} />
-                <p className="text-cream mb-1 group-hover:text-gold-200 transition-colors">
+              <Panel className="p-6 h-full hover:border-sky transition-colors group">
+                <NotebookPen className="text-brown mb-3" size={22} strokeWidth={1.75} />
+                <p className="text-ink mb-1 group-hover:text-brown-deep transition-colors">
                   Diário de Bordo
                 </p>
-                <p className="text-sm text-cream-faint">
+                <p className="text-sm text-ink-faint">
                   Registre aprendizados e sacadas dos seus encontros.
                 </p>
               </Panel>

@@ -1,0 +1,312 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import { ArrowLeft, ArrowRight, Compass, Sparkles, Loader2, Check } from 'lucide-react';
+import Sidebar from '@/components/Sidebar';
+import { Panel, Eyebrow } from '@/components/Panel';
+import { createClient } from '@/lib/supabase/client';
+import { posthog, limparIdentidade } from '@/lib/posthog';
+import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
+import type {
+  BussolaPosicionamento,
+  MapaEssencia,
+  Profile,
+  QuemSouEuResposta,
+} from '@/lib/types';
+
+interface Props {
+  profile: Profile | null;
+  userId: string;
+  respostasIniciais: QuemSouEuResposta[];
+  mapaInicial: MapaEssencia | null;
+  bussolaInicial: BussolaPosicionamento | null;
+}
+
+export default function QuemSouEuClient({
+  profile,
+  userId,
+  respostasIniciais,
+  mapaInicial,
+  bussolaInicial,
+}: Props) {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const respostasMap: Record<string, string> = {};
+  respostasIniciais.forEach((r) => {
+    respostasMap[r.bloco] = r.resposta;
+  });
+
+  const [respostas, setRespostas] = useState<Record<string, string>>(respostasMap);
+  const [passo, setPasso] = useState(0);
+  const [salvando, setSalvando] = useState(false);
+  const [gerandoMapa, setGerandoMapa] = useState(false);
+  const [gerandoBussola, setGerandoBussola] = useState(false);
+  const [mapa, setMapa] = useState<MapaEssencia | null>(mapaInicial);
+  const [bussola, setBussola] = useState<BussolaPosicionamento | null>(bussolaInicial);
+  const [erro, setErro] = useState<string | null>(null);
+
+  const bloco = BLOCOS_QUEM_SOU_EU[passo];
+  const totalBlocos = BLOCOS_QUEM_SOU_EU.length;
+  const concluidos = Object.keys(respostas).length;
+  const todosRespondidos = concluidos >= totalBlocos;
+
+  async function handleSignOut() {
+    posthog.capture('logout_realizado');
+    await supabase.auth.signOut();
+    limparIdentidade();
+    router.push('/login');
+    router.refresh();
+  }
+
+  async function salvarBlocoAtual() {
+    const texto = respostas[bloco.codigo]?.trim();
+    if (!texto) return;
+
+    setSalvando(true);
+    await supabase.from('quem_sou_eu_respostas').upsert(
+      {
+        user_id: userId,
+        bloco: bloco.codigo,
+        resposta: texto,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,bloco' }
+    );
+    posthog.capture('quem_sou_eu_bloco_salvo', { bloco: bloco.codigo });
+    setSalvando(false);
+  }
+
+  async function irParaProximo() {
+    await salvarBlocoAtual();
+    if (passo < totalBlocos - 1) {
+      setPasso(passo + 1);
+    }
+  }
+
+  async function gerarMapa() {
+    setGerandoMapa(true);
+    setErro(null);
+    try {
+      const res = await fetch('/api/gerar-mapa-essencia', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setMapa(data.mapa);
+      posthog.capture('mapa_essencia_gerado');
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Não foi possível gerar o mapa agora.');
+    }
+    setGerandoMapa(false);
+  }
+
+  async function gerarBussola() {
+    setGerandoBussola(true);
+    setErro(null);
+    try {
+      const res = await fetch('/api/gerar-bussola', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setBussola(data.bussola);
+      posthog.capture('bussola_gerada');
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Não foi possível gerar a bússola agora.');
+    }
+    setGerandoBussola(false);
+  }
+
+  return (
+    <div className="flex flex-col md:flex-row w-full">
+      <Sidebar profile={profile} onSignOut={handleSignOut} />
+
+      <div className="flex-1 flex">
+        <div className="hidden lg:block w-[240px] shrink-0 border-r border-line p-8">
+          <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-4">
+            {concluidos} de {totalBlocos} blocos
+          </p>
+          <div className="flex flex-col gap-1">
+            {BLOCOS_QUEM_SOU_EU.map((b, i) => {
+              const respondido = !!respostas[b.codigo];
+              const ativo = i === passo;
+              return (
+                <button
+                  key={b.codigo}
+                  onClick={() => setPasso(i)}
+                  className={`flex items-center gap-2.5 text-left px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                    ativo
+                      ? 'bg-sky-tint text-brown-deep'
+                      : 'text-ink-soft hover:bg-cream'
+                  }`}
+                >
+                  <span
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
+                      respondido
+                        ? 'bg-brown border-brown text-paper'
+                        : 'border-line text-ink-faint'
+                    }`}
+                  >
+                    {respondido ? <Check size={10} /> : i + 1}
+                  </span>
+                  {b.titulo}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <main className="flex-1 px-6 py-10 md:px-12 max-w-2xl">
+          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+            Mapa Quem Sou Eu · bloco {passo + 1} de {totalBlocos}
+          </p>
+          <h1 className="font-display text-3xl text-brown-deep mb-1">{bloco.titulo}</h1>
+          {bloco.subtitulo && (
+            <p className="text-sm text-ink-faint mb-6">{bloco.subtitulo}</p>
+          )}
+
+          <Panel className="p-6 mb-8">
+            <p className="text-sm text-ink leading-relaxed mb-4">{bloco.pergunta}</p>
+            <p className="text-xs text-ink-faint italic mb-5">Exemplo: {bloco.exemplo}</p>
+
+            <textarea
+              value={respostas[bloco.codigo] ?? ''}
+              onChange={(e) =>
+                setRespostas((prev) => ({ ...prev, [bloco.codigo]: e.target.value }))
+              }
+              rows={7}
+              placeholder="Escreva com calma, sem se preocupar em organizar. Deixe fluir."
+              className="w-full bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+            />
+
+            <div className="flex items-center justify-between mt-5">
+              <button
+                onClick={() => setPasso(Math.max(0, passo - 1))}
+                disabled={passo === 0}
+                className="flex items-center gap-1.5 text-sm text-ink-faint hover:text-brown disabled:opacity-40 transition-colors"
+              >
+                <ArrowLeft size={15} /> Voltar
+              </button>
+
+              {passo < totalBlocos - 1 ? (
+                <button
+                  onClick={irParaProximo}
+                  disabled={salvando || !respostas[bloco.codigo]?.trim()}
+                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                >
+                  {salvando ? <Loader2 size={15} className="animate-spin" /> : null}
+                  Continuar <ArrowRight size={15} />
+                </button>
+              ) : (
+                <button
+                  onClick={salvarBlocoAtual}
+                  disabled={salvando || !respostas[bloco.codigo]?.trim()}
+                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                >
+                  {salvando ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+                  Salvar último bloco
+                </button>
+              )}
+            </div>
+          </Panel>
+
+          {todosRespondidos && (
+            <section className="mb-10">
+              <Eyebrow>
+                <Compass size={13} /> Síntese
+              </Eyebrow>
+
+              {erro && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-4 py-2.5 mb-4">
+                  {erro}
+                </p>
+              )}
+
+              {!mapa ? (
+                <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-ink mb-1">Você respondeu os 9 blocos</p>
+                    <p className="text-sm text-ink-faint">
+                      Gere agora o seu Mapa de Essência, uma síntese visual de tudo que você
+                      trouxe.
+                    </p>
+                  </div>
+                  <button
+                    onClick={gerarMapa}
+                    disabled={gerandoMapa}
+                    className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                  >
+                    {gerandoMapa ? (
+                      <Loader2 size={15} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={15} />
+                    )}
+                    {gerandoMapa ? 'Gerando...' : 'Gerar Mapa de Essência'}
+                  </button>
+                </Panel>
+              ) : (
+                <Panel className="p-6 mb-4 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
+                  <ReactMarkdown>{mapa.conteudo_markdown}</ReactMarkdown>
+                </Panel>
+              )}
+
+              {mapa && !bussola && (
+                <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-ink mb-1">Mapa pronto</p>
+                    <p className="text-sm text-ink-faint">
+                      Agora gere sua Bússola de Posicionamento, a tradução do seu mapa em
+                      direção estratégica de carreira.
+                    </p>
+                  </div>
+                  <button
+                    onClick={gerarBussola}
+                    disabled={gerandoBussola}
+                    className="shrink-0 flex items-center gap-2 bg-sky-deep hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                  >
+                    {gerandoBussola ? (
+                      <Loader2 size={15} className="animate-spin" />
+                    ) : (
+                      <Compass size={15} />
+                    )}
+                    {gerandoBussola ? 'Gerando...' : 'Gerar Bússola de Posicionamento'}
+                  </button>
+                </Panel>
+              )}
+
+              {bussola && (
+                <div className="grid sm:grid-cols-2 gap-3 mt-4">
+                  <BussolaCard titulo="Norte · Essência" texto={bussola.norte} />
+                  <BussolaCard titulo="Sul · Propósito" texto={bussola.sul} />
+                  <BussolaCard titulo="Leste · Energia" texto={bussola.leste} />
+                  <BussolaCard titulo="Oeste · Mensagem" texto={bussola.oeste} />
+                  <BussolaCard
+                    titulo="Centro · Presença"
+                    texto={bussola.centro}
+                    className="sm:col-span-2"
+                  />
+                </div>
+              )}
+            </section>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function BussolaCard({
+  titulo,
+  texto,
+  className = '',
+}: {
+  titulo: string;
+  texto: string | null;
+  className?: string;
+}) {
+  return (
+    <Panel className={`p-5 ${className}`}>
+      <p className="text-[11px] uppercase tracking-wide text-sky-deep mb-2">{titulo}</p>
+      <p className="text-sm text-ink leading-relaxed">{texto}</p>
+    </Panel>
+  );
+}
