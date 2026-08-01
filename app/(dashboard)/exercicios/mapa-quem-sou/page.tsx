@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import posthog from 'posthog-js';
 
 const MAPA_BLOCKS = [
   {
@@ -133,6 +134,10 @@ export default function MapaQuemSouPage() {
         [`${block.id}_${Object.keys(responses).filter(k => k.startsWith(block.id)).length}`]: currentText,
       });
       setCurrentText('');
+      posthog.capture('exercise_response_saved', {
+        exercise_id: 'mapa-quem-sou',
+        block_id: block.id,
+      });
     }
   };
 
@@ -144,6 +149,10 @@ export default function MapaQuemSouPage() {
       setIsCompleted(true);
       // TODO: Salvar no banco de dados
       console.log('Respostas finais:', responses);
+      posthog.capture('exercise_completed', {
+        exercise_id: 'mapa-quem-sou',
+        response_count: Object.keys(responses).length,
+      });
     }
   };
 

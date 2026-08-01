@@ -3,7 +3,15 @@
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
+import posthog from 'posthog-js';
+
+const subscribeToAuthCookie = () => () => {};
+
+const getAuthUserId = () => document.cookie
+  .split('; ')
+  .find((cookie) => cookie.startsWith('auth_user_id='))
+  ?.split('=')[1];
 
 export default function DashboardLayout({
   children,
@@ -11,22 +19,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const userId = useSyncExternalStore(
+    subscribeToAuthCookie,
+    getAuthUserId,
+    () => undefined,
+  );
 
   useEffect(() => {
-    // Verificar token de autenticação
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
+    if (!userId) {
       router.push('/auth');
       return;
     }
 
-    // TODO: Validar token e carregar dados do usuário
-    setIsLoading(false);
-  }, [router]);
+    posthog.identify(userId);
+  }, [router, userId]);
 
-  if (isLoading) {
+  if (!userId) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

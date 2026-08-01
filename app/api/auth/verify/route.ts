@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,7 +32,27 @@ export async function GET(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 86400 * 7, // 7 dias
+      path: '/',
     });
+
+    response.cookies.set({
+      name: 'auth_user_id',
+      value: String(decoded.userId),
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 86400 * 7, // 7 dias
+      path: '/',
+    });
+
+    const posthog = getPostHogClient();
+    if (posthog) {
+      posthog.capture({
+        distinctId: String(decoded.userId),
+        event: 'magic_link_verified',
+      });
+      await posthog.flush();
+    }
 
     return response;
   } catch (error) {

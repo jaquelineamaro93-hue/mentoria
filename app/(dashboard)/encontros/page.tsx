@@ -2,6 +2,7 @@
 
 import { Card } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, Link as LinkIcon, Video } from 'lucide-react';
+import posthog from 'posthog-js';
 
 export default function EncontrosPage() {
   // Mock data - será substituído por dados do banco
@@ -102,7 +103,13 @@ export default function EncontrosPage() {
                   </p>
                 </div>
 
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                <button
+                  onClick={() => posthog.capture('mentoring_session_confirmed', {
+                    session_id: session.id,
+                    session_type: session.type,
+                  })}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                >
                   Confirmar
                 </button>
               </div>

@@ -3,6 +3,7 @@ import { db } from '@/lib/db/client';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 // SendGrid é opcional - tenta importar se disponível
 let sgMail: any = null;
@@ -100,6 +101,15 @@ export async function POST(req: NextRequest) {
       } catch (emailError) {
         console.error('SendGrid error:', emailError);
       }
+    }
+
+    const posthog = getPostHogClient();
+    if (posthog) {
+      posthog.capture({
+        distinctId: String(user[0].id),
+        event: 'magic_link_requested',
+      });
+      await posthog.flush();
     }
 
     return NextResponse.json({
