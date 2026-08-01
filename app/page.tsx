@@ -1,10 +1,5 @@
+import { redirect } from 'next/navigation';
+
 export default function Home() {
-  return (
-    <html>
-      <head>
-        <meta httpEquiv="refresh" content="0;url=/auth" />
-      </head>
-      <body></body>
-    </html>
-  );
+  redirect('/auth');
 }
