@@ -1,4 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
+// @ts-ignore
 import { Pool } from 'pg';
 import * as schema from './schema';
 
