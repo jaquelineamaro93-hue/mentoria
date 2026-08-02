@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   FileSearch,
   MessageCircle,
+  Gift,
+  TrendingUp,
 } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 
@@ -27,6 +29,8 @@ const NAV_ITEMS = [
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
   { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
   { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
+  { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
+  { href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp },
 ];
 
 interface SidebarProps {

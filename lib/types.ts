@@ -17,6 +17,10 @@ export interface Profile {
   proxima_cobranca: string | null;
   observacao_pagamento: string | null;
   creditos_simulacao_cv: number;
+  codigo_indicacao: string | null;
+  indicado_por_id: string | null;
+  sessoes_bonus_resgatadas: number;
+  plano_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -234,5 +238,26 @@ export interface Announcement {
   tipo: TipoAviso | null;
   data_evento: string | null;
   link_url: string | null;
+  created_at: string;
+}
+
+export interface Indicacao {
+  id: string;
+  indicador_id: string;
+  indicado_id: string | null;
+  indicado_nome: string;
+  indicado_email: string;
+  status: 'pendente' | 'convertido';
+  created_at: string;
+  convertido_em: string | null;
+}
+
+export interface CheckinMensal {
+  id: string;
+  user_id: string;
+  mes_referencia: string;
+  nota: number;
+  feedback_texto: string | null;
+  sugestao_melhoria: string | null;
   created_at: string;
 }

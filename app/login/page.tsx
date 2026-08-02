@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, identificarMentorado } from '@/lib/posthog';
 import type { TipoPacote } from '@/lib/types';
 
 type Modo = 'entrar' | 'cadastrar';
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const codigoIndicacao = searchParams.get('ref');
   const supabase = createClient();
 
   const [modo, setModo] = useState<Modo>('entrar');
@@ -59,7 +61,7 @@ export default function LoginPage() {
       email,
       password: senha,
       options: {
-        data: { nome, tipo_pacote: tipoPacote },
+        data: { nome, tipo_pacote: tipoPacote, codigo_indicacao_referencia: codigoIndicacao },
       },
     });
 
@@ -277,6 +279,24 @@ function Alert({ tipo, children }: { tipo: 'erro' | 'sucesso'; children: React.R
       }`}
     >
       {children}
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-ink-soft">Carregando...</p>
+      </div>
     </div>
   );
 }

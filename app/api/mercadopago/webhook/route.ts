@@ -99,6 +99,21 @@ export async function POST(request: Request) {
           .update({ status_assinatura: 'ativo', origem_assinatura: 'mercadopago' })
           .eq('id', userId);
 
+        // Se esse mentorado foi indicado por alguém, marca a indicação como convertida
+        const { data: perfilPago } = await supabase
+          .from('profiles')
+          .select('indicado_por_id')
+          .eq('id', userId)
+          .single();
+
+        if (perfilPago?.indicado_por_id) {
+          await supabase
+            .from('indicacoes')
+            .update({ status: 'convertido', convertido_em: new Date().toISOString() })
+            .eq('indicado_id', userId)
+            .eq('status', 'pendente');
+        }
+
         await supabase.from('pagamentos_historico').insert({
           user_id: userId,
           valor: pagamento.transaction_amount ?? null,
