@@ -49,7 +49,6 @@ export default function AdminClient({
       if (!res.ok) throw new Error(data.error);
 
       const { error } = await supabase.auth.verifyOtp({
-        email: data.email,
         token_hash: data.tokenHash,
         type: 'magiclink',
       });
