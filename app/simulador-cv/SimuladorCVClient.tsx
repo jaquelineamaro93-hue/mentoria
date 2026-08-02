@@ -4,9 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { FileText, Loader2, Sparkles, History } from 'lucide-react';
+import {
+  Loader2,
+  Sparkles,
+  History,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+} from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
-import { Panel, Eyebrow } from '@/components/Panel';
+import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { CvSimulacao, Profile } from '@/lib/types';
@@ -16,6 +23,8 @@ interface Props {
   userId: string;
   simulacoesIniciais: CvSimulacao[];
 }
+
+type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista';
 
 export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props) {
   const router = useRouter();
@@ -30,6 +39,7 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
   );
   const [historico, setHistorico] = useState(simulacoesIniciais);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
+  const [aba, setAba] = useState<Aba>('compatibilidade');
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -53,12 +63,31 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
       if (!res.ok) throw new Error(data.error);
       setResultado(data.simulacao);
       setHistorico((prev) => [data.simulacao, ...prev]);
+      setAba('compatibilidade');
       posthog.capture('simulacao_cv_gerada');
     } catch (e) {
       setErro(e instanceof Error ? e.message : 'Não foi possível gerar a análise agora.');
     }
     setGerando(false);
   }
+
+  const r = resultado?.resultado_json;
+
+  const corFit = !r
+    ? 'text-ink-faint'
+    : r.fit_percentual >= 70
+      ? 'text-green-600'
+      : r.fit_percentual >= 45
+        ? 'text-amber-600'
+        : 'text-red-600';
+
+  const barraFit = !r
+    ? 'bg-line'
+    : r.fit_percentual >= 70
+      ? 'bg-green-500'
+      : r.fit_percentual >= 45
+        ? 'bg-amber-500'
+        : 'bg-red-500';
 
   return (
     <div className="flex flex-col md:flex-row w-full">
@@ -92,7 +121,10 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
             {historico.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setResultado(s)}
+                onClick={() => {
+                  setResultado(s);
+                  setAba('compatibilidade');
+                }}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                   resultado?.id === s.id
                     ? 'bg-sky-tint border-sky text-sky-deep'
@@ -110,7 +142,7 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-4 mb-8">
+        <div className="grid lg:grid-cols-2 gap-4 mb-6">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs uppercase tracking-wide text-ink-faint">
               Seu currículo atual
@@ -118,7 +150,7 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
             <textarea
               value={curriculo}
               onChange={(e) => setCurriculo(e.target.value)}
-              rows={12}
+              rows={10}
               placeholder="Cole aqui o texto do seu currículo atual, com suas experiências, formação e conquistas..."
               className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none font-mono"
             />
@@ -130,8 +162,8 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
             <textarea
               value={vaga}
               onChange={(e) => setVaga(e.target.value)}
-              rows={12}
-              placeholder="Cole aqui a descrição completa da vaga que você quer aplicar..."
+              rows={10}
+              placeholder="Cole aqui a descrição completa da vaga. Se for um link do LinkedIn, abra a vaga, copie o texto da descrição e cole aqui (links do LinkedIn exigem login e não funcionam direto)."
               className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none font-mono"
             />
           </label>
@@ -156,16 +188,160 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
           {gerando ? 'Analisando como um recrutador...' : 'Analisar e otimizar'}
         </button>
 
-        {resultado && (
+        {r && (
           <section>
-            <Eyebrow>
-              <FileText size={13} /> Resultado da análise
-            </Eyebrow>
-            <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-p:leading-relaxed prose-p:my-4 prose-strong:text-brown-deep prose-li:text-ink prose-table:text-sm">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {resultado.resultado_markdown}
-              </ReactMarkdown>
-            </Panel>
+            <div className="flex flex-wrap gap-2 mb-6 border-b border-line">
+              {(
+                [
+                  ['compatibilidade', 'Compatibilidade'],
+                  ['curriculo', 'Currículo'],
+                  ['palavras', 'Palavras-chave'],
+                  ['entrevista', 'Entrevista'],
+                ] as [Aba, string][]
+              ).map(([valor, label]) => (
+                <button
+                  key={valor}
+                  onClick={() => setAba(valor)}
+                  className={`px-4 py-2.5 text-sm border-b-2 -mb-px transition-colors ${
+                    aba === valor
+                      ? 'border-brown text-brown-deep'
+                      : 'border-transparent text-ink-faint hover:text-ink-soft'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {aba === 'compatibilidade' && (
+              <div className="flex flex-col gap-6">
+                <Panel className="p-6">
+                  <div className="flex items-center gap-6 flex-wrap">
+                    <p className={`font-display text-5xl ${corFit}`}>
+                      {r.fit_percentual}%
+                    </p>
+                    <div>
+                      <p className="text-ink font-medium">{r.fit_label}</p>
+                      <p className="text-sm text-ink-faint">
+                        Sua compatibilidade estimada com essa vaga
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-2 bg-line rounded-full mt-4 overflow-hidden">
+                    <div
+                      className={`h-full ${barraFit} transition-all`}
+                      style={{ width: `${r.fit_percentual}%` }}
+                    />
+                  </div>
+                </Panel>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Panel className="p-5">
+                    <p className="text-xs uppercase tracking-wide text-green-700 mb-3 flex items-center gap-1.5">
+                      <CheckCircle2 size={13} /> Pontos fortes
+                    </p>
+                    <ul className="flex flex-col gap-2">
+                      {r.pontos_fortes.map((p, i) => (
+                        <li key={i} className="text-sm text-ink leading-relaxed">
+                          {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </Panel>
+                  <Panel className="p-5">
+                    <p className="text-xs uppercase tracking-wide text-amber-700 mb-3 flex items-center gap-1.5">
+                      <AlertTriangle size={13} /> Pontos de atenção
+                    </p>
+                    <ul className="flex flex-col gap-2">
+                      {r.pontos_atencao.map((p, i) => (
+                        <li key={i} className="text-sm text-ink leading-relaxed">
+                          {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </Panel>
+                </div>
+
+                <Panel className="p-5">
+                  <p className="text-xs uppercase tracking-wide text-ink-faint mb-1">
+                    Faixa salarial estimada
+                  </p>
+                  <p className="text-lg text-brown-deep font-medium">
+                    {r.faixa_salarial_estimada}
+                  </p>
+                </Panel>
+
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-red-700 mb-3 flex items-center gap-1.5">
+                    <XCircle size={13} /> Os 6 sabotadores do seu currículo
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {r.sabotadores.map((s, i) => (
+                      <Panel key={i} className="p-5">
+                        <div className="flex items-start gap-3">
+                          <span className="w-6 h-6 rounded-full bg-red-50 border border-red-300 text-red-700 text-xs flex items-center justify-center shrink-0 mt-0.5">
+                            {i + 1}
+                          </span>
+                          <div>
+                            <p className="text-ink font-medium mb-1">{s.titulo}</p>
+                            <p className="text-sm text-ink-faint mb-2">{s.motivo}</p>
+                            <p className="text-sm text-sky-deep">{s.correcao}</p>
+                          </div>
+                        </div>
+                      </Panel>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {aba === 'curriculo' && (
+              <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-p:leading-relaxed prose-p:my-3 prose-strong:text-brown-deep prose-li:text-ink">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {r.curriculo_final_markdown}
+                </ReactMarkdown>
+                <hr className="my-6" />
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {r.carta_apresentacao_markdown}
+                </ReactMarkdown>
+              </Panel>
+            )}
+
+            {aba === 'palavras' && (
+              <Panel className="p-6">
+                <p className="text-sm text-ink-faint mb-4">
+                  Inclua essas palavras no seu currículo para passar pelos filtros ATS:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {r.palavras_chave_ausentes.map((p, i) => (
+                    <span
+                      key={i}
+                      className="text-sm px-3 py-1.5 rounded-full bg-sky-tint border border-sky text-sky-deep"
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </Panel>
+            )}
+
+            {aba === 'entrevista' && (
+              <Panel className="p-6">
+                <p className="text-sm text-ink-faint mb-4">
+                  Perguntas prováveis com base na vaga e no seu perfil:
+                </p>
+                <div className="flex flex-col gap-3">
+                  {r.perguntas_entrevista.map((p, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="w-6 h-6 rounded-full bg-sky-tint border border-sky text-sky-deep text-xs flex items-center justify-center shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <p className="text-sm text-ink leading-relaxed">{p}</p>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            )}
           </section>
         )}
       </main>

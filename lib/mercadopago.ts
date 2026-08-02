@@ -1,18 +1,18 @@
-interface CriarPreferenciaParams {
-  planoTitulo: string;
-  valorCentavos: number;
-  userId: string;
-  planoId: string;
-  urlBase: string;
+const MP_API = 'https://api.mercadopago.com';
+
+interface CriarAssinaturaParams {
+  email: string;
+  valor: number;
+  motivo: string;
+  externalReference: string;
 }
 
-export async function criarPreferenciaMercadoPago({
-  planoTitulo,
-  valorCentavos,
-  userId,
-  planoId,
-  urlBase,
-}: CriarPreferenciaParams): Promise<{ init_point: string }> {
+export async function criarAssinaturaMercadoPago({
+  email,
+  valor,
+  motivo,
+  externalReference,
+}: CriarAssinaturaParams): Promise<{ init_point: string; id: string }> {
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
   if (!accessToken) {
@@ -21,51 +21,48 @@ export async function criarPreferenciaMercadoPago({
     );
   }
 
-  const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://mentoria-pi-taupe.vercel.app';
+
+  const response = await fetch(`${MP_API}/preapproval`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      items: [
-        {
-          title: planoTitulo,
-          quantity: 1,
-          unit_price: valorCentavos / 100,
-          currency_id: 'BRL',
-        },
-      ],
-      back_urls: {
-        success: `${urlBase}/assinatura?status=sucesso`,
-        pending: `${urlBase}/assinatura?status=pendente`,
-        failure: `${urlBase}/assinatura?status=falhou`,
+      reason: motivo,
+      external_reference: externalReference,
+      payer_email: email,
+      back_url: `${appUrl}/dashboard`,
+      auto_recurring: {
+        frequency: 1,
+        frequency_type: 'months',
+        transaction_amount: valor,
+        currency_id: 'BRL',
       },
-      auto_return: 'approved',
-      notification_url: `${urlBase}/api/webhooks/mercadopago`,
-      external_reference: JSON.stringify({ userId, planoId }),
+      status: 'pending',
     }),
   });
 
   if (!response.ok) {
     const detalhe = await response.text();
-    throw new Error(`Erro ao criar cobrança no Mercado Pago: ${response.status} ${detalhe}`);
+    throw new Error(`Erro ao criar assinatura no Mercado Pago: ${response.status} ${detalhe}`);
   }
 
   const data = await response.json();
-  return { init_point: data.init_point };
+  return { init_point: data.init_point, id: data.id };
 }
 
-export async function buscarPagamentoMercadoPago(paymentId: string) {
+export async function buscarPreapprovalMercadoPago(id: string) {
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!accessToken) throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado.');
 
-  const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+  const response = await fetch(`${MP_API}/preapproval/${id}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!response.ok) {
-    throw new Error(`Erro ao buscar pagamento no Mercado Pago: ${response.status}`);
+    throw new Error(`Erro ao buscar assinatura no Mercado Pago: ${response.status}`);
   }
 
   return response.json();

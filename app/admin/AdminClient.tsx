@@ -40,7 +40,7 @@ export default function AdminClient({
 
   async function atualizarPagamento(
     userId: string,
-    campo: 'status_pagamento' | 'data_fim_acesso',
+    campo: 'status_assinatura' | 'proxima_cobranca' | 'observacao_pagamento',
     valor: string
   ) {
     setLinhas((prev) =>
@@ -58,12 +58,13 @@ export default function AdminClient({
     await supabase
       .from('profiles')
       .update({
-        status_pagamento: linha.profile.status_pagamento,
-        data_fim_acesso: linha.profile.data_fim_acesso || null,
+        status_assinatura: linha.profile.status_assinatura,
+        proxima_cobranca: linha.profile.proxima_cobranca || null,
+        observacao_pagamento: linha.profile.observacao_pagamento || null,
       })
       .eq('id', userId);
     setSalvandoId(null);
-    posthog.capture('status_pagamento_atualizado', { status: linha.profile.status_pagamento });
+    posthog.capture('status_assinatura_atualizado', { status: linha.profile.status_assinatura });
   }
 
   const total = linhas.length;
@@ -218,7 +219,13 @@ export default function AdminClient({
         </section>
 
         <section>
-          <Eyebrow>Status de pagamento</Eyebrow>
+          <Eyebrow>Status de assinatura</Eyebrow>
+          <p className="text-xs text-ink-faint mb-4">
+            Alunos atuais entraram como "manual" (já pagaram fora do sistema). Novos
+            cadastros entram automaticamente como "mercadopago", e o status muda sozinho
+            conforme os pagamentos chegam. Quando o status vira "encerrado", a pessoa é
+            redirecionada para a tela de renovação em qualquer acesso.
+          </p>
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead>
@@ -227,10 +234,16 @@ export default function AdminClient({
                     Nome
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    Origem
+                  </th>
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Status
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Acesso até
+                    Próxima cobrança
+                  </th>
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    Observação
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide" />
                 </tr>
@@ -240,10 +253,21 @@ export default function AdminClient({
                   <tr key={l.profile.id} className="border-b border-line last:border-0 bg-cream">
                     <td className="px-4 py-3 text-ink">{l.profile.nome}</td>
                     <td className="px-4 py-3">
+                      <span
+                        className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                          l.profile.origem_assinatura === 'manual'
+                            ? 'bg-[#f1e6d6] text-brown border border-brown/30'
+                            : 'bg-sky-tint text-sky-deep border border-sky'
+                        }`}
+                      >
+                        {l.profile.origem_assinatura === 'manual' ? 'Manual' : 'Mercado Pago'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
                       <select
-                        value={l.profile.status_pagamento}
+                        value={l.profile.status_assinatura}
                         onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'status_pagamento', e.target.value)
+                          atualizarPagamento(l.profile.id, 'status_assinatura', e.target.value)
                         }
                         className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink"
                       >
@@ -255,11 +279,22 @@ export default function AdminClient({
                     <td className="px-4 py-3">
                       <input
                         type="date"
-                        value={l.profile.data_fim_acesso ?? ''}
+                        value={l.profile.proxima_cobranca ?? ''}
                         onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'data_fim_acesso', e.target.value)
+                          atualizarPagamento(l.profile.id, 'proxima_cobranca', e.target.value)
                         }
                         className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={l.profile.observacao_pagamento ?? ''}
+                        onChange={(e) =>
+                          atualizarPagamento(l.profile.id, 'observacao_pagamento', e.target.value)
+                        }
+                        placeholder="Nota opcional..."
+                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink w-40"
                       />
                     </td>
                     <td className="px-4 py-3">

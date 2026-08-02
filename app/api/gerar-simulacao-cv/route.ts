@@ -26,7 +26,9 @@ export async function POST(request: Request) {
 
   try {
     const prompt = montarPromptSimuladorCV(curriculo, vaga);
-    const resultado = await chamarClaude(prompt, 4000);
+    const respostaTexto = await chamarClaude(prompt, 4000);
+    const limpo = respostaTexto.replace(/```json|```/g, '').trim();
+    const resultadoJson = JSON.parse(limpo);
 
     const { data: simulacao, error } = await supabase
       .from('cv_simulacoes')
@@ -34,7 +36,8 @@ export async function POST(request: Request) {
         user_id: user.id,
         curriculo_texto: curriculo,
         vaga_texto: vaga,
-        resultado_markdown: resultado,
+        resultado_markdown: resultadoJson.curriculo_final_markdown ?? '',
+        resultado_json: resultadoJson,
       })
       .select()
       .single();

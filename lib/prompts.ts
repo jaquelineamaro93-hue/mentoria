@@ -186,29 +186,23 @@ export function montarPromptSimuladorCV(curriculo: string, vaga: string): string
 
 ${REGRAS_DE_ESTILO}
 
-Analise o currículo e a vaga desejada abaixo para criar um currículo implacável e uma carta de apresentação perfeita. Siga rigorosamente esta ordem, mostrando o raciocínio de cada passo antes de entregar o produto final.
+Analise o currículo e a vaga desejada abaixo. Faça o raciocínio completo internamente (rejeição silenciosa, otimização ATS, bullets de resultado, resumo profissional, auditoria), mas responda **apenas** com um JSON estrito, sem markdown ao redor, sem texto antes ou depois, no formato exato abaixo.
 
-## Passo 1: Análise de Rejeição Silenciosa
-Liste os 10 motivos que levariam um especialista de RH a rejeitar este currículo em 6 segundos, do mais perigoso ao menos perigoso. Para cada um: onde está o erro, por que é motivo de rejeição, e qual seria a versão corrigida. Seja direto e implacável na crítica.
-
-## Passo 2: Otimização para ATS
-Detecte as palavras-chave da vaga ausentes no currículo, mostre onde adicionar cada uma naturalmente, e dê uma pontuação de compatibilidade antes e depois, numa escala de 0 a 100.
-
-## Passo 3: Bullet Points de Resultados
-Reescreva cada experiência profissional trocando descrições de tarefas por resultados de alto impacto, no formato verbo de ação forte mais conquista concreta mais métrica de negócio. Mostre antes e depois lado a lado. Se não houver números explícitos no texto original, estime um valor lógico com base no contexto e sinalize que é uma estimativa.
-
-## Passo 4: Resumo Profissional
-Escreva 5 versões diferentes do resumo profissional, cada uma com no máximo 3 linhas, com posicionamento forte, um resultado concreto e uma direção clara de carreira. Evite clichês como "profissional ambicioso" ou "pioneiro".
-
-## Passo 5: Auditoria e Reajuste
-Antes de entregar a versão final, audite tudo: o currículo final ultrapassa 2 páginas? Se sim, corte redundâncias. A narrativa está coesa e voltada para os problemas da empresa? Ajuste internamente com base nesses pontos antes de seguir para o passo 6.
-
-## Passo 6: Produto Final
-Entregue dois documentos prontos:
-
-**Currículo Personalizado Final**: versão definitiva, com as palavras-chave de ATS incluídas, bullet points de resultado, o melhor resumo adaptado ao cargo, limite máximo de 2 páginas, sem nada que não agregue valor.
-
-**Carta de Apresentação Estratégica**: identifique os 3 problemas mais críticos que a vaga revela que a empresa quer resolver, e escreva uma carta de no máximo 200 palavras conectando a experiência da pessoa a cada um desses problemas, com abertura forte, provas concretas de resultado e uma chamada clara para entrevista.
+{
+  "fit_percentual": número de 0 a 100 representando a compatibilidade real entre o currículo e a vaga,
+  "fit_label": "Fit baixo" ou "Fit médio" ou "Fit alto", de acordo com o percentual,
+  "pontos_fortes": array com 3 frases curtas sobre o que já está alinhado entre currículo e vaga,
+  "pontos_atencao": array com 3 frases curtas sobre lacunas reais entre currículo e vaga,
+  "faixa_salarial_estimada": string curta, ex: "R$ 6.000 - R$ 9.500/mês", estimada com base no cargo e senioridade da vaga,
+  "sabotadores": array com exatamente 6 objetos, do mais grave ao menos grave, cada um com:
+    "titulo": nome curto do problema,
+    "motivo": por que isso faz um recrutador rejeitar o currículo em segundos,
+    "correcao": a versão corrigida ou o que fazer,
+  "palavras_chave_ausentes": array com as palavras-chave da vaga que faltam no currículo e deveriam ser incluídas,
+  "curriculo_final_markdown": string em markdown com o currículo reescrito, completo, pronto pra uso, com bullets de resultado e o melhor resumo profissional adaptado ao cargo, limite de 2 páginas,
+  "carta_apresentacao_markdown": string em markdown com a carta de apresentação estratégica, no máximo 200 palavras, conectando a experiência da pessoa aos problemas que a vaga revela,
+  "perguntas_entrevista": array com 5 perguntas prováveis de entrevista com base na vaga e no perfil da pessoa
+}
 
 CURRÍCULO ATUAL:
 ${curriculo}

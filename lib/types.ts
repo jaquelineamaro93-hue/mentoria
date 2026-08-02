@@ -12,8 +12,9 @@ export interface Profile {
   pontos_total: number;
   is_admin: boolean;
   last_login_at: string | null;
-  status_pagamento: 'ativo' | 'inadimplente' | 'encerrado';
-  data_fim_acesso: string | null;
+  status_assinatura: 'ativo' | 'inadimplente' | 'encerrado';
+  origem_assinatura: 'manual' | 'mercadopago';
+  proxima_cobranca: string | null;
   observacao_pagamento: string | null;
   created_at: string;
   updated_at: string;
@@ -161,15 +162,6 @@ export interface TermoAceite {
   aceito_em: string;
 }
 
-export interface Plano {
-  id: string;
-  titulo: string;
-  descricao: string | null;
-  valor_centavos: number;
-  duracao_dias: number;
-  ativo: boolean;
-}
-
 export interface Pagamento {
   id: string;
   user_id: string;
@@ -195,12 +187,26 @@ export interface PeerFeedback {
   created_at: string;
 }
 
+export interface CvSimulacaoResultado {
+  fit_percentual: number;
+  fit_label: string;
+  pontos_fortes: string[];
+  pontos_atencao: string[];
+  faixa_salarial_estimada: string;
+  sabotadores: { titulo: string; motivo: string; correcao: string }[];
+  palavras_chave_ausentes: string[];
+  curriculo_final_markdown: string;
+  carta_apresentacao_markdown: string;
+  perguntas_entrevista: string[];
+}
+
 export interface CvSimulacao {
   id: string;
   user_id: string;
   curriculo_texto: string;
   vaga_texto: string;
   resultado_markdown: string;
+  resultado_json: CvSimulacaoResultado | null;
   created_at: string;
 }
 

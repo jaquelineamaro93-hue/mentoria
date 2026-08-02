@@ -24,7 +24,27 @@ export async function proxy(request: NextRequest) {
   );
 
   // Mantém a sessão renovada (importante para Server Components)
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const path = request.nextUrl.pathname;
+  const rotaLiberada =
+    path.startsWith('/login') || path === '/renovar' || path.startsWith('/api');
+
+  if (user && !rotaLiberada) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('status_assinatura, is_admin')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (profile && !profile.is_admin && profile.status_assinatura === 'encerrado') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/renovar';
+      return NextResponse.redirect(url);
+    }
+  }
 
   return supabaseResponse;
 }
