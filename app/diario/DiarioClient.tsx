@@ -150,7 +150,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
               </label>
 
               {erro && (
-                <p className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-md px-4 py-2.5">
+                <p className="text-sm text-red-700 bg-red-50 border border-red-300 rounded-md px-4 py-2.5">
                   {erro}
                 </p>
               )}
@@ -184,7 +184,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                         className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide px-2 py-1 rounded-full border ${
                           note.tipo_encontro === 'individual'
                             ? 'bg-sky-tint border-sky text-brown-deep'
-                            : 'bg-blue-500/10 border-blue-500/30 text-blue-300'
+                            : 'bg-sky-tint border-sky text-sky-deep'
                         }`}
                       >
                         {note.tipo_encontro === 'individual' ? (

@@ -54,6 +54,9 @@ export default function LoginPage() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
+      options: {
+        data: { nome, tipo_pacote: tipoPacote },
+      },
     });
 
     if (error) {
@@ -64,12 +67,11 @@ export default function LoginPage() {
     }
 
     if (data.user) {
-      await supabase.from('profiles').insert({
-        id: data.user.id,
-        nome,
-        email,
-        tipo_pacote: tipoPacote,
-      });
+      // O perfil é criado automaticamente por um trigger no banco a partir
+      // dos metadados enviados acima (nome, tipo_pacote), então não
+      // precisamos (e não devemos) inserir manualmente aqui: se a sessão
+      // ainda não estiver confirmada, esse insert falharia por RLS sem
+      // que o usuário percebesse.
       identificarMentorado(data.user.id, { email, nome, tipo_pacote: tipoPacote });
       posthog.capture('cadastro_realizado', { tipo_pacote: tipoPacote });
     }
@@ -266,8 +268,8 @@ function Alert({ tipo, children }: { tipo: 'erro' | 'sucesso'; children: React.R
     <div
       className={`text-sm rounded-md px-4 py-3 border ${
         isErro
-          ? 'bg-red-500/10 border-red-500/30 text-red-300'
-          : 'bg-green-500/10 border-green-500/30 text-green-300'
+          ? 'bg-red-50 border-red-300 text-red-700'
+          : 'bg-green-50 border-green-300 text-green-700'
       }`}
     >
       {children}

@@ -141,6 +141,21 @@ export interface ResumoPerfil {
   gerado_em: string;
 }
 
+export interface TermoVersao {
+  id: string;
+  versao: string;
+  titulo: string;
+  conteudo_markdown: string;
+  publicado_em: string;
+}
+
+export interface TermoAceite {
+  id: string;
+  user_id: string;
+  termo_id: string;
+  aceito_em: string;
+}
+
 export interface Announcement {
   id: string;
   titulo: string;

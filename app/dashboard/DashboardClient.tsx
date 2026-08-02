@@ -59,7 +59,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
             <p className="text-xs uppercase tracking-[0.2em] text-ink-faint mb-1">
               Bem-vinda de volta
             </p>
-            <h1 className="font-display text-3xl sm:text-4xl text-ink">{primeiroNome}</h1>
+            <h1 className="font-display text-3xl sm:text-4xl text-brown-deep">{primeiroNome}</h1>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[11px] uppercase tracking-wide bg-sky-tint border border-sky text-brown-deep px-2.5 py-1 rounded-full">
                 Pacote {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
@@ -67,8 +67,8 @@ export default function DashboardClient({ profile, announcements }: Props) {
               <span
                 className={`flex items-center gap-1 text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full border ${
                   profile?.onboarding_concluido
-                    ? 'bg-green-500/10 border-green-500/30 text-green-300'
-                    : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                    ? 'bg-green-50 border-green-300 text-green-700'
+                    : 'bg-amber-50 border-amber-300 text-amber-700'
                 }`}
               >
                 {profile?.onboarding_concluido ? (
@@ -93,59 +93,19 @@ export default function DashboardClient({ profile, announcements }: Props) {
               Nenhum aviso no momento. Fica de olho: novidades sobre encontros aparecem aqui.
             </Panel>
           ) : (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {announcements.map((a) => (
-                <Panel key={a.id} className="p-5">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <span
-                      className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide px-2 py-1 rounded-full border shrink-0 ${
-                        a.tipo === 'individual'
-                          ? 'bg-sky-tint border-sky text-brown-deep'
-                          : a.tipo === 'grupo'
-                            ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
-                            : 'bg-cream border-line text-ink-faint'
-                      }`}
-                    >
-                      {a.tipo === 'individual' ? (
-                        <UserIcon size={11} />
-                      ) : (
-                        <Users size={11} />
-                      )}
-                      {a.tipo === 'individual'
-                        ? 'Sessão individual'
-                        : a.tipo === 'grupo'
-                          ? 'Encontro em grupo'
-                          : 'Geral'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-ink mb-1">{a.titulo}</p>
-                  {a.descricao && (
-                    <p className="text-sm text-ink-faint mb-2">{a.descricao}</p>
-                  )}
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-xs text-ink-faint">
-                      {a.data_evento
-                        ? new Date(a.data_evento).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : 'Data a definir'}
-                    </span>
-                    {a.link_url && (
-                      <a
-                        href={a.link_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-brown-deep hover:text-brown-deep transition-colors"
-                      >
-                        Acessar <ExternalLink size={12} />
-                      </a>
-                    )}
-                  </div>
-                </Panel>
-              ))}
+            <div className="flex flex-col gap-6">
+              <MuralGrupo
+                titulo="Avisos gerais"
+                itens={announcements.filter((a) => a.tipo === 'geral' || !a.tipo)}
+              />
+              <MuralGrupo
+                titulo="Sessões individuais"
+                itens={announcements.filter((a) => a.tipo === 'individual')}
+              />
+              <MuralGrupo
+                titulo="Próximos encontros em grupo"
+                itens={announcements.filter((a) => a.tipo === 'grupo')}
+              />
             </div>
           )}
         </section>
@@ -202,6 +162,64 @@ export default function DashboardClient({ profile, announcements }: Props) {
           </div>
         </section>
       </main>
+    </div>
+  );
+}
+
+function MuralGrupo({ titulo, itens }: { titulo: string; itens: Announcement[] }) {
+  if (itens.length === 0) return null;
+
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wide text-ink-faint mb-2.5">{titulo}</p>
+      <div className="grid sm:grid-cols-2 gap-3">
+        {itens.map((a) => (
+          <Panel key={a.id} className="p-5">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <span
+                className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide px-2 py-1 rounded-full border shrink-0 ${
+                  a.tipo === 'individual'
+                    ? 'bg-sky-tint border-sky text-brown-deep'
+                    : a.tipo === 'grupo'
+                      ? 'bg-sky-tint border-sky text-sky-deep'
+                      : 'bg-cream border-line text-ink-faint'
+                }`}
+              >
+                {a.tipo === 'individual' ? <UserIcon size={11} /> : <Users size={11} />}
+                {a.tipo === 'individual'
+                  ? 'Sessão individual'
+                  : a.tipo === 'grupo'
+                    ? 'Encontro em grupo'
+                    : 'Geral'}
+              </span>
+            </div>
+            <p className="text-sm text-ink mb-1">{a.titulo}</p>
+            {a.descricao && <p className="text-sm text-ink-faint mb-2">{a.descricao}</p>}
+            <div className="flex items-center justify-between mt-3">
+              <span className="text-xs text-ink-faint">
+                {a.data_evento
+                  ? new Date(a.data_evento).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : 'Data a definir'}
+              </span>
+              {a.link_url && (
+                <a
+                  href={a.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-brown-deep hover:text-brown-deep transition-colors"
+                >
+                  Acessar <ExternalLink size={12} />
+                </a>
+              )}
+            </div>
+          </Panel>
+        ))}
+      </div>
     </div>
   );
 }

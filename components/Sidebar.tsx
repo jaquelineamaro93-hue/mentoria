@@ -84,6 +84,12 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
             </div>
           </div>
         )}
+        <Link
+          href="/termos"
+          className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors mb-3"
+        >
+          Termos da mentoria
+        </Link>
         <button
           onClick={onSignOut}
           className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors"
