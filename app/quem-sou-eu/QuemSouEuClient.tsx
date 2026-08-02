@@ -181,7 +181,7 @@ export default function QuemSouEuClient({
           </div>
         </div>
 
-        <main className="flex-1 px-6 py-10 md:px-12 max-w-3xl xl:max-w-4xl">
+        <main className="flex-1 px-6 py-10 md:px-12 max-w-4xl xl:max-w-5xl">
           <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
             Mapa Quem Sou Eu · bloco {passo + 1} de {totalBlocos}
           </p>

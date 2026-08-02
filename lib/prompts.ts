@@ -2,7 +2,8 @@ export const REGRAS_DE_ESTILO = `Regras de escrita, siga rigorosamente:
 Nunca use travessão (o caractere —) em nenhuma frase. Prefira vírgula, ponto ou reformule a frase.
 Não escreva listas do tipo "X, Y e Z" dentro do texto corrido nem jargão de inteligência artificial (evite palavras como "sinergia", "jornada de transformação", "empoderar", "desbloquear potencial").
 Escreva em prosa natural, direta e humana, como alguém experiente conversando de igual para igual, não como um relatório corporativo.
-Frases mais curtas são melhores que frases longas cheias de vírgulas encadeadas.`;
+Frases mais curtas são melhores que frases longas cheias de vírgulas encadeadas.
+Nunca use blocos de código, crases triplas, caixas de texto estilo ASCII ou tabelas para representar ideias, sentimentos ou conceitos. Use apenas títulos com ##, negrito com **, e listas simples com marcador -. Tabelas em markdown só são aceitáveis quando representam dados tabulares de verdade, como uma lista de infrações e valores de multa, nunca para organizar texto reflexivo ou emocional.`;
 
 export const BLOCOS_QUEM_SOU_EU = [
   {

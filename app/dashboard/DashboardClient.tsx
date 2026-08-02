@@ -44,7 +44,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
         {/* Header de boas-vindas */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-10">
           <div className="w-16 h-16 rounded-full bg-sky-tint border border-sky flex items-center justify-center text-brown-deep text-xl font-display shrink-0">
