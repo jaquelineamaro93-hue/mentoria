@@ -180,7 +180,7 @@ export default function QuemSouEuClient({
           </div>
         </div>
 
-        <main className="flex-1 px-6 py-10 md:px-12 max-w-2xl">
+        <main className="flex-1 px-6 py-10 md:px-12 max-w-3xl xl:max-w-4xl">
           <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
             Mapa Quem Sou Eu · bloco {passo + 1} de {totalBlocos}
           </p>
@@ -275,9 +275,23 @@ export default function QuemSouEuClient({
                   </button>
                 </Panel>
               ) : (
-                <Panel className="p-6 mb-4 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
-                  <ReactMarkdown>{mapa.conteudo_markdown}</ReactMarkdown>
-                </Panel>
+                <>
+                  <Panel className="p-6 mb-3 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
+                    <ReactMarkdown>{mapa.conteudo_markdown}</ReactMarkdown>
+                  </Panel>
+                  <button
+                    onClick={gerarMapa}
+                    disabled={gerandoMapa}
+                    className="flex items-center gap-1.5 text-xs text-ink-faint hover:text-brown transition-colors mb-4"
+                  >
+                    {gerandoMapa ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={12} />
+                    )}
+                    Gerar novamente
+                  </button>
+                </>
               )}
 
               {mapa && !bussola && (
@@ -305,17 +319,31 @@ export default function QuemSouEuClient({
               )}
 
               {bussola && (
-                <div className="grid sm:grid-cols-2 gap-3 mt-4">
-                  <BussolaCard titulo="Norte · Essência" texto={bussola.norte} />
-                  <BussolaCard titulo="Sul · Propósito" texto={bussola.sul} />
-                  <BussolaCard titulo="Leste · Energia" texto={bussola.leste} />
-                  <BussolaCard titulo="Oeste · Mensagem" texto={bussola.oeste} />
-                  <BussolaCard
-                    titulo="Centro · Presença"
-                    texto={bussola.centro}
-                    className="sm:col-span-2"
-                  />
-                </div>
+                <>
+                  <div className="grid sm:grid-cols-2 gap-3 mt-4">
+                    <BussolaCard titulo="Norte · Essência" texto={bussola.norte} />
+                    <BussolaCard titulo="Sul · Propósito" texto={bussola.sul} />
+                    <BussolaCard titulo="Leste · Energia" texto={bussola.leste} />
+                    <BussolaCard titulo="Oeste · Mensagem" texto={bussola.oeste} />
+                    <BussolaCard
+                      titulo="Centro · Presença"
+                      texto={bussola.centro}
+                      className="sm:col-span-2"
+                    />
+                  </div>
+                  <button
+                    onClick={gerarBussola}
+                    disabled={gerandoBussola}
+                    className="flex items-center gap-1.5 text-xs text-ink-faint hover:text-brown transition-colors mt-3"
+                  >
+                    {gerandoBussola ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Compass size={12} />
+                    )}
+                    Gerar novamente
+                  </button>
+                </>
               )}
             </section>
           )}

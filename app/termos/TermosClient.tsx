@@ -31,7 +31,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-10 md:px-12 max-w-2xl">
+      <main className="flex-1 px-6 py-10 md:px-12 max-w-4xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
           Consulta
         </p>

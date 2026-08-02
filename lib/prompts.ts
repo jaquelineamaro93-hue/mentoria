@@ -1,3 +1,9 @@
+export const REGRAS_DE_ESTILO = `Regras de escrita, siga rigorosamente:
+Nunca use travessão (o caractere —) em nenhuma frase. Prefira vírgula, ponto ou reformule a frase.
+Não escreva listas do tipo "X, Y e Z" dentro do texto corrido nem jargão de inteligência artificial (evite palavras como "sinergia", "jornada de transformação", "empoderar", "desbloquear potencial").
+Escreva em prosa natural, direta e humana, como alguém experiente conversando de igual para igual, não como um relatório corporativo.
+Frases mais curtas são melhores que frases longas cheias de vírgulas encadeadas.`;
+
 export const BLOCOS_QUEM_SOU_EU = [
   {
     codigo: 'valores_crencas',
@@ -90,6 +96,8 @@ export function montarPromptMapaEssencia(respostas: Record<string, string>): str
 
   return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA.
 
+${REGRAS_DE_ESTILO}
+
 Abaixo estão as respostas mapeadas para os 9 pontos de investigação profunda sobre a trajetória e identidade da pessoa. Sua única tarefa é organizar todas essas informações no MAPA DE QUEM SOU EU.
 
 Estruture-o visualmente em formato Markdown, como um mapa mental detalhado, criando categorias e ramos claros que agrupem e sintetizem cada uma das 9 áreas exploradas, sem perder a profundidade e a emoção das palavras originais.
@@ -105,6 +113,8 @@ export function montarPromptBussola(respostas: Record<string, string>): string {
   ).join('\n\n');
 
   return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA.
+
+${REGRAS_DE_ESTILO}
 
 A partir das informações mapeadas sobre a essência e trajetória da pessoa, sua tarefa é construir a Bússola de Posicionamento dela, transformando autoconhecimento em narrativa estratégica de mercado.
 
@@ -145,6 +155,8 @@ export function montarPromptResumoPerfil(dados: {
     : '(VIA ainda não preenchido)';
 
   return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA.
+
+${REGRAS_DE_ESTILO}
 
 Você vai cruzar três fontes de dados sobre uma pessoa (Mapa Quem Sou Eu, Diagnóstico de carreira e VIA Character Strengths) e produzir um RESUMO DE PERFIL objetivo, em formato Markdown, estruturado como uma matriz de quatro blocos:
 
@@ -209,6 +221,8 @@ export function montarPromptAnaliseVia(forcasOrdenadas: string[]): string {
     .join('\n');
 
   return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA, especialista em VIA Character Strengths.
+
+${REGRAS_DE_ESTILO}
 
 O objetivo desta análise não é apenas dizer no que a pessoa é boa, é mostrar a dinâmica de energia dela. O resultado abaixo lista 24 forças de caráter, da mais natural (1ª, força de assinatura) à que exige mais esforço racional (24ª, força escondida).
 

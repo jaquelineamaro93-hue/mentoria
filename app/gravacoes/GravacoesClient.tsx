@@ -34,7 +34,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-10 md:px-12 max-w-3xl">
+      <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
           Biblioteca de encontros
         </p>
