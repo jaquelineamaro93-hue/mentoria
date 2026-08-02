@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import RenovarClient from './RenovarClient';
-import type { Profile } from '@/lib/types';
+import type { PlanoMentoria, Profile } from '@/lib/types';
 
 export default async function RenovarPage() {
   const supabase = await createClient();
@@ -19,5 +19,12 @@ export default async function RenovarPage() {
     .eq('id', user.id)
     .single<Profile>();
 
-  return <RenovarClient profile={profile} />;
+  const { data: planos } = await supabase
+    .from('planos_mentoria')
+    .select('*')
+    .eq('ativo', true)
+    .order('ordem')
+    .returns<PlanoMentoria[]>();
+
+  return <RenovarClient profile={profile} planos={planos ?? []} />;
 }

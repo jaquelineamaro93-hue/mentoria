@@ -211,6 +211,22 @@ export interface CvSimulacao {
   created_at: string;
 }
 
+export interface PlanoMentoria {
+  id: string;
+  codigo: string;
+  nome: string;
+  duracao_meses: number;
+  foco: string | null;
+  preco_avista: number;
+  preco_cartao: number;
+  preco_recorrente_total: number;
+  parcelas_recorrente: number;
+  descricao_encontros: string | null;
+  itens_inclusos: string[];
+  ativo: boolean;
+  ordem: number;
+}
+
 export interface Announcement {
   id: string;
   titulo: string;

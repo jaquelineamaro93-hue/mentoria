@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -29,6 +29,41 @@ export default function AdminClient({
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
+  const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
+
+  async function entrarComoUsuario(userId: string, nome: string) {
+    const confirmado = window.confirm(
+      `Você vai sair da sua conta admin e entrar como ${nome}. Sua sessão de admin vai ser substituída, pra voltar a ser você mesma, saia e faça login de novo com seu e-mail. Confirma?`
+    );
+    if (!confirmado) return;
+
+    setEntrandoComoId(userId);
+
+    try {
+      const res = await fetch('/api/admin/gerar-link-impersonacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      const { error } = await supabase.auth.verifyOtp({
+        email: data.email,
+        token_hash: data.tokenHash,
+        type: 'magiclink',
+      });
+
+      if (error) throw error;
+
+      posthog.capture('admin_entrou_como_usuario', { usuario_alvo: userId });
+      router.push('/dashboard');
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Não foi possível entrar como esse usuário.');
+      setEntrandoComoId(null);
+    }
+  }
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -156,6 +191,7 @@ export default function AdminClient({
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide text-center">
                     Pontos
                   </th>
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide" />
                 </tr>
               </thead>
               <tbody>
@@ -210,6 +246,20 @@ export default function AdminClient({
                     </td>
                     <td className="px-4 py-3 text-center text-brown-deep font-medium">
                       {l.profile.pontos_total}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => entrarComoUsuario(l.profile.id, l.profile.nome)}
+                        disabled={entrandoComoId === l.profile.id}
+                        className="flex items-center gap-1.5 text-xs text-sky-deep hover:text-brown-deep transition-colors whitespace-nowrap disabled:opacity-60"
+                      >
+                        {entrandoComoId === l.profile.id ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <LogIn size={12} />
+                        )}
+                        Entrar como
+                      </button>
                     </td>
                   </tr>
                 ))}
