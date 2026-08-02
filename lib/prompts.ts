@@ -127,6 +127,47 @@ MATÉRIA-PRIMA:
 ${partes}`;
 }
 
+export function montarPromptResumoPerfil(dados: {
+  quemSouEu: Record<string, string>;
+  diagnostico: { momento_carreira?: string; objetivos?: string; forcas?: string[] } | null;
+  via: { forcas: string[]; analise: string | null } | null;
+}): string {
+  const partesQuemSouEu = BLOCOS_QUEM_SOU_EU.map(
+    (b) => `${b.titulo}: ${dados.quemSouEu[b.codigo] ?? '(não respondido)'}`
+  ).join('\n');
+
+  const diagnosticoTexto = dados.diagnostico
+    ? `Momento de carreira: ${dados.diagnostico.momento_carreira ?? '(não informado)'}\nObjetivos: ${dados.diagnostico.objetivos ?? '(não informado)'}\nPontos fortes selecionados: ${(dados.diagnostico.forcas ?? []).join(', ') || '(nenhum)'}`
+    : '(diagnóstico ainda não preenchido)';
+
+  const viaTexto = dados.via
+    ? `Forças de assinatura (1ª a 5ª): ${dados.via.forcas.slice(0, 5).join(', ')}\nForças escondidas (21ª a 24ª): ${dados.via.forcas.slice(20, 24).join(', ')}`
+    : '(VIA ainda não preenchido)';
+
+  return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA.
+
+Você vai cruzar três fontes de dados sobre uma pessoa (Mapa Quem Sou Eu, Diagnóstico de carreira e VIA Character Strengths) e produzir um RESUMO DE PERFIL objetivo, em formato Markdown, estruturado como uma matriz de quatro blocos:
+
+**Características centrais**: 4 a 6 bullet points sobre quem essa pessoa é, na essência, cruzando os dados.
+
+**Pontos fortes**: 4 a 6 bullet points sobre onde ela já é forte e deve se apoiar.
+
+**Pontos de atenção**: 3 a 5 bullet points sobre o que pode ser um obstáculo ou lado sombra se não for gerenciado.
+
+**Onde atuar agora**: 3 a 5 bullet points objetivos e acionáveis sobre em que direção de carreira focar nos próximos meses.
+
+Tom: direto, sem jargão, como uma mentora experiente resumindo uma sessão de diagnóstico. Frases curtas, cada bullet com no máximo 2 linhas.
+
+DADOS DO MAPA QUEM SOU EU:
+${partesQuemSouEu}
+
+DADOS DO DIAGNÓSTICO:
+${diagnosticoTexto}
+
+DADOS DO VIA:
+${viaTexto}`;
+}
+
 export const VIA_FORCAS = [
   'Criatividade',
   'Curiosidade',

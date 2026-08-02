@@ -40,7 +40,15 @@ export default function QuemSouEuClient({
   });
 
   const [respostas, setRespostas] = useState<Record<string, string>>(respostasMap);
-  const [passo, setPasso] = useState(0);
+  const primeiroNaoRespondido = BLOCOS_QUEM_SOU_EU.findIndex(
+    (b) => !respostasMap[b.codigo]?.trim()
+  );
+  const [passo, setPasso] = useState(
+    primeiroNaoRespondido === -1 ? BLOCOS_QUEM_SOU_EU.length - 1 : primeiroNaoRespondido
+  );
+  const [blocosSalvos, setBlocosSalvos] = useState<Set<string>>(
+    new Set(respostasIniciais.map((r) => r.bloco))
+  );
   const [salvando, setSalvando] = useState(false);
   const [gerandoMapa, setGerandoMapa] = useState(false);
   const [gerandoBussola, setGerandoBussola] = useState(false);
@@ -50,7 +58,7 @@ export default function QuemSouEuClient({
 
   const bloco = BLOCOS_QUEM_SOU_EU[passo];
   const totalBlocos = BLOCOS_QUEM_SOU_EU.length;
-  const concluidos = Object.keys(respostas).length;
+  const concluidos = blocosSalvos.size;
   const todosRespondidos = concluidos >= totalBlocos;
 
   async function handleSignOut() {
@@ -61,12 +69,13 @@ export default function QuemSouEuClient({
     router.refresh();
   }
 
-  async function salvarBlocoAtual() {
+  async function salvarBlocoAtual(): Promise<boolean> {
     const texto = respostas[bloco.codigo]?.trim();
-    if (!texto) return;
+    if (!texto) return false;
 
     setSalvando(true);
-    await supabase.from('quem_sou_eu_respostas').upsert(
+    setErro(null);
+    const { error } = await supabase.from('quem_sou_eu_respostas').upsert(
       {
         user_id: userId,
         bloco: bloco.codigo,
@@ -75,12 +84,28 @@ export default function QuemSouEuClient({
       },
       { onConflict: 'user_id,bloco' }
     );
-    posthog.capture('quem_sou_eu_bloco_salvo', { bloco: bloco.codigo });
+
     setSalvando(false);
+
+    if (error) {
+      setErro('Não consegui salvar esse bloco. Confira sua internet e tente de novo.');
+      return false;
+    }
+
+    setBlocosSalvos((prev) => new Set(prev).add(bloco.codigo));
+    posthog.capture('quem_sou_eu_bloco_salvo', { bloco: bloco.codigo });
+    return true;
+  }
+
+  async function irParaBloco(indice: number) {
+    if (indice === passo) return;
+    await salvarBlocoAtual();
+    setPasso(indice);
   }
 
   async function irParaProximo() {
-    await salvarBlocoAtual();
+    const salvou = await salvarBlocoAtual();
+    if (!salvou) return;
     if (passo < totalBlocos - 1) {
       setPasso(passo + 1);
     }
@@ -127,12 +152,12 @@ export default function QuemSouEuClient({
           </p>
           <div className="flex flex-col gap-1">
             {BLOCOS_QUEM_SOU_EU.map((b, i) => {
-              const respondido = !!respostas[b.codigo];
+              const respondido = blocosSalvos.has(b.codigo);
               const ativo = i === passo;
               return (
                 <button
                   key={b.codigo}
-                  onClick={() => setPasso(i)}
+                  onClick={() => irParaBloco(i)}
                   className={`flex items-center gap-2.5 text-left px-3 py-2 rounded-lg text-[13px] transition-colors ${
                     ativo
                       ? 'bg-sky-tint text-brown-deep'
@@ -162,6 +187,12 @@ export default function QuemSouEuClient({
           <h1 className="font-display text-3xl text-brown-deep mb-1">{bloco.titulo}</h1>
           {bloco.subtitulo && (
             <p className="text-sm text-ink-faint mb-6">{bloco.subtitulo}</p>
+          )}
+
+          {erro && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-4 py-2.5 mb-6">
+              {erro}
+            </p>
           )}
 
           <Panel className="p-6 mb-8">

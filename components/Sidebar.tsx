@@ -8,6 +8,9 @@ import {
   NotebookPen,
   LogOut,
   Sparkles,
+  Target,
+  PlayCircle,
+  Award,
 } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 
@@ -15,7 +18,10 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Início', icon: LayoutDashboard },
   { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
+  { href: '/pdi', label: 'Meu PDI', icon: Target },
   { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
+  { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
+  { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
 ];
 
 interface SidebarProps {

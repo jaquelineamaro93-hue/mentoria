@@ -9,7 +9,9 @@ import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { VIA_FORCAS } from '@/lib/prompts';
-import type { Diagnostic, Profile, ViaResultado } from '@/lib/types';
+import { extrairTextoPdf } from '@/lib/pdf';
+import { Upload } from 'lucide-react';
+import type { Diagnostic, Profile, ResumoPerfil, ViaResultado } from '@/lib/types';
 
 interface Props {
   profile: Profile | null;
@@ -56,6 +58,54 @@ export default function ExerciciosClient({
   const [viaData, setViaData] = useState('');
   const [enviandoVia, setEnviandoVia] = useState(false);
   const [erroVia, setErroVia] = useState<string | null>(null);
+  const [extraindoPdf, setExtraindoPdf] = useState(false);
+
+  const [resumoPerfil, setResumoPerfil] = useState<ResumoPerfil | null>(null);
+  const [gerandoResumo, setGerandoResumo] = useState(false);
+  const [erroResumo, setErroResumo] = useState<string | null>(null);
+
+  async function handlePdfUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+
+    setExtraindoPdf(true);
+    setErroVia(null);
+    try {
+      const texto = await extrairTextoPdf(arquivo);
+      const res = await fetch('/api/extrair-via-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setViaForcas(data.forcas);
+      posthog.capture('via_pdf_extraido');
+    } catch (err) {
+      setErroVia(
+        err instanceof Error
+          ? err.message
+          : 'Não consegui ler esse PDF. Tente preencher manualmente.'
+      );
+    }
+    setExtraindoPdf(false);
+    e.target.value = '';
+  }
+
+  async function gerarResumoPerfil() {
+    setGerandoResumo(true);
+    setErroResumo(null);
+    try {
+      const res = await fetch('/api/gerar-resumo-perfil', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setResumoPerfil(data.resumo);
+      posthog.capture('resumo_perfil_gerado');
+    } catch (e) {
+      setErroResumo(e instanceof Error ? e.message : 'Não foi possível gerar o resumo agora.');
+    }
+    setGerandoResumo(false);
+  }
 
   async function enviarVia() {
     setEnviandoVia(true);
@@ -263,10 +313,29 @@ export default function ExerciciosClient({
                 ?
               </p>
               <p className="text-sm text-ink-faint mb-5">
-                Cole abaixo as 24 forças na ordem exata do seu resultado, da 1ª (mais natural)
-                à 24ª (mais escondida). A Jaque vai receber uma análise gerada a partir da sua
-                combinação única.
+                Envie o PDF do seu resultado (mais rápido) ou preencha manualmente as 24
+                forças na ordem exata, da 1ª (mais natural) à 24ª (mais escondida). A Jaque
+                vai receber uma análise gerada a partir da sua combinação única.
               </p>
+
+              <div className="flex items-center gap-3 mb-5 flex-wrap">
+                <label className="flex items-center gap-2 text-sm bg-sky-tint hover:bg-sky/20 text-sky-deep px-4 py-2.5 rounded-full cursor-pointer transition-colors">
+                  {extraindoPdf ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <Upload size={15} />
+                  )}
+                  {extraindoPdf ? 'Lendo o PDF...' : 'Enviar PDF do resultado'}
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    disabled={extraindoPdf}
+                    onChange={handlePdfUpload}
+                  />
+                </label>
+                <span className="text-xs text-ink-faint">ou preencha manualmente abaixo</span>
+              </div>
 
               <label className="flex flex-col gap-1.5 mb-4 max-w-[220px]">
                 <span className="text-xs uppercase tracking-wide text-ink-faint">
@@ -324,6 +393,47 @@ export default function ExerciciosClient({
                 )}
                 {enviandoVia ? 'Gerando análise...' : 'Salvar e gerar análise'}
               </button>
+            </Panel>
+          )}
+        </section>
+
+        {/* Resumo de Perfil */}
+        <section className="mb-10">
+          <Eyebrow>
+            <Compass size={13} /> Resumo de perfil
+          </Eyebrow>
+
+          {erroResumo && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-4 py-2.5 mb-4">
+              {erroResumo}
+            </p>
+          )}
+
+          {!resumoPerfil ? (
+            <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-ink mb-1">Cruzamento de tudo que você já preencheu</p>
+                <p className="text-sm text-ink-faint">
+                  A IA cruza seu Mapa Quem Sou Eu, o diagnóstico e o VIA para gerar um resumo
+                  com características, pontos fortes, pontos de atenção e onde focar agora.
+                </p>
+              </div>
+              <button
+                onClick={gerarResumoPerfil}
+                disabled={gerandoResumo}
+                className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+              >
+                {gerandoResumo ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Sparkles size={15} />
+                )}
+                {gerandoResumo ? 'Gerando...' : 'Gerar resumo de perfil'}
+              </button>
+            </Panel>
+          ) : (
+            <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink prose-strong:text-brown-deep">
+              <ReactMarkdown>{resumoPerfil.conteudo_markdown}</ReactMarkdown>
             </Panel>
           )}
         </section>
