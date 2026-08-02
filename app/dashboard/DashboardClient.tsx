@@ -194,7 +194,11 @@ function MuralGrupo({ titulo, itens }: { titulo: string; itens: Announcement[] }
               </span>
             </div>
             <p className="text-sm text-ink mb-1">{a.titulo}</p>
-            {a.descricao && <p className="text-sm text-ink-faint mb-2">{a.descricao}</p>}
+            {a.descricao && (
+              <p className="text-sm text-ink-faint mb-2 whitespace-pre-line leading-relaxed">
+                {a.descricao}
+              </p>
+            )}
             <div className="flex items-center justify-between mt-3">
               <span className="text-xs text-ink-faint">
                 {a.data_evento

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ArrowLeft, ArrowRight, Compass, Sparkles, Loader2, Check } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
@@ -277,7 +278,7 @@ export default function QuemSouEuClient({
               ) : (
                 <>
                   <Panel className="p-6 mb-3 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
-                    <ReactMarkdown>{mapa.conteudo_markdown}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{mapa.conteudo_markdown}</ReactMarkdown>
                   </Panel>
                   <button
                     onClick={gerarMapa}

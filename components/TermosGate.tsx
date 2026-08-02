@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import type { TermoVersao } from '@/lib/types';
@@ -12,6 +13,8 @@ export default function TermosGate() {
   const [precisaAceitar, setPrecisaAceitar] = useState(false);
   const [marcado, setMarcado] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [nomeMentoranda, setNomeMentoranda] = useState('');
+  const [emailMentoranda, setEmailMentoranda] = useState('');
 
   useEffect(() => {
     async function checar() {
@@ -19,6 +22,15 @@ export default function TermosGate() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
+
+      const { data: perfil } = await supabase
+        .from('profiles')
+        .select('nome, email')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setNomeMentoranda(perfil?.nome ?? '');
+      setEmailMentoranda(perfil?.email ?? user.email ?? '');
 
       const { data: ultimoTermo } = await supabase
         .from('termos_versoes')
@@ -73,8 +85,26 @@ export default function TermosGate() {
         <div className="p-6 border-b border-line">
           <p className="font-display text-2xl text-brown-deep">{termo.titulo}</p>
         </div>
-        <div className="p-6 overflow-y-auto prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-strong:text-brown-deep">
-          <ReactMarkdown>{termo.conteudo_markdown}</ReactMarkdown>
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-5 pb-5 border-b border-line grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-ink-faint mb-0.5">
+                Mentora
+              </p>
+              <p className="text-sm text-ink">Jaqueline Amaro</p>
+              <p className="text-xs text-ink-faint">CPF 416.******</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-ink-faint mb-0.5">
+                Mentoranda
+              </p>
+              <p className="text-sm text-ink">{nomeMentoranda || 'Carregando...'}</p>
+              <p className="text-xs text-ink-faint">{emailMentoranda}</p>
+            </div>
+          </div>
+          <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-p:leading-relaxed prose-p:my-4 prose-strong:text-brown-deep prose-li:text-ink prose-li:my-1">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{termo.conteudo_markdown}</ReactMarkdown>
+          </div>
         </div>
         <div className="p-6 border-t border-line">
           <label className="flex items-start gap-2.5 mb-4 cursor-pointer">

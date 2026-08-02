@@ -33,7 +33,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-full md:w-[260px] shrink-0 border-r border-line bg-paper flex md:flex-col md:h-screen md:sticky md:top-0">
+    <aside className="w-full md:w-[260px] shrink-0 border-r border-b md:border-b-0 border-line bg-paper flex flex-col md:h-screen md:sticky md:top-0">
       <div className="flex-1 flex flex-col p-6 md:p-7">
         <div className="mb-9">
           <p className="font-display text-2xl text-brown-deep">SOMA</p>

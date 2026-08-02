@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Compass, Sparkles, TrendingUp, Save, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -294,7 +295,7 @@ export default function ExerciciosClient({
               </div>
               {viaResultado.analise_ia && (
                 <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
-                  <ReactMarkdown>{viaResultado.analise_ia}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{viaResultado.analise_ia}</ReactMarkdown>
                 </div>
               )}
             </Panel>
@@ -433,7 +434,7 @@ export default function ExerciciosClient({
             </Panel>
           ) : (
             <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink prose-strong:text-brown-deep">
-              <ReactMarkdown>{resumoPerfil.conteudo_markdown}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{resumoPerfil.conteudo_markdown}</ReactMarkdown>
             </Panel>
           )}
         </section>
