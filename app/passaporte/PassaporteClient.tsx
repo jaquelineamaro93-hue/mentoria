@@ -7,6 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
+import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
 
 interface Props {
@@ -99,6 +100,35 @@ export default function PassaporteClient({
               );
             })}
           </div>
+        </section>
+
+        <section className="mb-10">
+          <Eyebrow>Pilares SOMA</Eyebrow>
+          {['sabedoria', 'objetividade', 'maestria', 'alquimia'].map((pilar) => {
+            const badgesDosPilar = SOMA_ACHIEVEMENTS.filter(b => b.pilar === pilar);
+            const cores = getCoresDosPilares();
+
+            return (
+              <div key={pilar} className="mb-6">
+                <p className="text-sm font-medium mb-2" style={{ color: cores[pilar as keyof typeof cores] }}>
+                  {getNomePilar(pilar)}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {badgesDosPilar.map((badge) => (
+                    <div
+                      key={badge.id}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
+                      style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
+                      title={badge.descricao}
+                    >
+                      <span>{badge.emoji}</span>
+                      <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </section>
 
         <section>

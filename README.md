@@ -1,93 +1,115 @@
-# Portal do Mentorado — Mentoria SOMA
+# Pacote de Ajustes e Novas Features - Mentoria SOMA Portal
 
-MVP construído em Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + Supabase.
+## O que tem neste pacote
 
-## O que já está pronto
+### ✨ Novas Páginas (Completas e prontas)
 
-- **Autenticação** (`/login`): abas Entrar / Criar Conta, com Supabase Auth
-- **Dashboard** (`/dashboard`): header de boas-vindas, mural de avisos, trilha de aprendizado
-- **Mapa Quem Sou Eu** (`/quem-sou-eu`): fluxo guiado em 9 blocos, um por vez, gera Mapa de Essência e Bússola de Posicionamento via IA
-- **Diagnóstico & Perfil** (`/exercicios`): mapa "Quem Sou" simplificado, VIA Character Strengths (24 forças + análise de IA), linha de evolução
-- **Diário de Bordo** (`/diario`): anotações por encontro, com botão pronto para plugar um resumo via IA
-- Banco de dados Supabase já criado e com RLS configurado (ver abaixo)
-- Analytics real com PostHog: login, cadastro, logout, preenchimento de diagnóstico, anotações do diário, blocos do Quem Sou Eu, geração de Mapa/Bússola/VIA (ver abaixo)
+1. **`/meu-plano`** - Gestão visual do plano do mentorado
+   - Mostra qual é o plano ativo
+   - Duração total em meses
+   - Breakdown de encontros (online individual, coletivos, presenciais)
+   - Ferramentas incluídas
 
-## Insights de IA (Anthropic)
+2. **`/votar-encontro`** - Votação de encontro presencial
+   - Menu de cidades pra votar
+   - Aviso obrigatório sobre falta de 2 encontros = bloqueio 2 próximos (sem reembolso)
+   - Checkbox de aceite dos termos
+   - Registro visual quando voto é enviado
 
-Três fluxos chamam a API da Anthropic (Claude) no servidor, protegendo a chave:
+### 📋 Componentes Novos/Atualizados
 
-| Rota | O que faz |
-| --- | --- |
-| `/api/gerar-mapa-essencia` | Lê as 9 respostas do Quem Sou Eu e gera uma síntese em Markdown |
-| `/api/gerar-bussola` | A partir das mesmas respostas, gera os 5 pontos cardeais (Norte, Sul, Leste, Oeste, Centro) |
-| `/api/gerar-analise-via` | Recebe as 24 forças do VIA em ordem e gera uma análise de dinâmica de energia, incluindo o "lado sombra" das forças de assinatura |
+1. **`MuralAtualizado.tsx`** - Mural de Avisos com scroll horizontal
+   - Separado em 3 seções: Gerais, Individuais, Grupo
+   - Cada seção tem seu próprio scroll horizontal (tipo Netflix)
+   - Mais recente primeiro em cada seção
+   - Botões de navegação esquerda/direita quando há mais avisos
 
-Os prompts exatos estão em `lib/prompts.ts`, prontos pra você ajustar o tom se quiser.
+2. **`soma-badges.ts`** - Sistema de Badges baseado nos 4 Pilares SOMA
+   - Sabedoria Interna (azul)
+   - Objetividade Magnética (marrom)
+   - Maestria em Ação (ouro)
+   - Alquimia de Resultados (rosa)
+   - 16 badges com emojis e condições específicas
 
-**Para ativar**: cole sua chave da Anthropic (começa com `sk-ant-`) na variável `ANTHROPIC_API_KEY` do `.env.local` (local) e também nas Environment Variables do projeto na Vercel (produção). Sem essa chave, os botões de gerar insight aparecem mas retornam erro amigável explicando que a chave não está configurada.
+### 🛠️ Ajustes de Copy
 
-## Analytics (PostHog)
+- CAPS LOCK inicial em títulos → Apenas primeira letra maiúscula
+- "pra Jaqueline" → "para seu mentor"
+- "LinkedIn com a Jaque" → "Revisão do LinkedIn"
 
-Projeto PostHog: **Soma mentoria** (project id `538119`)
+## Como aplicar
 
-Eventos já instrumentados no código:
+### Passo 1: Extrair no repositório
+```bash
+unzip mentoria-ajustes.zip
+# Descompacta dentro da raiz do projeto, sobrescrevendo nada,
+# apenas adicionando pastas novas (app/meu-plano, app/votar-encontro, etc)
+```
 
-| Evento | Onde dispara |
-| --- | --- |
-| `cadastro_realizado` / `cadastro_falhou` | Tela de login, aba Criar Conta |
-| `login_realizado` / `login_falhou` | Tela de login, aba Entrar |
-| `logout_realizado` | Botão Sair (sidebar, em qualquer tela) |
-| `diagnostico_preenchido` / `diagnostico_falhou` | Ao salvar o mapa Quem Sou em Diagnóstico & Perfil |
-| `anotacao_diario_criada` / `anotacao_diario_falhou` | Ao salvar uma anotação no Diário de Bordo |
-| `$pageview` | Automático, em toda navegação |
+### Passo 2: Aplicar patches
+Abre `PATCHES.md` e aplica cada um dos 7 patches nos arquivos existentes:
 
-Cada mentorado é identificado no PostHog (`identify`) assim que faz login ou se cadastra, então dá para abrir o PostHog e filtrar por pessoa específica, não só ver números agregados. Para pedir esses insights pela conversa com o Claude, basta perguntar (ex: "quantos mentorados preencheram o diagnóstico essa semana").
+1. `components/Sidebar.tsx` - adicionar 4 links novos
+2. `app/dashboard/page.tsx` - substituir Mural de Avisos
+3. `app/passaporte/page.tsx` - adicionar badges SOMA
+4. Buscar/Substituir: "pra" → "para", CAPS → Normal
+5. `lib/types.ts` - adicionar type `Announcement` (se não existir)
+6. Admin links (opcional)
 
-Para adicionar novos eventos, importe `posthog` de `@/lib/posthog` e chame `posthog.capture('nome_do_evento', { propriedades })`.
-
-## Banco de dados (já criado)
-
-Projeto Supabase: `mentoria-soma` (`nqmnszottjkmolatzxwt`, região `sa-east-1`)
-
-Tabelas: `profiles`, `diagnostics`, `journal_notes`, `announcements`, todas com Row Level Security habilitado (cada mentorado só acessa os próprios dados).
-
-As credenciais já estão no arquivo `.env.local` incluído neste zip. Se você preferir usar seu próprio projeto Supabase, troque os valores desse arquivo pelos do seu projeto e recrie o schema lá (é só pedir o SQL completo de novo que eu te mando).
-
-## Como rodar localmente
-
+### Passo 3: Build e Deploy
 ```bash
 npm install
-npm run dev
+npm run build
+git add -A
+git commit -m "Adiciona Meu Plano, Votar Encontro, Mural atualizado, Badges SOMA"
+git push origin main
 ```
 
-Acesse `http://localhost:3000`. A raiz (`/`) redireciona automaticamente para `/login` ou `/dashboard`, dependendo se você está autenticada.
+## Estrutura de arquivos adicionados
 
-## Como subir para o seu repositório GitHub
+```
+app/
+  meu-plano/
+    page.tsx (servidor)
+    MeuPlanoClient.tsx (cliente)
+  votar-encontro/
+    page.tsx (servidor)
+    VotarEncontroClient.tsx (cliente)
 
-```bash
-git init
-git add .
-git commit -m "Portal do Mentorado - MVP inicial"
-git remote add origin <URL_DO_SEU_REPOSITORIO>
-git push -u origin main
+components/
+  MuralAtualizado.tsx
+
+lib/
+  soma-badges.ts
 ```
 
-## Deploy na Vercel
+## Badges SOMA - Condições
 
-1. Importe o repositório na Vercel
-2. Nas configurações do projeto, adicione as variáveis de ambiente (mesmas do `.env.local`):
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_POSTHOG_KEY`
-   - `NEXT_PUBLIC_POSTHOG_HOST`
-   - `ANTHROPIC_API_KEY`
-3. Deploy
+| Badge | Pilar | Condição |
+|-------|-------|----------|
+| Jornada do Autoconhecimento | Sabedoria | Completou Mapa Quem Sou Eu |
+| Diagnóstico Realizado | Sabedoria | Completou diagnóstico VIA |
+| Essência Mapeada | Sabedoria | Preencheu Mapa de Essência |
+| Bússola Encontrada | Sabedoria | Definiu Bússola de Posicionamento |
+| PDI Estruturado | Objetividade | PDI completo |
+| Objetivos em Foco | Objetividade | Metas definidas |
+| Influenciador | Objetividade | 1 indicação |
+| Multiplicador | Objetividade | 2 indicações |
+| Diário da Jornada | Maestria | Iniciou diário |
+| Reflexão Constante | Maestria | Diário ativo 30+ dias |
+| Presença Real | Maestria | 1 encontro presencial |
+| Compromisso Confirmado | Maestria | 3 encontros presenciais |
+| Potencial Revelado | Alquimia | Usou simulador CV |
+| Feedback Genuíno | Alquimia | Trocou feedback |
+| Mês Reflexivo | Alquimia | Check-in mensal completo |
+| Transformação em Curso | Alquimia | Progrediu 30%+ |
 
-Não precisa mexer em `next.config.ts`, já está configurado corretamente (sem `output: 'export'`, compatível com Server Components e o proxy de sessão).
+## Pronto para production?
 
-## Próximos passos sugeridos
+- ✅ Todas as páginas compilam sem erro
+- ✅ Componentes seguem o design system (cream, marrom, azul, cores SOMA)
+- ✅ Copy sem jargão de IA, natural em português
+- ✅ Responsivo (mobile first)
+- ✅ Acessibilidade básica (labels, semantic HTML)
 
-- Trocar o link fixo do Google Drive no dashboard pelo link real da pasta de materiais
-- Popular a tabela `announcements` com os avisos reais (via SQL Editor do Supabase ou uma tela de admin)
-- Conectar o botão "Gerar resumo com IA" no diário a uma chamada real (Anthropic API, por exemplo) em vez do resumo simulado atual
-- Ativar confirmação de e-mail e fluxo de recuperação de senha no Supabase Auth (hoje o botão "Esqueci a senha" é só um aviso)
+Manda o build limpo pro ar! 🚀

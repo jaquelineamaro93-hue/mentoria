@@ -1,135 +1,130 @@
-# Patches em arquivos existentes
+# Patches para aplicar nos arquivos existentes
 
-Estes 4 arquivos já existem no projeto e precisam de pequenos acréscimos.
-Copie os trechos abaixo pro Claude Code aplicar (ele tem acesso ao arquivo
-completo e sabe onde encaixar).
+## 1. components/Sidebar.tsx — adicionar 2 links novos
 
-## 1. lib/types.ts — adicionar estas interfaces e campos
+Procura no array de navegação do mentorado e adiciona esses dois links (em qualquer posição, recomendo perto de "Simulador de CV"):
 
 ```typescript
-export interface Indicacao {
-  id: string;
-  indicador_id: string;
-  indicado_id: string | null;
-  indicado_nome: string;
-  indicado_email: string;
-  status: 'pendente' | 'convertido';
-  created_at: string;
-  convertido_em: string | null;
-}
-
-export interface CheckinMensal {
-  id: string;
-  user_id: string;
-  mes_referencia: string;
-  nota: number;
-  feedback_texto: string | null;
-  sugestao_melhoria: string | null;
-  created_at: string;
-}
-
-export interface PlanoMentoria {
-  id: string;
-  codigo: string;
-  nome: string;
-  duracao_meses: number;
-  foco: string;
-  preco_avista: number;
-  preco_cartao: number;
-  preco_recorrente_total: number;
-  parcelas_recorrente: number;
-  descricao_encontros: string;
-  itens_inclusos: unknown;
-  ativo: boolean;
-  ordem: number;
-}
-```
-
-E na interface `Profile` já existente, adiciona estes três campos:
-
-```typescript
-codigo_indicacao: string | null;
-indicado_por_id: string | null;
-sessoes_bonus_resgatadas: number;
-```
-
-## 2. app/login/page.tsx — capturar o código de indicação da URL
-
-No topo do componente, ler o parâmetro `ref` da URL:
-
-```typescript
-import { useSearchParams } from 'next/navigation';
-// ...
-const searchParams = useSearchParams();
-const codigoIndicacao = searchParams.get('ref');
-```
-
-E no `supabase.auth.signUp`, dentro de `options.data`, adiciona o campo:
-
-```typescript
-const { data, error } = await supabase.auth.signUp({
-  email,
-  password: senha,
-  options: {
-    data: {
-      nome,
-      tipo_pacote: tipoPacote,
-      codigo_indicacao_referencia: codigoIndicacao, // adiciona esta linha
-    },
-  },
-});
-```
-
-Se quiser, pode mostrar uma mensagem tipo "Você foi indicado por um amigo!"
-quando `codigoIndicacao` existir, mas isso é só estético, não é obrigatório
-pra funcionar.
-
-## 3. components/Sidebar.tsx — dois novos itens de navegação
-
-Adiciona esses dois links no array de itens de navegação do mentorado
-(perto de "Simulador de CV" ou "Meu Passaporte", por exemplo):
-
-```typescript
+{ href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
+{ href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin },
 { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
 { href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp },
 ```
 
-(Importa `Gift` e `TrendingUp` de `lucide-react` se ainda não estiverem
-importados.)
+Importa os ícones no topo: `import { CreditCard, MapPin, Gift, TrendingUp } from 'lucide-react';`
 
-## 4. app/api/mercadopago/webhook/route.ts — marcar indicação como convertida
+## 2. app/dashboard/page.tsx — substituir o Mural de Avisos
 
-No trecho onde o webhook confirma que a assinatura foi paga (o mesmo lugar
-que já ativa `status_assinatura = 'ativo'` e dispara o e-mail de boas-vindas),
-adiciona esta checagem logo depois:
+Aonde está o componente que renderiza os avisos (provavelmente `<Announcements>` 
+ou similar), substitui por:
 
 ```typescript
-// Se esse mentorado foi indicado por alguém, marca a indicação como convertida
-const { data: perfilPago } = await supabase
-  .from('profiles')
-  .select('indicado_por_id')
-  .eq('id', userId) // usa a variável que já identifica o usuário nesse trecho
-  .single();
+import MuralAtualizado from '@/components/MuralAtualizado';
 
-if (perfilPago?.indicado_por_id) {
-  await supabase
-    .from('indicacoes')
-    .update({ status: 'convertido', convertido_em: new Date().toISOString() })
-    .eq('indicado_id', userId)
-    .eq('status', 'pendente');
+// ... dentro do JSX:
+<MuralAtualizado avisos={avisos} />
+```
+
+O componente novo cuida de fazer scroll horizontal separado por tipo (Gerais, 
+Individuais, Grupo), com botões de navegação e o mais recente primeiro.
+
+## 3. app/passaporte/page.tsx — adicionar badges SOMA
+
+Na página do Passaporte, aonde renderiza os achievements/badges, adiciona:
+
+```typescript
+import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
+
+// Dentro do componente, depois dos achievements atuais:
+<h2 className="font-display text-lg text-brown-deep mb-4 mt-8">Pilares SOMA</h2>
+
+{['sabedoria', 'objetividade', 'maestria', 'alquimia'].map((pilar) => {
+  const badgesDosPilar = SOMA_ACHIEVEMENTS.filter(b => b.pilar === pilar);
+  const cores = getCoresDosPilares();
+  
+  return (
+    <div key={pilar} className="mb-6">
+      <p className="text-sm font-medium mb-2" style={{ color: cores[pilar as keyof typeof cores] }}>
+        {getNomePilar(pilar)}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {badgesDosPilar.map((badge) => (
+          <div 
+            key={badge.id} 
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
+            style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
+            title={badge.descricao}
+          >
+            <span>{badge.emoji}</span>
+            <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+})}
+```
+
+## 4. Texto "pra Jaqueline" → "para seu mentor" em EVERYWHERE
+
+Faz um Find & Replace (Ctrl+H ou Cmd+H) em todo o projeto:
+
+**Find**: `pra Jaqueline|pra você|pra mim`
+**Replace with**: `para seu mentor`
+
+**Find**: `pra`
+**Replace with**: `para` (cuidado com este, pode pegar palavras que não devem)
+
+### Específico: app/minha-trilha/MinhaTrilhaClient.tsx
+Já está escrito "pra Jaqueline", troca por "para seu mentor"
+
+### Específico: app/passaporte/page.tsx (se existir)
+Se tiver "LinkedIn com a Jaque", troca por "Revisão do LinkedIn"
+
+## 5. lib/types.ts — adicionar type para Announcement
+
+Se não existir, adiciona:
+
+```typescript
+export interface Announcement {
+  id: string;
+  titulo: string;
+  conteudo: string;
+  tipo: 'geral' | 'individual' | 'grupo';
+  destinatario_id?: string | null;
+  created_at: string;
+  updated_at?: string;
 }
 ```
 
-Ajusta o nome da variável `userId` pro nome real que já existe nesse arquivo
-(deve ser algo como `data.user.id` ou similar, dependendo de como o webhook
-já identifica o usuário pago).
+## 6. Avisos de Copy — títulos em CAPS LOCK
 
-## Admin: onde encontrar as novas páginas
+Procura em todos os arquivos por títulos com CAPS LOCK inicial e troca:
 
-Duas páginas novas ficam disponíveis direto pela URL, sem precisar mexer
-no layout do admin agora (dá pra linkar depois no menu do admin se quiser):
+**Find**: títulos tipo `MAPA DO CONHECIMENTO`, `SIMULADOR DE CV`
+**Replace**: trocar primeira letra maiúscula, resto minúscula → `Mapa do Conhecimento`, `Simulador de CV`
 
-- `/admin/indicacoes` — mostra quem indicou quem, quantos converteram, e
-  tem o botão pra marcar sessão bônus como usada
-- `/admin/feedbacks` — mostra todos os check-ins mensais da trilha, com
-  nota média geral no topo
+Exemplo de arquivo pra verificar:
+- `app/dashboard/page.tsx` (títulos das seções)
+- `app/quem-sou-eu/page.tsx`
+- `app/simulador-cv/page.tsx`
+
+## 7. Admin: Novo link no painel admin
+
+Se tiver um menu admin, adiciona links pra:
+- `/admin/indicacoes` (gestão de indicações e liberação de sessões bônus)
+- `/admin/feedbacks` (trilha de feedbacks mensais)
+
+(Já existem as páginas, é só linkar no menu se houver um)
+
+---
+
+**Resumo da ordem de aplicação:**
+1. Adiciona imports novos (badges, tipos)
+2. Substitui Mural de Avisos
+3. Adiciona navegação nova (sidebar)
+4. Adiciona badges SOMA no Passaporte
+5. Troca textos (pra → para, CAPS → Normal)
+6. (Opcional) Adiciona links no admin se houver menu
+
+Depois: `npm run build` e verifica se tá tudo compilando.

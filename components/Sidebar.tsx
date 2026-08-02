@@ -16,6 +16,8 @@ import {
   MessageCircle,
   Gift,
   TrendingUp,
+  CreditCard,
+  MapPin,
 } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 
@@ -29,6 +31,8 @@ const NAV_ITEMS = [
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
   { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
   { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
+  { href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
+  { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin },
   { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
   { href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp },
 ];

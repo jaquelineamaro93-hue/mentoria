@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
+import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Announcement, Profile } from '@/lib/types';
@@ -87,27 +88,7 @@ export default function DashboardClient({ profile, announcements }: Props) {
           <Eyebrow>
             <Calendar size={13} /> Mural de avisos & próximos encontros
           </Eyebrow>
-
-          {announcements.length === 0 ? (
-            <Panel className="p-6 text-sm text-ink-faint">
-              Nenhum aviso no momento. Fica de olho: novidades sobre encontros aparecem aqui.
-            </Panel>
-          ) : (
-            <div className="flex flex-col gap-6">
-              <MuralGrupo
-                titulo="Avisos gerais"
-                itens={announcements.filter((a) => a.tipo === 'geral' || !a.tipo)}
-              />
-              <MuralGrupo
-                titulo="Sessões individuais"
-                itens={announcements.filter((a) => a.tipo === 'individual')}
-              />
-              <MuralGrupo
-                titulo="Próximos encontros em grupo"
-                itens={announcements.filter((a) => a.tipo === 'grupo')}
-              />
-            </div>
-          )}
+          <MuralAtualizado avisos={announcements} />
         </section>
 
         {/* Trilha de aprendizado / Drive Hub */}
