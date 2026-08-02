@@ -97,17 +97,48 @@ export interface Announcement {
 }
 ```
 
-## 6. Avisos de Copy — títulos em CAPS LOCK
+## 6. Avisos de Copy — títulos em CAPS LOCK e Title Case
 
+### 6.1 Títulos de seções (CAPS LOCK → Normal)
 Procura em todos os arquivos por títulos com CAPS LOCK inicial e troca:
 
-**Find**: títulos tipo `MAPA DO CONHECIMENTO`, `SIMULADOR DE CV`
-**Replace**: trocar primeira letra maiúscula, resto minúscula → `Mapa do Conhecimento`, `Simulador de CV`
+**Find**: `MAPA DO CONHECIMENTO`, `SIMULADOR DE CV`, `PDI`, etc
+**Replace**: `Mapa do conhecimento`, `Simulador de CV`, `Pdi`, etc (apenas primeira letra maiúscula)
 
 Exemplo de arquivo pra verificar:
 - `app/dashboard/page.tsx` (títulos das seções)
 - `app/quem-sou-eu/page.tsx`
 - `app/simulador-cv/page.tsx`
+
+### 6.2 ⚠️ CRÍTICO: Títulos de Insights (Title Case → Sentence case)
+Os títulos dos insights estão vindo com Title Case (primeira letra de cada palavra maiúscula).
+Precisa trocar pra Sentence case (apenas primeira letra maiúscula, resto minúsculo).
+
+Exemplos:
+- ❌ `Sua Dinâmica de Energia: Uma Leitura de Forças`
+- ✅ `Sua dinâmica de energia: uma leitura de forças`
+
+- ❌ `Como Você Opera no Automático`
+- ✅ `Como você opera no automático`
+
+Procura em:
+- `app/quem-sou-eu/page.tsx` ou componente de insights
+- `app/simulador-cv/page.tsx` ou componente de insights
+- `components/InsightCard.tsx` (se existir)
+- Qualquer arquivo que renderize `insight.titulo` ou `insight.nome`
+
+Se houver um componente que renderiza insights, adiciona uma função helper:
+```typescript
+function formatarTituloInsight(titulo: string): string {
+  if (!titulo) return '';
+  return titulo.charAt(0).toUpperCase() + titulo.slice(1).toLowerCase();
+}
+```
+
+E usa assim no JSX:
+```typescript
+<h3>{formatarTituloInsight(insight.titulo)}</h3>
+```
 
 ## 7. Admin: Novo link no painel admin
 

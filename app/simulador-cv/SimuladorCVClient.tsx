@@ -16,6 +16,7 @@ import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
+import { formatarTituloInsight } from '@/lib/string-utils';
 import type { CvSimulacao, Profile } from '@/lib/types';
 
 interface Props {
@@ -356,7 +357,7 @@ export default function SimuladorCVClient({
                             {i + 1}
                           </span>
                           <div>
-                            <p className="text-ink font-medium mb-1">{s.titulo}</p>
+                            <p className="text-ink font-medium mb-1">{formatarTituloInsight(s.titulo)}</p>
                             <p className="text-sm text-ink-faint mb-2">{s.motivo}</p>
                             <p className="text-sm text-sky-deep">{s.correcao}</p>
                           </div>

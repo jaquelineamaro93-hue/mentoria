@@ -96,7 +96,7 @@ export default function MeuPlanoClient({
 
         <div className="mt-8 bg-sky-deep/10 border border-sky-deep/30 rounded-2xl p-5">
           <p className="text-sm text-brown-deep">
-            Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho para você.
+            Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho pra você.
           </p>
         </div>
       </main>

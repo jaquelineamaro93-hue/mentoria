@@ -30,23 +30,23 @@ export default function MuralAtualizado({ avisos }: MuralProps) {
 
     return (
       <div key={titulo} className="mb-8">
-        <h3 className="text-sm font-medium text-brown-deep mb-3">{titulo}</h3>
+        <h3 className="text-sm font-medium text-brown-deep mb-4">{titulo}</h3>
         <div className="relative">
           <div
             ref={ref}
-            className="flex gap-3 overflow-x-auto pb-2 scroll-smooth"
+            className="flex gap-4 overflow-x-auto pb-4 scroll-smooth"
             style={{ scrollBehavior: 'smooth' }}
           >
             {lista.map((aviso) => (
               <div
                 key={aviso.id}
-                className="flex-shrink-0 w-72 bg-white border border-line rounded-xl p-4"
+                className="flex-shrink-0 w-96 bg-white border border-line rounded-2xl p-6"
               >
-                <p className="text-xs text-ink-faint mb-1">
+                <p className="text-xs text-ink-faint mb-3 uppercase tracking-wide">
                   {new Date(aviso.created_at).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm font-medium text-brown-deep mb-1">{aviso.titulo}</p>
-                <p className="text-xs text-ink-faint line-clamp-3">{aviso.descricao}</p>
+                <p className="text-base font-medium text-brown-deep mb-3 line-clamp-2">{aviso.titulo}</p>
+                <p className="text-sm text-ink-faint line-clamp-4">{aviso.descricao}</p>
               </div>
             ))}
           </div>
