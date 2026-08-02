@@ -132,6 +132,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                   >
                     <option value="individual">Sessão individual</option>
                     <option value="grupo">Encontro em grupo</option>
+                    <option value="pessoal">Dia a dia (pessoal)</option>
                   </select>
                 </label>
               </div>
@@ -184,15 +185,23 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                         className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide px-2 py-1 rounded-full border ${
                           note.tipo_encontro === 'individual'
                             ? 'bg-sky-tint border-sky text-brown-deep'
-                            : 'bg-sky-tint border-sky text-sky-deep'
+                            : note.tipo_encontro === 'pessoal'
+                              ? 'bg-[#f1e6d6] border-brown/30 text-brown'
+                              : 'bg-sky-tint border-sky text-sky-deep'
                         }`}
                       >
                         {note.tipo_encontro === 'individual' ? (
                           <UserIcon size={11} />
+                        ) : note.tipo_encontro === 'pessoal' ? (
+                          <NotebookPen size={11} />
                         ) : (
                           <Users size={11} />
                         )}
-                        {note.tipo_encontro === 'individual' ? 'Individual' : 'Grupo'}
+                        {note.tipo_encontro === 'individual'
+                          ? 'Individual'
+                          : note.tipo_encontro === 'pessoal'
+                            ? 'Pessoal'
+                            : 'Grupo'}
                       </span>
                       <span className="text-xs text-ink-faint">
                         {new Date(note.encontro_data).toLocaleDateString('pt-BR')}

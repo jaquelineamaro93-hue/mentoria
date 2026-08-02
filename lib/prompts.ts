@@ -181,6 +181,42 @@ DADOS DO VIA:
 ${viaTexto}`;
 }
 
+export function montarPromptSimuladorCV(curriculo: string, vaga: string): string {
+  return `Atue como um Recrutador Executivo de Alto Nível, Especialista em Sistemas ATS (Applicant Tracking System) e Copywriter de Carreira.
+
+${REGRAS_DE_ESTILO}
+
+Analise o currículo e a vaga desejada abaixo para criar um currículo implacável e uma carta de apresentação perfeita. Siga rigorosamente esta ordem, mostrando o raciocínio de cada passo antes de entregar o produto final.
+
+## Passo 1: Análise de Rejeição Silenciosa
+Liste os 10 motivos que levariam um especialista de RH a rejeitar este currículo em 6 segundos, do mais perigoso ao menos perigoso. Para cada um: onde está o erro, por que é motivo de rejeição, e qual seria a versão corrigida. Seja direto e implacável na crítica.
+
+## Passo 2: Otimização para ATS
+Detecte as palavras-chave da vaga ausentes no currículo, mostre onde adicionar cada uma naturalmente, e dê uma pontuação de compatibilidade antes e depois, numa escala de 0 a 100.
+
+## Passo 3: Bullet Points de Resultados
+Reescreva cada experiência profissional trocando descrições de tarefas por resultados de alto impacto, no formato verbo de ação forte mais conquista concreta mais métrica de negócio. Mostre antes e depois lado a lado. Se não houver números explícitos no texto original, estime um valor lógico com base no contexto e sinalize que é uma estimativa.
+
+## Passo 4: Resumo Profissional
+Escreva 5 versões diferentes do resumo profissional, cada uma com no máximo 3 linhas, com posicionamento forte, um resultado concreto e uma direção clara de carreira. Evite clichês como "profissional ambicioso" ou "pioneiro".
+
+## Passo 5: Auditoria e Reajuste
+Antes de entregar a versão final, audite tudo: o currículo final ultrapassa 2 páginas? Se sim, corte redundâncias. A narrativa está coesa e voltada para os problemas da empresa? Ajuste internamente com base nesses pontos antes de seguir para o passo 6.
+
+## Passo 6: Produto Final
+Entregue dois documentos prontos:
+
+**Currículo Personalizado Final**: versão definitiva, com as palavras-chave de ATS incluídas, bullet points de resultado, o melhor resumo adaptado ao cargo, limite máximo de 2 páginas, sem nada que não agregue valor.
+
+**Carta de Apresentação Estratégica**: identifique os 3 problemas mais críticos que a vaga revela que a empresa quer resolver, e escreva uma carta de no máximo 200 palavras conectando a experiência da pessoa a cada um desses problemas, com abertura forte, provas concretas de resultado e uma chamada clara para entrevista.
+
+CURRÍCULO ATUAL:
+${curriculo}
+
+DESCRIÇÃO DA VAGA:
+${vaga}`;
+}
+
 export const VIA_FORCAS = [
   'Criatividade',
   'Curiosidade',

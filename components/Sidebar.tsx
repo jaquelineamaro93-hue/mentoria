@@ -11,6 +11,9 @@ import {
   Target,
   PlayCircle,
   Award,
+  ShieldCheck,
+  FileSearch,
+  MessageCircle,
 } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 
@@ -20,12 +23,14 @@ const NAV_ITEMS = [
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
   { href: '/pdi', label: 'Meu PDI', icon: Target },
   { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
+  { href: '/feedback-pares', label: 'Feedback entre Colegas', icon: MessageCircle },
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
   { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
+  { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
 ];
 
 interface SidebarProps {
-  profile: Pick<Profile, 'nome' | 'tipo_pacote'> | null;
+  profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin'> | null;
   onSignOut?: () => void;
 }
 
@@ -63,6 +68,23 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
             );
           })}
         </nav>
+
+        {profile?.is_admin && (
+          <>
+            <div className="h-px bg-line my-4" />
+            <Link
+              href="/admin"
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
+                pathname === '/admin'
+                  ? 'bg-sky-tint text-brown-deep border border-sky'
+                  : 'text-ink-soft border border-transparent hover:bg-cream'
+              }`}
+            >
+              <ShieldCheck size={17} strokeWidth={1.75} />
+              Painel dos mentorados
+            </Link>
+          </>
+        )}
       </div>
 
       <div className="p-6 md:p-7 border-t border-line">

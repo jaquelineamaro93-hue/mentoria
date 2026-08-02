@@ -39,6 +39,10 @@ export default function LoginPage() {
     if (data.user) {
       identificarMentorado(data.user.id, { email: data.user.email });
       posthog.capture('login_realizado');
+      await supabase
+        .from('profiles')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('id', data.user.id);
     }
 
     router.push('/dashboard');

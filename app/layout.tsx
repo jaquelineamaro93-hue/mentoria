@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import PostHogInit from '@/components/PostHogInit';
 import TermosGate from '@/components/TermosGate';
+import AcessoGate from '@/components/AcessoGate';
 
 export const metadata: Metadata = {
   title: 'Portal do Mentorado | Mentoria SOMA',
@@ -26,6 +27,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <PostHogInit />
+        <AcessoGate />
         <TermosGate />
         {children}
       </body>

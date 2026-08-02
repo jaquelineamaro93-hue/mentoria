@@ -1,4 +1,4 @@
-export async function chamarClaude(prompt: string): Promise<string> {
+export async function chamarClaude(prompt: string, maxTokens = 2000): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
@@ -16,7 +16,7 @@ export async function chamarClaude(prompt: string): Promise<string> {
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2000,
+      max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }],
     }),
   });

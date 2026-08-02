@@ -1,5 +1,5 @@
 export type TipoPacote = 'online' | 'presencial';
-export type TipoEncontro = 'grupo' | 'individual';
+export type TipoEncontro = 'grupo' | 'individual' | 'pessoal';
 export type TipoAviso = 'grupo' | 'individual' | 'geral';
 
 export interface Profile {
@@ -10,6 +10,11 @@ export interface Profile {
   foto_url: string | null;
   onboarding_concluido: boolean;
   pontos_total: number;
+  is_admin: boolean;
+  last_login_at: string | null;
+  status_pagamento: 'ativo' | 'inadimplente' | 'encerrado';
+  data_fim_acesso: string | null;
+  observacao_pagamento: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -154,6 +159,49 @@ export interface TermoAceite {
   user_id: string;
   termo_id: string;
   aceito_em: string;
+}
+
+export interface Plano {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  valor_centavos: number;
+  duracao_dias: number;
+  ativo: boolean;
+}
+
+export interface Pagamento {
+  id: string;
+  user_id: string;
+  plano_id: string | null;
+  valor_centavos: number;
+  status: 'pendente' | 'aprovado' | 'rejeitado' | 'estornado';
+  provedor: string;
+  provedor_pagamento_id: string | null;
+  origem: 'automatico' | 'manual';
+  created_at: string;
+}
+
+export interface MentoradoPublico {
+  id: string;
+  nome: string;
+}
+
+export interface PeerFeedback {
+  id: string;
+  de_user_id: string;
+  para_user_id: string;
+  mensagem: string;
+  created_at: string;
+}
+
+export interface CvSimulacao {
+  id: string;
+  user_id: string;
+  curriculo_texto: string;
+  vaga_texto: string;
+  resultado_markdown: string;
+  created_at: string;
 }
 
 export interface Announcement {
