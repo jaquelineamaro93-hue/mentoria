@@ -16,6 +16,7 @@ export interface Profile {
   origem_assinatura: 'manual' | 'mercadopago';
   proxima_cobranca: string | null;
   observacao_pagamento: string | null;
+  creditos_simulacao_cv: number;
   created_at: string;
   updated_at: string;
 }

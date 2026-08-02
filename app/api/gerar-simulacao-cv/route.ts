@@ -24,6 +24,36 @@ export async function POST(request: Request) {
     );
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('creditos_simulacao_cv')
+    .eq('id', user.id)
+    .single();
+
+  const inicioDoMes = new Date();
+  inicioDoMes.setDate(1);
+  inicioDoMes.setHours(0, 0, 0, 0);
+
+  const { count: usadasEsteMes } = await supabase
+    .from('cv_simulacoes')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .gte('created_at', inicioDoMes.toISOString());
+
+  const LIMITE_GRATIS_MES = 3;
+  const jaUsouGratis = (usadasEsteMes ?? 0) >= LIMITE_GRATIS_MES;
+  const temCredito = (profile?.creditos_simulacao_cv ?? 0) > 0;
+
+  if (jaUsouGratis && !temCredito) {
+    return NextResponse.json(
+      {
+        error: 'limite_atingido',
+        mensagem: `Você já usou suas ${LIMITE_GRATIS_MES} simulações gratuitas deste mês. Cada simulação extra custa R$ 5.`,
+      },
+      { status: 402 }
+    );
+  }
+
   try {
     const prompt = montarPromptSimuladorCV(curriculo, vaga);
     const respostaTexto = await chamarClaude(prompt, 8000);
@@ -41,6 +71,13 @@ export async function POST(request: Request) {
         },
         { status: 500 }
       );
+    }
+
+    if (jaUsouGratis && temCredito) {
+      await supabase
+        .from('profiles')
+        .update({ creditos_simulacao_cv: (profile?.creditos_simulacao_cv ?? 1) - 1 })
+        .eq('id', user.id);
     }
 
     const { data: simulacao, error } = await supabase

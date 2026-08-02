@@ -26,11 +26,19 @@ export default async function SimuladorCVPage() {
     .order('created_at', { ascending: false })
     .returns<CvSimulacao[]>();
 
+  const inicioDoMes = new Date();
+  inicioDoMes.setDate(1);
+  inicioDoMes.setHours(0, 0, 0, 0);
+  const usadasEsteMes = (simulacoes ?? []).filter(
+    (s) => new Date(s.created_at) >= inicioDoMes
+  ).length;
+
   return (
     <SimuladorCVClient
       profile={profile}
       userId={user.id}
       simulacoesIniciais={simulacoes ?? []}
+      usadasEsteMes={usadasEsteMes}
     />
   );
 }

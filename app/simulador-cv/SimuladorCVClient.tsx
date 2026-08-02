@@ -22,24 +22,37 @@ interface Props {
   profile: Profile | null;
   userId: string;
   simulacoesIniciais: CvSimulacao[];
+  usadasEsteMes: number;
 }
+
+const LIMITE_GRATIS_MES = 3;
 
 type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista';
 
-export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props) {
+export default function SimuladorCVClient({
+  profile,
+  simulacoesIniciais,
+  usadasEsteMes,
+}: Props) {
   const router = useRouter();
   const supabase = createClient();
 
   const [curriculo, setCurriculo] = useState('');
   const [vaga, setVaga] = useState('');
   const [gerando, setGerando] = useState(false);
+  const [comprando, setComprando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [limiteAtingido, setLimiteAtingido] = useState(false);
+  const [usadas, setUsadas] = useState(usadasEsteMes);
+  const [creditos, setCreditos] = useState(profile?.creditos_simulacao_cv ?? 0);
   const [resultado, setResultado] = useState<CvSimulacao | null>(
     simulacoesIniciais[0] ?? null
   );
   const [historico, setHistorico] = useState(simulacoesIniciais);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
   const [aba, setAba] = useState<Aba>('compatibilidade');
+
+  const restantesGratis = Math.max(0, LIMITE_GRATIS_MES - usadas);
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -53,6 +66,7 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
     if (!curriculo.trim() || !vaga.trim()) return;
     setGerando(true);
     setErro(null);
+    setLimiteAtingido(false);
     try {
       const res = await fetch('/api/gerar-simulacao-cv', {
         method: 'POST',
@@ -60,15 +74,44 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
         body: JSON.stringify({ curriculo, vaga }),
       });
       const data = await res.json();
+
+      if (res.status === 402) {
+        setLimiteAtingido(true);
+        setErro(data.mensagem ?? 'Limite gratuito atingido.');
+        setGerando(false);
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error);
+
       setResultado(data.simulacao);
       setHistorico((prev) => [data.simulacao, ...prev]);
       setAba('compatibilidade');
+      if (usadas >= LIMITE_GRATIS_MES) {
+        setCreditos((c) => Math.max(0, c - 1));
+      } else {
+        setUsadas((u) => u + 1);
+      }
       posthog.capture('simulacao_cv_gerada');
     } catch (e) {
       setErro(e instanceof Error ? e.message : 'Não foi possível gerar a análise agora.');
     }
     setGerando(false);
+  }
+
+  async function comprarSimulacaoExtra() {
+    setComprando(true);
+    setErro(null);
+    try {
+      const res = await fetch('/api/mercadopago/comprar-simulacao-cv', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      posthog.capture('compra_simulacao_cv_iniciada');
+      window.location.href = data.init_point;
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Não foi possível iniciar a compra agora.');
+    }
+    setComprando(false);
   }
 
   const r = resultado?.resultado_json;
@@ -113,6 +156,19 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
               <History size={13} />
               {mostrarHistorico ? 'Ocultar histórico' : `Histórico (${historico.length})`}
             </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 mb-6">
+          <span className="text-xs px-3 py-1.5 rounded-full bg-sky-tint border border-sky text-sky-deep">
+            {restantesGratis > 0
+              ? `${restantesGratis} simulação${restantesGratis > 1 ? 'ões' : ''} grátis restante${restantesGratis > 1 ? 's' : ''} este mês`
+              : 'Simulações grátis deste mês esgotadas'}
+          </span>
+          {creditos > 0 && (
+            <span className="text-xs px-3 py-1.5 rounded-full bg-[#f1e6d6] border border-brown/30 text-brown">
+              {creditos} crédito{creditos > 1 ? 's' : ''} extra
+            </span>
           )}
         </div>
 
@@ -169,15 +225,32 @@ export default function SimuladorCVClient({ profile, simulacoesIniciais }: Props
           </label>
         </div>
 
-        {erro && (
+        {erro && !limiteAtingido && (
           <p className="text-sm text-red-700 bg-red-50 border border-red-300 rounded-md px-4 py-2.5 mb-4">
             {erro}
           </p>
         )}
 
+        {limiteAtingido && (
+          <Panel className="p-6 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-ink mb-1">Limite gratuito deste mês atingido</p>
+              <p className="text-sm text-ink-faint">{erro}</p>
+            </div>
+            <button
+              onClick={comprarSimulacaoExtra}
+              disabled={comprando}
+              className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+            >
+              {comprando ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+              {comprando ? 'Abrindo pagamento...' : 'Comprar simulação extra (R$ 5)'}
+            </button>
+          </Panel>
+        )}
+
         <button
           onClick={analisar}
-          disabled={gerando || !curriculo.trim() || !vaga.trim()}
+          disabled={gerando || !curriculo.trim() || !vaga.trim() || (limiteAtingido && creditos === 0)}
           className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-6 py-3 rounded-full transition-colors mb-10"
         >
           {gerando ? (
