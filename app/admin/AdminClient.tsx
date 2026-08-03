@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -31,6 +31,7 @@ export default function AdminClient({
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
+  const [deletandoId, setDeletandoId] = useState<string | null>(null);
 
   async function entrarComoUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
@@ -91,6 +92,34 @@ export default function AdminClient({
       alert(err instanceof Error ? err.message : 'Não foi possível gerar o link de reset.');
     } finally {
       setResetandoId(null);
+    }
+  }
+
+  async function deletarUsuario(userId: string, nome: string) {
+    const confirmado = window.confirm(
+      `ATENÇÃO: Tem certeza que quer deletar ${nome}? Esta ação não pode ser desfeita. O usuário terá que criar uma nova conta.`
+    );
+    if (!confirmado) return;
+
+    setDeletandoId(userId);
+
+    try {
+      const res = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      // Remove da lista local
+      setLinhas((prev) => prev.filter((l) => l.profile.id !== userId));
+      posthog.capture('admin_deletou_usuario', { usuario_alvo: userId });
+      alert('Usuário deletado com sucesso!');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Não foi possível deletar o usuário.');
+    } finally {
+      setDeletandoId(null);
     }
   }
 
@@ -403,6 +432,18 @@ export default function AdminClient({
                             <Key size={12} />
                           )}
                           Reset senha
+                        </button>
+                        <button
+                          onClick={() => deletarUsuario(l.profile.id, l.profile.nome)}
+                          disabled={deletandoId === l.profile.id}
+                          className="flex items-center gap-1.5 text-xs bg-red-800 hover:bg-red-900 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                        >
+                          {deletandoId === l.profile.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={12} />
+                          )}
+                          Deletar
                         </button>
                       </div>
                     </td>
