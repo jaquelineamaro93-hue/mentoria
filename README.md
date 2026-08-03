@@ -4,17 +4,39 @@
 
 ### ✨ Novas Páginas (Completas e prontas)
 
-1. **`/meu-plano`** - Gestão visual do plano do mentorado
+1. **`/meu-plano`** - Gestão visual do plano do mentorado (TODOS VÊM)
    - Mostra qual é o plano ativo
    - Duração total em meses
-   - Breakdown de encontros (online individual, coletivos, presenciais)
+   - Breakdown de encontros
    - Ferramentas incluídas
+   - Não mostra planos de teste (R$ 0,01)
 
 2. **`/votar-encontro`** - Votação de encontro presencial
-   - Menu de cidades pra votar
-   - Aviso obrigatório sobre falta de 2 encontros = bloqueio 2 próximos (sem reembolso)
-   - Checkbox de aceite dos termos
-   - Registro visual quando voto é enviado
+   - Votação exclusiva: São Paulo, Pinheiros
+   - 3 datas específicas (22/08, 29/08, 5/09)
+   - Horário: 11:30 às 17h
+   - Vota uma vez só
+   - Vê quem votou (tipo WhatsApp)
+   - Encerramento: terça 4/08 às 23h
+
+3. **`/checkout`** - Landing page pública de vendas (SEM LOGIN)
+   - Novos interessados veem os planos
+   - Escolhem forma de pagamento
+   - Pagam via Mercado Pago
+   - Após pagamento, usuário é criado automático + já consegue fazer login
+
+### 🔧 Páginas de Admin (para você)
+
+1. **`/admin/gerenciar-planos`** - Controle total de planos e pagamentos
+   - Tabela com todos os mentorados
+   - Trocar plano (dropdown)
+   - Marcar como "Ativo" ou "Inadimplente"
+   - Salvar com um clique
+   - Você controla manualmente quem pagou, mesmo pra cadastros seus
+
+2. **`/admin/indicacoes`** - Gestão de indicações (já existia)
+
+3. **`/admin/feedbacks`** - Trilha de feedbacks mensais (já existia)
 
 ### 📋 Componentes Novos/Atualizados
 
@@ -75,6 +97,13 @@ app/
   votar-encontro/
     page.tsx (servidor)
     VotarEncontroClient.tsx (cliente)
+  checkout/
+    page.tsx (servidor - pública, sem login)
+    CheckoutClient.tsx (cliente)
+  admin/
+    gerenciar-planos/
+      page.tsx (servidor)
+      GerenciarPlanosClient.tsx (cliente)
 
 components/
   MuralAtualizado.tsx

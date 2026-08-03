@@ -140,9 +140,41 @@ E usa assim no JSX:
 <h3>{formatarTituloInsight(insight.titulo)}</h3>
 ```
 
-## 7. Banco de dados — Tabela de votos para encontros presenciais
+## 8. app/checkout/page.tsx — Landing page pública de vendas
 
-No Supabase, cria a tabela:
+Já vem pronta no pacote. É a página que novos interessados veem, escolhem plano e pagam.
+- URL: `/checkout` (pública, sem login)
+- Mostra os 3 planos com preços
+- Escolhe forma de pagamento (à vista, cartão, recorrente)
+- Integra com Mercado Pago
+
+IMPORTANTE: Depois que o cliente paga via Mercado Pago, o webhook cria o usuário automaticamente. Você não precisa fazer nada, só o link `/checkout` fica disponível.
+
+## 9. app/admin/gerenciar-planos/page.tsx — Painel de gestão de planos
+
+Você consegue:
+- Ver todos os mentorados
+- Trocar plano de cada um (dropdown)
+- Marcar como "Ativo" ou "Inadimplente"
+- Salvar mudanças com um clique
+
+IMPORTANTE: Aqui você marca MANUALMENTE se alguém pagou ou não. Quando um novo interessado paga via `/checkout`, isso vem automático do Mercado Pago. Mas pra quem você cadastra manual (seus 38 mentorados), você controla aqui.
+
+## 10. Mercado Pago — Setup do webhook
+
+Se ainda não tiver, no painel do Mercado Pago:
+- Vai em Settings → Webhooks
+- Adiciona URL: `https://mentoria-pi-taupe.vercel.app/api/mercadopago/webhook`
+- Event: `payment.successful` e `subscription.* events`
+
+Quando alguém paga, o webhook já cria o usuário no sistema com plano + acesso liberado.
+
+## 11. Sidebar — Adicionar link pro checkout (opcional)
+
+Se quiser, adiciona no menu um link tipo:
+`{ href: '/checkout', label: 'Assinar Agora', icon: CreditCard }`
+
+Mas ele só aparece pra quem NOT tá autenticado. Se estiver logado, ele vê o menu normal.
 
 ```sql
 create table public.votos_encontro (
