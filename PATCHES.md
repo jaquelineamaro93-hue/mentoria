@@ -1,279 +1,83 @@
-# Patches para aplicar nos arquivos existentes
+# Patches — Meu Plano (saída do Meu PDI)
 
-## 1. components/Sidebar.tsx — adicionar 2 links novos
+Este pacote resolve o problema: a mentorada preenche as 20 seções do Meu PDI e não
+aparece nenhum plano, roadmap ou ação depois disso. Agora existe uma página
+`/meu-pdi/plano` que transforma as respostas em um plano com pilares SMART,
+roadmap, lista de ações (feita/não feita) e reflexão mensal — no mesmo formato
+dos PDIs que a Jaque já produz manualmente (Brunna, Laura).
 
-Procura no array de navegação do mentorado e adiciona esses dois links (em qualquer posição, recomendo perto de "Simulador de CV"):
+Arquivos NOVOS neste zip (não sobrescrevem nada):
+- `supabase/migrations/20260803_pdi_plano_gerado.sql`
+- `lib/prompts-pdi.ts`
+- `app/api/pdi/gerar-plano/route.ts`
+- `app/api/pdi/acoes/route.ts`
+- `app/api/pdi/reflexao/route.ts`
+- `app/meu-pdi/plano/page.tsx`
+- `components/pdi/AcaoItem.tsx`
+- `components/pdi/RoadmapTimeline.tsx`
+- `components/pdi/ReflexaoMensal.tsx`
 
-```typescript
-{ href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
-{ href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin },
-{ href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
-{ href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp },
+## 1. Confirmar nome real da tabela das 20 seções
+
+Em `app/api/pdi/gerar-plano/route.ts` a query assume uma tabela `pdi_respostas`
+com colunas `secao_codigo`, `secao_titulo`, `resposta`, `mentorado_id`,
+`secao_ordem`. Procura no projeto pelo nome real da tabela que guarda as
+respostas do Meu PDI (as 20 seções, incluindo `bem_estar`, `inteligencia_emocional`,
+`celebracao`, `planejamento_futuro` etc, vistas na migração anterior) e ajusta
+o nome da tabela/colunas nessa rota. Se os nomes de coluna forem diferentes,
+ajusta o `.select(...)` e o `.map(...)` logo abaixo.
+
+## 2. Trocar os imports de "client Supabase" pelos helpers reais do projeto
+
+Três arquivos usam `createClient` direto do `@supabase/supabase-js` como
+placeholder:
+- `app/api/pdi/acoes/route.ts`
+- `app/meu-pdi/plano/page.tsx`
+
+Troca pelos helpers que o projeto já usa nas outras rotas/páginas (client
+autenticado a partir dos cookies da sessão), do mesmo jeito que as demais
+páginas client-side do dashboard fazem.
+
+## 3. Botão "Meu plano" dentro do Meu PDI
+
+No arquivo da página do Meu PDI (o workbook de 20 seções), depois que a
+mentorada preenche a seção 20 (`planejamento_futuro`), mostra um botão/banner
+levando para `/meu-pdi/plano`:
+
+```tsx
+{todasSecoesPreenchidas && (
+  <Link href="/meu-pdi/plano" className="...">
+    Ver meu plano →
+  </Link>
+)}
 ```
 
-Importa os ícones no topo: `import { CreditCard, MapPin, Gift, TrendingUp } from 'lucide-react';`
+Ajusta `todasSecoesPreenchidas` para a variável/checagem real que o projeto já
+usa para saber se as 20 seções foram completadas.
 
-## 2. app/dashboard/page.tsx — substituir o Mural de Avisos
+## 4. Sidebar
 
-Aonde está o componente que renderiza os avisos (provavelmente `<Announcements>` 
-ou similar), substitui por:
+Se "Meu PDI" já é um item da sidebar, não precisa de item novo — o link fica
+dentro da própria página do PDI (ver item 3). Se preferir um item de sidebar
+separado chamado "Meu plano", segue o mesmo padrão dos outros ícones da nav.
 
-```typescript
-import MuralAtualizado from '@/components/MuralAtualizado';
+## 5. Painel admin (opcional, mas recomendado)
 
-// ... dentro do JSX:
-<MuralAtualizado avisos={avisos} />
-```
+Dá pra reaproveitar `pdi_planos` e `pdi_acoes` para a Jaque ver, por
+mentorado, se o plano foi gerado e quantas ações estão concluídas — parecido
+com o que já existe em `/admin/financeiro`. Não incluído neste pacote para
+manter o escopo pequeno; avisa se quiser que eu monte essa tela também.
 
-O componente novo cuida de fazer scroll horizontal separado por tipo (Gerais, 
-Individuais, Grupo), com botões de navegação e o mais recente primeiro.
+## 6. Variáveis de ambiente
 
-## 3. app/passaporte/page.tsx — adicionar badges SOMA
+Nenhuma variável nova. Usa as que já existem: `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`.
+Confirma que o pacote `@anthropic-ai/sdk` já está no `package.json` (é usado em
+outras partes do projeto, tipo o Simulador de CV); se não estiver, `npm install
+@anthropic-ai/sdk`.
 
-Na página do Passaporte, aonde renderiza os achievements/badges, adiciona:
+## 7. Aplicar a migração
 
-```typescript
-import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
-
-// Dentro do componente, depois dos achievements atuais:
-<h2 className="font-display text-lg text-brown-deep mb-4 mt-8">Pilares SOMA</h2>
-
-{['sabedoria', 'objetividade', 'maestria', 'alquimia'].map((pilar) => {
-  const badgesDosPilar = SOMA_ACHIEVEMENTS.filter(b => b.pilar === pilar);
-  const cores = getCoresDosPilares();
-  
-  return (
-    <div key={pilar} className="mb-6">
-      <p className="text-sm font-medium mb-2" style={{ color: cores[pilar as keyof typeof cores] }}>
-        {getNomePilar(pilar)}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {badgesDosPilar.map((badge) => (
-          <div 
-            key={badge.id} 
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
-            style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
-            title={badge.descricao}
-          >
-            <span>{badge.emoji}</span>
-            <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-})}
-```
-
-## 4. Texto "pra Jaqueline" → "para seu mentor" em EVERYWHERE
-
-Faz um Find & Replace (Ctrl+H ou Cmd+H) em todo o projeto:
-
-**Find**: `pra Jaqueline|pra você|pra mim`
-**Replace with**: `para seu mentor`
-
-**Find**: `pra`
-**Replace with**: `para` (cuidado com este, pode pegar palavras que não devem)
-
-### Específico: app/minha-trilha/MinhaTrilhaClient.tsx
-Já está escrito "pra Jaqueline", troca por "para seu mentor"
-
-### Específico: app/passaporte/page.tsx (se existir)
-Se tiver "LinkedIn com a Jaque", troca por "Revisão do LinkedIn"
-
-## 5. lib/types.ts — adicionar type para Announcement
-
-Se não existir, adiciona:
-
-```typescript
-export interface Announcement {
-  id: string;
-  titulo: string;
-  conteudo: string;
-  tipo: 'geral' | 'individual' | 'grupo';
-  destinatario_id?: string | null;
-  created_at: string;
-  updated_at?: string;
-}
-```
-
-## 6. Avisos de Copy — títulos em CAPS LOCK e Title Case
-
-### 6.1 Títulos de seções (CAPS LOCK → Normal)
-Procura em todos os arquivos por títulos com CAPS LOCK inicial e troca:
-
-**Find**: `MAPA DO CONHECIMENTO`, `SIMULADOR DE CV`, `PDI`, etc
-**Replace**: `Mapa do conhecimento`, `Simulador de CV`, `Pdi`, etc (apenas primeira letra maiúscula)
-
-Exemplo de arquivo pra verificar:
-- `app/dashboard/page.tsx` (títulos das seções)
-- `app/quem-sou-eu/page.tsx`
-- `app/simulador-cv/page.tsx`
-
-### 6.2 ⚠️ CRÍTICO: Títulos de Insights (Title Case → Sentence case)
-Os títulos dos insights estão vindo com Title Case (primeira letra de cada palavra maiúscula).
-Precisa trocar pra Sentence case (apenas primeira letra maiúscula, resto minúsculo).
-
-Exemplos:
-- ❌ `Sua Dinâmica de Energia: Uma Leitura de Forças`
-- ✅ `Sua dinâmica de energia: uma leitura de forças`
-
-- ❌ `Como Você Opera no Automático`
-- ✅ `Como você opera no automático`
-
-Procura em:
-- `app/quem-sou-eu/page.tsx` ou componente de insights
-- `app/simulador-cv/page.tsx` ou componente de insights
-- `components/InsightCard.tsx` (se existir)
-- Qualquer arquivo que renderize `insight.titulo` ou `insight.nome`
-
-Se houver um componente que renderiza insights, adiciona uma função helper:
-```typescript
-function formatarTituloInsight(titulo: string): string {
-  if (!titulo) return '';
-  return titulo.charAt(0).toUpperCase() + titulo.slice(1).toLowerCase();
-}
-```
-
-E usa assim no JSX:
-```typescript
-<h3>{formatarTituloInsight(insight.titulo)}</h3>
-```
-
-## 8. app/checkout/page.tsx — Landing page pública de vendas
-
-Já vem pronta no pacote. É a página que novos interessados veem, escolhem plano e pagam.
-- URL: `/checkout` (pública, sem login)
-- Mostra os 3 planos com preços
-- Escolhe forma de pagamento (à vista, cartão, recorrente)
-- Integra com Mercado Pago
-
-IMPORTANTE: Depois que o cliente paga via Mercado Pago, o webhook cria o usuário automaticamente. Você não precisa fazer nada, só o link `/checkout` fica disponível.
-
-## 9. app/admin/gerenciar-planos/page.tsx — Painel de gestão de planos
-
-Você consegue:
-- Ver todos os mentorados
-- Trocar plano de cada um (dropdown)
-- Marcar como "Ativo" ou "Inadimplente"
-- Salvar mudanças com um clique
-
-IMPORTANTE: Aqui você marca MANUALMENTE se alguém pagou ou não. Quando um novo interessado paga via `/checkout`, isso vem automático do Mercado Pago. Mas pra quem você cadastra manual (seus 38 mentorados), você controla aqui.
-
-## 10. Mercado Pago — Setup do webhook
-
-Se ainda não tiver, no painel do Mercado Pago:
-- Vai em Settings → Webhooks
-- Adiciona URL: `https://mentoria-pi-taupe.vercel.app/api/mercadopago/webhook`
-- Event: `payment.successful` e `subscription.* events`
-
-Quando alguém paga, o webhook já cria o usuário no sistema com plano + acesso liberado.
-
-## 11. Sidebar — Adicionar link pro checkout (opcional)
-
-Se quiser, adiciona no menu um link tipo:
-`{ href: '/checkout', label: 'Assinar Agora', icon: CreditCard }`
-
-Mas ele só aparece pra quem NOT tá autenticado. Se estiver logado, ele vê o menu normal.
-
-```sql
-create table public.votos_encontro (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  data_escolhida text not null,
-  nome_mentorado text not null,
-  created_at timestamptz not null default now()
-);
-
-create unique index votos_encontro_user_unico on public.votos_encontro(user_id);
-
-alter table public.votos_encontro enable row level security;
-
-create policy "mentorado ve seu voto"
-  on public.votos_encontro for select
-  using (user_id = auth.uid());
-
-create policy "mentorado cria seu voto"
-  on public.votos_encontro for insert
-  with check (user_id = auth.uid());
-
-create policy "admin ve todos votos"
-  on public.votos_encontro for select
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin));
-```
-
-## 8. Sistema de Emails e Alertas (Cron)
-
-**IMPORTANTE**: Adiciona um cron job que roda:
-- **Hoje, 14h**: aviso pra votar (deadline amanhã 16h)
-- **Amanhã, 16h30**: último aviso antes do encerramento
-- **Terça de manhã, 8h**: aviso final pra quem não votou (só presencial)
-- **Terça 23h**: votação encerra
-
-O endpoint já existe em `app/api/cron/lembretes`. Precisa adicionar lógica pra avisos de votação.
-
-Criar arquivo `app/api/cron/avisos-votacao/route.ts`:
-
-```typescript
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-
-export async function POST(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const supabase = await createClient();
-  const agora = new Date();
-  const dia = agora.getDate();
-  const hora = agora.getHours();
-
-  // 1. Se for hoje 14h: aviso pra votar
-  if (dia === 2 && hora === 14) {
-    // Busca quem não votou ainda
-    const { data: quemNaoVotou } = await supabase
-      .from('profiles')
-      .select('email, nome')
-      .not('email', 'is', null);
-
-    // Manda email pra cada um
-    // Usar SendGrid via /api/enviar-email ou similar
-
-    return NextResponse.json({ enviados: quemNaoVotou?.length || 0 });
-  }
-
-  // 2. Se for amanhã 16h30: segundo aviso
-  if (dia === 3 && hora === 16) {
-    // Similar ao anterior
-  }
-
-  // 3. Se for terça 8h: aviso final (só presencial)
-  if (dia === 4 && hora === 8) {
-    // Busca quem tem plano presencial e não votou
-    // Manda email
-  }
-
-  return NextResponse.json({ ok: true });
-}
-```
-
-## 9. Admin: Novo link no painel admin
-
-Se tiver um menu admin, adiciona links pra:
-- `/admin/indicacoes` (gestão de indicações e liberação de sessões bônus)
-- `/admin/feedbacks` (trilha de feedbacks mensais)
-
-(Já existem as páginas, é só linkar no menu se houver um)
-
----
-
-**Resumo da ordem de aplicação:**
-1. Adiciona imports novos (badges, tipos)
-2. Substitui Mural de Avisos
-3. Adiciona navegação nova (sidebar)
-4. Adiciona badges SOMA no Passaporte
-5. Troca textos (pra → para, CAPS → Normal)
-6. (Opcional) Adiciona links no admin se houver menu
-
-Depois: `npm run build` e verifica se tá tudo compilando.
+Aplica `supabase/migrations/20260803_pdi_plano_gerado.sql` direto pelo Supabase
+(MCP), do mesmo jeito que as migrações anteriores foram aplicadas — não precisa
+esperar o deploy do front pra isso.
