@@ -44,10 +44,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Busca o usuário
-    const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(email);
+    // Verifica se o usuário existe
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .single();
 
-    if (userError || !userData.user) {
+    if (profileError || !profile) {
       return NextResponse.json(
         { error: 'Usuário não encontrado' },
         { status: 404 }
@@ -56,7 +60,7 @@ export async function POST(request: Request) {
 
     // Gera um link de login
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-      type: 'email',
+      type: 'magiclink',
       email: email,
       options: {
         redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://mentoria-pi-taupe.vercel.app'}/dashboard`,
