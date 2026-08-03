@@ -28,8 +28,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Retorna o link para o admin copiar/enviar
-    const resetUrl = (data.properties as any)?.action_link;
+    console.log('Data completa do generateLink:', JSON.stringify(data, null, 2));
+
+    // Supabase retorna o link em data.properties?.action_link ou data?.action_link
+    const resetUrl = (data.properties as any)?.action_link || (data as any)?.action_link;
+
+    console.log('Reset URL gerada:', resetUrl);
+
+    if (!resetUrl) {
+      console.error('action_link não encontrado em:', JSON.stringify(data));
+      return NextResponse.json(
+        { error: 'Erro ao gerar link de reset (action_link vazio)' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       message: 'Link gerado com sucesso',

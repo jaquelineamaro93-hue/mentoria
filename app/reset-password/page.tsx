@@ -23,28 +23,43 @@ function ResetPasswordContent() {
       try {
         // Tenta extrair tokens do hash da URL (enviados pelo link de recovery)
         const hash = window.location.hash;
+        console.log('Hash completo da URL:', hash);
+        console.log('URL completa:', window.location.href);
+
         if (hash) {
           const params = new URLSearchParams(hash.substring(1));
           const accessToken = params.get('access_token');
           const refreshToken = params.get('refresh_token');
           const type = params.get('type');
 
+          console.log('Tokens extraídos:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+
           if (accessToken && type === 'recovery') {
+            console.log('Tentando estabelecer sessão com tokens...');
             // Estabelece a sessão com os tokens do recovery link
             const { error: setSessionError } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken || '',
             });
 
+            console.log('Erro ao setSession:', setSessionError);
+
             if (!setSessionError) {
+              console.log('Sessão estabelecida com sucesso!');
               setTokenValido(true);
               return;
             }
+          } else {
+            console.log('Tokens inválidos ou tipo errado:', { hasAccessToken: !!accessToken, type });
           }
+        } else {
+          console.log('Nenhum hash encontrado na URL');
         }
 
         // Se não há tokens no hash, verifica se já existe uma sessão
         const { data } = await supabase.auth.getSession();
+        console.log('Sessão existente:', !!data?.session);
+
         if (data?.session) {
           setTokenValido(true);
         } else {
