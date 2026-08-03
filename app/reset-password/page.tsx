@@ -24,17 +24,15 @@ function ResetPasswordContent() {
         // Tenta extrair tokens do hash da URL (enviados pelo link de recovery)
         const hash = window.location.hash;
         console.log('Hash completo da URL:', hash);
-        console.log('URL completa:', window.location.href);
 
         if (hash) {
           const params = new URLSearchParams(hash.substring(1));
           const accessToken = params.get('access_token');
           const refreshToken = params.get('refresh_token');
-          const type = params.get('type');
 
-          console.log('Tokens extraídos:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+          console.log('Tokens extraídos:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
 
-          if (accessToken && type === 'recovery') {
+          if (accessToken) {
             console.log('Tentando estabelecer sessão com tokens...');
             // Estabelece a sessão com os tokens do recovery link
             const { error: setSessionError } = await supabase.auth.setSession({
@@ -48,12 +46,12 @@ function ResetPasswordContent() {
               console.log('Sessão estabelecida com sucesso!');
               setTokenValido(true);
               return;
+            } else {
+              console.error('Falha ao setSession:', setSessionError);
             }
           } else {
-            console.log('Tokens inválidos ou tipo errado:', { hasAccessToken: !!accessToken, type });
+            console.log('Sem access_token no hash');
           }
-        } else {
-          console.log('Nenhum hash encontrado na URL');
         }
 
         // Se não há tokens no hash, verifica se já existe uma sessão
@@ -61,8 +59,10 @@ function ResetPasswordContent() {
         console.log('Sessão existente:', !!data?.session);
 
         if (data?.session) {
+          console.log('Usando sessão existente');
           setTokenValido(true);
         } else {
+          console.log('Nenhuma sessão encontrada');
           setErro('Link inválido ou expirado. Solicite um novo link de reset.');
         }
       } catch (err) {
@@ -72,7 +72,7 @@ function ResetPasswordContent() {
     };
 
     verificarSessao();
-  }, [supabase.auth]);
+  }, [supabase]);
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
