@@ -24,13 +24,13 @@ export default function MeuPlanoClient({
     router.refresh();
   }
 
-  if (!plano || plano.codigo === 'teste' || plano.preco_avista < 10) {
+  if (!plano) {
     return (
       <div className="flex flex-col md:flex-row w-full">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
           <p className="text-sm text-ink-faint">
-            Seu plano será exibido aqui em breve. Aguarde a ativação.
+            Seu plano será ativado em breve. Você receberá um aviso por email.
           </p>
         </main>
       </div>
