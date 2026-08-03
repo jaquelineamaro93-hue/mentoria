@@ -52,16 +52,32 @@ export default function MeuPlanoClient({
         <p className="text-sm text-ink-faint max-w-xl mb-8">{plano.foco}</p>
 
         <div className="bg-white border border-line rounded-2xl p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
               <p className="text-xs text-ink-faint mb-1">Duração total</p>
               <p className="text-2xl font-display text-brown-deep">{mesesRestantes} meses</p>
             </div>
-            <div className="text-right">
+            <div>
               <p className="text-xs text-ink-faint mb-1">Status</p>
               <p className="text-sm font-medium text-green-600">Ativo</p>
             </div>
           </div>
+          
+          <div className="bg-cream rounded-lg p-4 mb-4">
+            <p className="text-xs text-ink-faint mb-3">Opções de investimento:</p>
+            <div className="space-y-1 text-sm">
+              <p className="text-brown-deep">
+                <span className="font-medium">À vista:</span> R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </p>
+              <p className="text-brown-deep">
+                <span className="font-medium">Cartão:</span> R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </p>
+              <p className="text-brown-deep">
+                <span className="font-medium">Recorrente:</span> {plano.parcelas_recorrente}x de R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
+
           <p className="text-sm text-ink-faint">{plano.descricao_encontros}</p>
         </div>
 
