@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
+import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
 interface Props {
@@ -194,19 +194,19 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
           </Panel>
 
           {concluidos === total && (
-            <div className="mt-8 bg-sky-tint border border-sky rounded-lg p-8 text-center">
-              <h2 className="text-xl font-display text-brown-deep mb-2">
-                🎉 Você completou seu PDI!
-              </h2>
-              <p className="text-sm text-ink-soft mb-6">
-                Agora vamos transformar essas respostas em um plano de ação com pilares, metas SMART e roadmap.
-              </p>
-              <Link
-                href="/meu-pdi/plano"
-                className="inline-flex items-center gap-2 bg-brown hover:bg-brown-deep text-paper font-medium px-6 py-3 rounded-full transition-colors"
-              >
-                Ver meu plano <ArrowRight size={16} />
-              </Link>
+            <div className="mt-8">
+              <div className="bg-sky-tint border border-sky rounded-lg p-6 text-center mb-6">
+                <h2 className="text-xl font-display text-brown-deep mb-2">
+                  🎉 Você completou seu PDI!
+                </h2>
+                <p className="text-sm text-ink-soft">
+                  Aqui embaixo está seu plano de ação, gerado a partir de tudo que você escreveu:
+                  pilares, metas SMART e roadmap.
+                </p>
+              </div>
+              <Panel className="p-6">
+                <PlanoGerado mentoradoId={userId} />
+              </Panel>
             </div>
           )}
         </main>

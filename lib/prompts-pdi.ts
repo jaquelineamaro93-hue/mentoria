@@ -19,12 +19,25 @@ export function montarPromptGeracaoPDI(params: {
 }) {
   const { nomeMentorado, cargoAtual, respostas } = params;
 
+  const hoje = new Date();
+  const dataAtualFormatada = hoje.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  const anoAtual = hoje.getFullYear();
+  const anoSeguinte = anoAtual + 1;
+
   const blocoRespostas = respostas
     .filter((r) => r.resposta && r.resposta.trim().length > 0)
     .map((r) => `### ${r.titulo}\n${r.resposta.trim()}`)
     .join("\n\n");
 
   return `${REGRAS_DE_ESTILO}
+
+A data de hoje é ${dataAtualFormatada}. Todo prazo, data e período do roadmap que você gerar
+precisa ser no futuro a partir de hoje — nunca use datas de anos anteriores a ${anoAtual}.
+Este ciclo de plano cobre aproximadamente de ${anoAtual} a ${anoSeguinte}.
 
 Você é a mentora de carreira lendo o workbook de PDI (Plano de Desenvolvimento Individual)
 que ${nomeMentorado}${cargoAtual ? `, ${cargoAtual},` : ""} acabou de preencher, seção por seção.
@@ -62,7 +75,7 @@ mentoria genérico: cada frase precisa vir de algo que a pessoa efetivamente esc
     }
   ],
   "roadmap": [
-    { "periodo": "ex: Ago-Set 2026", "foco": "foco principal do período", "marcos": "marcos de entrega, separados por ponto" }
+    { "periodo": "ex: ${hoje.toLocaleDateString("pt-BR", { month: "short" })}-${anoAtual}", "foco": "foco principal do período", "marcos": "marcos de entrega, separados por ponto" }
   ],
   "alertas": [
     { "tipo": "curto, ex: Travamento autoral", "cor": "vermelho | amarelo | azul", "descricao": "o que observar e o que fazer quando aparecer" }
