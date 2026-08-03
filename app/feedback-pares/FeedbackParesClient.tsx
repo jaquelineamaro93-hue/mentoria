@@ -92,7 +92,7 @@ export default function FeedbackParesClient({
           <Panel className="p-6">
             {colegas.length === 0 ? (
               <p className="text-sm text-ink-faint">
-                Ainda não tem outras pessoas cadastradas na mentoria pra você dar
+                Ainda não tem outras pessoas cadastradas na mentoria para você dar
                 feedback. Assim que mais gente entrar, aparece aqui.
               </p>
             ) : (

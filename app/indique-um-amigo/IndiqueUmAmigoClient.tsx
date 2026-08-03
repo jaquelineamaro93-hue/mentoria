@@ -91,13 +91,13 @@ export default function IndiqueUmAmigoClient({
             <Gift size={18} className="text-sky-deep mb-2" />
             <p className="text-2xl font-display text-brown-deep">{sessoesDisponiveis}</p>
             <p className="text-xs text-ink-faint">
-              {sessoesDisponiveis === 1 ? 'sessão liberada' : 'sessões liberadas'} pra usar
+              {sessoesDisponiveis === 1 ? 'sessão liberada' : 'sessões liberadas'} para usar
             </p>
           </div>
           <div className="bg-white border border-line rounded-2xl p-5">
             <p className="text-2xl font-display text-brown-deep">{faltamParaProxima}</p>
             <p className="text-xs text-ink-faint">
-              {faltamParaProxima === 1 ? 'amigo falta' : 'amigos faltam'} pra próxima sessão
+              {faltamParaProxima === 1 ? 'amigo falta' : 'amigos faltam'} para próxima sessão
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function IndiqueUmAmigoClient({
             <p className="text-sm text-brown-deep">
               Você tem {sessoesDisponiveis}{' '}
               {sessoesDisponiveis === 1 ? 'sessão bônus disponível' : 'sessões bônus disponíveis'}.
-              Me chama pra combinarmos o horário.
+              Me chama para combinarmos o horário.
             </p>
           </div>
         )}
@@ -115,7 +115,7 @@ export default function IndiqueUmAmigoClient({
         <h2 className="font-display text-xl text-brown-deep mb-4">Seus indicados</h2>
         {indicacoesIniciais.length === 0 ? (
           <p className="text-sm text-ink-faint">
-            Ainda não tem ninguém indicado. Compartilha seu link acima pra começar.
+            Ainda não tem ninguém indicado. Compartilha seu link acima para começar.
           </p>
         ) : (
           <div className="space-y-2">

@@ -64,7 +64,7 @@ export default function RenovarClient({ profile, planos }: Props) {
           </p>
           <p className="text-sm text-ink-faint max-w-lg mx-auto">
             Olá, {profile?.nome?.split(' ')[0] ?? 'futura mentorada'}. Escolha o plano e a
-            forma de pagamento que fazem mais sentido pra você.
+            forma de pagamento que fazem mais sentido para você.
           </p>
         </div>
 

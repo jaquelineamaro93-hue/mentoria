@@ -159,7 +159,7 @@ export default function MinhaTrilhaClient({
                 ) : ehMesAtual && !jaEnviouEsseMes ? (
                   <div className="bg-white border border-brown-deep/30 rounded-xl p-4 space-y-3">
                     <div>
-                      <p className="text-xs text-ink-faint mb-2">Como está sendo esse mês pra você?</p>
+                      <p className="text-xs text-ink-faint mb-2">Como está sendo esse mês para você?</p>
                       <div className="flex gap-1.5">
                         {[0, 1, 2, 3, 4, 5].map((n) => (
                           <button
@@ -179,7 +179,7 @@ export default function MinhaTrilhaClient({
                     <textarea
                       value={feedbackTexto}
                       onChange={(e) => setFeedbackTexto(e.target.value)}
-                      placeholder="Como está sendo a mentoria pra você esse mês? (opcional)"
+                      placeholder="Como está sendo a mentoria para você esse mês? (opcional)"
                       className="w-full text-sm border border-line rounded-lg px-3 py-2 min-h-[70px] focus:outline-none focus:border-brown-deep"
                     />
                     <textarea

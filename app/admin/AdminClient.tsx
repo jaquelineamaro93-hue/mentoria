@@ -33,7 +33,7 @@ export default function AdminClient({
 
   async function entrarComoUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
-      `Você vai sair da sua conta admin e entrar como ${nome}. Sua sessão de admin vai ser substituída, pra voltar a ser você mesma, saia e faça login de novo com seu e-mail. Confirma?`
+      `Você vai sair da sua conta admin e entrar como ${nome}. Sua sessão de admin vai ser substituída, para voltar a ser você mesma, saia e faça login de novo com seu e-mail. Confirma?`
     );
     if (!confirmado) return;
 
