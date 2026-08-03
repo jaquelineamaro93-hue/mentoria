@@ -17,17 +17,41 @@ function ResetPasswordContent() {
   const [sucesso, setSucesso] = useState(false);
   const [tokenValido, setTokenValido] = useState(false);
 
-  // Verifica se há uma sessão válida (criada pelo link do Supabase)
+  // Verifica se há uma sessão válida ou tokens na URL
   useEffect(() => {
     const verificarSessao = async () => {
-      // Aguarda um pouco para o Supabase processar a URL
-      await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        // Tenta extrair tokens do hash da URL (enviados pelo link de recovery)
+        const hash = window.location.hash;
+        if (hash) {
+          const params = new URLSearchParams(hash.substring(1));
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+          const type = params.get('type');
 
-      const { data, error } = await supabase.auth.getSession();
+          if (accessToken && type === 'recovery') {
+            // Estabelece a sessão com os tokens do recovery link
+            const { error: setSessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
 
-      if (data?.session) {
-        setTokenValido(true);
-      } else {
+            if (!setSessionError) {
+              setTokenValido(true);
+              return;
+            }
+          }
+        }
+
+        // Se não há tokens no hash, verifica se já existe uma sessão
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) {
+          setTokenValido(true);
+        } else {
+          setErro('Link inválido ou expirado. Solicite um novo link de reset.');
+        }
+      } catch (err) {
+        console.error('Erro ao verificar sessão:', err);
         setErro('Link inválido ou expirado. Solicite um novo link de reset.');
       }
     };
