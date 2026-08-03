@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -19,10 +20,11 @@ import {
   CreditCard,
   MapPin,
 } from 'lucide-react';
+import { NotificationBadge } from './NotificationBadge';
 import type { Profile } from '@/lib/types';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Início', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Início', icon: LayoutDashboard, notificationKey: 'avisoNaoLido' },
   { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
   { href: '/pdi', label: 'Meu PDI', icon: Target },
@@ -32,9 +34,9 @@ const NAV_ITEMS = [
   { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
   { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
   { href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
-  { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin },
+  { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin, notificationKey: 'naoVotou' },
   { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
-  { href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp },
+  { href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp, notificationKey: 'atividadesPendentes' },
 ];
 
 interface SidebarProps {
@@ -44,6 +46,21 @@ interface SidebarProps {
 
 export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   const pathname = usePathname();
+  const [notificacoes, setNotificacoes] = useState<Record<string, boolean>>({
+    avisoNaoLido: true,
+    naoVotou: false,
+    atividadesPendentes: false,
+  });
+
+  useEffect(() => {
+    const handleNotificationCleared = (e: CustomEvent) => {
+      const { key } = e.detail;
+      setNotificacoes((prev) => ({ ...prev, [key]: false }));
+    };
+
+    window.addEventListener('clearNotification' as any, handleNotificationCleared);
+    return () => window.removeEventListener('clearNotification' as any, handleNotificationCleared);
+  }, []);
 
   return (
     <aside className="w-full md:w-[260px] shrink-0 border-r border-b md:border-b-0 border-line bg-paper flex flex-col md:h-screen md:sticky md:top-0">
@@ -60,18 +77,20 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
+            const temNotificacao = item.notificationKey && notificacoes[item.notificationKey];
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
+                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
                     ? 'bg-sky-tint text-brown-deep border border-sky'
                     : 'text-ink-soft border border-transparent hover:bg-cream'
                 }`}
               >
                 <Icon size={17} strokeWidth={1.75} />
-                {item.label}
+                <span>{item.label}</span>
+                {temNotificacao && <NotificationBadge temNotificacao={true} />}
               </Link>
             );
           })}

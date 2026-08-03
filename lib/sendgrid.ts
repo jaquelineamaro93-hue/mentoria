@@ -38,7 +38,7 @@ export function templateInatividade(nome: string): string {
       <h2 style="color: #3c2c1f;">Sentimos sua falta, ${nome.split(' ')[0]}</h2>
       <p>Faz um tempo que você não acessa o Portal da Mentoria SOMA. Sua jornada continua esperando por você.</p>
       <p>Entra quando puder para continuar de onde parou, seja no Mapa Quem Sou Eu, no Diário de Bordo ou no PDI.</p>
-      <p style="margin-top: 24px;">Com carinho,<br>Jaque</p>
+      <p style="margin-top: 24px;">Com carinho,<br>Equipe SOMA Mentoria</p>
     </div>
   `;
 }
@@ -79,7 +79,7 @@ export function templateBoasVindas(nome: string): string {
         </a>
       </p>
       <p>Qualquer dúvida, é só chamar.</p>
-      <p style="margin-top: 24px;">Com carinho,<br>Jaque</p>
+      <p style="margin-top: 24px;">Com carinho,<br>Equipe SOMA Mentoria</p>
     </div>
   `;
 }

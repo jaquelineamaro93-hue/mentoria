@@ -56,10 +56,10 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
             <div className="mb-5 pb-5 border-b border-line grid sm:grid-cols-2 gap-3">
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-ink-faint mb-0.5">
-                  Mentora
+                  Programa
                 </p>
-                <p className="text-sm text-ink">Jaqueline Amaro</p>
-                <p className="text-xs text-ink-faint">CPF 416.******</p>
+                <p className="text-sm text-ink">SOMA Mentoria</p>
+                <p className="text-xs text-ink-faint">Programa de Desenvolvimento de Carreira</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-ink-faint mb-0.5">

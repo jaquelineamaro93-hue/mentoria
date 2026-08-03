@@ -61,7 +61,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
 
         {filtradas.length === 0 ? (
           <div className="rounded-xl border border-line bg-paper p-6 text-sm text-ink-faint text-center">
-            Nenhuma gravação por aqui ainda. Assim que a Jaque adicionar, aparece nesta lista.
+            Nenhuma gravação por aqui ainda. As gravações aparecerão nesta lista quando estiverem disponíveis.
           </div>
         ) : (
           <div className="flex flex-col gap-3">

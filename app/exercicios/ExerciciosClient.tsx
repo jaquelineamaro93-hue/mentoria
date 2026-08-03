@@ -315,8 +315,8 @@ export default function ExerciciosClient({
               </p>
               <p className="text-sm text-ink-faint mb-5">
                 Envie o PDF do seu resultado (mais rápido) ou preencha manualmente as 24
-                forças na ordem exata, da 1ª (mais natural) à 24ª (mais escondida). A Jaque
-                vai receber uma análise gerada a partir da sua combinação única.
+                forças na ordem exata, da 1ª (mais natural) à 24ª (mais escondida). Você
+                receberá uma análise gerada a partir da sua combinação única.
               </p>
 
               <div className="flex items-center gap-3 mb-5 flex-wrap">
