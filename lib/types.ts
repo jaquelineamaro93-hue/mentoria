@@ -230,6 +230,7 @@ export interface PlanoMentoria {
   descricao_encontros: string | null;
   itens_inclusos: string[];
   ativo: boolean;
+  visivel_checkout: boolean;
   ordem: number;
 }
 

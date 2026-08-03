@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: 'Não autorizado.' }, { status: 403 });
   }
 
-  const { nome, duracaoMeses, precoAvista, precoCartao, precoRecorrenteTotal } = await req.json();
+  const { nome, duracaoMeses, precoAvista, precoCartao, precoRecorrenteTotal, visivelCheckout } =
+    await req.json();
 
   if (!nome || !duracaoMeses) {
     return NextResponse.json({ erro: 'Nome e duração são obrigatórios.' }, { status: 400 });
@@ -51,6 +52,11 @@ export async function POST(req: NextRequest) {
       preco_recorrente_total: Number(precoRecorrenteTotal) || Number(precoAvista) || 0,
       parcelas_recorrente: 1,
       ativo: true,
+      // Por padrão, planos criados aqui (ex: cortesia, ajuste pontual de
+      // valor) NÃO aparecem no checkout público, só ficam disponíveis pra
+      // atribuição manual em Gerenciar Planos. Só vira público se marcado
+      // explicitamente.
+      visivel_checkout: visivelCheckout === true,
     })
     .select()
     .single();

@@ -37,6 +37,7 @@ export default function GerenciarPlanosClient({
     precoAvista: '',
     precoCartao: '',
     precoRecorrenteTotal: '',
+    visivelCheckout: false,
   });
 
   const planoMap = new Map(planos.map((p) => [p.id, p]));
@@ -77,13 +78,21 @@ export default function GerenciarPlanosClient({
           precoAvista: novoPlano.precoAvista,
           precoCartao: novoPlano.precoCartao,
           precoRecorrenteTotal: novoPlano.precoRecorrenteTotal,
+          visivelCheckout: novoPlano.visivelCheckout,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.erro);
       setPlanos((prev) => [...prev, data.plano].sort((a, b) => a.duracao_meses - b.duracao_meses));
       posthog.capture('admin_plano_criado', { nome: novoPlano.nome });
-      setNovoPlano({ nome: '', duracaoMeses: '', precoAvista: '', precoCartao: '', precoRecorrenteTotal: '' });
+      setNovoPlano({
+        nome: '',
+        duracaoMeses: '',
+        precoAvista: '',
+        precoCartao: '',
+        precoRecorrenteTotal: '',
+        visivelCheckout: false,
+      });
       setMostrarFormPlano(false);
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Não consegui criar o plano.');
@@ -200,6 +209,18 @@ export default function GerenciarPlanosClient({
               className="text-sm border border-line rounded px-3 py-2"
             />
           </div>
+          <label className="flex items-center gap-2 text-sm text-ink-soft mb-4">
+            <input
+              type="checkbox"
+              checked={novoPlano.visivelCheckout}
+              onChange={(e) => setNovoPlano({ ...novoPlano, visivelCheckout: e.target.checked })}
+            />
+            Mostrar esse plano na página pública de checkout
+          </label>
+          <p className="text-xs text-ink-faint mb-4 -mt-2">
+            Desmarcado (padrão): o plano fica disponível só aqui, pra você atribuir manualmente.
+            Marcado: qualquer visitante pode escolher e comprar esse plano em /checkout.
+          </p>
           <button
             onClick={handleCriarPlano}
             disabled={criandoPlano}
