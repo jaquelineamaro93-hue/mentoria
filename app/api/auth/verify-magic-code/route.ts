@@ -74,12 +74,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Extrai o action link corretamente
+    const actionLink = (linkData.properties as any)?.action_link;
+    if (!actionLink) {
+      console.error('Link não gerado:', linkData);
+      return NextResponse.json(
+        { error: 'Erro ao gerar link de acesso' },
+        { status: 500 }
+      );
+    }
+
     // Limpa o código usado
     await supabase.from('magic_codes').delete().eq('email', email);
 
     return NextResponse.json({
       message: 'Código verificado com sucesso!',
-      loginUrl: (linkData.properties as any)?.action_link || linkData,
+      loginUrl: actionLink,
     });
   } catch (error) {
     console.error('Erro:', error);
