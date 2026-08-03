@@ -164,7 +164,7 @@ function LoginPageContent() {
                 <button
                   type="button"
                   className="text-xs text-ink-faint hover:text-brown transition-colors text-center mt-1"
-                  onClick={() => setErro('Envio de recuperação de senha ainda não configurado neste MVP.')}
+                  onClick={() => router.push('/reset-password')}
                 >
                   Esqueci a senha
                 </button>
