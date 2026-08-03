@@ -49,34 +49,54 @@ export async function POST(request: Request) {
     // Envia email com o código
     if (process.env.SENDGRID_API_KEY) {
       try {
-        const sgMail = require('@sendgrid/mail');
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-        await sgMail.send({
-          to: email,
-          from: process.env.SENDGRID_FROM_EMAIL || 'noreply@somamentoria.com.br',
-          subject: 'Seu código de acesso - SOMA Mentoria',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #4a3b35; margin-bottom: 20px;">Seu código de acesso</h2>
-              <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
-                Use o código abaixo para entrar no SOMA Mentoria:
-              </p>
-              <div style="background: #f5f1ed; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
-                <p style="font-size: 32px; font-weight: bold; color: #2a5ba8; letter-spacing: 4px; margin: 0;">
-                  ${codigo}
-                </p>
-              </div>
-              <p style="color: #999; font-size: 12px;">
-                Este código expira em 15 minutos.
-              </p>
-              <p style="color: #999; font-size: 12px; margin-top: 20px;">
-                Com carinho,<br>
-                Equipe SOMA Mentoria
-              </p>
-            </div>
-          `,
+        const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            personalizations: [
+              {
+                to: [{ email }],
+              },
+            ],
+            from: {
+              email: process.env.SENDGRID_FROM_EMAIL || 'noreply@somamentoria.com.br',
+              name: 'SOMA Mentoria',
+            },
+            subject: 'Seu código de acesso - SOMA Mentoria',
+            content: [
+              {
+                type: 'text/html',
+                value: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #4a3b35; margin-bottom: 20px;">Seu código de acesso</h2>
+                    <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
+                      Use o código abaixo para entrar no SOMA Mentoria:
+                    </p>
+                    <div style="background: #f5f1ed; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
+                      <p style="font-size: 32px; font-weight: bold; color: #2a5ba8; letter-spacing: 4px; margin: 0;">
+                        ${codigo}
+                      </p>
+                    </div>
+                    <p style="color: #999; font-size: 12px;">
+                      Este código expira em 15 minutos.
+                    </p>
+                    <p style="color: #999; font-size: 12px; margin-top: 20px;">
+                      Com carinho,<br>
+                      Equipe SOMA Mentoria
+                    </p>
+                  </div>
+                `,
+              },
+            ],
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error(`SendGrid error: ${response.status}`);
+        }
 
         console.log(`Email enviado para ${email}`);
       } catch (emailError) {
