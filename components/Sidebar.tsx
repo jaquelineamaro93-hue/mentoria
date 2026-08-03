@@ -47,7 +47,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
 
   return (
     <aside className="w-full md:w-[260px] shrink-0 border-r border-b md:border-b-0 border-line bg-paper flex flex-col md:h-screen md:sticky md:top-0">
-      <div className="flex-1 flex flex-col p-6 md:p-7">
+      <div className="flex-1 flex flex-col p-6 md:p-7 md:max-h-screen md:overflow-y-auto">
         <div className="mb-9">
           <p className="font-display text-2xl text-brown-deep">SOMA</p>
           <div className="h-px w-8 bg-brown my-2.5" />
