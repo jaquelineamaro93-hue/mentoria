@@ -46,7 +46,7 @@ export default function RenovarClient({ profile, planos }: Props) {
       setErro(
         e instanceof Error
           ? e.message
-          : 'Não foi possível iniciar o pagamento agora. Entre em contato com a Jaque.'
+          : 'Não foi possível iniciar o pagamento agora. Entre em contato com seu mentor.'
       );
       setCarregando(null);
     }
