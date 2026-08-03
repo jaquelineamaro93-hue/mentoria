@@ -164,7 +164,7 @@ function LoginPageContent() {
                 <button
                   type="button"
                   className="text-xs text-ink-faint hover:text-brown transition-colors text-center mt-1"
-                  onClick={() => router.push('/reset-password')}
+                  onClick={() => router.push('/magic-login')}
                 >
                   Esqueci a senha
                 </button>

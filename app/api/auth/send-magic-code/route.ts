@@ -46,13 +46,47 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Enviar email com o código via SendGrid
-    console.log(`[DEV] Código para ${email}: ${codigo}`);
+    // Envia email com o código
+    if (process.env.SENDGRID_API_KEY) {
+      try {
+        const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+        await sgMail.send({
+          to: email,
+          from: process.env.SENDGRID_FROM_EMAIL || 'noreply@somamentoria.com.br',
+          subject: 'Seu código de acesso - SOMA Mentoria',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #4a3b35; margin-bottom: 20px;">Seu código de acesso</h2>
+              <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
+                Use o código abaixo para entrar no SOMA Mentoria:
+              </p>
+              <div style="background: #f5f1ed; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
+                <p style="font-size: 32px; font-weight: bold; color: #2a5ba8; letter-spacing: 4px; margin: 0;">
+                  ${codigo}
+                </p>
+              </div>
+              <p style="color: #999; font-size: 12px;">
+                Este código expira em 15 minutos.
+              </p>
+              <p style="color: #999; font-size: 12px; margin-top: 20px;">
+                Com carinho,<br>
+                Equipe SOMA Mentoria
+              </p>
+            </div>
+          `,
+        });
+
+        console.log(`Email enviado para ${email}`);
+      } catch (emailError) {
+        console.error('Erro ao enviar email:', emailError);
+        // Não retorna erro, pois o código já foi gerado
+      }
+    }
 
     return NextResponse.json({
       message: 'Se o email existe, você receberá um código.',
-      // Em desenvolvimento, retorna o código (remover em produção!)
-      ...(process.env.NODE_ENV === 'development' && { debug_code: codigo }),
     });
   } catch (error) {
     console.error('Erro:', error);
