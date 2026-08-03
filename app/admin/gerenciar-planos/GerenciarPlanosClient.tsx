@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
-import type { Profile, PlanoMentoria } from '@/lib/types';
+import type { Profile, PlanoMentoria, TipoPacote } from '@/lib/types';
 
 interface MentoradoComEdicao extends Profile {
   plano?: { nome: string; duracao_meses: number } | null;
@@ -52,11 +52,12 @@ export default function GerenciarPlanosClient({
         setMentorados(
           mentorados.map((m) => {
             if (m.id !== mentoradoId) return m;
-            const updated: any = { ...m };
-            if (changes.plano_id) updated.plano_id = changes.plano_id;
-            if (changes.tipo_pacote) updated.tipo_pacote = changes.tipo_pacote as 'online' | 'presencial';
-            if (changes.origem_assinatura) updated.origem_assinatura = changes.origem_assinatura as 'manual' | 'mercadopago';
-            if (changes.status_pagamento) updated.status_pagamento = changes.status_pagamento;
+            const updated: Profile = {
+              ...m,
+              ...(changes.plano_id && { plano_id: changes.plano_id }),
+              ...(changes.tipo_pacote && { tipo_pacote: changes.tipo_pacote as TipoPacote }),
+              ...(changes.origem_assinatura && { origem_assinatura: changes.origem_assinatura as any }),
+            };
             return updated;
           })
         );
@@ -151,7 +152,7 @@ export default function GerenciarPlanosClient({
                       className="text-xs border border-line rounded px-2 py-1 w-28"
                     >
                       <option value="ativo">Ativo</option>
-                      <option value="cancelado">Cancelado</option>
+                      <option value="inadimplente">Inadimplente</option>
                     </select>
                   </td>
                   <td className="py-3 px-4">

@@ -1,78 +1,36 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
-function ResetPasswordContent() {
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
+  const [mostraSenha, setMostraSenha] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
   const [tokenValido, setTokenValido] = useState(false);
 
-  // Verifica se há uma sessão válida ou tokens na URL
+  // Verifica se o token está na URL
   useEffect(() => {
-    const verificarSessao = async () => {
-      try {
-        // Tenta extrair tokens do hash da URL (enviados pelo link de recovery)
-        const hash = window.location.hash;
-        console.log('Hash completo da URL:', hash);
-        console.log('URL completa:', window.location.href);
-
-        if (hash) {
-          const params = new URLSearchParams(hash.substring(1));
-          const accessToken = params.get('access_token');
-          const refreshToken = params.get('refresh_token');
-          const type = params.get('type');
-
-          console.log('Tokens extraídos:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
-
-          if (accessToken && type === 'recovery') {
-            console.log('Tentando estabelecer sessão com tokens...');
-            // Estabelece a sessão com os tokens do recovery link
-            const { error: setSessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken || '',
-            });
-
-            console.log('Erro ao setSession:', setSessionError);
-
-            if (!setSessionError) {
-              console.log('Sessão estabelecida com sucesso!');
-              setTokenValido(true);
-              return;
-            }
-          } else {
-            console.log('Tokens inválidos ou tipo errado:', { hasAccessToken: !!accessToken, type });
-          }
-        } else {
-          console.log('Nenhum hash encontrado na URL');
-        }
-
-        // Se não há tokens no hash, verifica se já existe uma sessão
-        const { data } = await supabase.auth.getSession();
-        console.log('Sessão existente:', !!data?.session);
-
-        if (data?.session) {
-          setTokenValido(true);
-        } else {
-          setErro('Link inválido ou expirado. Solicite um novo link de reset.');
-        }
-      } catch (err) {
-        console.error('Erro ao verificar sessão:', err);
+    const verificarToken = async () => {
+      const { data } = await supabase.auth.getSession();
+      
+      if (data?.session) {
+        setTokenValido(true);
+      } else {
         setErro('Link inválido ou expirado. Solicite um novo link de reset.');
       }
     };
 
-    verificarSessao();
-  }, [supabase.auth]);
+    verificarToken();
+  }, []);
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
@@ -162,26 +120,44 @@ function ResetPasswordContent() {
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-brown-deep mb-2">Nova Senha</label>
-                <input
-                  type="password"
-                  value={novaSenha}
-                  onChange={(e) => setNovaSenha(e.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                  className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
-                  disabled={carregando}
-                />
+                <div className="relative">
+                  <input
+                    type={mostraSenha ? 'text' : 'password'}
+                    value={novaSenha}
+                    onChange={(e) => setNovaSenha(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                    className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors pr-10"
+                    disabled={carregando}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostraSenha(!mostraSenha)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                  >
+                    {mostraSenha ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-brown-deep mb-2">Confirmar Senha</label>
-                <input
-                  type="password"
-                  value={confirmaSenha}
-                  onChange={(e) => setConfirmaSenha(e.target.value)}
-                  placeholder="Confirme sua nova senha"
-                  className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
-                  disabled={carregando}
-                />
+                <div className="relative">
+                  <input
+                    type={mostraSenha ? 'text' : 'password'}
+                    value={confirmaSenha}
+                    onChange={(e) => setConfirmaSenha(e.target.value)}
+                    placeholder="Confirme sua nova senha"
+                    className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors pr-10"
+                    disabled={carregando}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostraSenha(!mostraSenha)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                  >
+                    {mostraSenha ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -203,13 +179,5 @@ function ResetPasswordContent() {
         )}
       </div>
     </div>
-  );
-}
-
-export default function ResetPasswordPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Carregando...</p></div>}>
-      <ResetPasswordContent />
-    </Suspense>
   );
 }
