@@ -1,13 +1,12 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
-function ResetPasswordContent() {
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [novaSenha, setNovaSenha] = useState('');
@@ -15,38 +14,22 @@ function ResetPasswordContent() {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
-  const [tokenInvalido, setTokenInvalido] = useState(false);
+  const [tokenValido, setTokenValido] = useState(false);
 
+  // Verifica se o token está na URL
   useEffect(() => {
-    const validarToken = async () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const params = new URLSearchParams(hash.substring(1));
-        const accessToken = params.get('access_token');
-        const type = params.get('type');
-
-        if (accessToken && type === 'recovery') {
-          const { error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: params.get('refresh_token') || '',
-          });
-
-          if (error) {
-            setTokenInvalido(true);
-            setErro('Link de reset expirado ou inválido. Tente novamente.');
-          }
-        } else {
-          setTokenInvalido(true);
-          setErro('Link de reset incompleto. Verifique se você clicou no link completo do email.');
-        }
+    const verificarToken = async () => {
+      const { data } = await supabase.auth.getSession();
+      
+      if (data?.session) {
+        setTokenValido(true);
       } else {
-        setTokenInvalido(true);
-        setErro('Link de reset não encontrado. Clique no link do email para continuar.');
+        setErro('Link inválido ou expirado. Solicite um novo link de reset.');
       }
     };
 
-    validarToken();
-  }, [supabase.auth, searchParams]);
+    verificarToken();
+  }, []);
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
@@ -98,23 +81,28 @@ function ResetPasswordContent() {
           <p className="text-sm text-ink-faint">Portal do Mentorado</p>
         </div>
 
-        {tokenInvalido ? (
-          <div className="bg-white border-2 border-red-500 rounded-2xl p-8 text-center">
-            <AlertCircle size={48} className="text-red-600 mx-auto mb-4" />
-            <h2 className="font-display text-xl text-brown-deep mb-2">Link inválido ou expirado</h2>
-            <p className="text-sm text-ink-faint mb-6">{erro}</p>
-            <a
-              href="/login"
-              className="inline-block bg-brown text-white px-6 py-2.5 rounded-lg font-medium hover:bg-brown-deep transition-colors"
-            >
-              Voltar ao login
-            </a>
-          </div>
-        ) : sucesso ? (
+        {sucesso ? (
           <div className="bg-white border-2 border-green-500 rounded-2xl p-8 text-center">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
             <h2 className="font-display text-xl text-brown-deep mb-2">Senha redefinida com sucesso!</h2>
             <p className="text-sm text-ink-faint">Redirecionando para login...</p>
+          </div>
+        ) : !tokenValido ? (
+          <div className="bg-white border-2 border-red-500 rounded-2xl p-8">
+            <div className="flex gap-3 mb-6">
+              <AlertCircle size={20} className="text-red-700 flex-shrink-0" />
+              <div>
+                <h2 className="font-display text-lg text-red-700 mb-1">Link Inválido</h2>
+                <p className="text-sm text-red-600">{erro}</p>
+              </div>
+            </div>
+
+            <a
+              href="/login"
+              className="block text-center bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors"
+            >
+              Voltar ao Login
+            </a>
           </div>
         ) : (
           <div className="bg-white border-2 border-line rounded-2xl p-8">
@@ -155,7 +143,7 @@ function ResetPasswordContent() {
 
               <button
                 type="submit"
-                disabled={carregando || tokenInvalido}
+                disabled={carregando}
                 className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
               >
                 {carregando ? 'Processando...' : 'Redefinir Senha'}
@@ -172,13 +160,5 @@ function ResetPasswordContent() {
         )}
       </div>
     </div>
-  );
-}
-
-export default function ResetPasswordPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Carregando...</p></div>}>
-      <ResetPasswordContent />
-    </Suspense>
   );
 }

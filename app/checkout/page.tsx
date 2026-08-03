@@ -13,12 +13,12 @@ export default async function CheckoutPage() {
   if (user) {
     const { data: perfil } = await supabase
       .from('profiles')
-      .select('plano_id, status_pagamento')
+      .select('plano_id, status_assinatura')
       .eq('id', user.id)
       .single();
 
     // Se tem plano e tá ativo, não deixa recomprar
-    if (perfil?.plano_id && perfil?.status_pagamento === 'ativo') {
+    if (perfil?.plano_id && perfil?.status_assinatura === 'ativo') {
       redirect('/dashboard');
     }
   }

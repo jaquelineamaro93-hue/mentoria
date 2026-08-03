@@ -151,7 +151,7 @@ export default function GerenciarPlanosClient({
                       className="text-xs border border-line rounded px-2 py-1 w-28"
                     >
                       <option value="ativo">Ativo</option>
-                      <option value="inadimplente">Inadimplente</option>
+                      <option value="cancelado">Cancelado</option>
                     </select>
                   </td>
                   <td className="py-3 px-4">
