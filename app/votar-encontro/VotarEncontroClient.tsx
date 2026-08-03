@@ -1,19 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import Sidebar from '@/components/Sidebar';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Users } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 
-const OPCOES_ENCONTROS = [
-  { id: 'sao-paulo', label: 'São Paulo' },
-  { id: 'rio-janeiro', label: 'Rio de Janeiro' },
-  { id: 'belo-horizonte', label: 'Belo Horizonte' },
-  { id: 'brasilia', label: 'Brasília' },
+const DATAS_ENCONTROS = [
+  { id: '22-08', label: 'Sábado, 22 de agosto', data: '2026-08-22' },
+  { id: '29-08', label: 'Sábado, 29 de agosto', data: '2026-08-29' },
+  { id: '05-09', label: 'Sábado, 5 de setembro', data: '2026-09-05' },
 ];
+
+const HORARIO = '11:30 às 17h';
+const LOCAL = 'Pinheiros, São Paulo';
+
+interface VotoEncontro {
+  id: string;
+  user_id: string;
+  data_escolhida: string;
+  nome_mentorado: string;
+  created_at: string;
+}
 
 export default function VotarEncontroClient({
   profile,
@@ -23,9 +33,32 @@ export default function VotarEncontroClient({
   const router = useRouter();
   const supabase = createClient();
   const [voto, setVoto] = useState<string | null>(null);
-  const [aceitouTermos, setAceitouTermos] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
+  const [votos, setVotos] = useState<VotoEncontro[]>([]);
+  const [jaSeuVoto, setJaSeuVoto] = useState(false);
+
+  useEffect(() => {
+    carregarVotos();
+  }, [profile]);
+
+  async function carregarVotos() {
+    if (!profile?.id) return;
+
+    const { data } = await supabase
+      .from('votos_encontro')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      setVotos(data);
+      const meuVoto = data.find((v) => v.user_id === profile.id);
+      if (meuVoto) {
+        setJaSeuVoto(true);
+        setVoto(meuVoto.data_escolhida);
+      }
+    }
+  }
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -35,28 +68,40 @@ export default function VotarEncontroClient({
   }
 
   async function enviarVoto() {
-    if (!voto || !aceitouTermos) return;
+    if (!voto || jaSeuVoto) return;
 
     setEnviando(true);
     try {
-      posthog.capture('voto_encontro_enviado', { voto });
-      setEnviado(true);
+      const { error } = await supabase.from('votos_encontro').insert({
+        user_id: profile?.id,
+        data_escolhida: voto,
+        nome_mentorado: profile?.nome || 'Mentorado',
+      });
+
+      if (!error) {
+        posthog.capture('voto_encontro_enviado', { data: voto });
+        setEnviado(true);
+        await carregarVotos();
+      }
     } catch (e) {
       console.error(e);
     }
     setEnviando(false);
   }
 
-  if (enviado) {
+  if (enviado && jaSeuVoto) {
     return (
       <div className="flex flex-col md:flex-row w-full">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
           <div className="text-center py-12">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
-            <h1 className="font-display text-2xl text-brown-deep mb-2">Voto registrado!</h1>
+            <h1 className="font-display text-2xl text-brown-deep mb-2">Seu voto foi registrado!</h1>
+            <p className="text-sm text-ink-faint mb-8">
+              Você escolheu o sábado {DATAS_ENCONTROS.find((d) => d.id === voto)?.label?.split(',')[1]}.
+            </p>
             <p className="text-sm text-ink-faint">
-              Obrigada por participar. Em breve anuncio qual cidade foi escolhida.
+              Acompanhe aqui quem mais já votou e qual data está vencendo. 💪
             </p>
           </div>
         </main>
@@ -64,72 +109,102 @@ export default function VotarEncontroClient({
     );
   }
 
+  const contagemVotos = DATAS_ENCONTROS.map((data) => ({
+    ...data,
+    count: votos.filter((v) => v.data_escolhida === data.id).length,
+  }));
+
   return (
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
-          Participação
-        </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Onde você quer se encontrar?</h1>
+        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Participação</p>
+        <h1 className="font-display text-3xl text-brown-deep mb-1">Qual é o melhor dia?</h1>
         <p className="text-sm text-ink-faint max-w-xl mb-8">
-          Vote na cidade para o próximo encontro presencial da mentoria.
+          Vote no sábado que funciona melhor para você. Encontro em {LOCAL}, das {HORARIO}.
         </p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8 flex gap-3">
           <AlertCircle size={18} className="text-amber-700 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-amber-900">
-            <p className="font-medium mb-1">Regra importante sobre encontros presenciais</p>
+            <p className="font-medium mb-1">Atenção importante</p>
             <p>
-              Se você faltar a 2 encontros presenciais, você será bloqueado de participar 
-              dos 2 próximos encontros. Esse tempo não será reembolsado e não poderá ser recuperado depois.
+              Você pode votar uma única vez. Essa votação encerra na terça, 4 de agosto, às 23h.
+              Se você não votar até lá e está no plano presencial, receberá um aviso final.
             </p>
           </div>
         </div>
 
-        <h2 className="font-display text-lg text-brown-deep mb-4">Escolha uma cidade</h2>
-        <div className="space-y-2 mb-8">
-          {OPCOES_ENCONTROS.map((opcao) => (
-            <label
-              key={opcao.id}
-              className="flex items-center gap-3 p-4 border border-line rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
-            >
-              <input
-                type="radio"
-                name="cidade"
-                value={opcao.id}
-                checked={voto === opcao.id}
-                onChange={(e) => setVoto(e.target.value)}
-                className="w-4 h-4 text-brown-deep cursor-pointer"
-              />
-              <span className="text-sm text-brown-deep">{opcao.label}</span>
-            </label>
-          ))}
+        {jaSeuVoto && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-8">
+            <p className="text-sm text-green-900">
+              ✅ Você já votou no sábado {DATAS_ENCONTROS.find((d) => d.id === voto)?.label}
+            </p>
+          </div>
+        )}
+
+        <h2 className="font-display text-lg text-brown-deep mb-4">Escolha seu dia</h2>
+        <div className="space-y-3 mb-8">
+          {DATAS_ENCONTROS.map((data) => {
+            const count = contagemVotos.find((c) => c.id === data.id)?.count || 0;
+            return (
+              <label
+                key={data.id}
+                className="flex items-center gap-3 p-4 border border-line rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
+              >
+                <input
+                  type="radio"
+                  name="data"
+                  value={data.id}
+                  checked={voto === data.id}
+                  onChange={(e) => setVoto(e.target.value)}
+                  disabled={jaSeuVoto}
+                  className="w-4 h-4 text-brown-deep cursor-pointer"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-brown-deep">{data.label}</p>
+                  <p className="text-xs text-ink-faint">{HORARIO}</p>
+                </div>
+                <div className="flex items-center gap-1 bg-sky-deep/10 px-2.5 py-1 rounded-full">
+                  <Users size={13} className="text-sky-deep" />
+                  <span className="text-xs font-medium text-sky-deep">{count}</span>
+                </div>
+              </label>
+            );
+          })}
         </div>
 
-        <div className="bg-white border border-line rounded-2xl p-5 mb-8">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={aceitouTermos}
-              onChange={(e) => setAceitouTermos(e.target.checked)}
-              className="w-4 h-4 mt-1 text-brown-deep cursor-pointer"
-            />
-            <span className="text-sm text-brown-deep">
-              Entendo que faltando 2 encontros presenciais, serei bloqueado dos 2 próximos 
-              e não terei direito a reembolso por esse período.
-            </span>
-          </label>
-        </div>
+        {!jaSeuVoto && (
+          <button
+            onClick={enviarVoto}
+            disabled={!voto || enviando}
+            className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {enviando ? 'Registrando...' : 'Confirmar meu voto'}
+          </button>
+        )}
 
-        <button
-          onClick={enviarVoto}
-          disabled={!voto || !aceitouTermos || enviando}
-          className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {enviando ? 'Enviando...' : 'Registrar meu voto'}
-        </button>
+        {votos.length > 0 && (
+          <>
+            <h3 className="font-display text-sm text-brown-deep mt-8 mb-4">Quem já votou</h3>
+            <div className="bg-white border border-line rounded-xl p-4 max-h-64 overflow-y-auto">
+              <div className="space-y-2">
+                {votos.map((v) => (
+                  <div
+                    key={v.id}
+                    className="flex items-center justify-between text-sm py-2 border-b border-line last:border-b-0"
+                  >
+                    <span className="text-brown-deep font-medium">{v.nome_mentorado}</span>
+                    <span className="text-xs text-ink-faint">
+                      {DATAS_ENCONTROS.find((d) => d.id === v.data_escolhida)?.label?.split(',')[1]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

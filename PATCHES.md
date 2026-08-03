@@ -140,7 +140,93 @@ E usa assim no JSX:
 <h3>{formatarTituloInsight(insight.titulo)}</h3>
 ```
 
-## 7. Admin: Novo link no painel admin
+## 7. Banco de dados — Tabela de votos para encontros presenciais
+
+No Supabase, cria a tabela:
+
+```sql
+create table public.votos_encontro (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  data_escolhida text not null,
+  nome_mentorado text not null,
+  created_at timestamptz not null default now()
+);
+
+create unique index votos_encontro_user_unico on public.votos_encontro(user_id);
+
+alter table public.votos_encontro enable row level security;
+
+create policy "mentorado ve seu voto"
+  on public.votos_encontro for select
+  using (user_id = auth.uid());
+
+create policy "mentorado cria seu voto"
+  on public.votos_encontro for insert
+  with check (user_id = auth.uid());
+
+create policy "admin ve todos votos"
+  on public.votos_encontro for select
+  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin));
+```
+
+## 8. Sistema de Emails e Alertas (Cron)
+
+**IMPORTANTE**: Adiciona um cron job que roda:
+- **Hoje, 14h**: aviso pra votar (deadline amanhã 16h)
+- **Amanhã, 16h30**: último aviso antes do encerramento
+- **Terça de manhã, 8h**: aviso final pra quem não votou (só presencial)
+- **Terça 23h**: votação encerra
+
+O endpoint já existe em `app/api/cron/lembretes`. Precisa adicionar lógica pra avisos de votação.
+
+Criar arquivo `app/api/cron/avisos-votacao/route.ts`:
+
+```typescript
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+export async function POST(request: Request) {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const supabase = await createClient();
+  const agora = new Date();
+  const dia = agora.getDate();
+  const hora = agora.getHours();
+
+  // 1. Se for hoje 14h: aviso pra votar
+  if (dia === 2 && hora === 14) {
+    // Busca quem não votou ainda
+    const { data: quemNaoVotou } = await supabase
+      .from('profiles')
+      .select('email, nome')
+      .not('email', 'is', null);
+
+    // Manda email pra cada um
+    // Usar SendGrid via /api/enviar-email ou similar
+
+    return NextResponse.json({ enviados: quemNaoVotou?.length || 0 });
+  }
+
+  // 2. Se for amanhã 16h30: segundo aviso
+  if (dia === 3 && hora === 16) {
+    // Similar ao anterior
+  }
+
+  // 3. Se for terça 8h: aviso final (só presencial)
+  if (dia === 4 && hora === 8) {
+    // Busca quem tem plano presencial e não votou
+    // Manda email
+  }
+
+  return NextResponse.json({ ok: true });
+}
+```
+
+## 9. Admin: Novo link no painel admin
 
 Se tiver um menu admin, adiciona links pra:
 - `/admin/indicacoes` (gestão de indicações e liberação de sessões bônus)

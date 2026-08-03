@@ -24,12 +24,12 @@ export default function MeuPlanoClient({
     router.refresh();
   }
 
-  if (!plano) {
+  if (!plano || plano.codigo === 'teste' || plano.preco_avista === 0.01) {
     return (
       <div className="flex flex-col md:flex-row w-full">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-          <p className="text-sm text-ink-faint">Nenhum plano ativo no momento.</p>
+          <p className="text-sm text-ink-faint">Nenhum plano ativo no momento. Em breve você verá seu plano aqui.</p>
         </main>
       </div>
     );
