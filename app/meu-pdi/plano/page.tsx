@@ -55,7 +55,7 @@ export default function MeuPlanoPage() {
     const { data: planoAtivo } = await supabase
       .from("pdi_planos")
       .select("*")
-      .eq("user_id", userId)
+      .eq("mentorado_id", userId)
       .eq("status", "ativo")
       .order("gerado_em", { ascending: false })
       .limit(1)

@@ -102,13 +102,13 @@ export async function POST(req: NextRequest) {
     await supabaseAdmin
       .from("pdi_planos")
       .update({ status: "arquivado" })
-      .eq("user_id", mentoradoId)
+      .eq("mentorado_id", mentoradoId)
       .eq("status", "ativo");
 
     const { data: planoSalvo, error: erroSalvar } = await supabaseAdmin
       .from("pdi_planos")
       .insert({
-        user_id: mentoradoId,
+        mentorado_id: mentoradoId,
         diagnostico: planoGerado.diagnostico,
         equacao: planoGerado.equacao,
         pilares: planoGerado.pilares,
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
     const acoesParaInserir = planoGerado.pilares.flatMap((pilar, indexPilar) =>
       pilar.acoes.map((acao, indexAcao) => ({
         plano_id: planoSalvo.id,
-        user_id: mentoradoId,
+        mentorado_id: mentoradoId,
         pilar_titulo: pilar.titulo,
         titulo: acao.titulo,
         descricao: acao.descricao ?? null,
