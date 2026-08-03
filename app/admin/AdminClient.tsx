@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -32,8 +32,35 @@ export default function AdminClient({
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
+  const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [enviandoLembretes, setEnviandoLembretes] = useState(false);
   const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
+
+  async function confirmarEmailUsuario(userId: string, nome: string) {
+    setConfirmandoId(userId);
+    try {
+      const res = await fetch('/api/admin/confirmar-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro);
+
+      setLinhas((prev) =>
+        prev.map((l) => (l.profile.id === userId ? { ...l, emailConfirmado: true } : l))
+      );
+      posthog.capture('admin_confirmou_email', { usuario_alvo: userId });
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : `Não consegui confirmar o e-mail de ${nome}.`
+      );
+    } finally {
+      setConfirmandoId(null);
+    }
+  }
 
   async function enviarLembretesAgora() {
     setEnviandoLembretes(true);
@@ -165,6 +192,7 @@ export default function AdminClient({
     return dias <= 7;
   }).length;
   const semAcessoNunca = linhas.filter((l) => !l.profile.last_login_at).length;
+  const emailsNaoConfirmados = linhas.filter((l) => !l.emailConfirmado);
 
   return (
     <div className="flex flex-col md:flex-row w-full">
@@ -220,6 +248,20 @@ export default function AdminClient({
         {resultadoLembretes && (
           <div className="mb-6 text-sm bg-sky-tint border border-sky rounded-lg px-4 py-3 text-brown-deep whitespace-pre-wrap font-mono">
             {resultadoLembretes}
+          </div>
+        )}
+
+        {emailsNaoConfirmados.length > 0 && (
+          <div className="mb-6 text-sm bg-red-50 border border-red-300 rounded-lg px-4 py-3 text-red-700">
+            <p className="flex items-center gap-1.5 font-medium mb-1">
+              <MailWarning size={14} />
+              {emailsNaoConfirmados.length} conta(s) sem confirmar o e-mail, ainda não conseguem
+              entrar:
+            </p>
+            <p>
+              {emailsNaoConfirmados.map((l) => l.profile.nome).join(', ')}. Confirma direto na
+              tabela &quot;Ações da conta&quot; mais abaixo.
+            </p>
           </div>
         )}
 
@@ -383,6 +425,9 @@ export default function AdminClient({
                     Nome
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    E-mail
+                  </th>
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Ações
                   </th>
                 </tr>
@@ -392,7 +437,33 @@ export default function AdminClient({
                   <tr key={l.profile.id} className="border-b border-line last:border-0 bg-cream">
                     <td className="px-4 py-3 text-ink">{l.profile.nome}</td>
                     <td className="px-4 py-3">
+                      {l.emailConfirmado ? (
+                        <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-300">
+                          Confirmado
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-300 w-fit">
+                          <MailWarning size={11} />
+                          Não confirmado
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
                       <div className="flex gap-2">
+                        {!l.emailConfirmado && (
+                          <button
+                            onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
+                            disabled={confirmandoId === l.profile.id}
+                            className="flex items-center gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                          >
+                            {confirmandoId === l.profile.id ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <MailWarning size={12} />
+                            )}
+                            Confirmar e-mail
+                          </button>
+                        )}
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
                           disabled={resetandoId === l.profile.id}
