@@ -43,8 +43,17 @@ export async function POST(request: Request) {
     }
 
     // Extrai o link de ação
-    const resetLink = (linkData.properties as any)?.action_link || linkData;
-    console.log('Link de reset gerado para:', email);
+    const resetLink = (linkData.properties as any)?.action_link;
+
+    if (!resetLink) {
+      console.error('Link de reset não gerado:', linkData);
+      return NextResponse.json(
+        { error: 'Erro ao gerar link de reset' },
+        { status: 500 }
+      );
+    }
+
+    console.log('Link de reset gerado para:', email, 'Link:', resetLink);
 
     // Envia email com o link de reset
     if (process.env.SENDGRID_API_KEY) {

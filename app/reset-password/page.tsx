@@ -34,7 +34,29 @@ function ResetPasswordContent() {
 
           if (accessToken) {
             console.log('Tentando estabelecer sessão com tokens...');
-            // Estabelece a sessão com os tokens do recovery link
+
+            // Primeiro tenta usar verifyOtp se o tipo for 'recovery'
+            const type = params.get('type');
+            console.log('Tipo de token:', type);
+
+            if (type === 'recovery') {
+              // Para recovery links, podemos tentar usar verifyOtp
+              const { error: verifyError } = await supabase.auth.verifyOtp({
+                token_hash: hash.substring(1),
+                type: 'recovery',
+              });
+
+              console.log('Erro ao verifyOtp:', verifyError);
+
+              if (!verifyError) {
+                console.log('Recovery token verificado com sucesso!');
+                setTokenValido(true);
+                return;
+              }
+            }
+
+            // Se verifyOtp falhar ou não for recovery, tenta setSession
+            console.log('Tentando setSession com access_token...');
             const { error: setSessionError } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken || '',
