@@ -23,6 +23,25 @@ export default function GerenciarPlanosClient({
 
   const planoMap = new Map(planos.map((p) => [p.id, p]));
 
+  function formatarMoeda(valor: number | null | undefined) {
+    if (valor === null || valor === undefined) return '—';
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function valorContratado(mentorado: Profile, plano: PlanoMentoria | null | undefined) {
+    if (!plano) return null;
+    switch (mentorado.forma_pagamento_escolhida) {
+      case 'avista':
+        return plano.preco_avista;
+      case 'cartao':
+        return plano.preco_cartao;
+      case 'recorrente':
+        return plano.preco_recorrente_total;
+      default:
+        return plano.preco_avista;
+    }
+  }
+
   async function handleSalvar(mentoradoId: string) {
     if (!edicao[mentoradoId] || Object.keys(edicao[mentoradoId]).length === 0) return;
 
@@ -85,9 +104,10 @@ export default function GerenciarPlanosClient({
 
   return (
     <main className="px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
-      <h1 className="font-display text-3xl text-brown-deep mb-1">Gerenciar Planos</h1>
+      <h1 className="font-display text-3xl text-brown-deep mb-1">Gerenciar Planos e Pagamentos</h1>
       <p className="text-sm text-ink-faint mb-8">
-        Aqui você pode trocar o plano, tipo (Online/Presencial), origem (Manual/Mercado Pago) e status de cada mentorado.
+        Aqui você troca o plano, tipo (Online/Presencial), origem (Manual/Mercado Pago), status e
+        acompanha a forma de pagamento e o valor contratado de cada mentorado.
       </p>
 
       <div className="overflow-x-auto border border-line rounded-2xl">
@@ -98,6 +118,8 @@ export default function GerenciarPlanosClient({
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Plano</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Tipo</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Origem</th>
+              <th className="text-left py-3 px-4 font-medium text-brown-deep">Forma pgto.</th>
+              <th className="text-left py-3 px-4 font-medium text-brown-deep">Valor</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Status</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Ação</th>
             </tr>
@@ -144,6 +166,12 @@ export default function GerenciarPlanosClient({
                       <option value="manual">Manual</option>
                       <option value="mercadopago">Mercado Pago</option>
                     </select>
+                  </td>
+                  <td className="py-3 px-4 text-ink-soft capitalize whitespace-nowrap">
+                    {mentorado.forma_pagamento_escolhida ?? '—'}
+                  </td>
+                  <td className="py-3 px-4 text-ink-soft whitespace-nowrap">
+                    {formatarMoeda(valorContratado(mentorado, planoAtual))}
                   </td>
                   <td className="py-3 px-4">
                     <select

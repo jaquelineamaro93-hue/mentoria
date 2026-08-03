@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -32,6 +33,30 @@ export default function AdminClient({
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
+  const [enviandoLembretes, setEnviandoLembretes] = useState(false);
+  const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
+
+  async function enviarLembretesAgora() {
+    setEnviandoLembretes(true);
+    setResultadoLembretes(null);
+    try {
+      const res = await fetch('/api/admin/enviar-lembretes', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro ?? 'Erro ao enviar lembretes.');
+      setResultadoLembretes(
+        `Enviados agora: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
+          `${data.encontros} de encontro, ${data.votacao} de votação. ` +
+          (data.erros?.length ? `Erros: ${data.erros.length}.` : 'Sem erros.') +
+          ' Uma cópia de cada foi enviada em cópia oculta para jaqueline.amaro93@gmail.com.'
+      );
+    } catch (err) {
+      setResultadoLembretes(
+        err instanceof Error ? err.message : 'Não foi possível enviar os lembretes agora.'
+      );
+    } finally {
+      setEnviandoLembretes(false);
+    }
+  }
 
   async function entrarComoUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
@@ -173,16 +198,43 @@ export default function AdminClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
-          Área administrativa
-        </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">
-          Painel dos mentorados
-        </h1>
-        <p className="text-sm text-ink-faint mb-8">
-          Visão geral de quem está usando o quê. Para dados de sessão, tempo médio de
-          acesso e localização, consulte o PostHog.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+              Área administrativa
+            </p>
+            <h1 className="font-display text-3xl text-brown-deep mb-1">
+              Painel dos mentorados
+            </h1>
+            <p className="text-sm text-ink-faint">
+              Visão geral de quem está usando o quê. Para dados de sessão, tempo médio de
+              acesso e localização, consulte o PostHog.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 shrink-0">
+            <Link
+              href="/admin/gerenciar-planos"
+              className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <CreditCard size={15} />
+              Gerenciar planos e pagamentos
+            </Link>
+            <button
+              onClick={enviarLembretesAgora}
+              disabled={enviandoLembretes}
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap disabled:opacity-60"
+            >
+              {enviandoLembretes ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+              Enviar lembretes agora
+            </button>
+          </div>
+        </div>
+
+        {resultadoLembretes && (
+          <div className="mb-6 text-sm bg-sky-tint border border-sky rounded-lg px-4 py-3 text-brown-deep">
+            {resultadoLembretes}
+          </div>
+        )}
 
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           <Panel className="p-5">

@@ -4,12 +4,22 @@ interface EnviarEmailParams {
   html: string;
 }
 
+// Cópia oculta para a Jaqueline em todo e-mail transacional, assim ela
+// consegue confirmar que o envio realmente aconteceu sem precisar acessar
+// o painel do SendGrid.
+const EMAIL_VERIFICACAO = 'jaqueline.amaro93@gmail.com';
+
 export async function enviarEmail({ para, assunto, html }: EnviarEmailParams): Promise<void> {
   const apiKey = process.env.SENDGRID_API_KEY;
   const remetente = process.env.SENDGRID_FROM_EMAIL ?? 'consultoria@camarocrm.com';
 
   if (!apiKey) {
     throw new Error('SENDGRID_API_KEY não configurada. Adicione essa variável de ambiente para habilitar o envio de e-mails.');
+  }
+
+  const personalization: Record<string, unknown> = { to: [{ email: para }] };
+  if (para.toLowerCase() !== EMAIL_VERIFICACAO) {
+    personalization.bcc = [{ email: EMAIL_VERIFICACAO }];
   }
 
   const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -19,7 +29,7 @@ export async function enviarEmail({ para, assunto, html }: EnviarEmailParams): P
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: para }] }],
+      personalizations: [personalization],
       from: { email: remetente, name: 'Mentoria SOMA' },
       subject: assunto,
       content: [{ type: 'text/html', value: html }],
@@ -50,7 +60,7 @@ export function templateLembreteEncontro(nome: string, tituloEncontro: string, d
       <p><strong>${tituloEncontro}</strong></p>
       <p>${dataEvento}</p>
       <p>Não esquece de dar uma olhada no Mural de Avisos do portal antes do encontro.</p>
-      <p style="margin-top: 24px;">Até lá,<br>Jaque</p>
+      <p style="margin-top: 24px;">Até lá,<br>Equipe SOMA Mentoria</p>
     </div>
   `;
 }
@@ -61,7 +71,24 @@ export function templateOnboardingPendente(nome: string): string {
       <h2 style="color: #3c2c1f;">Vamos marcar seu onboarding, ${nome.split(' ')[0]}?</h2>
       <p>Notei que você ainda não marcou sua sessão inicial na Mentoria SOMA.</p>
       <p>É rapidinho, 20 minutos para alinharmos seus objetivos logo no início da jornada.</p>
-      <p style="margin-top: 24px;">Te espero por lá,<br>Jaque</p>
+      <p style="margin-top: 24px;">Te esperamos por lá,<br>Equipe SOMA Mentoria</p>
+    </div>
+  `;
+}
+
+export function templateVotacaoPendente(nome: string): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://mentoria-pi-taupe.vercel.app';
+  return `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; color: #362b21;">
+      <h2 style="color: #3c2c1f;">Falta seu voto, ${nome.split(' ')[0]}</h2>
+      <p>Estamos organizando o próximo encontro presencial e ainda não vimos seu voto de data.</p>
+      <p>Entra no portal e escolhe uma das opções antes do encerramento da votação.</p>
+      <p style="margin: 24px 0;">
+        <a href="${appUrl}/votar-encontro" style="background: #6b4a35; color: #fbf8f2; padding: 12px 24px; border-radius: 999px; text-decoration: none; display: inline-block;">
+          Votar agora
+        </a>
+      </p>
+      <p style="margin-top: 24px;">Até lá,<br>Equipe SOMA Mentoria</p>
     </div>
   `;
 }

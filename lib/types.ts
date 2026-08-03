@@ -21,6 +21,7 @@ export interface Profile {
   indicado_por_id: string | null;
   sessoes_bonus_resgatadas: number;
   plano_id: string | null;
+  forma_pagamento_escolhida: 'avista' | 'cartao' | 'recorrente' | null;
   created_at: string;
   updated_at: string;
 }
