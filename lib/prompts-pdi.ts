@@ -16,8 +16,9 @@ export function montarPromptGeracaoPDI(params: {
   nomeMentorado: string;
   cargoAtual?: string | null;
   respostas: RespostaSecaoPDI[];
+  contextoAdicional?: string | null;
 }) {
-  const { nomeMentorado, cargoAtual, respostas } = params;
+  const { nomeMentorado, cargoAtual, respostas, contextoAdicional } = params;
 
   const hoje = new Date();
   const dataAtualFormatada = hoje.toLocaleDateString("pt-BR", {
@@ -43,7 +44,14 @@ Você é a mentora de carreira lendo o workbook de PDI (Plano de Desenvolvimento
 que ${nomeMentorado}${cargoAtual ? `, ${cargoAtual},` : ""} acabou de preencher, seção por seção.
 Sua tarefa é transformar essas 20 respostas soltas em um plano claro e objetivo, do jeito que
 uma mentora experiente devolveria para a pessoa: sem enrolação, com caminho prático.
-
+${
+  contextoAdicional
+    ? `\nAlém do PDI, você também tem acesso ao histórico dessa pessoa em outras etapas da mentoria
+(Mapa Quem Sou Eu, Diagnóstico VIA, Bússola de Posicionamento). Use isso para tornar o diagnóstico
+mais preciso e os pilares mais coerentes com quem essa pessoa já mostrou ser, não só com o que ela
+escreveu nas 20 seções do PDI.\n\n${contextoAdicional}\n`
+    : ''
+}
 Respostas do mentorado, seção por seção:
 
 ${blocoRespostas}

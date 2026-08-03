@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
 import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
+import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
 // POST /api/pdi/gerar-plano
 // Body: { mentoradoId: string }
@@ -57,10 +58,72 @@ export async function POST(req: NextRequest) {
       resposta: r.dados?.texto ?? "",
     }));
 
+    // Contexto extra de outras etapas já feitas na mentoria (Mapa Quem Sou Eu,
+    // Diagnóstico VIA, Bússola de Posicionamento), pra deixar o plano gerado
+    // mais fiel a quem a pessoa é, não só ao que ela escreveu nas 20 seções.
+    // Opcional: se a pessoa não fez alguma dessas etapas, simplesmente pulamos.
+    const [{ data: blocosQuemSouEu }, { data: viaResultado }, { data: bussola }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("quem_sou_eu_respostas")
+          .select("bloco, resposta")
+          .eq("user_id", mentoradoId),
+        supabaseAdmin
+          .from("via_resultados")
+          .select("forcas, analise_ia")
+          .eq("user_id", mentoradoId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("bussola_posicionamento")
+          .select("norte, sul, leste, oeste, centro")
+          .eq("user_id", mentoradoId)
+          .order("gerado_em", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+    const partesContexto: string[] = [];
+
+    if (blocosQuemSouEu && blocosQuemSouEu.length > 0) {
+      const tituloPorCodigo = new Map(BLOCOS_QUEM_SOU_EU.map((b) => [b.codigo, b.titulo]));
+      const textoQuemSouEu = blocosQuemSouEu
+        .filter((b) => b.resposta?.trim())
+        .map((b) => `${tituloPorCodigo.get(b.bloco) ?? b.bloco}: ${b.resposta.trim()}`)
+        .join("\n");
+      if (textoQuemSouEu) {
+        partesContexto.push(`### Mapa Quem Sou Eu\n${textoQuemSouEu}`);
+      }
+    }
+
+    if (viaResultado?.forcas && Array.isArray(viaResultado.forcas) && viaResultado.forcas.length > 0) {
+      const top5 = viaResultado.forcas.slice(0, 5).join(", ");
+      let textoVia = `### Diagnóstico VIA (forças de caráter)\nForças principais, da mais forte para baixo: ${top5}.`;
+      if (viaResultado.analise_ia) {
+        textoVia += `\nAnálise: ${viaResultado.analise_ia}`;
+      }
+      partesContexto.push(textoVia);
+    }
+
+    if (bussola && (bussola.norte || bussola.sul || bussola.leste || bussola.oeste || bussola.centro)) {
+      const linhas = [
+        bussola.norte && `Norte (para onde vai): ${bussola.norte}`,
+        bussola.sul && `Sul (de onde vem): ${bussola.sul}`,
+        bussola.leste && `Leste (o que soma): ${bussola.leste}`,
+        bussola.oeste && `Oeste (o que atrapalha): ${bussola.oeste}`,
+        bussola.centro && `Centro (essência): ${bussola.centro}`,
+      ].filter(Boolean);
+      partesContexto.push(`### Bússola de Posicionamento\n${linhas.join("\n")}`);
+    }
+
+    const contextoAdicional = partesContexto.length > 0 ? partesContexto.join("\n\n") : null;
+
     const prompt = montarPromptGeracaoPDI({
       nomeMentorado: perfil.nome ?? "Mentorada",
       cargoAtual: perfil.cargo_atual ?? "Não informado",
       respostas,
+      contextoAdicional,
     });
 
     const resposta = await anthropic.messages.create({
