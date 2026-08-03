@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     const { data: perfil, error: erroPerfil } = await supabaseAdmin
       .from("profiles")
-      .select("id, nome, cargo_atual")
+      .select("*")
       .eq("id", mentoradoId)
       .single();
 
@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
     }));
 
     const prompt = montarPromptGeracaoPDI({
-      nomeMentorado: perfil.nome,
-      cargoAtual: perfil.cargo_atual,
+      nomeMentorado: perfil.nome ?? "Mentorada",
+      cargoAtual: perfil.cargo_atual ?? "Não informado",
       respostas,
     });
 
