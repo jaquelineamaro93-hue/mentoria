@@ -21,41 +21,31 @@ export async function POST(request: Request) {
 
     if (!perfil) {
       // Não revela se email existe ou não (segurança)
-      return NextResponse.json({ message: 'Se o email existe, você receberá um link de reset.' });
+      return NextResponse.json({ message: 'Se o email existe, você receberá um código.' });
     }
 
-    // Usa admin client para gerar o link de recovery
+    // Gera código de 6 dígitos (mesmo fluxo do magic-login)
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Armazena o código com validade de 15 minutos
     const adminClient = createAdminClient();
-    const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://mentoria-pi-taupe.vercel.app'}/reset-password`,
-      },
-    });
+    const { error: insertError } = await adminClient
+      .from('magic_codes')
+      .upsert({
+        email,
+        code: codigo,
+        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      }, { onConflict: 'email' });
 
-    if (linkError || !linkData) {
-      console.error('Erro ao gerar link:', linkError);
+    if (insertError) {
+      console.error('Erro ao salvar código:', insertError);
       return NextResponse.json(
-        { error: 'Erro ao gerar link de reset' },
+        { error: 'Erro ao gerar código' },
         { status: 500 }
       );
     }
 
-    // Extrai o link de ação
-    const resetLink = (linkData.properties as any)?.action_link;
-
-    if (!resetLink) {
-      console.error('Link de reset não gerado:', linkData);
-      return NextResponse.json(
-        { error: 'Erro ao gerar link de reset' },
-        { status: 500 }
-      );
-    }
-
-    console.log('Link de reset gerado para:', email, 'Link:', resetLink);
-
-    // Envia email com o link de reset
+    // Envia email com o código
     if (process.env.SENDGRID_API_KEY) {
       try {
         const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -74,7 +64,7 @@ export async function POST(request: Request) {
               email: process.env.SENDGRID_FROM_EMAIL || 'noreply@somamentoria.com.br',
               name: 'SOMA Mentoria',
             },
-            subject: 'Redefina sua senha - SOMA Mentoria',
+            subject: 'Seu código para redefinir a senha - SOMA Mentoria',
             content: [
               {
                 type: 'text/html',
@@ -82,19 +72,18 @@ export async function POST(request: Request) {
                   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #4a3b35; margin-bottom: 20px;">Redefinir sua senha</h2>
                     <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
-                      Clique no link abaixo para redefinir sua senha no SOMA Mentoria:
+                      Use o código abaixo para redefinir sua senha no SOMA Mentoria:
                     </p>
-                    <div style="margin: 30px 0;">
-                      <a href="${resetLink}" style="background: #4a3b35; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-                        Redefinir Senha
-                      </a>
+                    <div style="background: #f5f1ed; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
+                      <p style="font-size: 32px; font-weight: bold; color: #2a5ba8; letter-spacing: 4px; margin: 0;">
+                        ${codigo}
+                      </p>
                     </div>
-                    <p style="color: #999; font-size: 12px;">
-                      Ou copie e cole este link no seu navegador:<br>
-                      <code style="background: #f5f1ed; padding: 8px; border-radius: 4px; display: block; word-break: break-all; margin-top: 8px;">${resetLink}</code>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                      Cole este código na página de verificação para continuar.
                     </p>
-                    <p style="color: #999; font-size: 12px; margin-top: 20px;">
-                      Este link expira em 1 hora.
+                    <p style="color: #999; font-size: 12px;">
+                      Este código expira em 15 minutos.
                     </p>
                     <p style="color: #999; font-size: 12px; margin-top: 20px;">
                       Com carinho,<br>
@@ -107,18 +96,19 @@ export async function POST(request: Request) {
           }),
         });
 
-        if (response.ok) {
-          console.log(`Email de reset enviado para ${email}`);
-        } else {
-          console.error('Erro ao enviar email via SendGrid:', response.status);
+        if (!response.ok) {
+          throw new Error(`SendGrid error: ${response.status}`);
         }
+
+        console.log(`Email de reset enviado para ${email}`);
       } catch (emailError) {
         console.error('Erro ao enviar email:', emailError);
+        // Não retorna erro, pois o código já foi gerado
       }
     }
 
     return NextResponse.json({
-      message: 'Se o email existe, você receberá um link de reset.',
+      message: 'Se o email existe, você receberá um código.',
     });
   } catch (error) {
     console.error('Erro:', error);

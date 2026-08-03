@@ -1,226 +1,320 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { Suspense, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 function ResetPasswordContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
-
+  const [stage, setStage] = useState<'email' | 'code' | 'password'>('email');
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
-  const [carregando, setCarregando] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState(false);
-  const [tokenValido, setTokenValido] = useState(false);
+  const [sucesso, setSucesso] = useState('');
 
-  // Verifica se há uma sessão válida ou tokens na URL
-  useEffect(() => {
-    const verificarSessao = async () => {
-      try {
-        // Tenta extrair tokens do hash da URL (enviados pelo link de recovery)
-        const hash = window.location.hash;
-        console.log('Hash completo da URL:', hash);
+  async function handleSendCode(e: React.FormEvent) {
+    e.preventDefault();
+    setErro('');
+    setLoading(true);
 
-        if (hash) {
-          const params = new URLSearchParams(hash.substring(1));
-          const accessToken = params.get('access_token');
-          const refreshToken = params.get('refresh_token');
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
-          console.log('Tokens extraídos:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
 
-          if (accessToken) {
-            console.log('Tentando estabelecer sessão com tokens...');
+      setSucesso('Código enviado! Verifique seu email.');
+      setStage('code');
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Erro ao enviar código');
+    } finally {
+      setLoading(false);
+    }
+  }
 
-            // Primeiro tenta usar verifyOtp se o tipo for 'recovery'
-            const type = params.get('type');
-            console.log('Tipo de token:', type);
+  async function handleVerifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setErro('');
+    setLoading(true);
 
-            if (type === 'recovery') {
-              // Para recovery links, podemos tentar usar verifyOtp
-              const { error: verifyError } = await supabase.auth.verifyOtp({
-                token_hash: hash.substring(1),
-                type: 'recovery',
-              });
+    try {
+      const res = await fetch('/api/auth/verify-magic-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
+      });
 
-              console.log('Erro ao verifyOtp:', verifyError);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
 
-              if (!verifyError) {
-                console.log('Recovery token verificado com sucesso!');
-                setTokenValido(true);
-                return;
-              }
-            }
-
-            // Se verifyOtp falhar ou não for recovery, tenta setSession
-            console.log('Tentando setSession com access_token...');
-            const { error: setSessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken || '',
-            });
-
-            console.log('Erro ao setSession:', setSessionError);
-
-            if (!setSessionError) {
-              console.log('Sessão estabelecida com sucesso!');
-              setTokenValido(true);
-              return;
-            } else {
-              console.error('Falha ao setSession:', setSessionError);
-            }
-          } else {
-            console.log('Sem access_token no hash');
-          }
-        }
-
-        // Se não há tokens no hash, verifica se já existe uma sessão
-        const { data } = await supabase.auth.getSession();
-        console.log('Sessão existente:', !!data?.session);
-
-        if (data?.session) {
-          console.log('Usando sessão existente');
-          setTokenValido(true);
-        } else {
-          console.log('Nenhuma sessão encontrada');
-          setErro('Link inválido ou expirado. Solicite um novo link de reset.');
-        }
-      } catch (err) {
-        console.error('Erro ao verificar sessão:', err);
-        setErro('Link inválido ou expirado. Solicite um novo link de reset.');
-      }
-    };
-
-    verificarSessao();
-  }, [supabase]);
+      // Código verificado, agora pode redefinir senha
+      setStage('password');
+      setSucesso('');
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Código inválido');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
     setErro('');
-    setSucesso(false);
-
-    if (!novaSenha || !confirmaSenha) {
-      setErro('Preencha todos os campos');
-      return;
-    }
-
-    if (novaSenha !== confirmaSenha) {
-      setErro('As senhas não conferem');
-      return;
-    }
-
-    if (novaSenha.length < 6) {
-      setErro('A senha deve ter no mínimo 6 caracteres');
-      return;
-    }
-
-    setCarregando(true);
+    setLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: novaSenha,
+      if (novaSenha !== confirmaSenha) {
+        throw new Error('As senhas não conferem');
+      }
+
+      if (novaSenha.length < 6) {
+        throw new Error('A senha deve ter no mínimo 6 caracteres');
+      }
+
+      // Primeiro verifica o código novamente (no servidor)
+      const verifyRes = await fetch('/api/auth/verify-magic-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
       });
 
-      if (error) {
-        setErro(error.message || 'Erro ao redefinir senha');
-      } else {
-        setSucesso(true);
+      if (!verifyRes.ok) {
+        throw new Error('Código expirado. Solicite um novo.');
+      }
+
+      const verifyData = await verifyRes.json();
+
+      // Se o código foi verificado com sucesso, agora atualiza a senha
+      if (verifyData.loginUrl) {
+        // Extrai o session da resposta de verificação do código
+        const { error } = await supabase.auth.updateUser({
+          password: novaSenha,
+        });
+
+        if (error) {
+          throw new Error(error.message || 'Erro ao redefinir senha');
+        }
+
+        setSucesso('Senha redefinida com sucesso! Redirecionando...');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
       }
-    } catch (e) {
-      console.error(e);
-      setErro('Erro ao processar. Tenta de novo.');
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Erro ao redefinir senha');
+    } finally {
+      setLoading(false);
     }
-    setCarregando(false);
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream to-white flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="font-display text-3xl text-brown-deep mb-2">SOMA Mentoria</h1>
-          <p className="text-sm text-ink-faint">Portal do Mentorado</p>
+        <div className="text-center mb-10">
+          <p className="font-display text-4xl tracking-wide text-brown-deep">
+            SOMA <span className="text-sky-deep">MENTORIA</span>
+          </p>
+          <div className="h-px w-12 bg-brown mx-auto my-3" />
+          <p className="text-xs uppercase tracking-[0.25em] text-ink-faint">
+            Redefinir Senha
+          </p>
         </div>
 
-        {sucesso ? (
+        {sucesso && stage !== 'password' ? (
           <div className="bg-white border-2 border-green-500 rounded-2xl p-8 text-center">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
-            <h2 className="font-display text-xl text-brown-deep mb-2">Senha redefinida com sucesso!</h2>
-            <p className="text-sm text-ink-faint">Redirecionando para login...</p>
-          </div>
-        ) : !tokenValido ? (
-          <div className="bg-white border-2 border-red-500 rounded-2xl p-8">
-            <div className="flex gap-3 mb-6">
-              <AlertCircle size={20} className="text-red-700 flex-shrink-0" />
-              <div>
-                <h2 className="font-display text-lg text-red-700 mb-1">Link Inválido</h2>
-                <p className="text-sm text-red-600">{erro}</p>
-              </div>
-            </div>
-
-            <a
-              href="/login"
-              className="block text-center bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors"
-            >
-              Voltar ao Login
-            </a>
+            <h2 className="font-display text-xl text-brown-deep mb-2">Sucesso!</h2>
+            <p className="text-sm text-ink-faint">{sucesso}</p>
           </div>
         ) : (
           <div className="bg-white border-2 border-line rounded-2xl p-8">
-            <h2 className="font-display text-xl text-brown-deep mb-1">Redefinir Senha</h2>
-            <p className="text-sm text-ink-faint mb-6">Crie uma nova senha para sua conta</p>
+            {stage === 'email' ? (
+              <>
+                <h2 className="font-display text-xl text-brown-deep mb-1">Redefinir Senha</h2>
+                <p className="text-sm text-ink-faint mb-6">
+                  Digite seu email para receber um código
+                </p>
 
-            {erro && (
-              <div className="flex gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <AlertCircle size={16} className="text-red-700 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-red-700">{erro}</p>
-              </div>
+                {erro && (
+                  <div className="flex gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <AlertCircle size={16} className="text-red-700 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-700">{erro}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleSendCode} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-brown-deep mb-2">
+                      E-mail
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="seu@email.com"
+                      className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
+                  >
+                    {loading ? 'Enviando...' : 'Enviar código'}
+                  </button>
+                </form>
+
+                <p className="text-xs text-ink-faint text-center mt-6">
+                  <a href="/login" className="text-brown-deep hover:underline font-medium">
+                    Voltar ao login
+                  </a>
+                </p>
+              </>
+            ) : stage === 'code' ? (
+              <>
+                <h2 className="font-display text-xl text-brown-deep mb-1">Verificar Código</h2>
+                <p className="text-sm text-ink-faint mb-6">
+                  Enviamos um código para<br /><strong>{email}</strong>
+                </p>
+
+                {erro && (
+                  <div className="flex gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <AlertCircle size={16} className="text-red-700 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-700">{erro}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleVerifyCode} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-brown-deep mb-2">
+                      Código (6 dígitos)
+                    </label>
+                    <input
+                      type="text"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
+                      maxLength={6}
+                      className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors text-center text-2xl tracking-widest"
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading || code.length !== 6}
+                    className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
+                  >
+                    {loading ? 'Verificando...' : 'Continuar'}
+                  </button>
+                </form>
+
+                <p className="text-xs text-ink-faint text-center mt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStage('email');
+                      setCode('');
+                      setErro('');
+                    }}
+                    className="text-brown-deep hover:underline font-medium"
+                  >
+                    Usar outro email
+                  </button>
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="font-display text-xl text-brown-deep mb-1">Nova Senha</h2>
+                <p className="text-sm text-ink-faint mb-6">
+                  Crie uma nova senha para sua conta
+                </p>
+
+                {erro && (
+                  <div className="flex gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <AlertCircle size={16} className="text-red-700 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-700">{erro}</p>
+                  </div>
+                )}
+
+                {sucesso && (
+                  <div className="flex gap-3 bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <CheckCircle2 size={16} className="text-green-700 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-green-700">{sucesso}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-brown-deep mb-2">
+                      Nova Senha
+                    </label>
+                    <input
+                      type="password"
+                      value={novaSenha}
+                      onChange={(e) => setNovaSenha(e.target.value)}
+                      placeholder="Mínimo 6 caracteres"
+                      className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-brown-deep mb-2">
+                      Confirmar Senha
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmaSenha}
+                      onChange={(e) => setConfirmaSenha(e.target.value)}
+                      placeholder="Confirme sua nova senha"
+                      className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
+                  >
+                    {loading ? 'Processando...' : 'Redefinir Senha'}
+                  </button>
+                </form>
+
+                <p className="text-xs text-ink-faint text-center mt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStage('email');
+                      setEmail('');
+                      setCode('');
+                      setNovaSenha('');
+                      setConfirmaSenha('');
+                      setErro('');
+                    }}
+                    className="text-brown-deep hover:underline font-medium"
+                  >
+                    Recomeçar
+                  </button>
+                </p>
+              </>
             )}
-
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-brown-deep mb-2">Nova Senha</label>
-                <input
-                  type="password"
-                  value={novaSenha}
-                  onChange={(e) => setNovaSenha(e.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                  className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
-                  disabled={carregando}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-brown-deep mb-2">Confirmar Senha</label>
-                <input
-                  type="password"
-                  value={confirmaSenha}
-                  onChange={(e) => setConfirmaSenha(e.target.value)}
-                  placeholder="Confirme sua nova senha"
-                  className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
-                  disabled={carregando}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={carregando}
-                className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
-              >
-                {carregando ? 'Processando...' : 'Redefinir Senha'}
-              </button>
-            </form>
-
-            <p className="text-xs text-ink-faint text-center mt-6">
-              Lembrou da senha?{' '}
-              <a href="/login" className="text-brown-deep hover:underline font-medium">
-                Voltar ao login
-              </a>
-            </p>
           </div>
         )}
       </div>
