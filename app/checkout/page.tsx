@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import CheckoutClient from './CheckoutClient';
 import type { PlanoMentoria } from '@/lib/types';
@@ -8,10 +9,18 @@ export default async function CheckoutPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Se já está autenticado, redireciona pra dashboard
+  // Se já está autenticado e ativo, redireciona pra dashboard
   if (user) {
-    const { redirect } = await import('next/navigation');
-    redirect('/dashboard');
+    const { data: perfil } = await supabase
+      .from('profiles')
+      .select('plano_id, status_pagamento')
+      .eq('id', user.id)
+      .single();
+
+    // Se tem plano e tá ativo, não deixa recomprar
+    if (perfil?.plano_id && perfil?.status_pagamento === 'ativo') {
+      redirect('/dashboard');
+    }
   }
 
   const { data: planos } = await supabase

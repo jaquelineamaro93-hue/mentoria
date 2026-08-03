@@ -80,7 +80,23 @@ export default function MeuPlanoClient({
             </div>
           </div>
 
-          <p className="text-sm text-ink-faint">{plano.descricao_encontros}</p>
+          <div className="space-y-2 text-sm text-ink-faint">
+            {plano.duracao_meses === 6 ? (
+              <>
+                <p>✓ 7 encontros online individuais</p>
+                <p>✓ 6 encontros presenciais coletivos (sábados, Pinheiros/SP)</p>
+                <p>✓ 6 encontros online coletivos</p>
+                <p className="text-xs mt-3 pt-3 border-t border-line">Sessão extra individual: R$ 200,00 (cobrada via Mercado Pago)</p>
+              </>
+            ) : (
+              <>
+                <p>✓ 10 encontros online individuais</p>
+                <p>✓ 12 encontros presenciais coletivos (sábados, Pinheiros/SP)</p>
+                <p>✓ 12 encontros online coletivos</p>
+                <p className="text-xs mt-3 pt-3 border-t border-line">Sessão extra individual: R$ 200,00 (cobrada via Mercado Pago)</p>
+              </>
+            )}
+          </div>
         </div>
 
         <h2 className="font-display text-xl text-brown-deep mb-4">O que você tem incluído</h2>
@@ -114,7 +130,7 @@ export default function MeuPlanoClient({
 
         <div className="mt-8 bg-sky-deep/10 border border-sky-deep/30 rounded-2xl p-5">
           <p className="text-sm text-brown-deep">
-            Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho para você.
+            Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho pra você.
           </p>
         </div>
       </main>
