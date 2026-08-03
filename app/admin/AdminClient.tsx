@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -30,6 +30,7 @@ export default function AdminClient({
   const [linhas, setLinhas] = useState(linhasIniciais);
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
+  const [resetandoId, setResetandoId] = useState<string | null>(null);
 
   async function entrarComoUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
@@ -61,6 +62,35 @@ export default function AdminClient({
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Não foi possível entrar como esse usuário.');
       setEntrandoComoId(null);
+    }
+  }
+
+  async function resetarSenhaUsuario(userId: string, email: string, nome: string) {
+    const confirmado = window.confirm(
+      `Gerar link de reset de senha para ${nome}? O link será copiado para a área de transferência.`
+    );
+    if (!confirmado) return;
+
+    setResetandoId(userId);
+
+    try {
+      const res = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      // Copia o link para a área de transferência
+      await navigator.clipboard.writeText(data.link);
+
+      posthog.capture('admin_gerou_reset_senha', { usuario_alvo: userId });
+      alert('Link copiado para a área de transferência! Compartilhe com o usuário.');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Não foi possível gerar o link de reset.');
+    } finally {
+      setResetandoId(null);
     }
   }
 
@@ -294,7 +324,9 @@ export default function AdminClient({
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Observação
                   </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide" />
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -347,18 +379,32 @@ export default function AdminClient({
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => salvarPagamento(l.profile.id)}
-                        disabled={salvandoId === l.profile.id}
-                        className="flex items-center gap-1.5 text-xs bg-brown hover:bg-brown-deep text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
-                      >
-                        {salvandoId === l.profile.id ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Check size={12} />
-                        )}
-                        Salvar
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => salvarPagamento(l.profile.id)}
+                          disabled={salvandoId === l.profile.id}
+                          className="flex items-center gap-1.5 text-xs bg-brown hover:bg-brown-deep text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                        >
+                          {salvandoId === l.profile.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Check size={12} />
+                          )}
+                          Salvar
+                        </button>
+                        <button
+                          onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
+                          disabled={resetandoId === l.profile.id}
+                          className="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                        >
+                          {resetandoId === l.profile.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Key size={12} />
+                          )}
+                          Reset senha
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
