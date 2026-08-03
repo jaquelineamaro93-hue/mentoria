@@ -13,6 +13,8 @@ interface Edicao {
   status_pagamento?: string;
   forma_pagamento_escolhida?: string;
   data_fim_acesso?: string;
+  proxima_cobranca?: string;
+  observacao_pagamento?: string;
 }
 
 export default function GerenciarPlanosClient({
@@ -103,6 +105,12 @@ export default function GerenciarPlanosClient({
       if (changes.forma_pagamento_escolhida) updateData.forma_pagamento_escolhida = changes.forma_pagamento_escolhida;
       if (changes.data_fim_acesso !== undefined) {
         updateData.data_fim_acesso = changes.data_fim_acesso || null;
+      }
+      if (changes.proxima_cobranca !== undefined) {
+        updateData.proxima_cobranca = changes.proxima_cobranca || null;
+      }
+      if (changes.observacao_pagamento !== undefined) {
+        updateData.observacao_pagamento = changes.observacao_pagamento || null;
       }
       if (changes.status_pagamento) {
         updateData.status_pagamento = changes.status_pagamento;
@@ -213,7 +221,9 @@ export default function GerenciarPlanosClient({
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Forma pgto.</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Valor</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Status</th>
+              <th className="text-left py-3 px-4 font-medium text-brown-deep">Próx. cobrança</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Acesso até</th>
+              <th className="text-left py-3 px-4 font-medium text-brown-deep">Observação</th>
               <th className="text-left py-3 px-4 font-medium text-brown-deep">Ação</th>
             </tr>
           </thead>
@@ -289,8 +299,25 @@ export default function GerenciarPlanosClient({
                   <td className="py-3 px-4">
                     <input
                       type="date"
+                      value={emEdicao?.proxima_cobranca ?? mentorado.proxima_cobranca ?? ''}
+                      onChange={(e) => handleChange(mentorado.id, 'proxima_cobranca', e.target.value)}
+                      className="text-xs border border-line rounded px-2 py-1 w-36"
+                    />
+                  </td>
+                  <td className="py-3 px-4">
+                    <input
+                      type="date"
                       value={emEdicao?.data_fim_acesso ?? mentorado.data_fim_acesso ?? ''}
                       onChange={(e) => handleChange(mentorado.id, 'data_fim_acesso', e.target.value)}
+                      className="text-xs border border-line rounded px-2 py-1 w-36"
+                    />
+                  </td>
+                  <td className="py-3 px-4">
+                    <input
+                      type="text"
+                      value={emEdicao?.observacao_pagamento ?? mentorado.observacao_pagamento ?? ''}
+                      onChange={(e) => handleChange(mentorado.id, 'observacao_pagamento', e.target.value)}
+                      placeholder="Nota opcional..."
                       className="text-xs border border-line rounded px-2 py-1 w-36"
                     />
                   </td>

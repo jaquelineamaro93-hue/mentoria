@@ -29,7 +29,6 @@ export default function AdminClient({
   const router = useRouter();
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
-  const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
@@ -157,35 +156,6 @@ export default function AdminClient({
     limparIdentidade();
     router.push('/login');
     router.refresh();
-  }
-
-  async function atualizarPagamento(
-    userId: string,
-    campo: 'status_assinatura' | 'proxima_cobranca' | 'observacao_pagamento',
-    valor: string
-  ) {
-    setLinhas((prev) =>
-      prev.map((l) =>
-        l.profile.id === userId ? { ...l, profile: { ...l.profile, [campo]: valor } } : l
-      )
-    );
-  }
-
-  async function salvarPagamento(userId: string) {
-    const linha = linhas.find((l) => l.profile.id === userId);
-    if (!linha) return;
-
-    setSalvandoId(userId);
-    await supabase
-      .from('profiles')
-      .update({
-        status_assinatura: linha.profile.status_assinatura,
-        proxima_cobranca: linha.profile.proxima_cobranca || null,
-        observacao_pagamento: linha.profile.observacao_pagamento || null,
-      })
-      .eq('id', userId);
-    setSalvandoId(null);
-    posthog.capture('status_assinatura_atualizado', { status: linha.profile.status_assinatura });
   }
 
   const total = linhas.length;
@@ -396,12 +366,14 @@ export default function AdminClient({
         </section>
 
         <section>
-          <Eyebrow>Status de assinatura</Eyebrow>
+          <Eyebrow>Ações da conta</Eyebrow>
           <p className="text-xs text-ink-faint mb-4">
-            Alunos atuais entraram como "manual" (já pagaram fora do sistema). Novos
-            cadastros entram automaticamente como "mercadopago", e o status muda sozinho
-            conforme os pagamentos chegam. Quando o status vira "encerrado", a pessoa é
-            redirecionada para a tela de renovação em qualquer acesso.
+            Plano, forma de pagamento, valor, status, próxima cobrança, data de fim de acesso e
+            observação de cada mentorado agora ficam todos juntos em{' '}
+            <Link href="/admin/gerenciar-planos" className="text-sky-deep hover:underline">
+              Gerenciar planos e pagamentos
+            </Link>
+            . Aqui ficam só as ações de conta que não fazem sentido lá.
           </p>
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
@@ -409,18 +381,6 @@ export default function AdminClient({
                 <tr className="bg-paper border-b border-line text-left">
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Nome
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Origem
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Próxima cobrança
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Observação
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Ações
@@ -432,64 +392,7 @@ export default function AdminClient({
                   <tr key={l.profile.id} className="border-b border-line last:border-0 bg-cream">
                     <td className="px-4 py-3 text-ink">{l.profile.nome}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                          l.profile.origem_assinatura === 'manual'
-                            ? 'bg-[#f1e6d6] text-brown border border-brown/30'
-                            : 'bg-sky-tint text-sky-deep border border-sky'
-                        }`}
-                      >
-                        {l.profile.origem_assinatura === 'manual' ? 'Manual' : 'Mercado Pago'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={l.profile.status_assinatura}
-                        onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'status_assinatura', e.target.value)
-                        }
-                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink"
-                      >
-                        <option value="ativo">Ativo</option>
-                        <option value="inadimplente">Inadimplente</option>
-                        <option value="encerrado">Encerrado</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="date"
-                        value={l.profile.proxima_cobranca ?? ''}
-                        onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'proxima_cobranca', e.target.value)
-                        }
-                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        value={l.profile.observacao_pagamento ?? ''}
-                        onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'observacao_pagamento', e.target.value)
-                        }
-                        placeholder="Nota opcional..."
-                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink w-40"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => salvarPagamento(l.profile.id)}
-                          disabled={salvandoId === l.profile.id}
-                          className="flex items-center gap-1.5 text-xs bg-brown hover:bg-brown-deep text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
-                        >
-                          {salvandoId === l.profile.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Check size={12} />
-                          )}
-                          Salvar
-                        </button>
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
                           disabled={resetandoId === l.profile.id}
