@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Wallet, TrendingUp, Users, AlertTriangle, Gift } from 'lucide-react';
+import { Wallet, TrendingUp, Users, AlertTriangle, Gift, Target, Loader2 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -12,13 +13,19 @@ export default function FinanceiroClient({
   profile,
   mentorados,
   planos,
+  despesasMensaisIniciais,
 }: {
   profile: Profile;
   mentorados: Profile[];
   planos: PlanoMentoria[];
+  despesasMensaisIniciais: number;
 }) {
   const router = useRouter();
   const supabase = createClient();
+
+  const [despesasMensais, setDespesasMensais] = useState(despesasMensaisIniciais);
+  const [inputDespesas, setInputDespesas] = useState(String(despesasMensaisIniciais || ''));
+  const [salvandoDespesas, setSalvandoDespesas] = useState(false);
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -26,6 +33,21 @@ export default function FinanceiroClient({
     limparIdentidade();
     router.push('/login');
     router.refresh();
+  }
+
+  async function salvarDespesas() {
+    const valor = Number(inputDespesas.replace(',', '.')) || 0;
+    setSalvandoDespesas(true);
+    try {
+      const res = await fetch('/api/admin/configuracoes-financeiras', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ despesasMensais: valor }),
+      });
+      if (res.ok) setDespesasMensais(valor);
+    } finally {
+      setSalvandoDespesas(false);
+    }
   }
 
   const planoMap = new Map(planos.map((p) => [p.id, p]));
@@ -47,16 +69,33 @@ export default function FinanceiroClient({
     }
   }
 
+  function valorMensalEquivalente(mentorado: Profile) {
+    const plano = mentorado.plano_id ? planoMap.get(mentorado.plano_id) : null;
+    if (!plano || !plano.duracao_meses) return 0;
+    return valorContratado(mentorado) / plano.duracao_meses;
+  }
+
   const ativos = mentorados.filter((m) => m.status_assinatura === 'ativo');
   const inadimplentes = mentorados.filter((m) => m.status_assinatura === 'inadimplente');
   const gratuitos = mentorados.filter((m) => {
     const plano = m.plano_id ? planoMap.get(m.plano_id) : null;
     return plano && plano.preco_avista === 0;
   });
-  const pagantes = mentorados.filter((m) => !gratuitos.includes(m));
+  const pagantesAtivos = ativos.filter((m) => !gratuitos.includes(m));
 
-  const totalContratado = pagantes.reduce((soma, m) => soma + valorContratado(m), 0);
+  // "Entrou" é uma estimativa: como os pagamentos atuais são controlados
+  // manualmente (sem ledger de transações reais no banco), consideramos que
+  // todo mentorado com status ativo já pagou o valor contratado do plano.
+  const receitaRealizada = pagantesAtivos.reduce((soma, m) => soma + valorContratado(m), 0);
   const totalInadimplente = inadimplentes.reduce((soma, m) => soma + valorContratado(m), 0);
+  const mrr = pagantesAtivos.reduce((soma, m) => soma + valorMensalEquivalente(m), 0);
+  const ticketMedioMensal = pagantesAtivos.length > 0 ? mrr / pagantesAtivos.length : 0;
+
+  const mentoradosNecessarios =
+    ticketMedioMensal > 0 ? Math.ceil(despesasMensais / ticketMedioMensal) : null;
+  const saldoMensal = mrr - despesasMensais;
+  const margemMentorados =
+    mentoradosNecessarios !== null ? pagantesAtivos.length - mentoradosNecessarios : null;
 
   const porPlano = new Map<string, { nome: string; quantidade: number; total: number }>();
   for (const m of mentorados) {
@@ -74,6 +113,8 @@ export default function FinanceiroClient({
     .sort((a, b) => (a.proxima_cobranca! < b.proxima_cobranca! ? -1 : 1))
     .slice(0, 8);
 
+  const meses = [3, 6, 12];
+
   return (
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
@@ -82,20 +123,21 @@ export default function FinanceiroClient({
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Área administrativa</p>
         <h1 className="font-display text-3xl text-brown-deep mb-1">Financeiro</h1>
         <p className="text-sm text-ink-faint mb-8">
-          Visão geral de receita contratada, inadimplência e cortesias. Não substitui o extrato real
-          do Mercado Pago, é uma leitura do que está cadastrado no portal.
+          Como os pagamentos atuais são controlados manualmente (sem um extrato de transações no
+          portal), os valores de receita aqui são uma estimativa baseada no plano e status de cada
+          mentorado, não um extrato bancário. Para conferência exata, use o Mercado Pago.
         </p>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Panel className="p-5">
             <Wallet size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{formatarMoeda(totalContratado)}</p>
-            <p className="text-xs text-ink-faint">Valor total contratado (pagantes)</p>
+            <p className="font-display text-2xl text-brown-deep">{formatarMoeda(receitaRealizada)}</p>
+            <p className="text-xs text-ink-faint">Já entrou (estimado, mentorados ativos pagantes)</p>
           </Panel>
           <Panel className="p-5">
-            <Users size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{ativos.length}</p>
-            <p className="text-xs text-ink-faint">Mentorados com acesso ativo</p>
+            <TrendingUp size={18} className="text-sky-deep mb-2" />
+            <p className="font-display text-2xl text-brown-deep">{formatarMoeda(mrr)}</p>
+            <p className="text-xs text-ink-faint">Receita mensal recorrente equivalente (MRR)</p>
           </Panel>
           <Panel className="p-5">
             <AlertTriangle size={18} className="text-amber-600 mb-2" />
@@ -110,6 +152,127 @@ export default function FinanceiroClient({
             <p className="text-xs text-ink-faint">Em cortesia/gratuito</p>
           </Panel>
         </div>
+
+        <section className="mb-10">
+          <Eyebrow>
+            <Target size={13} /> Ponto de equilíbrio e fluxo de caixa
+          </Eyebrow>
+          <Panel className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-6">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-brown-deep mb-1.5">
+                  Suas despesas mensais fixas (estrutura, ferramentas, custo do seu tempo etc.)
+                </label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={inputDespesas}
+                  onChange={(e) => setInputDespesas(e.target.value)}
+                  placeholder="Ex: 3000"
+                  className="w-full sm:w-56 px-3 py-2 border border-line rounded-lg text-sm"
+                />
+              </div>
+              <button
+                onClick={salvarDespesas}
+                disabled={salvandoDespesas}
+                className="flex items-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {salvandoDespesas && <Loader2 size={14} className="animate-spin" />}
+                Salvar despesas
+              </button>
+            </div>
+
+            {despesasMensais > 0 ? (
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-xs text-ink-faint mb-1">Ticket médio mensal por mentorado</p>
+                  <p className="font-display text-xl text-brown-deep">
+                    {formatarMoeda(ticketMedioMensal)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-ink-faint mb-1">Mentorados pagantes necessários</p>
+                  <p className="font-display text-xl text-brown-deep">
+                    {mentoradosNecessarios} (você tem {pagantesAtivos.length})
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-ink-faint mb-1">Saldo mensal projetado</p>
+                  <p
+                    className={`font-display text-xl ${
+                      saldoMensal >= 0 ? 'text-green-700' : 'text-red-600'
+                    }`}
+                  >
+                    {formatarMoeda(saldoMensal)}
+                  </p>
+                </div>
+                <div className="sm:col-span-3 text-sm text-ink-soft border-t border-line pt-4">
+                  {margemMentorados !== null && margemMentorados >= 0 ? (
+                    <>
+                      Você está <strong>{margemMentorados} mentorado(s) acima</strong> do ponto de
+                      equilíbrio. Perder até essa quantidade de mentoradas pagantes ainda mantém o
+                      caixa positivo neste ticket médio.
+                    </>
+                  ) : (
+                    <>
+                      Você está <strong>{Math.abs(margemMentorados ?? 0)} mentorado(s) abaixo</strong>{' '}
+                      do ponto de equilíbrio neste ticket médio. Precisaria fechar mais{' '}
+                      {Math.abs(margemMentorados ?? 0)} contrato(s) do mesmo porte pra cobrir as
+                      despesas informadas.
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-ink-faint">
+                Informa suas despesas mensais acima pra ver o cálculo de quantos mentorados pagantes
+                você precisa manter pra ficar com o caixa positivo.
+              </p>
+            )}
+          </Panel>
+        </section>
+
+        {despesasMensais > 0 && (
+          <section className="mb-10">
+            <Eyebrow>Projeção simples (mantendo a base atual, sem considerar crescimento ou cancelamento)</Eyebrow>
+            <div className="overflow-x-auto rounded-xl border border-line">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-paper border-b border-line text-left">
+                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                      Período
+                    </th>
+                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                      Receita projetada
+                    </th>
+                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                      Despesas projetadas
+                    </th>
+                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                      Saldo acumulado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {meses.map((m) => (
+                    <tr key={m} className="border-b border-line last:border-0 bg-cream">
+                      <td className="px-4 py-3 text-ink">{m} meses</td>
+                      <td className="px-4 py-3 text-ink-soft">{formatarMoeda(mrr * m)}</td>
+                      <td className="px-4 py-3 text-ink-soft">{formatarMoeda(despesasMensais * m)}</td>
+                      <td
+                        className={`px-4 py-3 font-medium ${
+                          saldoMensal * m >= 0 ? 'text-green-700' : 'text-red-600'
+                        }`}
+                      >
+                        {formatarMoeda(saldoMensal * m)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
         <section className="mb-10">
           <Eyebrow>

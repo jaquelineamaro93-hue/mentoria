@@ -26,5 +26,19 @@ export default async function FinanceiroPage() {
 
   const { data: planos } = await supabase.from('planos_mentoria').select('*');
 
-  return <FinanceiroClient profile={perfilAdmin} mentorados={mentorados || []} planos={planos || []} />;
+  const { data: config } = await supabase
+    .from('configuracoes_financeiras')
+    .select('*')
+    .order('atualizado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return (
+    <FinanceiroClient
+      profile={perfilAdmin}
+      mentorados={mentorados || []}
+      planos={planos || []}
+      despesasMensaisIniciais={config?.despesas_mensais ?? 0}
+    />
+  );
 }
