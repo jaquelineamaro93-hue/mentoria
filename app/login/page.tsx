@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, identificarMentorado } from '@/lib/posthog';
 import type { TipoPacote } from '@/lib/types';
@@ -18,6 +19,7 @@ function LoginPageContent() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -145,14 +147,24 @@ function LoginPageContent() {
                   />
                 </Field>
                 <Field label="Senha">
-                  <input
-                    type="password"
-                    required
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    className="input"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={mostrarSenha ? 'text' : 'password'}
+                      required
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="input"
+                      style={{ paddingRight: 40 }}
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                    >
+                      {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </Field>
 
                 {erro && <Alert tipo="erro">{erro}</Alert>}
@@ -202,15 +214,25 @@ function LoginPageContent() {
                   </select>
                 </Field>
                 <Field label="Senha">
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    className="input"
-                    placeholder="Mínimo 6 caracteres"
-                  />
+                  <div className="relative">
+                    <input
+                      type={mostrarSenha ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="input"
+                      style={{ paddingRight: 40 }}
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                    >
+                      {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </Field>
 
                 {erro && <Alert tipo="erro">{erro}</Alert>}
