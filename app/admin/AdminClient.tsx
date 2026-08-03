@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -43,12 +43,15 @@ export default function AdminClient({
       const res = await fetch('/api/admin/enviar-lembretes', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.erro ?? 'Erro ao enviar lembretes.');
-      setResultadoLembretes(
+      const resumo =
         `Enviados agora: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
-          `${data.encontros} de encontro, ${data.votacao} de votação. ` +
-          (data.erros?.length ? `Erros: ${data.erros.length}.` : 'Sem erros.') +
-          ' Uma cópia de cada foi enviada em cópia oculta para jaqueline.amaro93@gmail.com.'
-      );
+        `${data.encontros} de encontro, ${data.votacao} de votação. ` +
+        (data.erros?.length ? `Erros: ${data.erros.length}.` : 'Sem erros.') +
+        ' Uma cópia de cada foi enviada em cópia oculta para jaqueline.amaro93@gmail.com.';
+      const detalheErros = data.erros?.length
+        ? `\n\nDetalhe dos erros (até 5):\n${data.erros.slice(0, 5).join('\n')}`
+        : '';
+      setResultadoLembretes(resumo + detalheErros);
     } catch (err) {
       setResultadoLembretes(
         err instanceof Error ? err.message : 'Não foi possível enviar os lembretes agora.'
@@ -213,11 +216,25 @@ export default function AdminClient({
           </div>
           <div className="flex flex-col gap-2 shrink-0">
             <Link
-              href="/admin/gerenciar-planos"
+              href="/admin/financeiro"
               className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Wallet size={15} />
+              Financeiro
+            </Link>
+            <Link
+              href="/admin/gerenciar-planos"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
             >
               <CreditCard size={15} />
               Gerenciar planos e pagamentos
+            </Link>
+            <Link
+              href="/admin/crescimento"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Rocket size={15} />
+              Boas práticas de crescimento
             </Link>
             <button
               onClick={enviarLembretesAgora}
@@ -231,7 +248,7 @@ export default function AdminClient({
         </div>
 
         {resultadoLembretes && (
-          <div className="mb-6 text-sm bg-sky-tint border border-sky rounded-lg px-4 py-3 text-brown-deep">
+          <div className="mb-6 text-sm bg-sky-tint border border-sky rounded-lg px-4 py-3 text-brown-deep whitespace-pre-wrap font-mono">
             {resultadoLembretes}
           </div>
         )}
