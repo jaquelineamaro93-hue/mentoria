@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 type Props = {
-  mentoradoId: string;
   planoId: string;
   mesReferencia: string; // "2026-08-01"
   reflexaoExistente?: {
@@ -19,7 +18,7 @@ const NOMES_MES = [
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
 ];
 
-export function ReflexaoMensal({ mentoradoId, planoId, mesReferencia, reflexaoExistente }: Props) {
+export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Props) {
   const [energia, setEnergia] = useState(reflexaoExistente?.energia ?? "");
   const [oQueAvancou, setOQueAvancou] = useState(reflexaoExistente?.o_que_avancou ?? "");
   const [oQueTravou, setOQueTravou] = useState(reflexaoExistente?.o_que_travou ?? "");
@@ -37,7 +36,6 @@ export function ReflexaoMensal({ mentoradoId, planoId, mesReferencia, reflexaoEx
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mentoradoId,
           planoId,
           mesReferencia,
           energia: energia || null,
