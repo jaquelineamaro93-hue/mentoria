@@ -3,10 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 
 // POST /api/pdi/reflexao
 // Body: {
-//   mentoradoId, planoId, mesReferencia ("2026-08-01"),
+//   planoId, mesReferencia ("2026-08-01"),
 //   energia, oQueAvancou, oQueTravou, ajusteParaProximoMes
 // }
 // Cria ou atualiza (upsert) a reflexão do mês. Um registro por mentorado por mês.
+// Usa o client autenticado para garantir que o usuário só salva reflexão dele mesmo.
 
 export async function POST(req: NextRequest) {
   const {
@@ -18,22 +19,24 @@ export async function POST(req: NextRequest) {
     ajusteParaProximoMes,
   } = await req.json();
 
- if (!planoId || !mesReferencia) {
-  return NextResponse.json(
-    { erro: "planoId e mesReferencia são obrigatórios" },
-    { status: 400 }
-  );
-}
+  if (!planoId || !mesReferencia) {
+    return NextResponse.json(
+      { erro: "planoId e mesReferencia são obrigatórios" },
+      { status: 400 }
+    );
+  }
 
-const supabase = await createClient();
-const { data: userData, error: userError } = await supabase.auth.getUser();
+  const supabase = await createClient();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
 
-if (userError || !userData?.user) {
-  return NextResponse.json({ erro: "não autorizado" }, { status: 401 });
-}
+  if (userError || !userData?.user) {
+    return NextResponse.json({ erro: "não autorizado" }, { status: 401 });
+  }
 
-const { data, error } = await supabase
-  .from("pdi_reflexoes_mensais")
+  const mentoradoId = userData.user.id;
+
+  const { data, error } = await supabase
+    .from("pdi_reflexoes_mensais")
     .upsert(
       {
         mentorado_id: mentoradoId,
