@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 
 // POST /api/pdi/reflexao
 // Body: {
@@ -10,7 +10,6 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function POST(req: NextRequest) {
   const {
-    mentoradoId,
     planoId,
     mesReferencia,
     energia,
@@ -19,20 +18,22 @@ export async function POST(req: NextRequest) {
     ajusteParaProximoMes,
   } = await req.json();
 
-  if (!mentoradoId || !planoId || !mesReferencia) {
-    return NextResponse.json(
-      { erro: "mentoradoId, planoId e mesReferencia são obrigatórios" },
-      { status: 400 }
-    );
-  }
-
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+ if (!planoId || !mesReferencia) {
+  return NextResponse.json(
+    { erro: "planoId e mesReferencia são obrigatórios" },
+    { status: 400 }
   );
+}
 
-  const { data, error } = await supabaseAdmin
-    .from("pdi_reflexoes_mensais")
+const supabase = await createClient();
+const { data: userData, error: userError } = await supabase.auth.getUser();
+
+if (userError || !userData?.user) {
+  return NextResponse.json({ erro: "não autorizado" }, { status: 401 });
+}
+
+const { data, error } = await supabase
+  .from("pdi_reflexoes_mensais")
     .upsert(
       {
         mentorado_id: mentoradoId,
