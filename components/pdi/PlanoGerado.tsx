@@ -212,7 +212,6 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
               CHECK-IN MENSAL
             </p>
             <ReflexaoMensal
-              mentoradoId={mentoradoId}
               planoId={plano.id}
               mesReferencia={mesReferencia}
             />
