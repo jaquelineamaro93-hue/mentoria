@@ -113,6 +113,15 @@ function LoginPageContent() {
       return;
     }
 
+    // Quando o e-mail já está cadastrado, o Supabase não retorna erro (pra
+    // não revelar se o e-mail existe), só devolve um usuário com
+    // identities vazio. Nesse caso não é um cadastro novo de verdade.
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      setLoading(false);
+      setErro('Esse e-mail já tem uma conta. Tenta entrar, ou usa "Esqueci a senha" se não lembrar.');
+      return;
+    }
+
     if (data.user) {
       // O perfil é criado automaticamente por um trigger no banco a partir
       // dos metadados enviados acima (nome, tipo_pacote), então não
@@ -121,6 +130,35 @@ function LoginPageContent() {
       // que o usuário percebesse.
       identificarMentorado(data.user.id, { email, nome, tipo_pacote: tipoPacote });
       posthog.capture('cadastro_realizado', { tipo_pacote: tipoPacote });
+
+      // Confirma o cadastro pelo servidor e já entra direto, em vez de
+      // depender do envio do e-mail de confirmação (instável e já travou
+      // cadastros legítimos várias vezes). Se por algum motivo essa etapa
+      // falhar, cai pro fluxo antigo (pede pra checar o e-mail).
+      try {
+        const res = await fetch('/api/auth/confirmar-cadastro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: data.user.id }),
+        });
+
+        if (res.ok) {
+          const { error: erroLogin } = await supabase.auth.signInWithPassword({
+            email,
+            password: senha,
+          });
+
+          if (!erroLogin) {
+            posthog.capture('login_realizado');
+            setLoading(false);
+            router.push('/dashboard');
+            router.refresh();
+            return;
+          }
+        }
+      } catch {
+        // segue pro fluxo de "verifique seu e-mail" abaixo
+      }
     }
 
     setLoading(false);
