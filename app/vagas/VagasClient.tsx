@@ -6,6 +6,7 @@ import { BarChart3, Zap, TrendingUp } from 'lucide-react';
 import AnaliseFitTab from './tabs/AnaliseFitTab';
 import KanbanTab from './tabs/KanbanTab';
 import RankingTab from './tabs/RankingTab';
+import type { Profile } from '@/lib/types';
 
 type Tab = 'analise' | 'kanban' | 'ranking';
 
@@ -26,12 +27,26 @@ interface Vaga {
 export default function VagasClient() {
   const [tab, setTab] = useState<Tab>('kanban');
   const [vagas, setVagas] = useState<Vaga[]>([]);
+  const [profile, setProfile] = useState<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin'> | null>(null);
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState(0);
 
   useEffect(() => {
+    carregarProfile();
     carregarVagas();
   }, [refetch]);
+
+  async function carregarProfile() {
+    try {
+      const res = await fetch('/api/perfil');
+      const data = await res.json();
+      if (data.profile) {
+        setProfile(data.profile);
+      }
+    } catch (erro) {
+      console.error('Erro ao carregar perfil:', erro);
+    }
+  }
 
   async function carregarVagas() {
     setLoading(true);
@@ -54,7 +69,7 @@ export default function VagasClient() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar profile={profile} />
 
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-7xl mx-auto">
