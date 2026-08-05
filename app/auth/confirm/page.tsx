@@ -11,19 +11,15 @@ export default function AuthConfirmPage() {
   useEffect(() => {
     const handleConfirmation = async () => {
       try {
-        // Aguarda o Supabase processar a sessão via URL hash
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Verifica se a sessão foi estabelecida
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (session?.user) {
-          // Sessão válida, redireciona para dashboard
           router.push('/dashboard');
         } else {
-          // Sem sessão, volta para login
           router.push('/login?error=auth_failed');
         }
       } catch (error) {
