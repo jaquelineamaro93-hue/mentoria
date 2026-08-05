@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, Loader, AlertCircle, Check } from 'lucide-react';
+import { Zap, Loader, AlertCircle, Check, Info } from 'lucide-react';
+import Link from 'next/link';
 
 interface Vaga {
   id: string;
@@ -54,17 +55,28 @@ interface AnaliseResult {
   cargo?: string;
 }
 
+interface Mensagem {
+  tipo: 'sucesso' | 'erro' | 'aviso' | 'erro-acao';
+  titulo: string;
+  descricao: string;
+  acao?: 'meu-perfil' | 'meu-pdi';
+}
+
 export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
   const [vagaInput, setVagaInput] = useState('');
   const [analisando, setAnalisando] = useState(false);
   const [analise, setAnalise] = useState<AnaliseResult | null>(null);
   const [salvando, setSalvando] = useState(false);
-  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [mensagem, setMensagem] = useState<Mensagem | null>(null);
   const [gapsResolvidos, setGapsResolvidos] = useState<Set<string>>(new Set());
 
   async function analisarFit() {
     if (!vagaInput.trim()) {
-      setMensagem('Cole a URL ou descrição da vaga');
+      setMensagem({
+        tipo: 'aviso',
+        titulo: 'Cole a vaga primeiro',
+        descricao: 'Insira a URL ou a descrição completa da vaga que você quer analisar',
+      });
       return;
     }
 
@@ -86,10 +98,19 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         setAnalise(data);
         setGapsResolvidos(new Set());
       } else {
-        setMensagem(data.error || 'Erro ao analisar fit');
+        setMensagem({
+          tipo: data.action ? 'erro-acao' : 'erro',
+          titulo: data.error || 'Erro ao analisar',
+          descricao: data.hint || 'Tente novamente ou contate o suporte',
+          acao: data.action,
+        });
       }
     } catch (erro) {
-      setMensagem('Erro ao conectar com a API');
+      setMensagem({
+        tipo: 'erro',
+        titulo: 'Erro ao conectar com a IA',
+        descricao: 'Verifique sua conexão com a internet e tente novamente',
+      });
     } finally {
       setAnalisando(false);
     }
@@ -121,7 +142,11 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
       });
 
       if (!vagaRes.ok) {
-        setMensagem('Erro ao criar vaga');
+        setMensagem({
+          tipo: 'erro',
+          titulo: 'Erro ao criar vaga',
+          descricao: 'Não conseguimos salvar a vaga. Tente novamente.',
+        });
         setSalvando(false);
         return;
       }
@@ -143,16 +168,28 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
       });
 
       if (readinessRes.ok) {
-        setMensagem('Vaga criada com sucesso!');
+        setMensagem({
+          tipo: 'sucesso',
+          titulo: '✨ Vaga salva com sucesso!',
+          descricao: 'Agora você pode acompanhar seu progresso de preparação na aba "Preparação"',
+        });
         setVagaInput('');
         setAnalise(null);
         onVagaAdicionada();
       } else {
-        setMensagem('Vaga criada mas erro ao salvar roadmap');
+        setMensagem({
+          tipo: 'aviso',
+          titulo: 'Vaga salva, mas houve um pequeno aviso',
+          descricao: 'A vaga foi salva, mas tivemos um problema ao gerar o roadmap. Tente novamente.',
+        });
         onVagaAdicionada();
       }
     } catch (erro) {
-      setMensagem('Erro ao salvar vaga');
+      setMensagem({
+        tipo: 'erro',
+        titulo: 'Erro ao salvar vaga',
+        descricao: 'Houve um erro inesperado. Tente novamente mais tarde.',
+      });
     } finally {
       setSalvando(false);
     }
@@ -166,6 +203,40 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
       novo.add(gapTitulo);
     }
     setGapsResolvidos(novo);
+  };
+
+  const renderMensagem = (msg: Mensagem) => {
+    const estilos = {
+      sucesso: 'bg-green-50 border border-green-200 text-green-700',
+      erro: 'bg-red-50 border border-red-200 text-red-700',
+      aviso: 'bg-yellow-50 border border-yellow-200 text-yellow-700',
+      'erro-acao': 'bg-blue-50 border border-blue-200 text-blue-700',
+    };
+
+    const icones = {
+      sucesso: <Check className="w-5 h-5 flex-shrink-0" />,
+      erro: <AlertCircle className="w-5 h-5 flex-shrink-0" />,
+      aviso: <Info className="w-5 h-5 flex-shrink-0" />,
+      'erro-acao': <Info className="w-5 h-5 flex-shrink-0" />,
+    };
+
+    return (
+      <div className={`p-4 rounded-lg flex gap-3 ${estilos[msg.tipo]}`}>
+        {icones[msg.tipo]}
+        <div className="flex-1">
+          <div className="font-medium mb-1">{msg.titulo}</div>
+          <p className="text-sm opacity-90 mb-2">{msg.descricao}</p>
+          {msg.acao && (
+            <Link
+              href={msg.acao === 'meu-pdi' ? '/meu-pdi' : '/meu-perfil'}
+              className="inline-block text-sm font-medium underline hover:opacity-75 transition"
+            >
+              {msg.acao === 'meu-pdi' ? 'Ir para Meu PDI' : 'Ir para Meu Perfil'} →
+            </Link>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -187,18 +258,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
             />
           </div>
 
-          {mensagem && (
-            <div
-              className={`p-4 rounded-lg flex gap-3 ${
-                mensagem.includes('sucesso')
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-red-50 text-red-700 border border-red-200'
-              }`}
-            >
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <span>{mensagem}</span>
-            </div>
-          )}
+          {mensagem && renderMensagem(mensagem)}
 
           <button
             onClick={analisarFit}
@@ -220,6 +280,8 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         </div>
       ) : (
         <div className="space-y-6">
+          {mensagem && renderMensagem(mensagem)}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
               <div className="text-sm text-gray-600 mb-2">Fit com a Vaga</div>
@@ -405,6 +467,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
               onClick={() => {
                 setAnalise(null);
                 setVagaInput('');
+                setMensagem(null);
               }}
               className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition"
             >
