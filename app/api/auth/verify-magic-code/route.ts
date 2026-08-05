@@ -63,7 +63,7 @@ export async function POST(request: Request) {
       type: 'magiclink',
       email: email,
       options: {
-        redirectTo: `https://${process.env.NEXT_PUBLIC_VERCEL_URL || 'somamentoria.com'}/dashboard`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/auth/confirm`,
       },
     });
 
