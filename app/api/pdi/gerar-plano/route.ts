@@ -4,24 +4,15 @@ import Anthropic from "@anthropic-ai/sdk";
 import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
 import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
-// POST /api/pdi/gerar-plano
-// Body: { mentoradoId: string }
-//
-// ATENÇÃO Claude Code: a leitura de `respostasSecoes` abaixo assume uma tabela
-// com as 20 respostas do Meu PDI. Ajuste o nome da tabela/colunas para o real
-// esquema do projeto (provavelmente algo como `pdi_respostas` com colunas
-// `secao_codigo`, `secao_titulo`, `resposta`, `user_id`). O resto da rota
-// não depende disso.
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
 export async function POST(req: NextRequest) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+
     const { mentoradoId } = await req.json();
     if (!mentoradoId) {
       return NextResponse.json({ erro: "mentoradoId é obrigatório" }, { status: 400 });
