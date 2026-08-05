@@ -11,25 +11,23 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Verifica se o usuário existe
+    console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
     const supabaseUser = await createClient();
     const { data: profile } = await supabaseUser
       .from('profiles')
       .select('id')
       .eq('email', email)
       .single();
+    console.log(`✅ [MAGIC-CODE] Perfil encontrado: ${!!profile}`);
 
     if (!profile) {
-      // Por segurança, não revela se o email existe
       return NextResponse.json({
         message: 'Se o email existe, você receberá um código.'
       });
     }
 
-    // Gera código de 6 dígitos
     const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Armazena o código com validade de 15 minutos
     const supabaseAdmin = createAdminClient();
     const { error: insertError } = await supabaseAdmin
       .from('magic_codes')
@@ -40,17 +38,14 @@ export async function POST(request: Request) {
       }, { onConflict: 'email' });
 
     if (insertError) {
-      console.error('Erro ao salvar código:', insertError);
+      console.error(`🔴 [MAGIC-CODE] Erro ao salvar código:`, insertError);
       return NextResponse.json(
         { error: 'Erro ao gerar código' },
         { status: 500 }
       );
     }
+    console.log(`✅ [MAGIC-CODE] Código ${codigo} salvo para: ${email}`);
 
-    // Envia email com o código usando o helper compartilhado (mesma cópia
-    // oculta de verificação pra jaqueline.amaro93@gmail.com que os outros
-    // e-mails do sistema já usam, então dá pra confirmar visualmente se o
-    // envio saiu de verdade em vez de descobrir só quando a mentorada reclama).
     try {
       await enviarEmail({
         para: email,
