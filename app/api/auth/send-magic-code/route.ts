@@ -72,14 +72,14 @@ export async function POST(request: Request) {
         `,
       });
     } catch (emailError) {
-      console.error(`Erro ao enviar codigo de acesso para ${email}:`, emailError);
+      console.error(`🔴 [MAGIC-CODE] Erro ao enviar código para ${email}:`, emailError);
     }
 
     return NextResponse.json({
       message: 'Se o email existe, você receberá um código.',
     });
   } catch (error) {
-    console.error('Erro:', error);
+    console.error('🔴 [MAGIC-CODE] Erro:', error);
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }
