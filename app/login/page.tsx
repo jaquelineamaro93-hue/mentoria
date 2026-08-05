@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -48,6 +48,39 @@ function LoginPageContent() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [tipoPacote, setTipoPacote] = useState<TipoPacote>('online');
+
+  useEffect(() => {
+    const processarMagicLink = async () => {
+      if (typeof window === 'undefined') return;
+
+      const hash = window.location.hash.substring(1);
+      if (!hash) return;
+
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      const type = params.get('type');
+
+      if (accessToken && type === 'recovery') {
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: accessToken,
+            type: 'recovery',
+          });
+
+          if (!error && data.user) {
+            identificarMentorado(data.user.id, { email: data.user.email });
+            posthog.capture('magic_login_realizado');
+            router.push('/dashboard');
+            router.refresh();
+          }
+        } catch {
+          console.error('Erro ao processar magic link');
+        }
+      }
+    };
+
+    processarMagicLink();
+  }, [supabase, router]);
 
   async function handleEntrar(e: React.FormEvent) {
     e.preventDefault();
