@@ -12,11 +12,7 @@ export default function AuthConfirmPage() {
     const handleConfirmation = async () => {
       try {
         await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
+        const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           router.push('/dashboard');
         } else {
@@ -27,7 +23,6 @@ export default function AuthConfirmPage() {
         router.push('/login?error=auth_error');
       }
     };
-
     handleConfirmation();
   }, [router, supabase]);
 
