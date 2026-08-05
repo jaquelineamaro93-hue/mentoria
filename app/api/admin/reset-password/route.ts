@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       type: 'recovery',
       email: email,
       options: {
-        ,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/reset-password`,
       },
     });
 
