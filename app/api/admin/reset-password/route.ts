@@ -9,46 +9,61 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log(`📧 [ADMIN-RESET-PASSWORD] Iniciando reset para: ${email}`);
+
+    console.log(`🔑 [ADMIN-RESET-PASSWORD] Criando admin client...`);
     const supabase = createAdminClient();
+    console.log(`✅ [ADMIN-RESET-PASSWORD] Admin client criado, chamando generateLink...`);
 
     // Gera link de reset para o usuário
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://mentoria-pi-taupe.vercel.app'}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/reset-password`,
       },
     });
 
     if (error || !data) {
-      console.error('Erro ao gerar link:', error);
+      console.error('🔴 Erro ao gerar link de reset:', {
+        error: error,
+        errorMessage: error?.message,
+        errorStatus: (error as any)?.status,
+        data: data,
+        email: email,
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      });
       return NextResponse.json(
         { error: 'Erro ao gerar link de reset' },
         { status: 500 }
       );
     }
 
-    console.log('Data completa do generateLink:', JSON.stringify(data, null, 2));
+    console.log(`✅ [ADMIN-RESET-PASSWORD] generateLink retornou com sucesso`);
 
     // Supabase retorna o link em data.properties?.action_link ou data?.action_link
     const resetUrl = (data.properties as any)?.action_link || (data as any)?.action_link;
 
-    console.log('Reset URL gerada:', resetUrl);
-
     if (!resetUrl) {
-      console.error('action_link não encontrado em:', JSON.stringify(data));
+      console.error(`🔴 [ADMIN-RESET-PASSWORD] Link não encontrado na resposta:`, data);
       return NextResponse.json(
-        { error: 'Erro ao gerar link de reset (action_link vazio)' },
+        { error: 'Erro ao gerar link de reset' },
         { status: 500 }
       );
     }
+
+    console.log(`✅ [ADMIN-RESET-PASSWORD] Link extraído com sucesso`);
 
     return NextResponse.json({
       message: 'Link gerado com sucesso',
       link: resetUrl,
     });
   } catch (error) {
-    console.error('Erro:', error);
+    console.error('🔴 [ADMIN-RESET-PASSWORD] Erro no catch block:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }
