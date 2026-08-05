@@ -52,17 +52,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Registrar auditoria
-    await admin
-      .from('admin_logs')
-      .insert({
-        admin_id: user.user.id,
-        acao: 'atualizar_vagas',
-        plano_tipo,
-        dados: { total_vagas, preco, descricao, ativo },
-      })
-      .then(() => {}) // Ignorar erros de log
-      .catch(() => {});
+    // Registrar auditoria - ignorar se falhar
+    try {
+      await admin
+        .from('admin_logs')
+        .insert({
+          admin_id: user.user.id,
+          acao: 'atualizar_vagas',
+          plano_tipo,
+          dados: { total_vagas, preco, descricao, ativo },
+        });
+    } catch {
+      // Ignorar erros de log
+    }
 
     return NextResponse.json({
       success: true,
