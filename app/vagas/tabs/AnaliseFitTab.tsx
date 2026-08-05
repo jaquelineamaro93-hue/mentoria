@@ -15,12 +15,34 @@ interface Props {
   onVagaAdicionada: () => void;
 }
 
+interface SubScores {
+  experiencia: number;
+  skills_tecnicas: number;
+  senioridade: number;
+  contexto_setor: number;
+}
+
+interface RoadmapItem {
+  tipo: 'skill' | 'project' | 'course';
+  titulo: string;
+  descricao: string;
+  semanas: number;
+  prioridade: 'high' | 'medium' | 'low';
+  recursos: string[];
+}
+
 interface AnaliseResult {
   fit_score: number;
+  readiness_score: number;
+  readiness_gap: number;
+  weeks_to_ready: number;
+  estimated_readiness_date: string;
+  sub_scores: SubScores;
   pontos_fortes: string[];
   gaps: string[];
-  recomendacoes: string[];
+  recomendacoes_curriculo: string[];
   resumo: string;
+  roadmap_items: RoadmapItem[];
 }
 
 export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
@@ -72,7 +94,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
     setSalvando(true);
 
     try {
-      const res = await fetch('/api/vagas', {
+      const vagaRes = await fetch('/api/vagas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,20 +102,46 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
           cargo,
           descricao_vaga: descricao,
           fit_score: analise.fit_score,
+          sub_scores: analise.sub_scores,
+          pontos_fortes: analise.pontos_fortes,
+          gaps: analise.gaps,
+          recomendacoes_curriculo: analise.recomendacoes_curriculo,
           etapa: 'para_aplicar',
         }),
       });
 
-      if (res.ok) {
-        setMensagem('✅ Vaga criada com sucesso!');
-        // Limpar formulário
+      if (!vagaRes.ok) {
+        setMensagem('Erro ao criar vaga');
+        setSalvando(false);
+        return;
+      }
+
+      const vagaData = await vagaRes.json();
+      const vagaId = vagaData.vaga.id;
+
+      const readinessRes = await fetch('/api/vagas/readiness', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vaga_id: vagaId,
+          readiness_score: analise.readiness_score,
+          readiness_gap: analise.readiness_gap,
+          weeks_to_ready: analise.weeks_to_ready,
+          estimated_readiness_date: analise.estimated_readiness_date,
+          roadmap_items: analise.roadmap_items,
+        }),
+      });
+
+      if (readinessRes.ok) {
+        setMensagem('Vaga criada com sucesso!');
         setEmpresa('');
         setCargo('');
         setDescricao('');
         setAnalise(null);
         onVagaAdicionada();
       } else {
-        setMensagem('Erro ao criar vaga');
+        setMensagem('Vaga criada mas erro ao salvar roadmap');
+        onVagaAdicionada();
       }
     } catch (erro) {
       setMensagem('Erro ao salvar vaga');
@@ -150,7 +198,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
       {mensagem && (
         <div
           className={`p-4 mb-6 rounded-lg ${
-            mensagem.includes('✅')
+            mensagem.includes('sucesso')
               ? 'bg-green-50 text-green-700 border border-green-200'
               : 'bg-red-50 text-red-700 border border-red-200'
           }`}
@@ -179,19 +227,58 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         </button>
       ) : (
         <div className="space-y-6">
-          {/* Fit Score */}
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600 mb-2">
-                {analise.fit_score}%
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
+              <div className="text-center">
+                <div className="text-sm text-gray-600 mb-2">Compatibilidade com Vaga</div>
+                <div className="text-4xl font-bold text-blue-600 mb-1">
+                  {analise.fit_score}%
+                </div>
+                <div className="text-xs text-gray-500">Fit Score</div>
               </div>
-              <div className="text-gray-700 font-medium">{analise.resumo}</div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-lg border border-purple-200">
+              <div className="text-center">
+                <div className="text-sm text-gray-600 mb-2">Prontidão Atual</div>
+                <div className="text-4xl font-bold text-purple-600 mb-1">
+                  {analise.readiness_score}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  +{analise.weeks_to_ready}w até 100%
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Pontos Fortes */}
+          <div className="text-center text-gray-700 font-medium text-lg">
+            {analise.resumo}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: 'Experiência', key: 'experiencia' as const },
+              { label: 'Skills Técnicas', key: 'skills_tecnicas' as const },
+              { label: 'Senioridade', key: 'senioridade' as const },
+              { label: 'Contexto do Setor', key: 'contexto_setor' as const },
+            ].map(({ label, key }) => (
+              <div key={key} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-700">{label}</span>
+                  <span className="text-sm font-bold text-gray-900">{analise.sub_scores[key]}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${analise.sub_scores[key]}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-3">✅ Seus Pontos Fortes</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-3">Seus Pontos Fortes</h3>
             <ul className="space-y-2">
               {analise.pontos_fortes.map((ponto, idx) => (
                 <li
@@ -204,9 +291,8 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
             </ul>
           </div>
 
-          {/* Gaps */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-3">📌 Áreas de Melhoria</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-3">Áreas de Melhoria</h3>
             <ul className="space-y-2">
               {analise.gaps.map((gap, idx) => (
                 <li
@@ -219,11 +305,10 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
             </ul>
           </div>
 
-          {/* Recomendações */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-3">💡 Recomendações</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-3">Recomendações para Currículo</h3>
             <ul className="space-y-2">
-              {analise.recomendacoes.map((rec, idx) => (
+              {(analise.recomendacoes_curriculo || []).map((rec, idx) => (
                 <li
                   key={idx}
                   className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700"
@@ -234,7 +319,51 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
             </ul>
           </div>
 
-          {/* Ações */}
+          {analise.roadmap_items && analise.roadmap_items.length > 0 && (
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-3">
+                Roadmap de Preparação ({analise.weeks_to_ready} semanas)
+              </h3>
+              <div className="space-y-2">
+                {analise.roadmap_items.slice(0, 3).map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg"
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-medium text-indigo-900">{item.titulo}</span>
+                      <span className="text-xs px-2 py-1 bg-indigo-200 text-indigo-700 rounded">
+                        {item.semanas}w
+                      </span>
+                    </div>
+                    <p className="text-sm text-indigo-700 mb-1">{item.descricao}</p>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        item.prioridade === 'high'
+                          ? 'bg-red-100 text-red-700'
+                          : item.prioridade === 'medium'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-green-100 text-green-700'
+                      }`}
+                    >
+                      {item.prioridade === 'high'
+                        ? '🔴 Alta'
+                        : item.prioridade === 'medium'
+                          ? '🟡 Média'
+                          : '🟢 Baixa'}{' '}
+                      Prioridade
+                    </span>
+                  </div>
+                ))}
+                {analise.roadmap_items.length > 3 && (
+                  <div className="text-center text-sm text-gray-600 py-2">
+                    +{analise.roadmap_items.length - 3} mais items no roadmap completo
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-3 pt-4">
             <button
               onClick={() => setAnalise(null)}
