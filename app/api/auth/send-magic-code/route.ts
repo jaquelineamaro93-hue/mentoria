@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { enviarEmail } from '@/lib/sendgrid';
 
@@ -11,8 +10,10 @@ export async function POST(request: Request) {
   }
 
   try {
-        console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
+    console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
 
+    // Gera código sem verificar se o perfil existe
+    // (por segurança, não revelamos se o email existe ou não)
     const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
     const supabaseAdmin = createAdminClient();
