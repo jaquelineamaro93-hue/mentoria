@@ -63,7 +63,7 @@ export async function POST(request: Request) {
       type: 'magiclink',
       email: email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://mentoria-pi-taupe.vercel.app'}/dashboard`,
+        redirectTo: `https://${process.env.NEXT_PUBLIC_VERCEL_URL || 'somamentoria.com'}/dashboard`,
       },
     });
 
