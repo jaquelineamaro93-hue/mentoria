@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-// GET - Listar vagas do mentorado
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -28,7 +27,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Criar nova vaga
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -38,8 +36,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const { empresa, cargo, descricao_vaga, link_vaga, etapa, observacoes } =
-      await request.json();
+    const body = await request.json();
+    const { empresa, cargo } = body;
 
     if (!empresa || !cargo) {
       return NextResponse.json(
@@ -52,12 +50,8 @@ export async function POST(request: NextRequest) {
       .from('vagas_candidatura')
       .insert({
         mentorado_id: user.user.id,
-        empresa,
-        cargo,
-        descricao_vaga,
-        link_vaga,
-        etapa: etapa || 'para_aplicar',
-        observacoes,
+        ...body,
+        etapa: body.etapa || 'para_aplicar',
       })
       .select()
       .single();
