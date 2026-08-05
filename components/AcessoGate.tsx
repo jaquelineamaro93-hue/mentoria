@@ -28,16 +28,22 @@ export default function AcessoGate() {
         return;
       }
 
-      if (!perfil) {
-  // Novo usuário sem perfil ainda - deixar entrar
-  setChecando(false);
-  return;
-}
+      const { data: perfil } = await supabase
+        .from('profiles')
+        .select('status_pagamento, data_fim_acesso, is_admin')
+        .eq('id', user.id)
+        .maybeSingle();
 
-if (perfil.is_admin) {
-  setChecando(false);
-  return;
-}
+      if (!perfil) {
+        // Novo usuário sem perfil ainda - deixar entrar
+        setChecando(false);
+        return;
+      }
+
+      if (perfil.is_admin) {
+        setChecando(false);
+        return;
+      }
 
       const passouDoPrazo =
         perfil.data_fim_acesso && perfil.data_fim_acesso < new Date().toISOString().slice(0, 10);
