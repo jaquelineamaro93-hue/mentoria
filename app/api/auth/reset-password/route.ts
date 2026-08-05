@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/reset-password`,
+        redirectTo: `https://${process.env.NEXT_PUBLIC_VERCEL_URL || 'somamentoria.com'}/reset-password`,
       },
     });
 
