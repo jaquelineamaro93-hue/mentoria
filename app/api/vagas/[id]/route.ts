@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
 // GET - Buscar vaga específica
-export async function GET(request: NextRequest, { params }: Params) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: user } = await supabase.auth.getUser();
 
@@ -20,7 +18,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const { data: vaga, error } = await supabase
       .from('vagas_candidatura')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('mentorado_id', user.user.id)
       .single();
 
@@ -36,8 +34,12 @@ export async function GET(request: NextRequest, { params }: Params) {
 }
 
 // PATCH - Atualizar vaga
-export async function PATCH(request: NextRequest, { params }: Params) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: user } = await supabase.auth.getUser();
 
@@ -51,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const { data: vaga } = await supabase
       .from('vagas_candidatura')
       .select('mentorado_id')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!vaga || vaga.mentorado_id !== user.user.id) {
@@ -64,7 +66,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         ...updateData,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -80,8 +82,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 }
 
 // DELETE - Deletar vaga
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: user } = await supabase.auth.getUser();
 
@@ -93,7 +99,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     const { data: vaga } = await supabase
       .from('vagas_candidatura')
       .select('mentorado_id')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!vaga || vaga.mentorado_id !== user.user.id) {
@@ -103,7 +109,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     const { error } = await supabase
       .from('vagas_candidatura')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       return NextResponse.json({ error: 'Erro ao deletar vaga' }, { status: 500 });
