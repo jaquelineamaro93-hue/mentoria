@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, identificarMentorado } from '@/lib/posthog';
+import OAuthButtons from '@/components/OAuthButtons';
 import type { TipoPacote } from '@/lib/types';
 
 type Modo = 'entrar' | 'cadastrar';
@@ -257,6 +258,17 @@ function LoginPageContent() {
                 >
                   Esqueci a senha
                 </button>
+
+                <div className="my-4 relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-line"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-paper text-ink-faint">ou</span>
+                  </div>
+                </div>
+
+                <OAuthButtons />
               </form>
             ) : (
               <form onSubmit={handleCadastrar} className="flex flex-col gap-4">
