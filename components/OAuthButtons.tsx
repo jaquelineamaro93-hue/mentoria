@@ -1,118 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-interface GoogleAuthResponse {
-  credential: string;
-}
-
-interface LinkedInProfile {
-  id: string;
-  email: string;
-  localizedFirstName: string;
-  localizedLastName: string;
-  profilePicture?: {
-    displayImage: string;
-  };
-}
 
 export default function OAuthButtons() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Google OAuth Handler
-  const handleGoogleLogin = async (response: GoogleAuthResponse) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Decodificar JWT do Google
-      const base64Url = response.credential.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-
-      const googleUser = JSON.parse(jsonPayload);
-
-      // Enviar para callback
-      const res = await fetch('/api/auth/oauth/google/callback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: response.credential,
-          user: {
-            id: googleUser.sub,
-            email: googleUser.email,
-            name: googleUser.name,
-            picture: googleUser.picture,
-          },
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.loginUrl) {
-        window.location.href = data.loginUrl;
-      } else {
-        setError('Erro ao fazer login com Google');
-      }
-    } catch (err) {
-      setError('Erro ao processar login com Google');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // LinkedIn OAuth Handler
-  const handleLinkedInLogin = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Simular login com LinkedIn (em produção, usar SDK do LinkedIn)
-      const linkedinToken = localStorage.getItem('linkedin_token');
-
-      if (!linkedinToken) {
-        setError('Token do LinkedIn não encontrado. Faça login no LinkedIn primeiro.');
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch('/api/auth/oauth/linkedin/callback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: linkedinToken,
-          user: {
-            id: localStorage.getItem('linkedin_id') || '',
-            email: localStorage.getItem('linkedin_email') || '',
-            name: localStorage.getItem('linkedin_name') || '',
-            picture: localStorage.getItem('linkedin_picture'),
-          },
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.loginUrl) {
-        window.location.href = data.loginUrl;
-      } else {
-        setError('Erro ao fazer login com LinkedIn');
-      }
-    } catch (err) {
-      setError('Erro ao processar login com LinkedIn');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error] = useState<string | null>(null);
 
   return (
     <div className="space-y-3 my-6">
@@ -122,10 +13,10 @@ export default function OAuthButtons() {
         </div>
       )}
 
+      {/* TODO: Implementar Google Sign-In com SDK oficial */}
       <button
-        onClick={handleGoogleLogin}
-        disabled={loading}
-        className="w-full py-2 px-4 bg-white border border-gray-300 rounded text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center gap-2 transition"
+        disabled={true}
+        className="w-full py-2 px-4 bg-gray-100 border border-gray-300 rounded text-gray-500 font-medium disabled:opacity-50 flex items-center justify-center gap-2 transition"
       >
         <svg
           className="w-5 h-5"
@@ -140,10 +31,10 @@ export default function OAuthButtons() {
         Continuar com Google
       </button>
 
+      {/* TODO: Implementar LinkedIn OAuth com SDK oficial */}
       <button
-        onClick={handleLinkedInLogin}
-        disabled={loading}
-        className="w-full py-2 px-4 bg-[#0A66C2] text-white rounded font-medium hover:bg-[#084A8F] disabled:opacity-50 flex items-center justify-center gap-2 transition"
+        disabled={true}
+        className="w-full py-2 px-4 bg-gray-100 border border-gray-300 rounded text-gray-500 font-medium disabled:opacity-50 flex items-center justify-center gap-2 transition"
       >
         <svg
           className="w-5 h-5"

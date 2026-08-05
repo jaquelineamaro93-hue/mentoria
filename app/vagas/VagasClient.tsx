@@ -24,29 +24,19 @@ interface Vaga {
   updated_at: string;
 }
 
-export default function VagasClient() {
+export default function VagasClient({
+  profile,
+}: {
+  profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin'> | null;
+}) {
   const [tab, setTab] = useState<Tab>('kanban');
   const [vagas, setVagas] = useState<Vaga[]>([]);
-  const [profile, setProfile] = useState<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin'> | null>(null);
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState(0);
 
   useEffect(() => {
-    carregarProfile();
     carregarVagas();
   }, [refetch]);
-
-  async function carregarProfile() {
-    try {
-      const res = await fetch('/api/perfil');
-      const data = await res.json();
-      if (data.profile) {
-        setProfile(data.profile);
-      }
-    } catch (erro) {
-      console.error('Erro ao carregar perfil:', erro);
-    }
-  }
 
   async function carregarVagas() {
     setLoading(true);
