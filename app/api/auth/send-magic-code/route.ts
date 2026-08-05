@@ -11,20 +11,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
-    const supabaseUser = await createClient();
-    const { data: profile } = await supabaseUser
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .single();
-    console.log(`✅ [MAGIC-CODE] Perfil encontrado: ${!!profile}`);
+        console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
 
-    if (!profile) {
-      return NextResponse.json({
-        message: 'Se o email existe, você receberá um código.'
-      });
-    }
+    // Gera código sem verificar se o perfil existe
+    // (por segurança, não revelamos se o email existe ou não)
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const supabaseAdmin = createAdminClient();
+    const { error: insertError } = await supabaseAdmin
+      .from('magic_codes')
+      .upsert({
+        email,
+        code: codigo,
+        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      }, { onConflict: 'email' });
 
     const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
