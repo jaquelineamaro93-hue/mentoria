@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     console.log(`📧 [RESET-PASSWORD] Iniciando reset para: ${email}`);
     const supabase = await createClient();
 
+    // Verifica se o perfil existe
     const { data: perfil } = await supabase
       .from('profiles')
       .select('id, nome')
@@ -20,9 +21,11 @@ export async function POST(request: Request) {
       .single();
 
     if (!perfil) {
+      // Não revela se email existe ou não (segurança)
       return NextResponse.json({ message: 'Se o email existe, você receberá um link de reset.' });
     }
 
+    // Gera link de reset com admin client para obter o link real
     console.log(`🔑 [RESET-PASSWORD] Criando admin client...`);
     const supabaseAdmin = createAdminClient();
     console.log(`✅ [RESET-PASSWORD] Admin client criado, chamando generateLink...`);
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/reset-password`,
       },
     });
 
@@ -50,6 +53,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Extrai o link real da resposta do Supabase
     console.log(`✅ [RESET-PASSWORD] generateLink retornou com sucesso`);
     const resetLink = (data.properties as any)?.action_link || (data as any)?.action_link;
     if (!resetLink) {
@@ -61,6 +65,7 @@ export async function POST(request: Request) {
     }
     console.log(`✅ [RESET-PASSWORD] Link extraído com sucesso`);
 
+    // Envia email customizado via SendGrid usando fetch (não sgMail para evitar issues de inicialização)
     const apiKey = process.env.SENDGRID_API_KEY;
     const fromEmail = process.env.SENDGRID_FROM_EMAIL ?? 'consultoria@camarocrm.com';
     const bccEmail = 'jaqueline.amaro93@gmail.com';
@@ -95,10 +100,23 @@ export async function POST(request: Request) {
               <div style="background: white; border-radius: 16px; padding: 40px; text-align: center;">
                 <h2 style="color: #3c2c1f; margin-bottom: 10px;">Redefinir Senha</h2>
                 <p style="color: #7a6b5f; margin-bottom: 30px;">Recebemos sua solicitação de reset de senha.</p>
-                <p style="color: #7a6b5f; margin-bottom: 30px; font-size: 14px;">Clique no botão abaixo para criar uma nova senha:</p>
-                <a href="${resetLink}" style="display: inline-block; background: #6b4a35; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-bottom: 30px;">Redefinir Senha</a>
-                <p style="color: #7a6b5f; font-size: 12px; margin-bottom: 10px;">Esse link expira em 24 horas.</p>
-                <p style="color: #7a6b5f; font-size: 12px; margin: 20px 0; border-top: 1px solid #e0d9cf; padding-top: 20px;">Se você não solicitou essa mudança, ignore este email.</p>
+
+                <p style="color: #7a6b5f; margin-bottom: 30px; font-size: 14px;">
+                  Clique no botão abaixo para criar uma nova senha:
+                </p>
+
+                <a href="${resetLink}"
+                   style="display: inline-block; background: #6b4a35; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-bottom: 30px;">
+                  Redefinir Senha
+                </a>
+
+                <p style="color: #7a6b5f; font-size: 12px; margin-bottom: 10px;">
+                  Esse link expira em 24 horas.
+                </p>
+
+                <p style="color: #7a6b5f; font-size: 12px; margin: 20px 0; border-top: 1px solid #e0d9cf; padding-top: 20px;">
+                  Se você não solicitou essa mudança, ignore este email.
+                </p>
               </div>
             </div>
           `,

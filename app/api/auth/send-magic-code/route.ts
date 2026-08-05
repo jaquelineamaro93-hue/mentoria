@@ -11,20 +11,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
-    const supabaseUser = await createClient();
-    const { data: profile } = await supabaseUser
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .single();
-    console.log(`✅ [MAGIC-CODE] Perfil encontrado: ${!!profile}`);
-
-    if (!profile) {
-      return NextResponse.json({
-        message: 'Se o email existe, você receberá um código.'
-      });
-    }
+        console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
 
     const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -72,14 +59,14 @@ export async function POST(request: Request) {
         `,
       });
     } catch (emailError) {
-      console.error(`Erro ao enviar codigo de acesso para ${email}:`, emailError);
+      console.error(`🔴 [MAGIC-CODE] Erro ao enviar código para ${email}:`, emailError);
     }
 
     return NextResponse.json({
       message: 'Se o email existe, você receberá um código.',
     });
   } catch (error) {
-    console.error('Erro:', error);
+    console.error('🔴 [MAGIC-CODE] Erro:', error);
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }

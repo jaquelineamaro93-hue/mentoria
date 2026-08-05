@@ -15,12 +15,11 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
     console.log(`✅ [ADMIN-RESET-PASSWORD] Admin client criado, chamando generateLink...`);
 
-    // Gera link de reset para o usuário
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/reset-password`,
+        ,
       },
     });
 
@@ -42,7 +41,6 @@ export async function POST(request: Request) {
 
     console.log(`✅ [ADMIN-RESET-PASSWORD] generateLink retornou com sucesso`);
 
-    // Supabase retorna o link em data.properties?.action_link ou data?.action_link
     const resetUrl = (data.properties as any)?.action_link || (data as any)?.action_link;
 
     if (!resetUrl) {
