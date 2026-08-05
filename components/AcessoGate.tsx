@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-const ROTAS_LIBERADAS = ['/login', '/assinatura'];
+const ROTAS_LIBERADAS = ['/login', '/assinatura', '/magic-login', '/reset-password'];
 
 export default function AcessoGate() {
   const supabase = createClient();
@@ -28,16 +28,16 @@ export default function AcessoGate() {
         return;
       }
 
-      const { data: perfil } = await supabase
-        .from('profiles')
-        .select('status_pagamento, data_fim_acesso, is_admin')
-        .eq('id', user.id)
-        .maybeSingle();
+      if (!perfil) {
+  // Novo usuário sem perfil ainda - deixar entrar
+  setChecando(false);
+  return;
+}
 
-      if (!perfil || perfil.is_admin) {
-        setChecando(false);
-        return;
-      }
+if (perfil.is_admin) {
+  setChecando(false);
+  return;
+}
 
       const passouDoPrazo =
         perfil.data_fim_acesso && perfil.data_fim_acesso < new Date().toISOString().slice(0, 10);
