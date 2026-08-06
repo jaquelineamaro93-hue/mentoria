@@ -17,66 +17,35 @@ interface Props {
   onVagaAdicionada: () => void;
 }
 
-interface SubScores {
-  experiencia: number;
-  skills_tecnicas: number;
-  senioridade: number;
-  contexto_setor: number;
-}
-
-interface Gap {
-  titulo: string;
-  descricao: string;
-  mitigacao?: string;
-  possuiBuscador?: boolean;
-}
-
-interface RoadmapItem {
-  tipo: 'skill' | 'project' | 'course';
-  titulo: string;
-  descricao: string;
-  semanas: number;
-  prioridade: 'high' | 'medium' | 'low';
-  recursos: string[];
-}
-
 interface AnaliseResult {
   fit_score: number;
-  readiness_score: number;
-  readiness_gap: number;
-  weeks_to_ready: number;
-  estimated_readiness_date: string;
-  sub_scores: SubScores;
   pontos_fortes: string[];
-  gaps: Gap[] | string[];
-  recomendacoes_curriculo: string[];
+  gaps: string[];
+  recomendacoes: string[];
   resumo: string;
-  roadmap_items: RoadmapItem[];
-  empresa?: string;
-  cargo?: string;
 }
 
 interface Mensagem {
-  tipo: 'sucesso' | 'erro' | 'aviso' | 'erro-acao';
+  tipo: 'sucesso' | 'erro' | 'aviso';
   titulo: string;
   descricao: string;
-  acao?: 'meu-perfil' | 'meu-pdi';
 }
 
 export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
-  const [vagaInput, setVagaInput] = useState('');
+  const [empresa, setEmpresa] = useState('');
+  const [cargo, setCargo] = useState('');
+  const [descricao_vaga, setDescricaoVaga] = useState('');
   const [analisando, setAnalisando] = useState(false);
   const [analise, setAnalise] = useState<AnaliseResult | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState<Mensagem | null>(null);
-  const [gapsResolvidos, setGapsResolvidos] = useState<Set<string>>(new Set());
 
   async function analisarFit() {
-    if (!vagaInput.trim()) {
+    if (!empresa.trim() || !cargo.trim() || !descricao_vaga.trim()) {
       setMensagem({
         tipo: 'aviso',
-        titulo: 'Cole a vaga primeiro',
-        descricao: 'Insira a URL ou a descrição completa da vaga que você quer analisar',
+        titulo: 'Preencha todos os campos',
+        descricao: 'Empresa, cargo e descrição são obrigatórios',
       });
       return;
     }
@@ -89,7 +58,9 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vaga_input: vagaInput,
+          empresa,
+          cargo,
+          descricao_vaga,
         }),
       });
 
@@ -97,20 +68,18 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
 
       if (res.ok) {
         setAnalise(data);
-        setGapsResolvidos(new Set());
       } else {
         setMensagem({
-          tipo: data.action ? 'erro-acao' : 'erro',
+          tipo: 'erro',
           titulo: data.error || 'Erro ao analisar',
-          descricao: data.hint || 'Tente novamente ou contate o suporte',
-          acao: data.action,
+          descricao: 'Tente novamente ou contate o suporte',
         });
       }
     } catch (erro) {
       setMensagem({
         tipo: 'erro',
-        titulo: 'Erro ao conectar com a IA',
-        descricao: 'Verifique sua conexão com a internet e tente novamente',
+        titulo: 'Erro ao conectar',
+        descricao: 'Verifique sua conexão e tente novamente',
       });
     } finally {
       setAnalisando(false);
@@ -123,102 +92,61 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
     setSalvando(true);
 
     try {
-      const empresa = analise.empresa || 'Não identificada';
-      const cargo = analise.cargo || 'Cargo não identificado';
-
       const vagaRes = await fetch('/api/vagas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           empresa,
           cargo,
-          descricao_vaga: vagaInput,
+          descricao_vaga,
           fit_score: analise.fit_score,
-          sub_scores: analise.sub_scores,
           pontos_fortes: analise.pontos_fortes,
           gaps: analise.gaps,
-          recomendacoes_curriculo: analise.recomendacoes_curriculo,
+          recomendacoes_curriculo: analise.recomendacoes,
           etapa: 'para_aplicar',
         }),
       });
 
-      if (!vagaRes.ok) {
-        setMensagem({
-          tipo: 'erro',
-          titulo: 'Erro ao criar vaga',
-          descricao: 'Não conseguimos salvar a vaga. Tente novamente.',
-        });
-        setSalvando(false);
-        return;
-      }
-
-      const vagaData = await vagaRes.json();
-      const vagaId = vagaData.vaga.id;
-
-      const readinessRes = await fetch('/api/vagas/readiness', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          vaga_id: vagaId,
-          readiness_score: analise.readiness_score,
-          readiness_gap: analise.readiness_gap,
-          weeks_to_ready: analise.weeks_to_ready,
-          estimated_readiness_date: analise.estimated_readiness_date,
-          roadmap_items: analise.roadmap_items,
-        }),
-      });
-
-      if (readinessRes.ok) {
+      if (vagaRes.ok) {
         setMensagem({
           tipo: 'sucesso',
           titulo: '✨ Vaga salva com sucesso!',
-          descricao: 'Agora você pode acompanhar seu progresso de preparação na aba "Preparação"',
+          descricao: 'Agora você pode acompanhar seu progresso no Kanban',
         });
-        setVagaInput('');
+        setEmpresa('');
+        setCargo('');
+        setDescricaoVaga('');
         setAnalise(null);
         onVagaAdicionada();
       } else {
         setMensagem({
-          tipo: 'aviso',
-          titulo: 'Vaga salva, mas houve um pequeno aviso',
-          descricao: 'A vaga foi salva, mas tivemos um problema ao gerar o roadmap. Tente novamente.',
+          tipo: 'erro',
+          titulo: 'Erro ao salvar vaga',
+          descricao: 'Tente novamente',
         });
-        onVagaAdicionada();
       }
     } catch (erro) {
       setMensagem({
         tipo: 'erro',
-        titulo: 'Erro ao salvar vaga',
-        descricao: 'Houve um erro inesperado. Tente novamente mais tarde.',
+        titulo: 'Erro ao salvar',
+        descricao: 'Houve um erro inesperado',
       });
     } finally {
       setSalvando(false);
     }
   }
 
-  const handleGapResolvido = (gapTitulo: string) => {
-    const novo = new Set(gapsResolvidos);
-    if (novo.has(gapTitulo)) {
-      novo.delete(gapTitulo);
-    } else {
-      novo.add(gapTitulo);
-    }
-    setGapsResolvidos(novo);
-  };
-
   const renderMensagem = (msg: Mensagem) => {
     const estilos = {
       sucesso: 'bg-sky-tint border border-sky text-sky-deep',
       erro: 'bg-red-50 border border-red-200 text-red-700',
       aviso: 'bg-yellow-50 border border-yellow-200 text-yellow-700',
-      'erro-acao': 'bg-sky-tint border border-sky text-sky-deep',
     };
 
     const icones = {
       sucesso: <Check className="w-5 h-5 flex-shrink-0" />,
       erro: <AlertCircle className="w-5 h-5 flex-shrink-0" />,
       aviso: <Info className="w-5 h-5 flex-shrink-0" />,
-      'erro-acao': <Info className="w-5 h-5 flex-shrink-0" />,
     };
 
     return (
@@ -226,15 +154,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         {icones[msg.tipo]}
         <div className="flex-1">
           <div className="font-medium mb-1">{msg.titulo}</div>
-          <p className="text-sm opacity-90 mb-2">{msg.descricao}</p>
-          {msg.acao && (
-            <Link
-              href={msg.acao === 'meu-pdi' ? '/pdi' : '/meu-perfil'}
-              className="inline-block text-sm font-medium underline hover:opacity-75 transition"
-            >
-              {msg.acao === 'meu-pdi' ? 'Ir para Meu PDI' : 'Ir para Meu Perfil'} →
-            </Link>
-          )}
+          <p className="text-sm opacity-90">{msg.descricao}</p>
         </div>
       </div>
     );
@@ -251,14 +171,34 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
       {!analise ? (
         <div className="space-y-4">
           <Panel className="p-6">
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-ink mb-2">Empresa</label>
+                <input
+                  type="text"
+                  value={empresa}
+                  onChange={(e) => setEmpresa(e.target.value)}
+                  placeholder="Ex: Nubank, Google, Uber"
+                  className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-cream text-ink"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink mb-2">Cargo</label>
+                <input
+                  type="text"
+                  value={cargo}
+                  onChange={(e) => setCargo(e.target.value)}
+                  placeholder="Ex: Analista de Marketing"
+                  className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-cream text-ink"
+                />
+              </div>
+            </div>
             <div>
-              <label className="block text-sm font-medium text-ink mb-2">
-                Cole a URL da Vaga ou Descrição
-              </label>
+              <label className="block text-sm font-medium text-ink mb-2">Descrição da Vaga</label>
               <textarea
-                value={vagaInput}
-                onChange={(e) => setVagaInput(e.target.value)}
-                placeholder="Cole a URL (LinkedIn, Gupy, etc.) ou a descrição completa da vaga..."
+                value={descricao_vaga}
+                onChange={(e) => setDescricaoVaga(e.target.value)}
+                placeholder="Cole aqui a descrição completa da vaga..."
                 rows={6}
                 className="w-full px-4 py-3 border border-line rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-cream text-ink font-mono text-sm"
               />
@@ -269,7 +209,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
 
           <button
             onClick={analisarFit}
-            disabled={analisando || !vagaInput.trim()}
+            disabled={analisando || !empresa.trim() || !cargo.trim() || !descricao_vaga.trim()}
             className="w-full bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition"
           >
             {analisando ? (
@@ -289,70 +229,16 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         <div className="space-y-6">
           {mensagem && renderMensagem(mensagem)}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Panel className="p-6 bg-gradient-to-br from-sky-tint to-sky-tint border border-sky">
-              <div className="text-sm text-sky-deep mb-2 font-medium">Fit com a Vaga</div>
-              <div className="text-4xl font-display text-sky-deep mb-1">
-                {analise.fit_score}%
-              </div>
-              <div className="text-xs text-ink-soft">Compatibilidade Geral</div>
-            </Panel>
-
-            <Panel className="p-6 bg-gradient-to-br from-cream to-cream border border-line">
-              <div className="text-sm text-brown mb-2 font-medium">Prontidão Atual</div>
-              <div className="text-4xl font-display text-brown mb-1">
-                {analise.readiness_score}%
-              </div>
-              <div className="text-xs text-ink-soft">
-                +{analise.weeks_to_ready}s para 100% pronto
-              </div>
-            </Panel>
-          </div>
-
-          <Panel className="p-6 border border-sky">
-            <p className="text-ink text-center text-sm">{analise.resumo}</p>
+          <Panel className="p-6 bg-sky-tint border border-sky">
+            <div className="text-sm text-sky-deep mb-2 font-medium">Compatibilidade</div>
+            <div className="text-4xl font-display text-sky-deep mb-2">{analise.fit_score}%</div>
+            <p className="text-ink text-sm">{analise.resumo}</p>
           </Panel>
-
-          <div>
-            <Eyebrow>Quebra de Scores</Eyebrow>
-            <h3 className="font-display text-xl text-brown-deep mb-4">Análise Detalhada</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: 'Experiência', key: 'experiencia' as const },
-                { label: 'Skills Técnicas', key: 'skills_tecnicas' as const },
-                { label: 'Senioridade', key: 'senioridade' as const },
-                { label: 'Contexto do Setor', key: 'contexto_setor' as const },
-              ].map(({ label, key }) => {
-                const score = analise.sub_scores[key];
-                const color =
-                  score >= 75
-                    ? 'bg-sky-deep'
-                    : score >= 50
-                      ? 'bg-sky'
-                      : 'bg-line';
-
-                return (
-                  <Panel key={key} className="p-4 border border-line">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-ink">{label}</span>
-                      <span className="text-sm font-bold text-brown-deep">{score}%</span>
-                    </div>
-                    <div className="w-full bg-cream rounded-full h-2">
-                      <div
-                        className={`${color} h-2 rounded-full transition-all duration-300`}
-                        style={{ width: `${score}%` }}
-                      />
-                    </div>
-                  </Panel>
-                );
-              })}
-            </div>
-          </div>
 
           <div>
             <Eyebrow>
               <Check size={14} />
-              Seus Pontos Fortes
+              Pontos Fortes
             </Eyebrow>
             <div className="space-y-2">
               {analise.pontos_fortes.map((ponto, idx) => (
@@ -366,57 +252,19 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
 
           <div>
             <Eyebrow>Áreas de Desenvolvimento</Eyebrow>
-            <h3 className="font-display text-xl text-brown-deep mb-4">Gaps Identificados</h3>
-            <div className="space-y-3">
-              {(analise.gaps as Gap[]).map((gap, idx) => {
-                const gapKey = typeof gap === 'string' ? gap : gap.titulo;
-                const isResolvido = gapsResolvidos.has(gapKey);
-
-                return (
-                  <Panel
-                    key={idx}
-                    className={`p-4 border transition ${
-                      isResolvido
-                        ? 'bg-sky-tint border-sky'
-                        : 'border-line'
-                    }`}
-                  >
-                    {typeof gap === 'string' ? (
-                      <div className="text-ink text-sm">• {gap}</div>
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="font-medium text-brown-deep">{gap.titulo}</div>
-                        <p className="text-sm text-ink">{gap.descricao}</p>
-                        {gap.mitigacao && (
-                          <div className="text-sm text-sky-deep bg-sky-tint p-3 rounded border border-sky">
-                            💡 <span className="font-medium">Como contornar:</span> {gap.mitigacao}
-                          </div>
-                        )}
-                        <div className="flex gap-2 pt-2">
-                          <button
-                            onClick={() => handleGapResolvido(gapKey)}
-                            className={`text-sm px-3 py-1.5 rounded transition font-medium ${
-                              isResolvido
-                                ? 'bg-sky border border-sky text-sky-deep'
-                                : 'bg-cream border border-line text-ink hover:bg-line'
-                            }`}
-                          >
-                            {isResolvido ? '✓ Já possuo' : 'Já possuo'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </Panel>
-                );
-              })}
+            <div className="space-y-2">
+              {analise.gaps.map((gap, idx) => (
+                <Panel key={idx} className="p-3 border border-line">
+                  <span className="text-ink text-sm">• {gap}</span>
+                </Panel>
+              ))}
             </div>
           </div>
 
           <div>
-            <Eyebrow>Currículo</Eyebrow>
-            <h3 className="font-display text-xl text-brown-deep mb-4">Recomendações para Currículo</h3>
+            <Eyebrow>Recomendações para Currículo</Eyebrow>
             <div className="space-y-2">
-              {(analise.recomendacoes_curriculo || []).map((rec, idx) => (
+              {analise.recomendacoes.map((rec, idx) => (
                 <Panel key={idx} className="p-3 border border-sky bg-sky-tint">
                   <span className="text-ink text-sm">• {rec}</span>
                 </Panel>
@@ -424,57 +272,13 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
             </div>
           </div>
 
-          {analise.roadmap_items && analise.roadmap_items.length > 0 && (
-            <div>
-              <Eyebrow>Preparação</Eyebrow>
-              <h3 className="font-display text-xl text-brown-deep mb-4">
-                Roadmap ({analise.weeks_to_ready} semanas)
-              </h3>
-              <div className="space-y-2">
-                {analise.roadmap_items.slice(0, 3).map((item, idx) => (
-                  <Panel
-                    key={idx}
-                    className="p-4 border border-sky bg-sky-tint"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium text-brown-deep">{item.titulo}</span>
-                      <span className="text-xs px-2 py-1 bg-sky border border-sky-deep text-sky-deep rounded font-medium">
-                        {item.semanas}s
-                      </span>
-                    </div>
-                    <p className="text-sm text-ink mb-2">{item.descricao}</p>
-                    <span
-                      className={`text-xs px-2 py-1 rounded font-medium ${
-                        item.prioridade === 'high'
-                          ? 'bg-red-100 text-red-700'
-                          : item.prioridade === 'medium'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-green-100 text-green-700'
-                      }`}
-                    >
-                      {item.prioridade === 'high'
-                        ? '🔴 Alta'
-                        : item.prioridade === 'medium'
-                          ? '🟡 Média'
-                          : '🟢 Baixa'}{' '}
-                      Prioridade
-                    </span>
-                  </Panel>
-                ))}
-                {analise.roadmap_items.length > 3 && (
-                  <div className="text-center text-sm text-ink-soft py-3">
-                    +{analise.roadmap_items.length - 3} mais items no roadmap completo
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
           <div className="flex gap-3 pt-6">
             <button
               onClick={() => {
                 setAnalise(null);
-                setVagaInput('');
+                setEmpresa('');
+                setCargo('');
+                setDescricaoVaga('');
                 setMensagem(null);
               }}
               className="flex-1 bg-cream border border-line text-ink py-2.5 rounded-lg font-medium hover:bg-line transition"
