@@ -7,6 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
+import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
 interface Props {
@@ -191,6 +192,23 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
               </button>
             </div>
           </Panel>
+
+          {concluidos === total && (
+            <div className="mt-8">
+              <div className="bg-sky-tint border border-sky rounded-lg p-6 text-center mb-6">
+                <h2 className="text-xl font-display text-brown-deep mb-2">
+                  🎉 Você completou seu PDI!
+                </h2>
+                <p className="text-sm text-ink-soft">
+                  Aqui embaixo está seu plano de ação, gerado a partir de tudo que você escreveu:
+                  pilares, metas SMART e roadmap.
+                </p>
+              </div>
+              <Panel className="p-6">
+                <PlanoGerado mentoradoId={userId} />
+              </Panel>
+            </div>
+          )}
         </main>
       </div>
     </div>

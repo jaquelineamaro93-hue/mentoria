@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "@sendgrid/mail": "^8.1.6",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.111.0",

@@ -24,6 +24,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
           rel="stylesheet"
         />
+        <script async defer src="https://accounts.google.com/gsi/client"></script>
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <PostHogInit />

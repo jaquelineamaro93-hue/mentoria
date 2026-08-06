@@ -1,12 +1,36 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, identificarMentorado } from '@/lib/posthog';
+import OAuthButtons from '@/components/OAuthButtons';
 import type { TipoPacote } from '@/lib/types';
 
 type Modo = 'entrar' | 'cadastrar';
+
+function traduzirErroCadastro(mensagem: string): string {
+  const m = mensagem.toLowerCase();
+  if (m.includes('already registered') || m.includes('already exists')) {
+    return 'Esse e-mail já tem uma conta. Tenta entrar, ou usa "Esqueci a senha" se não lembrar.';
+  }
+  if (m.includes('invalid') && m.includes('email')) {
+    return 'Esse e-mail parece inválido. Confere se digitou certo.';
+  }
+  if (m.includes('password') && (m.includes('weak') || m.includes('easy to guess'))) {
+    return 'Essa senha é fácil demais de adivinhar. Escolhe uma senha diferente.';
+  }
+  if (m.includes('password') && m.includes('least')) {
+    return 'A senha precisa ter pelo menos 6 caracteres.';
+  }
+  if (m.includes('rate limit') || m.includes('security purposes')) {
+    return 'Muitas tentativas seguidas. Espera um minuto e tenta de novo.';
+  }
+  // Sem tradução conhecida: mostra o texto original em vez de esconder o
+  // motivo real, pra não deixar a pessoa (ou o suporte) no escuro.
+  return `Não consegui criar sua conta: ${mensagem}`;
+}
 
 function LoginPageContent() {
   const router = useRouter();
@@ -18,11 +42,45 @@ function LoginPageContent() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [tipoPacote, setTipoPacote] = useState<TipoPacote>('online');
+
+  useEffect(() => {
+    const processarMagicLink = async () => {
+      if (typeof window === 'undefined') return;
+
+      const hash = window.location.hash.substring(1);
+      if (!hash) return;
+
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      const type = params.get('type');
+
+      if (accessToken && type === 'recovery') {
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: accessToken,
+            type: 'recovery',
+          });
+
+          if (!error && data.user) {
+            identificarMentorado(data.user.id, { email: data.user.email });
+            posthog.capture('magic_login_realizado');
+            router.push('/dashboard');
+            router.refresh();
+          }
+        } catch {
+          console.error('Erro ao processar magic link');
+        }
+      }
+    };
+
+    processarMagicLink();
+  }, [supabase, router]);
 
   async function handleEntrar(e: React.FormEvent) {
     e.preventDefault();
@@ -57,18 +115,44 @@ function LoginPageContent() {
     setSucesso(null);
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: senha,
-      options: {
-        data: { nome, tipo_pacote: tipoPacote, codigo_indicacao_referencia: codigoIndicacao },
-      },
-    });
+    let resultado;
+    try {
+      resultado = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: { nome, tipo_pacote: tipoPacote, codigo_indicacao_referencia: codigoIndicacao },
+        },
+      });
+    } catch (excecao) {
+      // Erro de rede (ex: conexão instável, bloqueio de firewall/ad-blocker
+      // pro domínio do Supabase) faz o fetch falhar antes de sair do
+      // navegador, então nunca chega a virar log no servidor.
+      setLoading(false);
+      const mensagem = excecao instanceof Error ? excecao.message : String(excecao);
+      posthog.capture('cadastro_falhou', { email, motivo: mensagem, tipo: 'rede' });
+      setErro(
+        'Não consegui me conectar pra criar sua conta. Confere sua internet (ou desativa um ' +
+          'bloqueador de anúncios/VPN, se tiver algum ativo) e tenta de novo.'
+      );
+      return;
+    }
+
+    const { data, error } = resultado;
 
     if (error) {
       setLoading(false);
-      posthog.capture('cadastro_falhou', { email });
-      setErro('Não foi possível criar sua conta. Verifique os dados e tente novamente.');
+      posthog.capture('cadastro_falhou', { email, motivo: error.message, status: error.status });
+      setErro(traduzirErroCadastro(error.message));
+      return;
+    }
+
+    // Quando o e-mail já está cadastrado, o Supabase não retorna erro (pra
+    // não revelar se o e-mail existe), só devolve um usuário com
+    // identities vazio. Nesse caso não é um cadastro novo de verdade.
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      setLoading(false);
+      setErro('Esse e-mail já tem uma conta. Tenta entrar, ou usa "Esqueci a senha" se não lembrar.');
       return;
     }
 
@@ -80,6 +164,35 @@ function LoginPageContent() {
       // que o usuário percebesse.
       identificarMentorado(data.user.id, { email, nome, tipo_pacote: tipoPacote });
       posthog.capture('cadastro_realizado', { tipo_pacote: tipoPacote });
+
+      // Confirma o cadastro pelo servidor e já entra direto, em vez de
+      // depender do envio do e-mail de confirmação (instável e já travou
+      // cadastros legítimos várias vezes). Se por algum motivo essa etapa
+      // falhar, cai pro fluxo antigo (pede pra checar o e-mail).
+      try {
+        const res = await fetch('/api/auth/confirmar-cadastro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: data.user.id }),
+        });
+
+        if (res.ok) {
+          const { error: erroLogin } = await supabase.auth.signInWithPassword({
+            email,
+            password: senha,
+          });
+
+          if (!erroLogin) {
+            posthog.capture('login_realizado');
+            setLoading(false);
+            router.push('/dashboard');
+            router.refresh();
+            return;
+          }
+        }
+      } catch {
+        // segue pro fluxo de "verifique seu e-mail" abaixo
+      }
     }
 
     setLoading(false);
@@ -145,14 +258,24 @@ function LoginPageContent() {
                   />
                 </Field>
                 <Field label="Senha">
-                  <input
-                    type="password"
-                    required
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    className="input"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={mostrarSenha ? 'text' : 'password'}
+                      required
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="input"
+                      style={{ paddingRight: 40 }}
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                    >
+                      {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </Field>
 
                 {erro && <Alert tipo="erro">{erro}</Alert>}
@@ -168,6 +291,17 @@ function LoginPageContent() {
                 >
                   Esqueci a senha
                 </button>
+
+                <div className="my-4 relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-line"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-paper text-ink-faint">ou</span>
+                  </div>
+                </div>
+
+                <OAuthButtons />
               </form>
             ) : (
               <form onSubmit={handleCadastrar} className="flex flex-col gap-4">
@@ -202,15 +336,25 @@ function LoginPageContent() {
                   </select>
                 </Field>
                 <Field label="Senha">
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    className="input"
-                    placeholder="Mínimo 6 caracteres"
-                  />
+                  <div className="relative">
+                    <input
+                      type={mostrarSenha ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="input"
+                      style={{ paddingRight: 40 }}
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                    >
+                      {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </Field>
 
                 {erro && <Alert tipo="erro">{erro}</Alert>}

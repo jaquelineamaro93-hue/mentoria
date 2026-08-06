@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import AdminClient from './AdminClient';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import type { Profile } from '@/lib/types';
@@ -11,6 +12,7 @@ export interface LinhaMentorado {
   blocosQuemSouEu: number;
   secoesPdi: number;
   fezVia: boolean;
+  emailConfirmado: boolean;
 }
 
 export default async function AdminPage() {
@@ -51,6 +53,21 @@ export default async function AdminPage() {
     supabase.from('pdi_guia_secoes').select('id'),
   ]);
 
+  // E-mail confirmado só dá pra ver com a service role (auth.users não é
+  // exposto pelo client normal). Usamos isso pra avisar a admin ANTES da
+  // mentorada travar tentando entrar, já que o envio de e-mail de
+  // confirmação já mostrou ser instável.
+  const admin = createAdminClient();
+  const emailsConfirmados = new Map<string, boolean>();
+  try {
+    const { data: authData } = await admin.auth.admin.listUsers({ perPage: 200 });
+    for (const authUser of authData?.users ?? []) {
+      emailsConfirmados.set(authUser.id, !!authUser.email_confirmed_at);
+    }
+  } catch {
+    // Se isso falhar, a coluna some silenciosamente ao inves de quebrar o painel inteiro.
+  }
+
   function contar(rows: { user_id: string }[] | null, userId: string) {
     return (rows ?? []).filter((r) => r.user_id === userId).length;
   }
@@ -64,6 +81,7 @@ export default async function AdminPage() {
       blocosQuemSouEu: contar(quemSouEu, p.id),
       secoesPdi: contar(pdi, p.id),
       fezVia: (via ?? []).some((v) => v.user_id === p.id),
+      emailConfirmado: emailsConfirmados.get(p.id) ?? true,
     }));
 
   return (

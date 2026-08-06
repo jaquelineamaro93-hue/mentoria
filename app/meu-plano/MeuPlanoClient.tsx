@@ -38,9 +38,9 @@ export default function MeuPlanoClient({
   }
 
   const mesesRestantes = plano.duracao_meses;
-  const encontrosOnlineIndividuais = 1;
-  const encontrosOnlineColetivos = 6;
-  const encontrosPresenciais = 6;
+  const encontrosOnlineIndividuais = plano.duracao_meses === 6 ? 7 : 10;
+  const encontrosOnlineColetivos = plano.duracao_meses === 6 ? 6 : 12;
+  const encontrosPresenciais = plano.duracao_meses === 6 ? 6 : 12;
 
   return (
     <div className="flex flex-col md:flex-row w-full">

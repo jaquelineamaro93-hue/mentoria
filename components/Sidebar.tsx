@@ -19,12 +19,16 @@ import {
   TrendingUp,
   CreditCard,
   MapPin,
+  ListChecks,
+  UserCog,
+  Briefcase,
 } from 'lucide-react';
 import { NotificationBadge } from './NotificationBadge';
 import type { Profile } from '@/lib/types';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Início', icon: LayoutDashboard, notificationKey: 'avisoNaoLido' },
+  { href: '/onboarding', label: 'Onboarding', icon: ListChecks },
   { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
   { href: '/pdi', label: 'Meu PDI', icon: Target },
@@ -33,6 +37,7 @@ const NAV_ITEMS = [
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
   { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
   { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
+  { href: '/vagas', label: 'Controle de Vagas', icon: Briefcase },
   { href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
   { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin, notificationKey: 'naoVotou' },
   { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
@@ -133,6 +138,13 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
             </div>
           </div>
         )}
+        <Link
+          href="/perfil"
+          className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors mb-3"
+        >
+          <UserCog size={15} strokeWidth={1.75} />
+          Meu Perfil
+        </Link>
         <Link
           href="/termos"
           className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors mb-3"

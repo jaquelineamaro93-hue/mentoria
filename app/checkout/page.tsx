@@ -27,6 +27,7 @@ export default async function CheckoutPage() {
     .from('planos_mentoria')
     .select('*')
     .eq('ativo', true)
+    .eq('visivel_checkout', true)
     .order('duracao_meses', { ascending: true });
 
   return <CheckoutClient planos={planos || []} />;

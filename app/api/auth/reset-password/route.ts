@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   const { email } = await request.json();
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log(`📧 [RESET-PASSWORD] Iniciando reset para: ${email}`);
     const supabase = await createClient();
 
     // Verifica se o perfil existe
@@ -111,7 +113,10 @@ export async function POST(request: Request) {
       message: 'Se o email existe, você receberá um código.',
     });
   } catch (error) {
-    console.error('Erro:', error);
+    console.error('🔴 [RESET-PASSWORD] Erro no catch block:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }

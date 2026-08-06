@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-const ROTAS_LIBERADAS = ['/login', '/assinatura'];
+const ROTAS_LIBERADAS = ['/login', '/assinatura', '/magic-login', '/reset-password'];
 
 export default function AcessoGate() {
   const supabase = createClient();
@@ -34,7 +34,13 @@ export default function AcessoGate() {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!perfil || perfil.is_admin) {
+      if (!perfil) {
+        // Novo usuário sem perfil ainda - deixar entrar
+        setChecando(false);
+        return;
+      }
+
+      if (perfil.is_admin) {
         setChecando(false);
         return;
       }

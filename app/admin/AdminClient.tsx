@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -28,10 +29,63 @@ export default function AdminClient({
   const router = useRouter();
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
-  const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
+  const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
+  const [enviandoLembretes, setEnviandoLembretes] = useState(false);
+  const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
+
+  async function confirmarEmailUsuario(userId: string, nome: string) {
+    setConfirmandoId(userId);
+    try {
+      const res = await fetch('/api/admin/confirmar-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro);
+
+      setLinhas((prev) =>
+        prev.map((l) => (l.profile.id === userId ? { ...l, emailConfirmado: true } : l))
+      );
+      posthog.capture('admin_confirmou_email', { usuario_alvo: userId });
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : `Não consegui confirmar o e-mail de ${nome}.`
+      );
+    } finally {
+      setConfirmandoId(null);
+    }
+  }
+
+  async function enviarLembretesAgora() {
+    setEnviandoLembretes(true);
+    setResultadoLembretes(null);
+    try {
+      const res = await fetch('/api/admin/enviar-lembretes', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro ?? 'Erro ao enviar lembretes.');
+      const resumo =
+        `Enviados agora: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
+        `${data.encontros} de encontro, ${data.votacao} de votação. ` +
+        (data.erros?.length ? `Erros: ${data.erros.length}.` : 'Sem erros.') +
+        ' Uma cópia de cada foi enviada em cópia oculta para jaqueline.amaro93@gmail.com.';
+      const detalheErros = data.erros?.length
+        ? `\n\nDetalhe dos erros (até 5):\n${data.erros.slice(0, 5).join('\n')}`
+        : '';
+      setResultadoLembretes(resumo + detalheErros);
+    } catch (err) {
+      setResultadoLembretes(
+        err instanceof Error ? err.message : 'Não foi possível enviar os lembretes agora.'
+      );
+    } finally {
+      setEnviandoLembretes(false);
+    }
+  }
 
   async function entrarComoUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
@@ -131,35 +185,6 @@ export default function AdminClient({
     router.refresh();
   }
 
-  async function atualizarPagamento(
-    userId: string,
-    campo: 'status_assinatura' | 'proxima_cobranca' | 'observacao_pagamento',
-    valor: string
-  ) {
-    setLinhas((prev) =>
-      prev.map((l) =>
-        l.profile.id === userId ? { ...l, profile: { ...l.profile, [campo]: valor } } : l
-      )
-    );
-  }
-
-  async function salvarPagamento(userId: string) {
-    const linha = linhas.find((l) => l.profile.id === userId);
-    if (!linha) return;
-
-    setSalvandoId(userId);
-    await supabase
-      .from('profiles')
-      .update({
-        status_assinatura: linha.profile.status_assinatura,
-        proxima_cobranca: linha.profile.proxima_cobranca || null,
-        observacao_pagamento: linha.profile.observacao_pagamento || null,
-      })
-      .eq('id', userId);
-    setSalvandoId(null);
-    posthog.capture('status_assinatura_atualizado', { status: linha.profile.status_assinatura });
-  }
-
   const total = linhas.length;
   const ativos7dias = linhas.filter((l) => {
     if (!l.profile.last_login_at) return false;
@@ -167,22 +192,78 @@ export default function AdminClient({
     return dias <= 7;
   }).length;
   const semAcessoNunca = linhas.filter((l) => !l.profile.last_login_at).length;
+  const emailsNaoConfirmados = linhas.filter((l) => !l.emailConfirmado);
 
   return (
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
-          Área administrativa
-        </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">
-          Painel dos mentorados
-        </h1>
-        <p className="text-sm text-ink-faint mb-8">
-          Visão geral de quem está usando o quê. Para dados de sessão, tempo médio de
-          acesso e localização, consulte o PostHog.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+              Área administrativa
+            </p>
+            <h1 className="font-display text-3xl text-brown-deep mb-1">
+              Painel dos mentorados
+            </h1>
+            <p className="text-sm text-ink-faint">
+              Visão geral de quem está usando o quê. Para dados de sessão, tempo médio de
+              acesso e localização, consulte o PostHog.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 shrink-0">
+            <Link
+              href="/admin/financeiro"
+              className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Wallet size={15} />
+              Financeiro
+            </Link>
+            <Link
+              href="/admin/gerenciar-planos"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <CreditCard size={15} />
+              Gerenciar planos e pagamentos
+            </Link>
+            <Link
+              href="/admin/crescimento"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Rocket size={15} />
+              Boas práticas de crescimento
+            </Link>
+            <button
+              onClick={enviarLembretesAgora}
+              disabled={enviandoLembretes}
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap disabled:opacity-60"
+            >
+              {enviandoLembretes ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+              Enviar lembretes agora
+            </button>
+          </div>
+        </div>
+
+        {resultadoLembretes && (
+          <div className="mb-6 text-sm bg-sky-tint border border-sky rounded-lg px-4 py-3 text-brown-deep whitespace-pre-wrap font-mono">
+            {resultadoLembretes}
+          </div>
+        )}
+
+        {emailsNaoConfirmados.length > 0 && (
+          <div className="mb-6 text-sm bg-red-50 border border-red-300 rounded-lg px-4 py-3 text-red-700">
+            <p className="flex items-center gap-1.5 font-medium mb-1">
+              <MailWarning size={14} />
+              {emailsNaoConfirmados.length} conta(s) sem confirmar o e-mail, ainda não conseguem
+              entrar:
+            </p>
+            <p>
+              {emailsNaoConfirmados.map((l) => l.profile.nome).join(', ')}. Confirma direto na
+              tabela &quot;Ações da conta&quot; mais abaixo.
+            </p>
+          </div>
+        )}
 
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           <Panel className="p-5">
@@ -327,12 +408,14 @@ export default function AdminClient({
         </section>
 
         <section>
-          <Eyebrow>Status de assinatura</Eyebrow>
+          <Eyebrow>Ações da conta</Eyebrow>
           <p className="text-xs text-ink-faint mb-4">
-            Alunos atuais entraram como "manual" (já pagaram fora do sistema). Novos
-            cadastros entram automaticamente como "mercadopago", e o status muda sozinho
-            conforme os pagamentos chegam. Quando o status vira "encerrado", a pessoa é
-            redirecionada para a tela de renovação em qualquer acesso.
+            Plano, forma de pagamento, valor, status, próxima cobrança, data de fim de acesso e
+            observação de cada mentorado agora ficam todos juntos em{' '}
+            <Link href="/admin/gerenciar-planos" className="text-sky-deep hover:underline">
+              Gerenciar planos e pagamentos
+            </Link>
+            . Aqui ficam só as ações de conta que não fazem sentido lá.
           </p>
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
@@ -342,16 +425,7 @@ export default function AdminClient({
                     Nome
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Origem
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Próxima cobrança
-                  </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
-                    Observação
+                    E-mail
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Ações
@@ -363,64 +437,33 @@ export default function AdminClient({
                   <tr key={l.profile.id} className="border-b border-line last:border-0 bg-cream">
                     <td className="px-4 py-3 text-ink">{l.profile.nome}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                          l.profile.origem_assinatura === 'manual'
-                            ? 'bg-[#f1e6d6] text-brown border border-brown/30'
-                            : 'bg-sky-tint text-sky-deep border border-sky'
-                        }`}
-                      >
-                        {l.profile.origem_assinatura === 'manual' ? 'Manual' : 'Mercado Pago'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={l.profile.status_assinatura}
-                        onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'status_assinatura', e.target.value)
-                        }
-                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink"
-                      >
-                        <option value="ativo">Ativo</option>
-                        <option value="inadimplente">Inadimplente</option>
-                        <option value="encerrado">Encerrado</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="date"
-                        value={l.profile.proxima_cobranca ?? ''}
-                        onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'proxima_cobranca', e.target.value)
-                        }
-                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        value={l.profile.observacao_pagamento ?? ''}
-                        onChange={(e) =>
-                          atualizarPagamento(l.profile.id, 'observacao_pagamento', e.target.value)
-                        }
-                        placeholder="Nota opcional..."
-                        className="bg-paper border border-line rounded-md px-2.5 py-1.5 text-sm text-ink w-40"
-                      />
+                      {l.emailConfirmado ? (
+                        <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-300">
+                          Confirmado
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-300 w-fit">
+                          <MailWarning size={11} />
+                          Não confirmado
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => salvarPagamento(l.profile.id)}
-                          disabled={salvandoId === l.profile.id}
-                          className="flex items-center gap-1.5 text-xs bg-brown hover:bg-brown-deep text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
-                        >
-                          {salvandoId === l.profile.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Check size={12} />
-                          )}
-                          Salvar
-                        </button>
+                        {!l.emailConfirmado && (
+                          <button
+                            onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
+                            disabled={confirmandoId === l.profile.id}
+                            className="flex items-center gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                          >
+                            {confirmandoId === l.profile.id ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <MailWarning size={12} />
+                            )}
+                            Confirmar e-mail
+                          </button>
+                        )}
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
                           disabled={resetandoId === l.profile.id}
