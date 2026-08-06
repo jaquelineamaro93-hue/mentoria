@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
+import RankingComunidade from './components/RankingComunidade';
 
 interface Props {
   profile: Profile | null;
@@ -129,6 +130,10 @@ export default function PassaporteClient({
               </div>
             );
           })}
+        </section>
+
+        <section className="mb-10">
+          <RankingComunidade />
         </section>
 
         <section>
