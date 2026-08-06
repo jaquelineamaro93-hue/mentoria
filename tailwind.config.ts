@@ -20,6 +20,8 @@ const config: Config = {
         'sky-tint': '#e7eff6',
         line: '#ded4c3',
         'line-soft': '#ded4c3',
+        'mustard-light': '#f4d67c',
+        'emerald-light': '#b8e5d8',
       },
       fontFamily: {
         display: ['Times New Roman', 'Times', 'serif'],
