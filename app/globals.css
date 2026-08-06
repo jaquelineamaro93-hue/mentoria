@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-:root {
+@theme {
   --font-display: 'Times New Roman', Times, serif;
   --font-body: 'Poppins', sans-serif;
 
@@ -27,34 +27,34 @@ html {
 }
 
 body {
-  background-color: #f6f2e9;
-  color: #362b21;
-  font-family: 'Poppins', sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
   font-weight: 300;
 }
 
 .font-display {
-  font-family: 'Times New Roman', Times, serif;
+  font-family: var(--font-display);
   font-style: italic;
 }
 
 ::selection {
   background: rgba(126, 160, 196, 0.3);
-  color: #3c2c1f;
+  color: var(--color-brown-deep);
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #f6f2e9;
+  background: var(--color-cream);
 }
 ::-webkit-scrollbar-thumb {
-  background: #ded4c3;
+  background: var(--color-line);
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #6b4a35;
+  background: var(--color-brown);
 }
 
 a:focus-visible,
@@ -62,7 +62,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid #4f7196;
+  outline: 2px solid var(--color-sky-deep);
   outline-offset: 2px;
 }
 
