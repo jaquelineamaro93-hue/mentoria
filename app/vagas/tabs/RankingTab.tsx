@@ -1,6 +1,7 @@
 'use client';
 
-import { Trophy, Star } from 'lucide-react';
+import { Trophy, Star, TrendingUp } from 'lucide-react';
+import { Panel, Eyebrow } from '@/components/Panel';
 
 interface Vaga {
   id: string;
@@ -16,16 +17,16 @@ interface Props {
 
 const getCorEtapa = (etapa: string): string => {
   const cores: Record<string, string> = {
-    para_aplicar: 'bg-red-100 text-red-700',
-    aplicada: 'bg-orange-100 text-orange-700',
-    entrevista_agendada: 'bg-yellow-100 text-yellow-700',
-    aguardando_retorno: 'bg-blue-100 text-blue-700',
-    entrevista_decisor: 'bg-purple-100 text-purple-700',
-    case: 'bg-pink-100 text-pink-700',
-    oferta: 'bg-green-100 text-green-700',
-    lost: 'bg-gray-100 text-gray-700',
+    para_aplicar: 'bg-cream border border-line text-ink',
+    aplicada: 'bg-sky-tint border border-sky text-sky-deep',
+    entrevista_agendada: 'bg-sky-tint border border-sky text-sky-deep',
+    aguardando_retorno: 'bg-sky-tint border border-sky text-sky-deep',
+    entrevista_decisor: 'bg-sky-tint border border-sky-deep text-sky-deep',
+    case: 'bg-cream border border-brown text-brown',
+    oferta: 'bg-sky-tint border border-sky-deep text-sky-deep',
+    lost: 'bg-cream border border-line text-ink-faint',
   };
-  return cores[etapa] || 'bg-gray-100 text-gray-700';
+  return cores[etapa] || 'bg-cream border border-line text-ink';
 };
 
 const getEtapaLabel = (etapa: string): string => {
@@ -53,39 +54,43 @@ export default function RankingTab({ vagas }: Props) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-6">Ranking de Compatibilidade</h2>
+      <Eyebrow>
+        <TrendingUp size={14} />
+        Análise de Oportunidades
+      </Eyebrow>
+      <h2 className="font-display text-3xl text-brown-deep mb-8">Ranking de Compatibilidade</h2>
 
       {vagasComFit.length === 0 ? (
-        <div className="text-center py-12 text-gray-600">
-          <p>Nenhuma vaga analisada ainda</p>
-          <p className="text-sm mt-2">Use a aba "Análise de Fit" para analisar vagas</p>
-        </div>
+        <Panel className="text-center py-12 p-6 border border-line">
+          <p className="text-ink">Nenhuma vaga analisada ainda</p>
+          <p className="text-sm text-ink-soft mt-2">Use a aba "Análise de Fit" para analisar vagas</p>
+        </Panel>
       ) : (
         <div className="space-y-6">
           {/* Top 3 - Destaque */}
           {top3.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-500" />
+              <Eyebrow>
+                <Trophy size={14} />
                 Melhores Oportunidades
-              </h3>
+              </Eyebrow>
 
               <div className="space-y-3">
                 {top3.map((vaga, idx) => (
-                  <div
+                  <Panel
                     key={vaga.id}
-                    className={`relative overflow-hidden rounded-lg p-4 border-2 transition ${
+                    className={`relative overflow-hidden p-4 border-2 transition ${
                       idx === 0
-                        ? 'bg-yellow-50 border-yellow-300'
+                        ? 'bg-sky-tint border-sky-deep'
                         : idx === 1
-                          ? 'bg-gray-100 border-gray-300'
-                          : 'bg-orange-50 border-orange-300'
+                          ? 'bg-cream border-brown'
+                          : 'bg-sky-tint border-sky'
                     }`}
                   >
                     {/* Posição */}
                     <div
                       className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
-                        idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-gray-400' : 'bg-orange-500'
+                        idx === 0 ? 'bg-sky-deep' : idx === 1 ? 'bg-brown' : 'bg-sky'
                       }`}
                     >
                       {idx + 1}
@@ -94,17 +99,17 @@ export default function RankingTab({ vagas }: Props) {
                     <div className="pr-16">
                       {/* Cargo e Empresa */}
                       <div className="mb-3">
-                        <p className="text-lg font-bold text-gray-900">{vaga.cargo}</p>
-                        <p className="text-gray-600">{vaga.empresa}</p>
+                        <p className="font-display text-lg text-brown-deep">{vaga.cargo}</p>
+                        <p className="text-ink-soft text-sm">{vaga.empresa}</p>
                       </div>
 
                       {/* Fit Score */}
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-wrap">
                         <div className="flex items-center gap-2">
-                          <div className="text-3xl font-bold text-blue-600">
+                          <div className="font-display text-3xl text-sky-deep">
                             {vaga.fit_score}%
                           </div>
-                          <div className="text-sm text-gray-600">de compatibilidade</div>
+                          <div className="text-sm text-ink-soft">de compatibilidade</div>
                         </div>
 
                         {/* Etapa */}
@@ -114,14 +119,14 @@ export default function RankingTab({ vagas }: Props) {
                       </div>
 
                       {/* Barra de progresso visual */}
-                      <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="mt-3 h-2 bg-cream rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all"
+                          className="h-full bg-gradient-to-r from-sky to-sky-deep transition-all"
                           style={{ width: `${vaga.fit_score}%` }}
                         />
                       </div>
                     </div>
-                  </div>
+                  </Panel>
                 ))}
               </div>
             </div>
@@ -130,41 +135,41 @@ export default function RankingTab({ vagas }: Props) {
           {/* Resto das vagas */}
           {resto.length > 0 && (
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Star className="w-5 h-5 text-blue-500" />
+              <Eyebrow>
+                <Star size={14} />
                 Outras Oportunidades
-              </h3>
+              </Eyebrow>
 
               <div className="space-y-2">
                 {resto.map((vaga, idx) => (
-                  <div key={vaga.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition">
+                  <Panel key={vaga.id} className="flex items-center gap-4 p-4 border border-line hover:border-sky hover:shadow-sm transition">
                     {/* Posição */}
-                    <div className="text-xl font-bold text-gray-400 w-8 text-center">
+                    <div className="font-medium text-ink-faint w-8 text-center">
                       {idx + 4}
                     </div>
 
                     {/* Conteúdo */}
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900">{vaga.cargo}</p>
-                      <p className="text-sm text-gray-600">{vaga.empresa}</p>
+                      <p className="font-medium text-ink">{vaga.cargo}</p>
+                      <p className="text-sm text-ink-soft">{vaga.empresa}</p>
                     </div>
 
                     {/* Fit Score */}
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-blue-600">{vaga.fit_score}%</p>
-                      <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-semibold ${getCorEtapa(vaga.etapa)}`}>
+                      <p className="font-display text-2xl text-sky-deep">{vaga.fit_score}%</p>
+                      <span className={`inline-block mt-1 px-2 py-1 rounded-full text-xs font-semibold ${getCorEtapa(vaga.etapa)}`}>
                         {getEtapaLabel(vaga.etapa)}
                       </span>
                     </div>
 
                     {/* Barra pequena */}
-                    <div className="w-24 h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="w-24 h-1 bg-cream rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-500 transition-all"
+                        className="h-full bg-sky transition-all"
                         style={{ width: `${vaga.fit_score}%` }}
                       />
                     </div>
-                  </div>
+                  </Panel>
                 ))}
               </div>
             </div>
@@ -173,18 +178,18 @@ export default function RankingTab({ vagas }: Props) {
       )}
 
       {/* Estatísticas */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <Panel className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border border-line">
         <div>
-          <p className="text-sm text-gray-600">Total de Vagas</p>
-          <p className="text-2xl font-bold text-gray-900">{vagas.length}</p>
+          <p className="text-xs text-ink-faint uppercase tracking-wide">Total de Vagas</p>
+          <p className="font-display text-3xl text-brown mt-1">{vagas.length}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-600">Vagas Analisadas</p>
-          <p className="text-2xl font-bold text-gray-900">{vagasComFit.length}</p>
+          <p className="text-xs text-ink-faint uppercase tracking-wide">Vagas Analisadas</p>
+          <p className="font-display text-3xl text-sky-deep mt-1">{vagasComFit.length}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-600">Fit Médio</p>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-xs text-ink-faint uppercase tracking-wide">Fit Médio</p>
+          <p className="font-display text-3xl text-sky mt-1">
             {vagasComFit.length > 0
               ? Math.round(
                   vagasComFit.reduce((acc, v) => acc + (v.fit_score || 0), 0) /
@@ -194,7 +199,7 @@ export default function RankingTab({ vagas }: Props) {
             %
           </p>
         </div>
-      </div>
+      </Panel>
     </div>
   );
 }

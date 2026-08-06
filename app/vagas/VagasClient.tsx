@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { BarChart3, Zap, TrendingUp } from 'lucide-react';
+import { BarChart3, Zap, TrendingUp, Briefcase } from 'lucide-react';
+import { Panel, Eyebrow } from '@/components/Panel';
 import AnaliseFitTab from './tabs/AnaliseFitTab';
 import KanbanTab from './tabs/KanbanTab';
 import RankingTab from './tabs/RankingTab';
@@ -58,63 +59,67 @@ export default function VagasClient({
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-cream">
       <Sidebar profile={profile} />
 
       <div className="flex-1 overflow-auto">
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className="p-8 md:p-12 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Controle de Candidaturas</h1>
-            <p className="text-gray-600">
+            <Eyebrow>
+              <Briefcase size={14} />
+              Gestão de Candidaturas
+            </Eyebrow>
+            <h1 className="font-display text-4xl text-brown-deep mb-2">Controle de Vagas</h1>
+            <p className="text-ink-soft text-sm">
               Acompanhe suas candidaturas a vagas de emprego durante sua jornada de transição de carreira
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4 mb-6 border-b border-gray-200">
+          <div className="flex gap-1 mb-6 border-b border-line">
             <button
               onClick={() => setTab('analise')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 ${
+              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'analise'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-sky-deep text-sky-deep'
+                  : 'border-transparent text-ink-soft hover:text-ink'
               }`}
             >
-              <Zap className="w-4 h-4 inline mr-2" />
+              <Zap className="w-4 h-4" />
               Análise de Fit
             </button>
 
             <button
               onClick={() => setTab('kanban')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 ${
+              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'kanban'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-sky-deep text-sky-deep'
+                  : 'border-transparent text-ink-soft hover:text-ink'
               }`}
             >
-              <BarChart3 className="w-4 h-4 inline mr-2" />
+              <BarChart3 className="w-4 h-4" />
               Kanban
             </button>
 
             <button
               onClick={() => setTab('ranking')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 ${
+              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'ranking'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-sky-deep text-sky-deep'
+                  : 'border-transparent text-ink-soft hover:text-ink'
               }`}
             >
-              <TrendingUp className="w-4 h-4 inline mr-2" />
+              <TrendingUp className="w-4 h-4" />
               Ranking
             </button>
           </div>
 
           {/* Content */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <Panel className="p-6">
             {loading ? (
               <div className="text-center py-12">
-                <div className="text-gray-600">Carregando vagas...</div>
+                <div className="text-ink-soft">Carregando vagas...</div>
               </div>
             ) : (
               <>
@@ -127,7 +132,7 @@ export default function VagasClient({
                 {tab === 'ranking' && <RankingTab vagas={vagas} />}
               </>
             )}
-          </div>
+          </Panel>
         </div>
       </div>
     </div>

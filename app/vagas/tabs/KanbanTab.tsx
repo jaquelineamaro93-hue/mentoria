@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { GripVertical, X } from 'lucide-react';
+import { GripVertical, X, Zap } from 'lucide-react';
+import { Panel, Eyebrow } from '@/components/Panel';
 
 interface Vaga {
   id: string;
@@ -21,14 +22,14 @@ interface Props {
 }
 
 const ETAPAS = [
-  { id: 'para_aplicar', label: 'Para Aplicar', cor: 'bg-red-50' },
-  { id: 'aplicada', label: 'Aplicada', cor: 'bg-orange-50' },
-  { id: 'entrevista_agendada', label: 'Entrevista Agendada', cor: 'bg-yellow-50' },
-  { id: 'aguardando_retorno', label: 'Aguardando Retorno', cor: 'bg-blue-50' },
-  { id: 'entrevista_decisor', label: 'Entrevista c/ Decisor', cor: 'bg-purple-50' },
-  { id: 'case', label: 'Case', cor: 'bg-pink-50' },
-  { id: 'oferta', label: 'Oferta', cor: 'bg-green-50' },
-  { id: 'lost', label: 'Lost', cor: 'bg-gray-50' },
+  { id: 'para_aplicar', label: 'Para Aplicar', bg: 'bg-cream', border: 'border-line' },
+  { id: 'aplicada', label: 'Aplicada', bg: 'bg-sky-tint', border: 'border-sky' },
+  { id: 'entrevista_agendada', label: 'Entrevista Agendada', bg: 'bg-sky-tint', border: 'border-sky' },
+  { id: 'aguardando_retorno', label: 'Aguardando Retorno', bg: 'bg-sky-tint', border: 'border-sky' },
+  { id: 'entrevista_decisor', label: 'Entrevista c/ Decisor', bg: 'bg-sky-tint', border: 'border-sky-deep' },
+  { id: 'case', label: 'Case', bg: 'bg-cream', border: 'border-brown' },
+  { id: 'oferta', label: 'Oferta', bg: 'bg-sky-tint', border: 'border-sky-deep' },
+  { id: 'lost', label: 'Lost', bg: 'bg-cream', border: 'border-line' },
 ];
 
 export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
@@ -70,7 +71,11 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-6">Kanban de Candidaturas</h2>
+      <Eyebrow>
+        <Zap size={14} />
+        Jornada de Candidaturas
+      </Eyebrow>
+      <h2 className="font-display text-3xl text-brown-deep mb-8">Kanban</h2>
 
       <div className="overflow-x-auto pb-4">
         <div className="flex gap-4 min-w-max">
@@ -80,22 +85,22 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             return (
               <div
                 key={etapa.id}
-                className={`flex-shrink-0 w-80 ${etapa.cor} rounded-lg p-4 border border-gray-200`}
+                className={`flex-shrink-0 w-80 ${etapa.bg} rounded-xl p-4 border border-2 ${etapa.border}`}
               >
                 {/* Header */}
                 <div className="mb-4">
-                  <h3 className="font-bold text-gray-900">{etapa.label}</h3>
-                  <p className="text-sm text-gray-600">{vagasEtapa.length} vagas</p>
+                  <h3 className="font-medium text-brown-deep">{etapa.label}</h3>
+                  <p className="text-xs text-ink-faint mt-1">{vagasEtapa.length} vaga{vagasEtapa.length !== 1 ? 's' : ''}</p>
                 </div>
 
                 {/* Zona de drop */}
                 <div
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, etapa.id)}
-                  className="space-y-3 min-h-[400px] rounded border-2 border-dashed border-gray-300 p-3"
+                  className="space-y-3 min-h-[400px] rounded-lg border-2 border-dashed border-line p-3"
                 >
                   {vagasEtapa.length === 0 ? (
-                    <div className="text-center text-gray-500 text-sm py-12">
+                    <div className="text-center text-ink-faint text-sm py-12">
                       Nenhuma vaga
                     </div>
                   ) : (
@@ -106,17 +111,17 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                         onDragStart={() => setDraggedVaga(vaga)}
                         onDragEnd={() => setDraggedVaga(null)}
                         onClick={() => setModalVaga(vaga)}
-                        className="bg-white p-3 rounded border border-gray-200 cursor-move hover:shadow-md hover:border-gray-300 transition group"
+                        className="bg-paper p-3 rounded-lg border border-line cursor-move hover:shadow-md hover:border-sky transition group"
                       >
                         <div className="flex items-start gap-2">
-                          <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <GripVertical className="w-4 h-4 text-ink-faint mt-0.5 flex-shrink-0 opacity-40" />
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-900 truncate">
+                            <p className="font-medium text-ink truncate text-sm">
                               {vaga.cargo}
                             </p>
-                            <p className="text-sm text-gray-600 truncate">{vaga.empresa}</p>
+                            <p className="text-xs text-ink-soft truncate">{vaga.empresa}</p>
                             {vaga.fit_score !== null && (
-                              <div className="mt-2 inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">
+                              <div className="mt-2 inline-block bg-sky-tint border border-sky text-sky-deep px-2 py-1 rounded-full text-xs font-bold">
                                 {vaga.fit_score}% fit
                               </div>
                             )}
@@ -135,15 +140,15 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       {/* Modal de detalhes */}
       {modalVaga && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-start justify-between">
+          <Panel className="max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-line">
+            <div className="sticky top-0 bg-paper border-b border-line p-6 flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{modalVaga.cargo}</h2>
-                <p className="text-gray-600">{modalVaga.empresa}</p>
+                <h2 className="font-display text-2xl text-brown-deep">{modalVaga.cargo}</h2>
+                <p className="text-ink-soft text-sm mt-1">{modalVaga.empresa}</p>
               </div>
               <button
                 onClick={() => setModalVaga(null)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-ink-faint hover:text-ink transition"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -152,17 +157,17 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             <div className="p-6 space-y-6">
               {/* Fit Score */}
               {modalVaga.fit_score !== null && (
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-600 font-medium">Compatibilidade</p>
-                  <p className="text-3xl font-bold text-blue-600">{modalVaga.fit_score}%</p>
-                </div>
+                <Panel className="p-4 bg-sky-tint border border-sky">
+                  <p className="text-sm text-sky-deep font-medium">Compatibilidade</p>
+                  <p className="text-4xl font-display text-sky-deep mt-1">{modalVaga.fit_score}%</p>
+                </Panel>
               )}
 
               {/* Descrição */}
               {modalVaga.descricao_vaga && (
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Descrição da Vaga</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap text-sm">
+                  <h3 className="font-medium text-brown-deep mb-2">Descrição da Vaga</h3>
+                  <p className="text-ink whitespace-pre-wrap text-sm leading-relaxed">
                     {modalVaga.descricao_vaga}
                   </p>
                 </div>
@@ -171,12 +176,12 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
               {/* Link */}
               {modalVaga.link_vaga && (
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Link da Vaga</h3>
+                  <h3 className="font-medium text-brown-deep mb-2">Link da Vaga</h3>
                   <a
                     href={modalVaga.link_vaga}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline break-all"
+                    className="text-sky-deep hover:text-sky-deep/80 underline break-all text-sm"
                   >
                     {modalVaga.link_vaga}
                   </a>
@@ -186,27 +191,27 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
               {/* Próximo Passo */}
               {modalVaga.proximo_passo && (
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Próximo Passo</h3>
-                  <p className="text-gray-700 text-sm">{modalVaga.proximo_passo}</p>
+                  <h3 className="font-medium text-brown-deep mb-2">Próximo Passo</h3>
+                  <p className="text-ink text-sm">{modalVaga.proximo_passo}</p>
                 </div>
               )}
 
               {/* Observações */}
               {modalVaga.observacoes && (
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Observações</h3>
-                  <p className="text-gray-700 text-sm">{modalVaga.observacoes}</p>
+                  <h3 className="font-medium text-brown-deep mb-2">Observações</h3>
+                  <p className="text-ink text-sm">{modalVaga.observacoes}</p>
                 </div>
               )}
 
               <button
                 onClick={() => setModalVaga(null)}
-                className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition"
+                className="w-full bg-cream border border-line text-ink py-2 rounded-lg font-medium hover:bg-line transition mt-4"
               >
                 Fechar
               </button>
             </div>
-          </div>
+          </Panel>
         </div>
       )}
     </div>
