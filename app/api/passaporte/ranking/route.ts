@@ -12,68 +12,25 @@ export async function GET(request: NextRequest) {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, nome, foto_url')
-      .order('nome', { ascending: true });
+      .select('id, nome, foto_url, pontos_total')
+      .order('pontos_total', { ascending: false });
 
     if (!profiles) {
       return NextResponse.json({ ranking: [] });
     }
 
-    const rankingData = await Promise.all(
-      profiles.map(async (profile) => {
-        const { count: analisadas } = await supabase
-          .from('vagas_candidatura')
-          .select('*', { count: 'exact', head: true })
-          .eq('mentorado_id', profile.id);
+    const rankingData = profiles.map((profile) => {
+      const pontos = profile.pontos_total || 0;
 
-        const { count: entrevistas } = await supabase
-          .from('vagas_candidatura')
-          .select('*', { count: 'exact', head: true })
-          .eq('mentorado_id', profile.id)
-          .eq('etapa', 'entrevista_agendada');
+      return {
+        userId: profile.id,
+        nome: profile.nome || 'Sem nome',
+        foto_url: profile.foto_url,
+        pontos,
+      };
+    });
 
-        const { data: vagas } = await supabase
-          .from('vagas_candidatura')
-          .select('fit_score')
-          .eq('mentorado_id', profile.id)
-          .not('fit_score', 'is', null);
-
-        const fitMedio =
-          vagas && vagas.length > 0
-            ? Math.round(
-                vagas.reduce((sum, vaga) => sum + (vaga.fit_score || 0), 0) /
-                  vagas.length
-              )
-            : 0;
-
-        const { data: xpRecords } = await supabase
-          .from('user_xp')
-          .select('pontos')
-          .eq('user_id', profile.id);
-
-        const totalXp =
-          xpRecords?.reduce((sum, record) => sum + (record.pontos || 0), 0) ||
-          0;
-
-        const pontos =
-          (analisadas || 0) * 20 +
-          (entrevistas || 0) * 100 +
-          totalXp;
-
-        return {
-          userId: profile.id,
-          nome: profile.nome || 'Sem nome',
-          foto_url: profile.foto_url,
-          aplicacoes: analisadas || 0,
-          entrevistas: entrevistas || 0,
-          fitMedio,
-          pontos,
-        };
-      })
-    );
-
-    const ranking = rankingData.sort((a, b) => b.pontos - a.pontos);
-    const rankingComPosicao = ranking.map((item, index) => ({
+    const rankingComPosicao = rankingData.map((item, index) => ({
       posicao: index + 1,
       ...item,
     }));

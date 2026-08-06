@@ -9,9 +9,6 @@ interface RankingItem {
   userId: string;
   nome: string;
   foto_url: string | null;
-  aplicacoes: number;
-  entrevistas: number;
-  fitMedio: number;
   pontos: number;
 }
 
@@ -107,17 +104,8 @@ export default function RankingComunidade() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-ink-soft uppercase tracking-wider">
                     Mentorado
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-ink-soft uppercase tracking-wider">
-                    Vagas Analisadas
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-ink-soft uppercase tracking-wider">
-                    Entrevistas
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-ink-soft uppercase tracking-wider">
-                    Fit Médio
-                  </th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-ink-soft uppercase tracking-wider">
-                    Pontos (XP)
+                    Engajamento (XP)
                   </th>
                 </tr>
               </thead>
@@ -159,41 +147,9 @@ export default function RankingComunidade() {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-center">
-                      <span className="text-sm text-ink font-medium">
-                        {item.aplicacoes}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-block px-2.5 py-1 rounded-full bg-mustard-light text-brown-deep text-xs font-bold">
-                        {item.entrevistas}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center">
-                        <div className="w-12 h-1 rounded-full bg-line overflow-hidden">
-                          <div
-                            className={`h-full transition-all ${
-                              item.fitMedio >= 70
-                                ? 'bg-emerald-light'
-                                : item.fitMedio >= 50
-                                  ? 'bg-sky-deep'
-                                  : 'bg-orange-500'
-                            }`}
-                            style={{ width: `${item.fitMedio}%` }}
-                          />
-                        </div>
-                        <span className="ml-2 text-xs font-bold text-ink-soft">
-                          {item.fitMedio}%
-                        </span>
-                      </div>
-                    </td>
-
                     <td className="px-6 py-4 text-right">
                       <span className="text-lg font-bold text-brown-deep">
-                        {item.pontos} pts
+                        {item.pontos.toLocaleString('pt-BR')} XP
                       </span>
                     </td>
                   </tr>
@@ -212,21 +168,15 @@ export default function RankingComunidade() {
 
       <Panel className="p-4 bg-emerald-light border border-line">
         <p className="text-xs text-ink-soft mb-3 font-medium">
-          Como ganhar pontos:
+          Engajamento Global do Mentorado:
         </p>
-        <ul className="space-y-1.5">
-          <li className="text-xs text-ink">
-            <span className="font-bold">+50 pts</span> ao importar PDF do
-            LinkedIn
-          </li>
-          <li className="text-xs text-ink">
-            <span className="font-bold">+20 pts</span> por cada análise de fit
-            realizada
-          </li>
-          <li className="text-xs text-ink">
-            <span className="font-bold">+100 pts</span> por vaga em "Entrevista
-            Agendada"
-          </li>
+        <ul className="space-y-1.5 text-xs text-ink">
+          <li><span className="font-bold">Onboarding</span> - Preenchimento do Perfil</li>
+          <li><span className="font-bold">Mapa Quem Sou Eu</span> - Autoconhecimento</li>
+          <li><span className="font-bold">PDI</span> - Plano de Desenvolvimento</li>
+          <li><span className="font-bold">Diário de Bordo</span> - Anotações de Encontros</li>
+          <li><span className="font-bold">Presença</span> - Participação em Encontros</li>
+          <li><span className="font-bold">Análise de Vagas</span> - Uso do Controle de Vagas</li>
         </ul>
       </Panel>
     </div>
