@@ -120,23 +120,39 @@ export default function PassaporteClient({
           {tab === 'conquistas' && (
             <div className="space-y-10">
               <section>
-                <Eyebrow>Conquistas</Eyebrow>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <Eyebrow>Emblemas & Conquistas</Eyebrow>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                   {conquistas.map((c) => {
                     const desbloqueada = idsDesbloqueadas.has(c.id);
                     return (
                       <div key={c.id} className="flex flex-col items-center text-center gap-2.5">
-                        <div
-                          className={`w-16 h-16 rounded-full border flex items-center justify-center ${
-                            desbloqueada
-                              ? 'bg-sky-tint border-sky text-sky-deep'
-                              : 'bg-paper border-line text-ink-faint opacity-50'
-                          }`}
-                        >
-                          {desbloqueada ? <Check size={22} /> : <Lock size={18} />}
+                        {/* Medal/Shield Badge */}
+                        <div className="relative w-20 h-24 flex items-center justify-center">
+                          {/* Shield Shape */}
+                          <div
+                            className={`w-20 h-20 rounded-t-3xl rounded-b-lg border-2 flex items-center justify-center shadow-lg transition-all ${
+                              desbloqueada
+                                ? 'bg-gradient-to-br from-brown-emblem to-ink-soft border-brown-deep text-paper'
+                                : 'bg-gradient-to-br from-paper to-cream border-line text-ink-faint opacity-60'
+                            }`}
+                            style={{
+                              clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
+                            }}
+                          >
+                            <span className="text-3xl">{c.icone || '⭐'}</span>
+                          </div>
+                          {/* Gold Accent (only for unlocked) */}
+                          {desbloqueada && (
+                            <div
+                              className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-6 h-6 bg-gold-matte rounded-full border-2 border-brown-emblem flex items-center justify-center"
+                              style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+                            >
+                              <span className="text-xs">★</span>
+                            </div>
+                          )}
                         </div>
                         <p
-                          className={`text-xs ${desbloqueada ? 'text-ink' : 'text-ink-faint'}`}
+                          className={`text-xs font-medium ${desbloqueada ? 'text-ink' : 'text-ink-faint'}`}
                         >
                           {c.titulo}
                         </p>
