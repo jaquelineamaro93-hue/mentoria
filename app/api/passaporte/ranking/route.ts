@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, nome, avatar_url')
+      .select('id, nome, foto_url')
       .order('nome', { ascending: true });
 
     if (!profiles) {
@@ -22,37 +22,37 @@ export async function GET(request: NextRequest) {
     const rankingData = await Promise.all(
       profiles.map(async (profile) => {
         const { count: analisadas } = await supabase
-          .from('jobs')
+          .from('vagas_candidatura')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile.id);
+          .eq('mentorado_id', profile.id);
 
         const { count: entrevistas } = await supabase
-          .from('jobs')
+          .from('vagas_candidatura')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile.id)
+          .eq('mentorado_id', profile.id)
           .eq('etapa', 'entrevista_agendada');
 
-        const { data: jobs } = await supabase
-          .from('jobs')
+        const { data: vagas } = await supabase
+          .from('vagas_candidatura')
           .select('fit_score')
-          .eq('user_id', profile.id)
+          .eq('mentorado_id', profile.id)
           .not('fit_score', 'is', null);
 
         const fitMedio =
-          jobs && jobs.length > 0
+          vagas && vagas.length > 0
             ? Math.round(
-                jobs.reduce((sum, job) => sum + (job.fit_score || 0), 0) /
-                  jobs.length
+                vagas.reduce((sum, vaga) => sum + (vaga.fit_score || 0), 0) /
+                  vagas.length
               )
             : 0;
 
         const { data: xpRecords } = await supabase
           .from('user_xp')
-          .select('points')
+          .select('pontos')
           .eq('user_id', profile.id);
 
         const totalXp =
-          xpRecords?.reduce((sum, record) => sum + (record.points || 0), 0) ||
+          xpRecords?.reduce((sum, record) => sum + (record.pontos || 0), 0) ||
           0;
 
         const pontos =
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         return {
           userId: profile.id,
           nome: profile.nome || 'Sem nome',
-          avatar_url: profile.avatar_url,
+          foto_url: profile.foto_url,
           aplicacoes: analisadas || 0,
           entrevistas: entrevistas || 0,
           fitMedio,

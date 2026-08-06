@@ -8,7 +8,7 @@ interface RankingItem {
   posicao: number;
   userId: string;
   nome: string;
-  avatar_url: string | null;
+  foto_url: string | null;
   aplicacoes: number;
   entrevistas: number;
   fitMedio: number;
@@ -142,9 +142,9 @@ export default function RankingComunidade() {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        {item.avatar_url ? (
+                        {item.foto_url ? (
                           <img
-                            src={item.avatar_url}
+                            src={item.foto_url}
                             alt={item.nome}
                             className="w-8 h-8 rounded-full object-cover"
                           />
@@ -166,7 +166,7 @@ export default function RankingComunidade() {
                     </td>
 
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-block px-2.5 py-1 rounded-full bg-sky-tint text-sky-deep text-xs font-bold">
+                      <span className="inline-block px-2.5 py-1 rounded-full bg-mustard-light text-brown-deep text-xs font-bold">
                         {item.entrevistas}
                       </span>
                     </td>
@@ -177,7 +177,7 @@ export default function RankingComunidade() {
                           <div
                             className={`h-full transition-all ${
                               item.fitMedio >= 70
-                                ? 'bg-emerald-500'
+                                ? 'bg-emerald-light'
                                 : item.fitMedio >= 50
                                   ? 'bg-sky-deep'
                                   : 'bg-orange-500'
@@ -210,7 +210,7 @@ export default function RankingComunidade() {
         </Panel>
       </div>
 
-      <Panel className="p-4 bg-cream border border-line">
+      <Panel className="p-4 bg-emerald-light border border-line">
         <p className="text-xs text-ink-soft mb-3 font-medium">
           Como ganhar pontos:
         </p>
@@ -224,10 +224,6 @@ export default function RankingComunidade() {
             realizada
           </li>
           <li className="text-xs text-ink">
-            <span className="font-bold">+30 pts</span> por vaga movida para
-            "Aplicada"
-          </li>
-          <li className="text-xs text-ink">
             <span className="font-bold">+100 pts</span> por vaga em "Entrevista
             Agendada"
           </li>
@@ -236,4 +232,3 @@ export default function RankingComunidade() {
     </div>
   );
 }
-
