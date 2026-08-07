@@ -78,7 +78,17 @@ export default function PerfilClient({
 
   async function handleUploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !perfil?.id) return;
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setMensagem('Por favor, selecione um arquivo de imagem válido');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setMensagem('Arquivo muito grande. Máximo permitido é 5MB');
+      return;
+    }
 
     setSalvando(true);
     try {

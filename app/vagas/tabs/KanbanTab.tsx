@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { GripVertical, X, Zap } from 'lucide-react';
+import { GripVertical, X, Zap, Plus } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 
 interface Vaga {

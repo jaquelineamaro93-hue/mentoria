@@ -76,8 +76,8 @@ export default function RankingComunidade() {
       </p>
 
       {top3.length > 0 && (
-        <div className="mb-2">
-          <div className="flex items-flex-end justify-center gap-3 h-[32rem]">
+        <div className="mb-8">
+          <div className="flex items-flex-end justify-center gap-3">
             {top3[1] && (
               <div className="text-center flex flex-col items-center">
                 <div className="w-24 h-60 bg-gradient-to-b from-paper to-cream rounded-t-xl border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
@@ -170,7 +170,7 @@ export default function RankingComunidade() {
       )}
 
       {usuarioLogado?.posicao && usuarioLogado.posicao > 3 && (
-        <Panel className="p-6 bg-sky-tint border-2 border-sky">
+        <Panel className="p-6 bg-sky-tint border-2 border-sky mb-8">
           <p className="text-sm text-sky-deep font-medium">Sua Posição</p>
           <p className="text-3xl font-display text-sky-deep mt-1">
             {usuarioLogado.posicao}º lugar
@@ -179,7 +179,7 @@ export default function RankingComunidade() {
       )}
 
       {resto.length > 0 && (
-        <div>
+        <div className="space-y-4">
           <h3 className="font-medium text-brown-deep mb-4">Próximos Classificados</h3>
           <Panel className="p-0 overflow-hidden border border-line">
             <div className="overflow-x-auto">
