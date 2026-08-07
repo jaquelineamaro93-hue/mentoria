@@ -32,13 +32,18 @@ export default function PerfilClient({
   }
 
   async function handleSalvarPerfil() {
+    if (!perfil?.id) {
+      setMensagem('Perfil não carregado');
+      return;
+    }
+
     setSalvando(true);
     setMensagem('');
 
     try {
       const updateData: any = {};
 
-      if (nome !== perfil?.nome) {
+      if (nome !== perfil.nome) {
         updateData.nome = nome;
       }
 
@@ -63,7 +68,7 @@ export default function PerfilClient({
       }
 
       if (Object.keys(updateData).length > 0) {
-        await supabase.from('profiles').update(updateData).eq('id', perfil?.id);
+        await supabase.from('profiles').update(updateData).eq('id', perfil.id);
       }
 
       setMensagem('Perfil atualizado com sucesso!');
@@ -92,30 +97,33 @@ export default function PerfilClient({
 
     setSalvando(true);
     try {
-      const ext = file.name.split('.').pop();
-      const path = `${perfil.id}/perfil.${ext}`;
+      const formData = new FormData();
+      formData.append('file', file);
 
-      const { error: deleteError } = await supabase.storage
-        .from('fotos-perfil')
-        .remove([path]);
+      const res = await fetch('/api/perfil/avatar', {
+        method: 'POST',
+        body: formData,
+      });
 
-      const { error: uploadError } = await supabase.storage
-        .from('fotos-perfil')
-        .upload(path, file);
+      const data = await res.json();
 
-      if (uploadError) {
-        setMensagem('Erro ao enviar foto');
+      if (!res.ok) {
+        const errorMsg = data.error || `Erro ao enviar foto (Status: ${res.status})`;
+        console.error('Upload error:', errorMsg, data);
+        setMensagem(errorMsg);
       } else {
-        const { data } = supabase.storage.from('fotos-perfil').getPublicUrl(path);
-        await supabase.from('profiles').update({ foto_url: data.publicUrl }).eq('id', perfil.id);
         setMensagem('Foto atualizada com sucesso!');
-        router.refresh();
+        setTimeout(() => router.refresh(), 500);
       }
     } catch (e) {
-      console.error(e);
-      setMensagem('Erro ao atualizar foto');
+      console.error('Upload exception:', e);
+      const errorMsg = e instanceof Error ? e.message : 'Erro desconhecido';
+      setMensagem(`Erro ao atualizar foto: ${errorMsg}`);
     }
     setSalvando(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }
 
   return (
