@@ -139,7 +139,7 @@ export default function PassaporteClient({
                               clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
                             }}
                           >
-                            <span className="text-lg leading-none">{c.icone || '⭐'}</span>
+                            <span className="text-2xl leading-none">{c.icone || '⭐'}</span>
                           </div>
                           {/* Gold Accent (only for unlocked) */}
                           {desbloqueada && (
