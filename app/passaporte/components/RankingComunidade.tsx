@@ -80,7 +80,7 @@ export default function RankingComunidade() {
           <div className="flex items-flex-end justify-center gap-4 h-80">
             {top3[1] && (
               <div className="text-center">
-                <div className="w-24 h-48 bg-gradient-to-b from-paper to-cream rounded-lg border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md">
+                <div className="w-24 h-52 bg-gradient-to-b from-paper to-cream rounded-lg border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md">
                   <span className="text-3xl mb-2">🥈</span>
                   {top3[1].foto_url ? (
                     <img
@@ -106,7 +106,7 @@ export default function RankingComunidade() {
             {top3[0] && (
               <div className="text-center">
                 <div className="relative">
-                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-4xl">👑</div>
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-4xl animate-bounce" style={{ animationDuration: "2s" }}>👑</div>
                   <div className="w-28 h-64 bg-gradient-to-b from-mustard-light to-paper rounded-lg border-4 border-brown-deep flex flex-col items-center justify-start pt-6 shadow-lg">
                     <span className="text-4xl mb-2">🥇</span>
                     {top3[0].foto_url ? (
@@ -133,7 +133,7 @@ export default function RankingComunidade() {
 
             {top3[2] && (
               <div className="text-center">
-                <div className="w-24 h-40 bg-gradient-to-b from-paper to-cream rounded-lg border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md">
+                <div className="w-24 h-48 bg-gradient-to-b from-paper to-cream rounded-lg border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md">
                   <span className="text-3xl mb-2">🥉</span>
                   {top3[2].foto_url ? (
                     <img
