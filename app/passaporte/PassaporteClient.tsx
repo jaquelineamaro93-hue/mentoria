@@ -63,14 +63,14 @@ export default function PassaporteClient({
       <main className="flex-1 overflow-auto">
         <div className="px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">
           <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
-            Sua jornada em pontos
+            Sua jornada em impulsos
           </p>
           <h1 className="font-display text-3xl text-brown-deep mb-8">Meu Passaporte</h1>
 
           <div className="rounded-2xl bg-brown-deep px-8 py-7 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <p className="text-[11px] uppercase tracking-wide text-[#cbb896] mb-1">
-                Pontos acumulados
+                Impulsos acumulados
               </p>
               <p className="font-display text-4xl text-[#f1e6d6]">{pontos}</p>
             </div>

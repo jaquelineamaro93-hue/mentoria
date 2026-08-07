@@ -21,6 +21,7 @@ const config: Config = {
         line: '#ded4c3',
         'line-soft': '#ded4c3',
         'mustard-light': '#f4d67c',
+        'gold-matte': '#d4a574',
         'emerald-light': '#b8e5d8',
       },
       fontFamily: {
