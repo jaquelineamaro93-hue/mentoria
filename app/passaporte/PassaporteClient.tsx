@@ -101,7 +101,7 @@ export default function PassaporteClient({
               }`}
             >
               <ShoppingBag className="w-4 h-4" />
-              Loja de Pontos
+              Impulsos Store
             </button>
 
             <button
@@ -156,7 +156,7 @@ export default function PassaporteClient({
                         >
                           {c.titulo}
                         </p>
-                        <p className="text-[10px] text-ink-faint">+{c.pontos} pts</p>
+                        <p className="text-[10px] text-ink-faint">+{c.pontos} Impulsos</p>
                       </div>
                     );
                   })}
