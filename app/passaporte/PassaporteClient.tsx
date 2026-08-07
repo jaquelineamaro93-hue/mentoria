@@ -63,7 +63,7 @@ export default function PassaporteClient({
       <main className="flex-1 overflow-auto">
         <div className="px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">
           <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
-            Sua jornada em impulsos
+            Sua jornada em pontos
           </p>
           <h1 className="font-display text-3xl text-brown-deep mb-8">Meu Passaporte</h1>
 
@@ -72,10 +72,10 @@ export default function PassaporteClient({
               <p className="text-[11px] uppercase tracking-wide text-[#cbb896] mb-1">
                 Impulsos acumulados
               </p>
-              <p className="font-display text-4xl text-[#f1e6d6]">{pontos}</p>
+              <p className="font-display text-4xl text-[#f1e6d6]">{pontos.toLocaleString('pt-BR')}</p>
             </div>
             <p className="text-sm text-[#d9c8ab] max-w-xs">
-              Cada meta concluída, anotação registrada ou encontro participado soma pontos aqui.
+              Cada meta concluída, anotação registrada ou encontro participado soma impulsos aqui.
             </p>
           </div>
 
@@ -130,7 +130,7 @@ export default function PassaporteClient({
                         <div className="relative w-20 h-24 flex items-center justify-center">
                           {/* Shield Shape */}
                           <div
-                            className={`w-20 h-20 rounded-t-3xl rounded-b-lg border-2 flex items-center justify-center shadow-lg transition-all ${
+                            className={`w-20 h-20 rounded-t-3xl rounded-b-lg border-2 flex items-center justify-center shadow-lg transition-all overflow-hidden ${
                               desbloqueada
                                 ? 'bg-gradient-to-br from-brown-emblem to-ink-soft border-brown-deep text-paper'
                                 : 'bg-gradient-to-br from-paper to-cream border-line text-ink-faint opacity-60'
@@ -139,7 +139,7 @@ export default function PassaporteClient({
                               clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
                             }}
                           >
-                            <span className="text-3xl">{c.icone || '⭐'}</span>
+                            <span className="text-lg leading-none">{c.icone || '⭐'}</span>
                           </div>
                           {/* Gold Accent (only for unlocked) */}
                           {desbloqueada && (
@@ -196,7 +196,7 @@ export default function PassaporteClient({
 
           {tab === 'loja' && (
             <section>
-              <Eyebrow>Loja de pontos, troque seus {pontos} pontos por prêmios</Eyebrow>
+              <Eyebrow>Impulsos Store, troque seus {pontos.toLocaleString('pt-BR')} impulsos por prêmios</Eyebrow>
               <div className="flex flex-col gap-2.5">
                 {recompensas.map((r) => {
                   const disponivel = pontos >= r.custo_pontos;
