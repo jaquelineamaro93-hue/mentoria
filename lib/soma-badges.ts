@@ -147,10 +147,10 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
 
 export function getCoresDosPilares() {
   return {
-    sabedoria: '#7ea0c4', // azul
-    objetividade: '#6b4a35', // marrom
-    maestria: '#f6a500', // ouro
-    alquimia: '#d4516b', // rosa
+    sabedoria: '#9e8b7e', // castanho claro
+    objetividade: '#8c7a6b', // castanho institucional
+    maestria: '#6b5d4f', // castanho médio
+    alquimia: '#3c2c1f', // castanho escuro
   };
 }
 
