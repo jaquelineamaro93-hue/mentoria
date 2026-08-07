@@ -76,7 +76,7 @@ export default function RankingComunidade() {
       </p>
 
       {top3.length > 0 && (
-        <div className="mb-8">
+        <div className="mb-2">
           <div className="flex items-flex-end justify-center gap-3 h-[32rem]">
             {top3[1] && (
               <div className="text-center flex flex-col items-center">

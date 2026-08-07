@@ -40,6 +40,10 @@ interface Mensagem {
 
 export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
   const linkedinInputRef = useRef<HTMLInputElement>(null);
+
+  const [perfil, setPerfil] = useState('');
+  const [objetivos, setObjetivos] = useState('');
+  const [cargosDesejados, setCargosDesejados] = useState('');
   const [empresa, setEmpresa] = useState('');
   const [cargo, setCargo] = useState('');
   const [descricao_vaga, setDescricaoVaga] = useState('');

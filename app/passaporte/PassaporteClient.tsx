@@ -124,6 +124,8 @@ export default function PassaporteClient({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                   {conquistas.map((c) => {
                     const desbloqueada = idsDesbloqueadas.has(c.id);
+                    const pillarAchievement = SOMA_ACHIEVEMENTS.find(s => s.id === c.codigo);
+                    const emoji = pillarAchievement?.emoji || '⭐';
                     return (
                       <div key={c.id} className="flex flex-col items-center text-center gap-2.5">
                         {/* Medal/Shield Badge */}
@@ -139,7 +141,7 @@ export default function PassaporteClient({
                               clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
                             }}
                           >
-                            <span className="text-2xl leading-none">{c.icone || '⭐'}</span>
+                            <span className="text-2xl leading-none">{emoji}</span>
                           </div>
                           {/* Gold Accent (only for unlocked) */}
                           {desbloqueada && (
