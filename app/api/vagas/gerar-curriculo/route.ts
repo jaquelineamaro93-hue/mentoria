@@ -28,7 +28,7 @@ PONTOS FORTES (que deve destacar):
 ${pontos_fortes?.join('\n') || 'Não preenchido'}
 
 GAPS (que deve contornar ou mitigar):
-${gaps?.map((g) => `- ${g.titulo}: ${g.descricao}`).join('\n') || 'Não preenchido'}
+${gaps?.map((g: any) => `- ${g.titulo}: ${g.descricao}`).join('\n') || 'Não preenchido'}
 
 Gere um currículo adaptado que:
 1. Destaque os pontos fortes relacionados à vaga
