@@ -63,6 +63,12 @@ interface Mensagem {
   acao?: 'meu-perfil' | 'meu-pdi';
 }
 
+interface Mensagem {
+  tipo: 'sucesso' | 'erro' | 'aviso';
+  titulo: string;
+  descricao: string;
+}
+
 export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
   const [vagaInput, setVagaInput] = useState('');
   const [analisando, setAnalisando] = useState(false);
@@ -347,7 +353,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
                 );
               })}
             </div>
-          </div>
+          </Panel>
 
           <div>
             <Eyebrow>

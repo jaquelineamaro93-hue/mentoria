@@ -87,13 +87,11 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 key={etapa.id}
                 className={`flex-shrink-0 w-80 ${etapa.bg} rounded-xl p-4 border border-2 ${etapa.border}`}
               >
-                {/* Header */}
                 <div className="mb-4">
                   <h3 className="font-medium text-brown-deep">{etapa.label}</h3>
                   <p className="text-xs text-ink-faint mt-1">{vagasEtapa.length} vaga{vagasEtapa.length !== 1 ? 's' : ''}</p>
                 </div>
 
-                {/* Zona de drop */}
                 <div
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, etapa.id)}
@@ -137,7 +135,6 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
         </div>
       </div>
 
-      {/* Modal de detalhes */}
       {modalVaga && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <Panel className="max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-line">
@@ -155,7 +152,6 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Fit Score */}
               {modalVaga.fit_score !== null && (
                 <Panel className="p-4 bg-sky-tint border border-sky">
                   <p className="text-sm text-sky-deep font-medium">Compatibilidade</p>
@@ -163,7 +159,6 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </Panel>
               )}
 
-              {/* Descrição */}
               {modalVaga.descricao_vaga && (
                 <div>
                   <h3 className="font-medium text-brown-deep mb-2">Descrição da Vaga</h3>
@@ -173,7 +168,6 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </div>
               )}
 
-              {/* Link */}
               {modalVaga.link_vaga && (
                 <div>
                   <h3 className="font-medium text-brown-deep mb-2">Link da Vaga</h3>
@@ -188,7 +182,6 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </div>
               )}
 
-              {/* Próximo Passo */}
               {modalVaga.proximo_passo && (
                 <div>
                   <h3 className="font-medium text-brown-deep mb-2">Próximo Passo</h3>
@@ -196,7 +189,6 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </div>
               )}
 
-              {/* Observações */}
               {modalVaga.observacoes && (
                 <div>
                   <h3 className="font-medium text-brown-deep mb-2">Observações</h3>

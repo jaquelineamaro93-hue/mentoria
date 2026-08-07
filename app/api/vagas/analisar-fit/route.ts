@@ -1,11 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import Anthropic from "@anthropic-ai/sdk";
+import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
+import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     if (!user?.user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -90,7 +94,7 @@ Retorne APENAS este JSON (sem markdown, sem backticks):
 
     let analise;
     try {
-      analise = JSON.parse(responseText);
+      planoGerado = JSON.parse(textoResposta);
     } catch {
       console.error('Erro ao parsear:', responseText);
       return NextResponse.json({ error: 'Erro ao processar análise de fit' }, { status: 500 });
