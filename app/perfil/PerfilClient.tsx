@@ -143,9 +143,17 @@ export default function PerfilClient({
         <div className="bg-white border border-line rounded-2xl p-8 mb-8">
           <h2 className="font-display text-xl text-brown-deep mb-4">Foto de Perfil</h2>
           <div className="flex items-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-sky-deep flex items-center justify-center text-white text-3xl font-display">
-              {perfil?.nome?.[0]?.toUpperCase() || 'U'}
-            </div>
+            {perfil?.foto_url ? (
+              <img
+                src={perfil.foto_url}
+                alt={perfil.nome}
+                className="w-24 h-24 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-sky-deep flex items-center justify-center text-white text-3xl font-display">
+                {perfil?.nome?.[0]?.toUpperCase() || 'U'}
+              </div>
+            )}
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={salvando}
@@ -222,6 +230,14 @@ export default function PerfilClient({
                 className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
               />
             </div>
+
+            <button
+              onClick={handleSalvarPerfil}
+              disabled={salvando}
+              className="w-full mt-6 bg-brown-deep text-white py-3 rounded-lg hover:bg-brown transition-colors disabled:opacity-50 font-medium"
+            >
+              {salvando ? 'Salvando...' : 'Salvar Alterações'}
+            </button>
           </div>
         </div>
 
@@ -248,30 +264,20 @@ export default function PerfilClient({
           <h2 className="font-display text-xl text-brown-deep mb-4">Documentos</h2>
           <a
             href="#"
-            className="text-brown-deep hover:underline font-medium text-sm"
+            className="text-brown-deep hover:underline text-sm"
           >
-            📄 Ler Termos de Mentoria
+            Termos e Condições
           </a>
         </div>
 
-        {/* Botões */}
-        <div className="flex gap-4">
-          <button
-            onClick={handleSalvarPerfil}
-            disabled={salvando}
-            className="bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50"
-          >
-            {salvando ? 'Salvando...' : 'Salvar Alterações'}
-          </button>
-
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 border-2 border-brown-deep text-brown-deep px-6 py-3 rounded-lg font-medium hover:bg-brown-deep/10 transition-colors"
-          >
-            <LogOut size={16} />
-            Sair
-          </button>
-        </div>
+        {/* Logout */}
+        <button
+          onClick={handleSignOut}
+          className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
+        >
+          <LogOut className="inline mr-2" size={18} />
+          Sair
+        </button>
       </main>
     </div>
   );
