@@ -21,12 +21,12 @@ export async function POST(request: NextRequest) {
     }
 
     const ext = file.name.split('.').pop() || 'jpg';
-    const path = `avatars/${user.id}/avatar.${ext}`;
+    const path = `avatar/${user.id}/avatar.${ext}`;
 
     const buffer = await file.arrayBuffer();
 
     const { error: uploadError, data: uploadData } = await supabase.storage
-      .from('avatars')
+      .from('avatar')
       .upload(path, buffer, {
         upsert: true,
         contentType: file.type,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Upload successful:', { path, size: buffer.byteLength });
 
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    const { data } = supabase.storage.from('avatar').getPublicUrl(path);
 
     const { error: updateError } = await supabase
       .from('profiles')
