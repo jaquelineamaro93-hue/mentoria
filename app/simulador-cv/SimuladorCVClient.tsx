@@ -416,7 +416,7 @@ export default function SimuladorCVClient({
                   ))}
                 </div>
               </Panel>
-            )}            )}
+            )}
 
             {aba === 'minhas-vagas' && (
               <Panel className="p-6">
