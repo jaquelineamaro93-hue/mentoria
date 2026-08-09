@@ -420,14 +420,7 @@ export default function SimuladorCVClient({
             )}
 
             {aba === 'minhas-vagas' && (
-              <Panel className="p-6">
-                <p className="text-sm text-ink-faint mb-4">
-                  Acompanhe suas candidaturas
-                </p>
-                <div className="text-center py-8">
-                  <p className="text-ink-faint">Kanban de vagas em desenvolvimento</p>
-                </div>
-              </Panel>
+              <KanbanTab vagas={vagas} onVagaAtualizada={handleVagaAtualizada} />
             )}
           </section>
         )}
