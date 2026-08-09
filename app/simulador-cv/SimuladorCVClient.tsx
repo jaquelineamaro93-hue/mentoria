@@ -36,6 +36,7 @@ export default function SimuladorCVClient({
   profile,
   simulacoesIniciais,
   usadasEsteMes,
+  vagasIniciais = [],
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
