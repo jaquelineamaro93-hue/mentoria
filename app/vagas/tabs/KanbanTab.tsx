@@ -36,6 +36,14 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
   const [draggedVaga, setDraggedVaga] = useState<Vaga | null>(null);
   const [modalVaga, setModalVaga] = useState<Vaga | null>(null);
   const [atualizando, setAtualizando] = useState(false);
+  const [mostraModalNova, setMostraModalNova] = useState(false);
+  const [salvandoNova, setSalvandoNova] = useState(false);
+  const [novaVaga, setNovaVaga] = useState({
+    empresa: '',
+    cargo: '',
+    descricao_vaga: '',
+    link_vaga: '',
+  });
 
   async function moveVaga(vaga: Vaga, novaEtapa: string) {
     setAtualizando(true);
@@ -69,13 +77,59 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
     }
   }
 
+  async function handleAdicionarVaga() {
+    if (!novaVaga.empresa.trim() || !novaVaga.cargo.trim()) {
+      alert('Empresa e cargo são obrigatórios');
+      return;
+    }
+
+    setSalvandoNova(true);
+    try {
+      const res = await fetch('/api/vagas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          empresa: novaVaga.empresa,
+          cargo: novaVaga.cargo,
+          descricao_vaga: novaVaga.descricao_vaga,
+          link_vaga: novaVaga.link_vaga,
+          etapa: 'para_aplicar',
+        }),
+      });
+
+      if (res.ok) {
+        setMostraModalNova(false);
+        setNovaVaga({ empresa: '', cargo: '', descricao_vaga: '', link_vaga: '' });
+        onVagaAtualizada();
+      } else {
+        alert('Erro ao adicionar vaga');
+      }
+    } catch (erro) {
+      console.error('Erro ao adicionar vaga:', erro);
+      alert('Erro ao adicionar vaga');
+    } finally {
+      setSalvandoNova(false);
+    }
+  }
+
   return (
     <div>
-      <Eyebrow>
-        <Zap size={14} />
-        Jornada de Candidaturas
-      </Eyebrow>
-      <h2 className="font-display text-3xl text-brown-deep mb-8">Kanban</h2>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <Eyebrow>
+            <Zap size={14} />
+            Jornada de Candidaturas
+          </Eyebrow>
+          <h2 className="font-display text-3xl text-brown-deep">Kanban</h2>
+        </div>
+        <button
+          onClick={() => setMostraModalNova(true)}
+          className="flex items-center gap-2 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors"
+        >
+          <Plus size={18} />
+          Adicionar Vaga
+        </button>
+      </div>
 
       <div className="overflow-x-auto pb-4 border border-line rounded-lg bg-paper">
         <div className="flex gap-4 p-4 min-w-max">
@@ -134,6 +188,84 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           })}
         </div>
       </div>
+
+      {mostraModalNova && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Panel className="max-w-2xl w-full border border-line">
+            <div className="bg-paper border-b border-line p-6 flex items-start justify-between">
+              <h2 className="font-display text-2xl text-brown-deep">Adicionar Nova Vaga</h2>
+              <button
+                onClick={() => setMostraModalNova(false)}
+                className="text-ink-faint hover:text-ink transition"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-brown-deep mb-2">Empresa *</label>
+                <input
+                  type="text"
+                  value={novaVaga.empresa}
+                  onChange={(e) => setNovaVaga({ ...novaVaga, empresa: e.target.value })}
+                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  placeholder="Nome da empresa"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-brown-deep mb-2">Cargo *</label>
+                <input
+                  type="text"
+                  value={novaVaga.cargo}
+                  onChange={(e) => setNovaVaga({ ...novaVaga, cargo: e.target.value })}
+                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  placeholder="Descrição do cargo"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-brown-deep mb-2">Link da Vaga</label>
+                <input
+                  type="url"
+                  value={novaVaga.link_vaga}
+                  onChange={(e) => setNovaVaga({ ...novaVaga, link_vaga: e.target.value })}
+                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-brown-deep mb-2">Descrição da Vaga</label>
+                <textarea
+                  value={novaVaga.descricao_vaga}
+                  onChange={(e) => setNovaVaga({ ...novaVaga, descricao_vaga: e.target.value })}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  placeholder="Cole a descrição completa da vaga..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handleAdicionarVaga}
+                  disabled={salvandoNova}
+                  className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
+                >
+                  {salvandoNova ? 'Salvando...' : 'Adicionar Vaga'}
+                </button>
+                <button
+                  onClick={() => setMostraModalNova(false)}
+                  className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </Panel>
+        </div>
+      )}
 
       {modalVaga && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
