@@ -93,6 +93,7 @@ export default function PerfilClient({
     setSalvando(true);
     try {
       const ext = file.name.split('.').pop();
+    if (!perfil) return;
       const path = `${perfil.id}/perfil.${ext}`;
 
       const { error: deleteError } = await supabase.storage
