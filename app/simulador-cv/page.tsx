@@ -26,6 +26,12 @@ export default async function SimuladorCVPage() {
     .order('created_at', { ascending: false })
     .returns<CvSimulacao[]>();
 
+    const { data: vagas } = await supabase
+    .from('vagas_candidatura')
+    .select('*')
+    .eq('mentorado_id', user.id)
+    .order('updated_at', { ascending: false });
+
   const inicioDoMes = new Date();
   inicioDoMes.setDate(1);
   inicioDoMes.setHours(0, 0, 0, 0);
@@ -39,6 +45,8 @@ export default async function SimuladorCVPage() {
       userId={user.id}
       simulacoesIniciais={simulacoes ?? []}
       usadasEsteMes={usadasEsteMes}
+      vagasIniciais={vagas ?? []}
+    
     />
   );
 }
