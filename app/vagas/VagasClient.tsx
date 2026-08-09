@@ -12,6 +12,8 @@ import type { Profile } from '@/lib/types';
 type Tab = 'analise' | 'kanban' | 'ranking';
 
 interface Vaga {
+  origem?: string;
+  contato: string | null;
   id: string;
   empresa: string;
   cargo: string;
