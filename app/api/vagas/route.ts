@@ -4,16 +4,16 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     const { data: vagas, error } = await supabase
       .from('vagas_candidatura')
       .select('*')
-      .eq('mentorado_id', user.user.id)
+      .eq('mentorado_id', user.id)
       .order('updated_at', { ascending: false });
 
     if (error) {
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
@@ -47,12 +47,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('📝 [VAGAS-POST] Inserindo:', { mentorado_id: user.user.id, ...body });
+    console.log('📝 [VAGAS-POST] Inserindo:', { mentorado_id: user.id, ...body });
 
     const { data: vaga, error } = await supabase
       .from('vagas_candidatura')
       .insert({
-        mentorado_id: user.user.id,
+        mentorado_id: user.id,
         empresa: body.empresa,
         cargo: body.cargo,
         descricao_vaga: body.descricao_vaga,

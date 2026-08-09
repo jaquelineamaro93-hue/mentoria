@@ -9,9 +9,9 @@ export async function GET(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
@@ -19,7 +19,7 @@ export async function GET(
       .from('vagas_candidatura')
       .select('*')
       .eq('id', id)
-      .eq('mentorado_id', user.user.id)
+      .eq('mentorado_id', user.id)
       .single();
 
     if (error || !vaga) {
@@ -41,9 +41,9 @@ export async function PATCH(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
@@ -56,7 +56,7 @@ export async function PATCH(
       .eq('id', id)
       .single();
 
-    if (!vaga || vaga.mentorado_id !== user.user.id) {
+    if (!vaga || vaga.mentorado_id !== user.id) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
     }
 
@@ -89,9 +89,9 @@ export async function DELETE(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
@@ -102,7 +102,7 @@ export async function DELETE(
       .eq('id', id)
       .single();
 
-    if (!vaga || vaga.mentorado_id !== user.user.id) {
+    if (!vaga || vaga.mentorado_id !== user.id) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
     }
 
