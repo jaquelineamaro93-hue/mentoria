@@ -25,6 +25,7 @@ interface Props {
   userId: string;
   simulacoesIniciais: CvSimulacao[];
   usadasEsteMes: number;
+  vagasIniciais?: any[];
 }
 
 const LIMITE_GRATIS_MES = 3;
@@ -53,6 +54,17 @@ export default function SimuladorCVClient({
   const [historico, setHistorico] = useState(simulacoesIniciais);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
   const [aba, setAba] = useState<Aba>('compatibilidade');
+  const [vagas, setVagas] = useState(vagasIniciais ?? []);
+
+  async function handleVagaAtualizada() {
+    try {
+      const res = await fetch('/api/vagas');
+      const data = await res.json();
+      setVagas(data.vagas);
+    } catch (erro) {
+      console.error('Erro ao recarregar vagas:', erro);
+    }
+  }
 
   const restantesGratis = Math.max(0, LIMITE_GRATIS_MES - usadas);
 
