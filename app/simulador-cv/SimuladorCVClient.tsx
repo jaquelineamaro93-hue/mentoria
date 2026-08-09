@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
+import KanbanTab from '@/app/vagas/tabs/KanbanTab';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { formatarTituloInsight } from '@/lib/string-utils';
