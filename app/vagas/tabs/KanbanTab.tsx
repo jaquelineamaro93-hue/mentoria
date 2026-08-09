@@ -15,6 +15,7 @@ interface Vaga {
   proximo_passo: string | null;
   observacoes: string | null;
   origem?: string;
+  contato: string | null;
 }
 
 interface Props {
@@ -44,11 +45,15 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
   const [atualizando, setAtualizando] = useState(false);
   const [mostraModalNova, setMostraModalNova] = useState(false);
   const [salvandoNova, setSalvandoNova] = useState(false);
+  const [editandoVaga, setEditandoVaga] = useState(false);
+  const [vagaEditada, setVagaEditada] = useState<Partial<Vaga>>({});
+  const [deletando, setDeletando] = useState(false);
   const [novaVaga, setNovaVaga] = useState({
     empresa: '',
     cargo: '',
     descricao_vaga: '',
     link_vaga: '',
+    contato: '',
   });
 
   async function moveVaga(vaga: Vaga, novaEtapa: string) {
@@ -108,6 +113,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           cargo: novaVaga.cargo,
           descricao_vaga: novaVaga.descricao_vaga,
           link_vaga: novaVaga.link_vaga,
+          contato: novaVaga.contato,
           etapa: 'para_aplicar',
           origem: 'organico',
         }),
@@ -115,7 +121,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
       if (res.ok) {
         setMostraModalNova(false);
-        setNovaVaga({ empresa: '', cargo: '', descricao_vaga: '', link_vaga: '' });
+        setNovaVaga({ empresa: '', cargo: '', descricao_vaga: '', link_vaga: '', contato: '' });
         onVagaAtualizada();
       } else {
         alert('Erro ao adicionar vaga');
@@ -125,6 +131,57 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       alert('Erro ao adicionar vaga');
     } finally {
       setSalvandoNova(false);
+    }
+  }
+
+  async function handleSalvarEdicao() {
+    if (!modalVaga) return;
+
+    setAtualizando(true);
+    try {
+      const res = await fetch(`/api/vagas/${modalVaga.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vagaEditada),
+      });
+
+      if (res.ok) {
+        setEditandoVaga(false);
+        setVagaEditada({});
+        onVagaAtualizada();
+        setModalVaga(null);
+      } else {
+        alert('Erro ao salvar vaga');
+      }
+    } catch (erro) {
+      console.error('Erro ao salvar vaga:', erro);
+      alert('Erro ao salvar vaga');
+    } finally {
+      setAtualizando(false);
+    }
+  }
+
+  async function handleDeletarVaga() {
+    if (!modalVaga) return;
+    if (!confirm('Tem certeza que deseja deletar esta vaga?')) return;
+
+    setDeletando(true);
+    try {
+      const res = await fetch(`/api/vagas/${modalVaga.id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setModalVaga(null);
+        onVagaAtualizada();
+      } else {
+        alert('Erro ao deletar vaga');
+      }
+    } catch (erro) {
+      console.error('Erro ao deletar vaga:', erro);
+      alert('Erro ao deletar vaga');
+    } finally {
+      setDeletando(false);
     }
   }
 
@@ -215,6 +272,10 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                           </div>
                         )}
 
+                        {vaga.contato && (
+                          <p className="text-xs text-ink-soft mt-2 truncate">📱 {vaga.contato}</p>
+                        )}
+
                         {vaga.descricao_vaga && (
                           <p className="text-xs text-ink-soft mt-2 line-clamp-2">
                             {vaga.descricao_vaga}
@@ -301,6 +362,17 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-brown-deep mb-2">Contato</label>
+                <input
+                  type="text"
+                  value={novaVaga.contato}
+                  onChange={(e) => setNovaVaga({ ...novaVaga, contato: e.target.value })}
+                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  placeholder="Email, telefone ou nome do contato"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-brown-deep mb-2">Descrição da Vaga</label>
                 <textarea
                   value={novaVaga.descricao_vaga}
@@ -336,11 +408,36 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           <Panel className="max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-line">
             <div className="sticky top-0 bg-paper border-b border-line p-6 flex items-start justify-between">
               <div>
-                <h2 className="font-display text-2xl text-brown-deep">{modalVaga.cargo}</h2>
-                <p className="text-ink-soft text-sm mt-1">{modalVaga.empresa}</p>
+                {editandoVaga ? (
+                  <input
+                    type="text"
+                    value={vagaEditada.cargo ?? modalVaga.cargo}
+                    onChange={(e) => setVagaEditada({ ...vagaEditada, cargo: e.target.value })}
+                    className="text-2xl font-display text-brown-deep w-full mb-2 px-3 py-2 border border-line rounded-lg"
+                  />
+                ) : (
+                  <h2 className="font-display text-2xl text-brown-deep">{modalVaga.cargo}</h2>
+                )}
+                {editandoVaga ? (
+                  <input
+                    type="text"
+                    value={vagaEditada.empresa ?? modalVaga.empresa}
+                    onChange={(e) => setVagaEditada({ ...vagaEditada, empresa: e.target.value })}
+                    className="text-sm text-ink-soft w-full px-3 py-2 border border-line rounded-lg mt-2"
+                  />
+                ) : (
+                  <p className="text-ink-soft text-sm mt-1">{modalVaga.empresa}</p>
+                )}
               </div>
               <button
-                onClick={() => setModalVaga(null)}
+                onClick={() => {
+                  if (editandoVaga) {
+                    setEditandoVaga(false);
+                    setVagaEditada({});
+                  } else {
+                    setModalVaga(null);
+                  }
+                }}
                 className="text-ink-faint hover:text-ink transition"
               >
                 <X className="w-6 h-6" />
@@ -355,41 +452,145 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </Panel>
               )}
 
-              {modalVaga.descricao_vaga && (
-                <div>
-                  <h3 className="font-medium text-brown-deep mb-2">Descrição da Vaga</h3>
-                  <p className="text-ink whitespace-pre-wrap text-sm leading-relaxed">
-                    {modalVaga.descricao_vaga}
-                  </p>
-                </div>
-              )}
+              {editandoVaga ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-brown-deep mb-2">Descrição da Vaga</label>
+                    <textarea
+                      value={vagaEditada.descricao_vaga ?? modalVaga.descricao_vaga ?? ''}
+                      onChange={(e) => setVagaEditada({ ...vagaEditada, descricao_vaga: e.target.value })}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    />
+                  </div>
 
-              {modalVaga.link_vaga && (
-                <div>
-                  <h3 className="font-medium text-brown-deep mb-2">Link da Vaga</h3>
-                  <a
-                    href={modalVaga.link_vaga}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sky-deep hover:text-sky-deep/80 underline break-all text-sm"
-                  >
-                    {modalVaga.link_vaga}
-                  </a>
-                </div>
-              )}
+                  <div>
+                    <label className="block text-sm font-medium text-brown-deep mb-2">Link da Vaga</label>
+                    <input
+                      type="url"
+                      value={vagaEditada.link_vaga ?? modalVaga.link_vaga ?? ''}
+                      onChange={(e) => setVagaEditada({ ...vagaEditada, link_vaga: e.target.value })}
+                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    />
+                  </div>
 
-              {modalVaga.proximo_passo && (
-                <div>
-                  <h3 className="font-medium text-brown-deep mb-2">Próximo Passo</h3>
-                  <p className="text-ink text-sm">{modalVaga.proximo_passo}</p>
-                </div>
-              )}
+                  <div>
+                    <label className="block text-sm font-medium text-brown-deep mb-2">Contato</label>
+                    <input
+                      type="text"
+                      value={vagaEditada.contato ?? modalVaga.contato ?? ''}
+                      onChange={(e) => setVagaEditada({ ...vagaEditada, contato: e.target.value })}
+                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    />
+                  </div>
 
-              {modalVaga.observacoes && (
-                <div>
-                  <h3 className="font-medium text-brown-deep mb-2">Observações</h3>
-                  <p className="text-ink text-sm">{modalVaga.observacoes}</p>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-brown-deep mb-2">Próximo Passo</label>
+                    <input
+                      type="text"
+                      value={vagaEditada.proximo_passo ?? modalVaga.proximo_passo ?? ''}
+                      onChange={(e) => setVagaEditada({ ...vagaEditada, proximo_passo: e.target.value })}
+                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-brown-deep mb-2">Observações</label>
+                    <textarea
+                      value={vagaEditada.observacoes ?? modalVaga.observacoes ?? ''}
+                      onChange={(e) => setVagaEditada({ ...vagaEditada, observacoes: e.target.value })}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleSalvarEdicao}
+                      disabled={atualizando}
+                      className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
+                    >
+                      {atualizando ? 'Salvando...' : 'Salvar Alterações'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditandoVaga(false);
+                        setVagaEditada({});
+                      }}
+                      className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleDeletarVaga}
+                      disabled={deletando}
+                      className="flex-1 border border-red-500 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      {deletando ? 'Deletando...' : 'Deletar'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {modalVaga.descricao_vaga && (
+                    <div>
+                      <h3 className="font-medium text-brown-deep mb-2">Descrição da Vaga</h3>
+                      <p className="text-ink whitespace-pre-wrap text-sm leading-relaxed">
+                        {modalVaga.descricao_vaga}
+                      </p>
+                    </div>
+                  )}
+
+                  {modalVaga.link_vaga && (
+                    <div>
+                      <h3 className="font-medium text-brown-deep mb-2">Link da Vaga</h3>
+                      <a
+                        href={modalVaga.link_vaga}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sky-deep hover:text-sky-deep/80 underline break-all text-sm"
+                      >
+                        {modalVaga.link_vaga}
+                      </a>
+                    </div>
+                  )}
+
+                  {modalVaga.contato && (
+                    <div>
+                      <h3 className="font-medium text-brown-deep mb-2">Contato</h3>
+                      <p className="text-ink text-sm">{modalVaga.contato}</p>
+                    </div>
+                  )}
+
+                  {modalVaga.proximo_passo && (
+                    <div>
+                      <h3 className="font-medium text-brown-deep mb-2">Próximo Passo</h3>
+                      <p className="text-ink text-sm">{modalVaga.proximo_passo}</p>
+                    </div>
+                  )}
+
+                  {modalVaga.observacoes && (
+                    <div>
+                      <h3 className="font-medium text-brown-deep mb-2">Observações</h3>
+                      <p className="text-ink text-sm">{modalVaga.observacoes}</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setEditandoVaga(true)}
+                      className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => setModalVaga(null)}
+                      className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </Panel>
