@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { GripVertical, X, Zap, Plus } from 'lucide-react';
+import { GripVertical, X, Zap, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 
 interface Vaga {
@@ -14,6 +14,7 @@ interface Vaga {
   link_vaga: string | null;
   proximo_passo: string | null;
   observacoes: string | null;
+  origem?: string;
 }
 
 interface Props {
@@ -31,6 +32,11 @@ const ETAPAS = [
   { id: 'oferta', label: 'Oferta', bg: 'bg-sky-tint', border: 'border-sky-deep' },
   { id: 'lost', label: 'Lost', bg: 'bg-cream', border: 'border-line' },
 ];
+
+const ORIGEM_COLORS: Record<string, string> = {
+  'organico': 'bg-green-100 text-green-800',
+  'indicacao': 'bg-purple-100 text-purple-800',
+};
 
 export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
   const [draggedVaga, setDraggedVaga] = useState<Vaga | null>(null);
@@ -77,6 +83,15 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
     }
   }
 
+  function moveToColumn(vaga: Vaga, direction: 'prev' | 'next') {
+    const currentIndex = ETAPAS.findIndex((e) => e.id === vaga.etapa);
+    if (direction === 'prev' && currentIndex > 0) {
+      moveVaga(vaga, ETAPAS[currentIndex - 1].id);
+    } else if (direction === 'next' && currentIndex < ETAPAS.length - 1) {
+      moveVaga(vaga, ETAPAS[currentIndex + 1].id);
+    }
+  }
+
   async function handleAdicionarVaga() {
     if (!novaVaga.empresa.trim() || !novaVaga.cargo.trim()) {
       alert('Empresa e cargo são obrigatórios');
@@ -94,6 +109,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           descricao_vaga: novaVaga.descricao_vaga,
           link_vaga: novaVaga.link_vaga,
           etapa: 'para_aplicar',
+          origem: 'organico',
         }),
       });
 
@@ -111,6 +127,14 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       setSalvandoNova(false);
     }
   }
+
+  const getFitColor = (score: number | null) => {
+    if (!score) return 'bg-gray-100 text-gray-800';
+    if (score >= 85) return 'bg-green-100 text-green-800';
+    if (score >= 70) return 'bg-yellow-100 text-yellow-800';
+    if (score >= 55) return 'bg-orange-100 text-orange-800';
+    return 'bg-red-100 text-red-800';
+  };
 
   return (
     <div>
@@ -133,13 +157,13 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
       <div className="overflow-x-auto pb-4 border border-line rounded-lg bg-paper">
         <div className="flex gap-4 p-4 min-w-max">
-          {ETAPAS.map((etapa) => {
+          {ETAPAS.map((etapa, etapaIndex) => {
             const vagasEtapa = vagas.filter((v) => v.etapa === etapa.id);
 
             return (
               <div
                 key={etapa.id}
-                className={`flex-shrink-0 w-72 ${etapa.bg} rounded-xl p-4 border-2 ${etapa.border}`}
+                className={`flex-shrink-0 w-80 ${etapa.bg} rounded-xl p-4 border-2 ${etapa.border}`}
               >
                 <div className="mb-4">
                   <h3 className="font-medium text-brown-deep">{etapa.label}</h3>
@@ -162,22 +186,62 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                         draggable
                         onDragStart={() => setDraggedVaga(vaga)}
                         onDragEnd={() => setDraggedVaga(null)}
-                        onClick={() => setModalVaga(vaga)}
                         className="bg-paper p-3 rounded-lg border border-line cursor-move hover:shadow-md hover:border-sky transition group"
                       >
-                        <div className="flex items-start gap-2">
-                          <GripVertical className="w-4 h-4 text-ink-faint mt-0.5 flex-shrink-0 opacity-40" />
+                        <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-ink truncate text-sm">
                               {vaga.cargo}
                             </p>
                             <p className="text-xs text-ink-soft truncate">{vaga.empresa}</p>
-                            {vaga.fit_score !== null && (
-                              <div className="mt-2 inline-block bg-sky-tint border border-sky text-sky-deep px-2 py-1 rounded-full text-xs font-bold">
-                                {vaga.fit_score}% fit
-                              </div>
-                            )}
                           </div>
+                          <button
+                            onClick={() => setModalVaga(vaga)}
+                            className="text-ink-faint hover:text-ink text-xs shrink-0"
+                          >
+                            ✎
+                          </button>
+                        </div>
+
+                        {vaga.fit_score !== null && (
+                          <div className={`inline-block ${getFitColor(vaga.fit_score)} px-2 py-1 rounded-full text-xs font-bold mb-2`}>
+                            {vaga.fit_score}% fit
+                          </div>
+                        )}
+
+                        {vaga.origem && (
+                          <div className={`inline-block ml-2 ${ORIGEM_COLORS[vaga.origem] || 'bg-gray-100 text-gray-800'} px-2 py-1 rounded-full text-xs font-semibold`}>
+                            {vaga.origem === 'organico' ? 'Orgânico' : 'Indicação'}
+                          </div>
+                        )}
+
+                        {vaga.descricao_vaga && (
+                          <p className="text-xs text-ink-soft mt-2 line-clamp-2">
+                            {vaga.descricao_vaga}
+                          </p>
+                        )}
+
+                        <div className="flex gap-1 mt-3 justify-center">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveToColumn(vaga, 'prev');
+                            }}
+                            disabled={etapaIndex === 0 || atualizando}
+                            className="p-1 hover:bg-sky hover:bg-opacity-20 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <ChevronLeft size={16} className="text-sky-deep" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveToColumn(vaga, 'next');
+                            }}
+                            disabled={etapaIndex === ETAPAS.length - 1 || atualizando}
+                            className="p-1 hover:bg-sky hover:bg-opacity-20 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <ChevronRight size={16} className="text-sky-deep" />
+                          </button>
                         </div>
                       </div>
                     ))
