@@ -28,7 +28,7 @@ interface Props {
 
 const LIMITE_GRATIS_MES = 3;
 
-type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista';
+type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista' | 'minhas-vagas';
 
 export default function SimuladorCVClient({
   profile,
@@ -271,6 +271,7 @@ export default function SimuladorCVClient({
                   ['curriculo', 'Currículo'],
                   ['palavras', 'Palavras-chave'],
                   ['entrevista', 'Entrevista'],
+                  ['minhas-vagas', 'Minhas Vagas'],
                 ] as [Aba, string][]
               ).map(([valor, label]) => (
                 <button
@@ -413,6 +414,17 @@ export default function SimuladorCVClient({
                       <p className="text-sm text-ink leading-relaxed">{p}</p>
                     </div>
                   ))}
+                </div>
+              </Panel>
+            )}            )}
+
+            {aba === 'minhas-vagas' && (
+              <Panel className="p-6">
+                <p className="text-sm text-ink-faint mb-4">
+                  Acompanhe suas candidaturas
+                </p>
+                <div className="text-center py-8">
+                  <p className="text-ink-faint">Kanban de vagas em desenvolvimento</p>
                 </div>
               </Panel>
             )}
