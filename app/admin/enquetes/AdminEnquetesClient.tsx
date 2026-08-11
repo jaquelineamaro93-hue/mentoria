@@ -17,6 +17,13 @@ interface Enquete {
   ativo: boolean;
   horario: string | null;
   local: string | null;
+  permitir_multiplas?: boolean;
+}
+
+interface OpcaoEnquete {
+  id?: string;
+  texto: string;
+  ordem: number;
 }
 
 export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { enquetes: Enquete[] }) {
@@ -37,10 +44,12 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
     ativo: true,
     horario: '',
     local: '',
+    permitir_multiplas: false,
   });
+  const [opcoes, setOpcoes] = useState<OpcaoEnquete[]>([]);
 
   function iniciarNova() {
-    setEditando({ id: '', titulo: '', descricao: null, data_inicio: '', data_fim: '', tipo: 'presencial', ativo: true, horario: null, local: null });
+    setEditando({ id: '', titulo: '', descricao: null, data_inicio: '', data_fim: '', tipo: 'presencial', ativo: true, horario: null, local: null, permitir_multiplas: false });
     setForm({
       titulo: '',
       descricao: '',
@@ -50,11 +59,13 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
       ativo: true,
       horario: '',
       local: '',
+      permitir_multiplas: false,
     });
+    setOpcoes([{ texto: '', ordem: 0 }]);
     setErro(null);
   }
 
-  function iniciarEdicao(enquete: Enquete) {
+  async function iniciarEdicao(enquete: Enquete) {
     setEditando(enquete);
     setForm({
       titulo: enquete.titulo,
@@ -65,8 +76,28 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
       ativo: enquete.ativo,
       horario: enquete.horario || '',
       local: enquete.local || '',
+      permitir_multiplas: enquete.permitir_multiplas || false,
     });
+    try {
+      const { data } = await supabase.from('enquete_opcoes').select('*').eq('enquete_id', enquete.id).order('ordem');
+      if (data) setOpcoes(data);
+      else setOpcoes([{ texto: '', ordem: 0 }]);
+    } catch {
+      setOpcoes([{ texto: '', ordem: 0 }]);
+    }
     setErro(null);
+  }
+
+  function adicionarOpcao() {
+    setOpcoes((prev) => [...prev, { texto: '', ordem: prev.length }]);
+  }
+
+  function removerOpcao(index: number) {
+    setOpcoes((prev) => prev.filter((_, i) => i !== index).map((op, i) => ({ ...op, ordem: i })));
+  }
+
+  function atualizarOpcao(index: number, texto: string) {
+    setOpcoes((prev) => prev.map((op, i) => (i === index ? { ...op, texto } : op)));
   }
 
   async function handleSalvar() {
@@ -76,6 +107,10 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
     }
     if (!form.data_inicio || !form.data_fim) {
       setErro('Datas são obrigatórias');
+      return;
+    }
+    if (opcoes.filter((op) => op.texto.trim()).length === 0) {
+      setErro('Adicione pelo menos uma opção');
       return;
     }
     setSalvando(true);
@@ -90,18 +125,30 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
         ativo: form.ativo !== false,
         horario: form.horario || null,
         local: form.local || null,
+        permitir_multiplas: form.permitir_multiplas || false,
       };
+      let enqueteId = editando?.id || '';
       if (editando) {
         const { error } = await supabase.from('enquetes').update(payload).eq('id', editando.id);
         if (error) throw error;
+        await supabase.from('enquete_opcoes').delete().eq('enquete_id', editando.id);
         setEnquetes((prev) => prev.map((e) => (e.id === editando.id ? { ...e, ...payload } : e)));
       } else {
         const { data, error } = await supabase.from('enquetes').insert([payload]).select().single();
         if (error) throw error;
-        if (data) setEnquetes((prev) => [data, ...prev]);
+        if (data) {
+          enqueteId = data.id;
+          setEnquetes((prev) => [data, ...prev]);
+        }
       }
-      setEditando({ id: '', titulo: '', descricao: null, data_inicio: '', data_fim: '', tipo: 'presencial', ativo: true, horario: null, local: null });
+      const opcoesPayload = opcoes.filter((op) => op.texto.trim()).map((op, i) => ({ enquete_id: enqueteId, texto: op.texto, ordem: i }));
+      if (opcoesPayload.length > 0) {
+        const { error } = await supabase.from('enquete_opcoes').insert(opcoesPayload);
+        if (error) throw error;
+      }
+      setEditando(null);
       setForm({});
+      setOpcoes([]);
       setErro(null);
     } catch (err) {
       setErro(err instanceof Error ? err.message : 'Erro ao salvar');
@@ -162,12 +209,19 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
                 <label className="block text-xs font-medium text-brown-deep mb-2">Descrição</label>
                 <textarea value={form.descricao || ''} onChange={(e) => setForm({ ...form, descricao: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" rows={3} placeholder="ex: Vote no sábado que funciona melhor para você" />
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-brown-deep mb-2">Tipo *</label>
                   <select value={form.tipo || 'presencial'} onChange={(e) => setForm({ ...form, tipo: e.target.value as 'online' | 'presencial' })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep">
                     <option value="presencial">Presencial</option>
                     <option value="online">Online</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-brown-deep mb-2">Escolhas</label>
+                  <select value={form.permitir_multiplas ? 'multipla' : 'unica'} onChange={(e) => setForm({ ...form, permitir_multiplas: e.target.value === 'multipla' })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep">
+                    <option value="unica">Escolha única</option>
+                    <option value="multipla">Múltiplas escolhas</option>
                   </select>
                 </div>
                 <div>
@@ -200,6 +254,25 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
                   </div>
                 </div>
               )}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-xs font-medium text-brown-deep">Alternativas *</label>
+                  <button onClick={adicionarOpcao} type="button" className="flex items-center gap-1 text-xs font-medium text-sky-deep hover:text-sky-dark">
+                    <Plus size={14} />
+                    Adicionar
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {opcoes.map((opcao, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input type="text" value={opcao.texto} onChange={(e) => atualizarOpcao(i, e.target.value)} className="flex-1 px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" placeholder={`Alternativa ${i + 1}`} />
+                      <button onClick={() => removerOpcao(i)} type="button" className="text-ink-faint hover:text-red-600 transition p-2">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="flex gap-3">
               <button onClick={handleSalvar} disabled={salvando} className="bg-brown-deep hover:bg-brown text-white font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-60">
@@ -228,12 +301,15 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
               enquetes.map((enquete) => (
                 <Panel key={enquete.id} className={`p-5 flex items-start justify-between gap-4 ${!enquete.ativo ? 'opacity-60' : ''}`}>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="font-medium text-brown-deep">{enquete.titulo}</h3>
                       <span className={`text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide ${enquete.ativo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                         {enquete.ativo ? 'Ativo' : 'Inativo'}
                       </span>
                       <span className="text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide bg-sky-tint text-brown-deep">{enquete.tipo}</span>
+                      <span className="text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide bg-purple-100 text-purple-700">
+                        {enquete.permitir_multiplas ? 'Múltipla' : 'Única'}
+                      </span>
                     </div>
                     {enquete.descricao && <p className="text-sm text-ink-soft mb-2">{enquete.descricao}</p>}
                     <div className="text-xs text-ink-faint space-y-1">
