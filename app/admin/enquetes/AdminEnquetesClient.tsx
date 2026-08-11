@@ -102,7 +102,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
       setEditando(null);
       setForm({});
       setErro(null);
-    } catch (err) {
+          prev.map((e) => (e.id === editando.id ? { ...e, ...payload } as Enquete : e))
       setErro(err instanceof Error ? err.message : 'Erro ao salvar');
     } finally {
       setSalvando(false);
