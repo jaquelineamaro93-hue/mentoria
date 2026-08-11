@@ -9,6 +9,7 @@ export interface Profile {
   tipo_pacote: TipoPacote;
   foto_url: string | null;
   onboarding_concluido: boolean;
+  tour_concluido: boolean;
   pontos_total: number;
   is_admin: boolean;
   last_login_at: string | null;

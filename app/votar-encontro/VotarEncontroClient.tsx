@@ -14,12 +14,17 @@ const DATAS_ENCONTROS = [
   { id: '05-09', label: 'Sábado, 5 de setembro', data: '2026-09-05' },
 ];
 
+// Datas dos encontros online. Enquanto estiver vazio, a aba mostra um aviso
+// em vez de um formulário de votação sem opções.
+const DATAS_ONLINE: { id: string; label: string; data: string }[] = [];
+
 const HORARIO = '11:30 às 17h';
 const LOCAL = 'Pinheiros, São Paulo';
 
 interface VotoEncontro {
   id: string;
   user_id: string;
+  tipo: 'online' | 'presencial';
   data_escolhida: string;
   nome_mentorado: string;
   created_at: string;
@@ -37,9 +42,13 @@ export default function VotarEncontroClient({
   const [enviado, setEnviado] = useState(false);
   const [votos, setVotos] = useState<VotoEncontro[]>([]);
   const [jaSeuVoto, setJaSeuVoto] = useState(false);
-  const [aba, setAba] = useState<'online' | 'presencial'>('presencial');
-
   const ehPresencial = profile?.tipo_pacote === 'presencial';
+  const [aba, setAba] = useState<'online' | 'presencial'>(
+    ehPresencial ? 'presencial' : 'online'
+  );
+
+  const datasDaAba = aba === 'presencial' ? DATAS_ENCONTROS : DATAS_ONLINE;
+  const votosDaAba = votos.filter((v) => v.tipo === aba);
 
   useEffect(() => {
     carregarVotos();
@@ -54,14 +63,17 @@ export default function VotarEncontroClient({
       .order('created_at', { ascending: false });
 
     if (data) {
-      setVotos(data);
-      const meuVoto = data.find((v) => v.user_id === profile.id);
-      if (meuVoto) {
-        setJaSeuVoto(true);
-        setVoto(meuVoto.data_escolhida);
-      }
+      setVotos(data as VotoEncontro[]);
     }
   }
+
+  // O voto é por tipo de encontro: votar no presencial não bloqueia o online.
+  useEffect(() => {
+    const meuVoto = votos.find((v) => v.user_id === profile?.id && v.tipo === aba);
+    setJaSeuVoto(Boolean(meuVoto));
+    setVoto(meuVoto?.data_escolhida ?? null);
+    setEnviado(false);
+  }, [aba, votos, profile?.id]);
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -77,12 +89,15 @@ export default function VotarEncontroClient({
     try {
       const { error } = await supabase.from('votos_encontro').insert({
         user_id: profile?.id,
+        tipo: aba,
         data_escolhida: voto,
         nome_mentorado: profile?.nome || 'Mentorado',
       });
 
-      if (!error) {
-        posthog.capture('voto_encontro_enviado', { data: voto });
+      if (error) {
+        alert(`Não consegui registrar seu voto: ${error.message}`);
+      } else {
+        posthog.capture('voto_encontro_enviado', { data: voto, tipo: aba });
         setEnviado(true);
         await carregarVotos();
       }
@@ -101,7 +116,7 @@ export default function VotarEncontroClient({
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
             <h1 className="font-display text-2xl text-brown-deep mb-2">Seu voto foi registrado!</h1>
             <p className="text-sm text-ink-faint mb-8">
-              Você escolheu o sábado {DATAS_ENCONTROS.find((d) => d.id === voto)?.label?.split(',')[1]}.
+              Você escolheu {datasDaAba.find((d) => d.id === voto)?.label}.
             </p>
             <p className="text-sm text-ink-faint">
               Acompanhe aqui quem mais já votou e qual data está vencendo. 💪
@@ -112,9 +127,9 @@ export default function VotarEncontroClient({
     );
   }
 
-  const contagemVotos = DATAS_ENCONTROS.map((data) => ({
+  const contagemVotos = datasDaAba.map((data) => ({
     ...data,
-    count: votos.filter((v) => v.data_escolhida === data.id).length,
+    count: votosDaAba.filter((v) => v.data_escolhida === data.id).length,
   }));
 
   return (
@@ -125,7 +140,9 @@ export default function VotarEncontroClient({
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Participação</p>
         <h1 className="font-display text-3xl text-brown-deep mb-1">Qual é o melhor dia?</h1>
         <p className="text-sm text-ink-faint max-w-xl mb-8">
-          Vote no sábado que funciona melhor para você. Encontro em {LOCAL}, das {HORARIO}.
+          {aba === 'presencial'
+            ? `Vote na data que funciona melhor para você. Encontro em ${LOCAL}, das ${HORARIO}.`
+            : 'Vote na data que funciona melhor para você no próximo encontro online.'}
         </p>
 
         <div className="flex gap-4 mb-8 border-b border-line">
@@ -151,13 +168,16 @@ export default function VotarEncontroClient({
           </button>
         </div>
 
-        {aba === 'online' && (
-          <div className="bg-paper border border-line rounded-2xl p-6 mb-8">
-            <h2 className="font-display text-lg text-brown-deep mb-2">Encontros online</h2>
-            <p className="text-sm text-ink-soft">
-              Os encontros online são marcados direto pela mentora e avisados no seu Início.
-              Não há votação de data aqui por enquanto.
-            </p>
+        {aba === 'online' && DATAS_ONLINE.length === 0 && (
+          <div className="bg-sky-tint border border-sky rounded-2xl p-6 mb-8 flex gap-3">
+            <AlertCircle size={18} className="text-sky-deep flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-sky-deep">
+              <p className="font-medium mb-1">Votação ainda não aberta</p>
+              <p>
+                As datas dos próximos encontros online ainda não foram definidas. Assim que
+                abrirem, elas aparecem aqui e você recebe um aviso por e-mail.
+              </p>
+            </div>
           </div>
         )}
 
@@ -165,29 +185,29 @@ export default function VotarEncontroClient({
           <div className="bg-sky-tint border border-sky rounded-2xl p-6 mb-8 flex gap-3">
             <AlertCircle size={18} className="text-sky-deep flex-shrink-0 mt-0.5" />
             <div className="text-sm text-sky-deep">
-              <p className="font-medium mb-1">Esta votação é do plano presencial</p>
+              <p className="font-medium mb-1">Votação exclusiva do Plano Presencial</p>
               <p>
-                Seu plano é o online, então você não precisa votar nesta data — e também não vai
-                receber os e-mails de lembrete do encontro presencial. Se quiser migrar de plano,
-                fale com a mentora.
+                Esta votação é exclusiva para membros do Plano Presencial SOMA. Caso deseje fazer
+                um upgrade de plano, entre em contato com a equipe.
               </p>
             </div>
           </div>
         )}
 
-        {aba === 'presencial' && ehPresencial && (
+        {((aba === 'presencial' && ehPresencial) || aba === 'online') &&
+          datasDaAba.length > 0 && (
           <>
         {jaSeuVoto && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-8">
-            <p className="text-sm text-green-900">
-              ✅ Você já votou no sábado {DATAS_ENCONTROS.find((d) => d.id === voto)?.label}
+          <div className="bg-sky-tint border border-sky rounded-2xl p-5 mb-8">
+            <p className="text-sm text-sky-deep">
+              Você já votou em {datasDaAba.find((d) => d.id === voto)?.label}
             </p>
           </div>
         )}
 
         <h2 className="font-display text-lg text-brown-deep mb-4">Escolha seu dia</h2>
         <div className="space-y-3 mb-8">
-          {DATAS_ENCONTROS.map((data) => {
+          {datasDaAba.map((data) => {
             const count = contagemVotos.find((c) => c.id === data.id)?.count || 0;
             return (
               <label
@@ -205,7 +225,9 @@ export default function VotarEncontroClient({
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-brown-deep">{data.label}</p>
-                  <p className="text-xs text-ink-faint">{HORARIO}</p>
+                  {aba === 'presencial' && (
+                    <p className="text-xs text-ink-faint">{HORARIO}</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-1 bg-sky-deep/10 px-2.5 py-1 rounded-full">
                   <Users size={13} className="text-sky-deep" />
@@ -226,19 +248,19 @@ export default function VotarEncontroClient({
           </button>
         )}
 
-        {votos.length > 0 && (
+        {votosDaAba.length > 0 && (
           <>
             <h3 className="font-display text-sm text-brown-deep mt-8 mb-4">Quem já votou</h3>
             <div className="bg-white border border-line rounded-xl p-4 max-h-64 overflow-y-auto">
               <div className="space-y-2">
-                {votos.map((v) => (
+                {votosDaAba.map((v) => (
                   <div
                     key={v.id}
                     className="flex items-center justify-between text-sm py-2 border-b border-line last:border-b-0"
                   >
                     <span className="text-brown-deep font-medium">{v.nome_mentorado}</span>
                     <span className="text-xs text-ink-faint">
-                      {DATAS_ENCONTROS.find((d) => d.id === v.data_escolhida)?.label?.split(',')[1]}
+                      {datasDaAba.find((d) => d.id === v.data_escolhida)?.label}
                     </span>
                   </div>
                 ))}

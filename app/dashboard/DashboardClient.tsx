@@ -19,6 +19,7 @@ import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Announcement, Profile } from '@/lib/types';
+import TourPortal from '@/components/TourPortal';
 
 interface Props {
   profile: Profile | null;
@@ -43,6 +44,9 @@ export default function DashboardClient({ profile, announcements }: Props) {
 
   return (
     <div className="flex flex-row w-full h-screen">
+      {profile && !profile.tour_concluido && (
+        <TourPortal userId={profile.id} aberturaAutomatica />
+      )}
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">

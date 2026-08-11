@@ -156,7 +156,12 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
 
   // Votação de encontro presencial pendente: manda uma vez para quem ainda
   // não votou (sem cooldown de repetição, já que é uma janela curta e única).
-  const { data: quemJaVotou } = await supabase.from('votos_encontro').select('user_id');
+  // Só conta voto do encontro presencial: quem votou no online continua
+  // recebendo o convite do presencial, e vice-versa.
+  const { data: quemJaVotou } = await supabase
+    .from('votos_encontro')
+    .select('user_id')
+    .eq('tipo', 'presencial');
   const idsJaVotaram = new Set((quemJaVotou ?? []).map((v) => v.user_id));
 
   for (const perfil of perfis ?? []) {

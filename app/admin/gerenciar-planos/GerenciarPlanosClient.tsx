@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import type { Profile, PlanoMentoria, TipoPacote } from '@/lib/types';
@@ -163,6 +164,13 @@ export default function GerenciarPlanosClient({
 
   return (
     <main className="px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
+      <Link
+        href="/admin"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-brown-deep transition mb-4"
+      >
+        <ArrowLeft size={16} />
+        Voltar
+      </Link>
       <div className="flex items-start justify-between gap-4 mb-1">
         <h1 className="font-display text-3xl text-brown-deep">Gerenciar Planos e Pagamentos</h1>
         <button

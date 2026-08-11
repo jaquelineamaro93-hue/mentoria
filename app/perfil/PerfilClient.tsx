@@ -4,8 +4,9 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Sidebar from '@/components/Sidebar';
-import { Eye, EyeOff, Upload, LogOut } from 'lucide-react';
+import { Eye, EyeOff, Upload, LogOut, Compass } from 'lucide-react';
 import type { Profile, PlanoMentoria } from '@/lib/types';
+import TourPortal from '@/components/TourPortal';
 
 export default function PerfilClient({
   perfil,
@@ -24,6 +25,7 @@ export default function PerfilClient({
   const [mostraSenha, setMostraSenha] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const [verTour, setVerTour] = useState(false);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -125,7 +127,27 @@ export default function PerfilClient({
       <Sidebar profile={perfil} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-        <h1 className="font-display text-3xl text-brown-deep mb-8">Meu Perfil</h1>
+        <div className="flex items-start justify-between gap-4 mb-8">
+          <h1 className="font-display text-3xl text-brown-deep">Meu Perfil</h1>
+          {perfil && (
+            <button
+              onClick={() => setVerTour(true)}
+              className="flex items-center gap-1.5 text-sm font-medium text-brown-deep bg-sky-tint border border-sky rounded-lg px-3 py-2 hover:bg-sky-tint/70 transition shrink-0"
+            >
+              <Compass size={15} />
+              Rever tour do portal
+            </button>
+          )}
+        </div>
+
+        {perfil && verTour && (
+          <TourPortal
+            userId={perfil.id}
+            aberturaAutomatica={false}
+            aberto={verTour}
+            onFechar={() => setVerTour(false)}
+          />
+        )}
 
         {mensagem && (
           <div className={`mb-6 p-4 rounded-lg ${mensagem.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
