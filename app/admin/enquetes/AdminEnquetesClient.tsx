@@ -1,9 +1,4 @@
-git add app/admin/enquetes/AdminEnquetesClient.tsx
-git commit -m "Add enquete opções support with alternatives management"
-git push origin main
-git add app/admin/enquetes/AdminEnquetesClient.tsx
-git commit --amend -m "Add enquete opções support with alternatives management"
-git push origin main --force'use client';
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
