@@ -17,10 +17,10 @@ export default async function NetworkPage() {
   try {
     const { data } = await supabase
       .from('profiles')
-      .select('nome, tipo_pacote, is_admin')
+      .select('*')
       .eq('id', user.id)
       .single();
-    profile = data;
+    profile = data as Profile;
   } catch (error) {
     console.error('Erro ao carregar profile:', error);
   }
