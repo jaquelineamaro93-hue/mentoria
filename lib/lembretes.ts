@@ -36,7 +36,7 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
 
   const { data: perfis } = await supabase
     .from('profiles')
-    .select('id, nome, email, last_login_at, onboarding_concluido')
+    .select('id, nome, email, last_login_at, onboarding_concluido, tipo_pacote, status_assinatura')
     .eq('is_admin', false);
 
   for (const perfil of perfis ?? []) {
@@ -160,6 +160,9 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
   const idsJaVotaram = new Set((quemJaVotou ?? []).map((v) => v.user_id));
 
   for (const perfil of perfis ?? []) {
+    // O encontro é presencial: só alunos ativos desse plano recebem o convite.
+    if (perfil.tipo_pacote !== 'presencial') continue;
+    if (perfil.status_assinatura !== 'ativo') continue;
     if (idsJaVotaram.has(perfil.id)) continue;
 
     const { data: jaEnviadoVotacao } = await supabase

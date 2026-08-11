@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, BookOpen, Briefcase, AlertCircle, Copy, CheckCircle2, Download } from 'lucide-react';
+import { Sparkles, BookOpen, Briefcase, AlertCircle, Copy, CheckCircle2, Download, ChevronDown, ChevronUp, Trash2, Target, MessageSquare, Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import Sidebar from '@/components/Sidebar';
 import { createClient } from '@/lib/supabase/client';
@@ -23,6 +23,13 @@ interface SOARExperiencia {
   forca: number;
 }
 
+interface AnaliseSalva {
+  id: string;
+  titulo: string;
+  created_at: string;
+  analise: AnaliseSoar;
+}
+
 interface AnaliseSoar {
   experiencias: SOARExperiencia[];
   mapaCompetencias: Record<string, string>;
@@ -31,6 +38,27 @@ interface AnaliseSoar {
   resposta_por_que_sair: string;
   resposta_por_que_vaga: string;
   tratamento_gaps: string;
+}
+
+/**
+ * Renderiza o texto vindo da IA convertendo **destaques** em negrito.
+ * Só trata negrito — nada de HTML cru, o conteúdo entra sempre como texto.
+ */
+function Texto({ children, className }: { children: string; className?: string }) {
+  const partes = (children ?? '').split(/\*\*(.+?)\*\*/g);
+  return (
+    <p className={className}>
+      {partes.map((parte, i) =>
+        i % 2 === 1 ? (
+          <strong key={i} className="font-semibold text-brown-deep">
+            {parte}
+          </strong>
+        ) : (
+          parte
+        )
+      )}
+    </p>
+  );
 }
 
 export default function EntrevistaClient({ userId, profile }: { userId: string; profile: Profile | null }) {
@@ -42,6 +70,48 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
   const [analise, setAnalise] = useState<AnaliseSoar | null>(null);
   const [gerando, setGerando] = useState(false);
   const [copiado, setCopiado] = useState<string | null>(null);
+  const [expandida, setExpandida] = useState<number | null>(null);
+  const [analises, setAnalises] = useState<AnaliseSalva[]>([]);
+  const [selecionada, setSelecionada] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function carregarAnalises() {
+      const { data, error } = await supabase
+        .from('soar_analises')
+        .select('id, titulo, created_at, analise')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setAnalises(data as AnaliseSalva[]);
+        if (data.length > 0) {
+          setSelecionada(data[0].id);
+          setAnalise(data[0].analise as AnaliseSoar);
+        }
+      }
+    }
+    carregarAnalises();
+  }, []);
+
+  const handleAbrirAnalise = (item: AnaliseSalva) => {
+    setSelecionada(item.id);
+    setAnalise(item.analise);
+    setExpandida(null);
+  };
+
+  const handleApagarAnalise = async (id: string) => {
+    if (!confirm('Apagar esta análise?')) return;
+    const { error } = await supabase.from('soar_analises').delete().eq('id', id);
+    if (error) {
+      alert(`Não consegui apagar: ${error.message}`);
+      return;
+    }
+    const restantes = analises.filter((a) => a.id !== id);
+    setAnalises(restantes);
+    if (selecionada === id) {
+      setSelecionada(restantes[0]?.id ?? null);
+      setAnalise(restantes[0]?.analise ?? null);
+    }
+  };
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -73,6 +143,30 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
       }
 
       setAnalise(data.analise);
+
+      // Guarda no banco para a análise não sumir ao sair da página.
+      const { data: salva, error: erroSalvar } = await supabase
+        .from('soar_analises')
+        .insert({
+          user_id: userId,
+          titulo: descricaoVaga.trim().split('\n')[0].slice(0, 80),
+          curriculo,
+          descricao_vaga: descricaoVaga,
+          analise: data.analise,
+        })
+        .select('id, titulo, created_at, analise')
+        .single();
+
+      if (erroSalvar) {
+        console.error('Erro ao salvar análise:', erroSalvar);
+        alert(
+          `A análise foi gerada, mas não consegui salvar: ${erroSalvar.message}. Copie o que precisar antes de sair da página.`
+        );
+      } else if (salva) {
+        setAnalises([salva as AnaliseSalva, ...analises]);
+        setSelecionada(salva.id);
+      }
+
       setAba('minhas');
     } catch (erro) {
       console.error('Erro:', erro);
@@ -179,7 +273,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
               >
                 {gerando ? (
                   <>
-                    <div className="animate-spin">⚙️</div>
+                    <Loader2 size={20} className="animate-spin" />
                     Analisando...
                   </>
                 ) : (
@@ -195,6 +289,43 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
 
         {aba === 'minhas' && (
           <div className="space-y-6">
+            {analises.length > 0 && (
+              <Panel className="p-4">
+                <h3 className="text-xs uppercase tracking-wider text-ink-faint mb-3">
+                  Análises salvas
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {analises.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
+                        selecionada === item.id
+                          ? 'bg-sky-tint border-sky text-brown-deep'
+                          : 'bg-paper border-line text-ink-soft hover:border-brown-deep'
+                      }`}
+                    >
+                      <button
+                        onClick={() => handleAbrirAnalise(item)}
+                        className="text-left font-medium"
+                      >
+                        {item.titulo || 'Análise sem título'}
+                        <span className="block text-xs text-ink-faint font-normal">
+                          {new Date(item.created_at).toLocaleDateString('pt-BR')}
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => handleApagarAnalise(item.id)}
+                        title="Apagar análise"
+                        className="text-ink-faint hover:text-brown-deep"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            )}
+
             {!analise ? (
               <Panel className="text-center py-12 p-6">
                 <BookOpen size={48} className="mx-auto text-brown-deep mb-4" />
@@ -209,19 +340,19 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
             ) : (
               <>
                 <Panel className="bg-sky-tint border border-sky p-6">
-                  <h3 className="font-display text-lg text-sky-deep mb-3">🎯 Sua Abertura (3 frases)</h3>
-                  <div className="bg-white p-4 rounded border border-sky text-sm text-ink leading-relaxed">
-                    {analise.abertura}
+                  <h3 className="font-display text-lg text-sky-deep mb-3 flex items-center gap-2"><Target size={18} />Sua Abertura (3 frases)</h3>
+                  <div className="bg-paper p-4 rounded-lg border border-sky">
+                    <Texto className="text-sm text-ink leading-relaxed">{analise.abertura}</Texto>
                   </div>
                 </Panel>
 
                 <Panel className="p-6">
-                  <h3 className="font-display text-lg text-brown-deep mb-4">📖 3 Histórias Âncora Prontas</h3>
+                  <h3 className="font-display text-lg text-brown-deep mb-4 flex items-center gap-2"><BookOpen size={18} />3 Histórias Âncora Prontas</h3>
                   <div className="space-y-4">
                     {analise.historiasAncora.map((historia, idx) => (
                       <div key={idx} className="bg-cream p-4 rounded-lg border border-line">
                         <h4 className="font-medium text-brown-deep mb-2">História #{idx + 1}</h4>
-                        <p className="text-sm text-ink leading-relaxed mb-3">{historia}</p>
+                        <Texto className="text-sm text-ink leading-relaxed mb-3">{historia}</Texto>
                         <button
                           onClick={() => handleCopiar(historia)}
                           className={`text-xs font-medium flex items-center gap-1 transition ${
@@ -247,12 +378,12 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                   </div>
                 </Panel>
 
-                <Panel className="bg-yellow-50 border border-yellow-200 p-6">
-                  <h3 className="font-display text-lg text-brown-deep mb-4">🤔 Respostas Prontas</h3>
+                <Panel className="p-6">
+                  <h3 className="font-display text-lg text-brown-deep mb-4 flex items-center gap-2"><MessageSquare size={18} />Respostas Prontas</h3>
                   <div className="space-y-4">
-                    <div className="bg-white p-4 rounded border border-yellow-200">
+                    <div className="bg-paper p-4 rounded-lg border border-line">
                       <h4 className="font-medium text-brown-deep mb-2">Por que quer sair da empresa atual?</h4>
-                      <p className="text-sm text-ink mb-3">{analise.resposta_por_que_sair}</p>
+                      <Texto className="text-sm text-ink mb-3">{analise.resposta_por_que_sair}</Texto>
                       <button
                         onClick={() => handleCopiar(analise.resposta_por_que_sair)}
                         className={`text-xs font-medium flex items-center gap-1 transition ${
@@ -275,9 +406,9 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                       </button>
                     </div>
 
-                    <div className="bg-white p-4 rounded border border-yellow-200">
+                    <div className="bg-paper p-4 rounded-lg border border-line">
                       <h4 className="font-medium text-brown-deep mb-2">Por que quer essa vaga?</h4>
-                      <p className="text-sm text-ink mb-3">{analise.resposta_por_que_vaga}</p>
+                      <Texto className="text-sm text-ink mb-3">{analise.resposta_por_que_vaga}</Texto>
                       <button
                         onClick={() => handleCopiar(analise.resposta_por_que_vaga)}
                         className={`text-xs font-medium flex items-center gap-1 transition ${
@@ -300,9 +431,9 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                       </button>
                     </div>
 
-                    <div className="bg-white p-4 rounded border border-yellow-200">
+                    <div className="bg-paper p-4 rounded-lg border border-line">
                       <h4 className="font-medium text-brown-deep mb-2">Como você trata seus gaps?</h4>
-                      <p className="text-sm text-ink mb-3">{analise.tratamento_gaps}</p>
+                      <Texto className="text-sm text-ink mb-3">{analise.tratamento_gaps}</Texto>
                       <button
                         onClick={() => handleCopiar(analise.tratamento_gaps)}
                         className={`text-xs font-medium flex items-center gap-1 transition ${
@@ -328,7 +459,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                 </Panel>
 
                 <Panel className="p-6">
-                  <h3 className="font-display text-lg text-brown-deep mb-4">💼 Experiências Mapeadas</h3>
+                  <h3 className="font-display text-lg text-brown-deep mb-4 flex items-center gap-2"><Briefcase size={18} />Experiências Mapeadas</h3>
                   <div className="space-y-4">
                     {analise.experiencias.map((exp, idx) => (
                       <div key={idx} className="border border-line p-4 rounded-lg">
@@ -339,34 +470,45 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                               {exp.empresa} • {exp.periodo}
                             </p>
                           </div>
-                          <div className="bg-brown-deep text-paper px-3 py-1 rounded-full text-xs font-bold shrink-0">
-                            Força: {exp.forca}/5
-                          </div>
+                          <span className="bg-sky-tint text-brown-deep border border-sky px-3 py-1 rounded-full text-xs font-medium shrink-0">
+                            Força {exp.forca}/5
+                          </span>
                         </div>
 
-                        <details className="text-sm space-y-2">
-                          <summary className="cursor-pointer font-medium text-brown-deep hover:text-brown transition">
-                            Ver detalhes SOAR
-                          </summary>
-                          <div className="bg-paper p-3 rounded space-y-2 mt-3 text-ink">
+                        <button
+                          type="button"
+                          onClick={() => setExpandida(expandida === idx ? null : idx)}
+                          aria-expanded={expandida === idx}
+                          className="flex items-center gap-1.5 text-sm font-medium text-brown-deep hover:text-brown transition"
+                        >
+                          {expandida === idx ? (
+                            <ChevronUp size={16} />
+                          ) : (
+                            <ChevronDown size={16} />
+                          )}
+                          Ver detalhes SOAR
+                        </button>
+
+                        {expandida === idx && (
+                          <div className="bg-paper border border-line p-4 rounded-lg space-y-3 mt-3 text-ink">
                             <div>
                               <strong className="text-brown-deep text-sm">Situação &amp; Obstáculos:</strong>
-                              <p className="mt-1 text-sm">{exp.situacao}</p>
+                              <Texto className="mt-1 text-sm">{exp.situacao}</Texto>
                             </div>
                             <div>
                               <strong className="text-brown-deep text-sm">Ações:</strong>
-                              <p className="mt-1 text-sm">{exp.acoes}</p>
+                              <Texto className="mt-1 text-sm">{exp.acoes}</Texto>
                             </div>
                             <div>
                               <strong className="text-brown-deep text-sm">Resultados:</strong>
-                              <p className="mt-1 text-sm">{exp.resultados}</p>
+                              <Texto className="mt-1 text-sm">{exp.resultados}</Texto>
                             </div>
-                            <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+                            <div className="bg-sky-tint p-3 rounded-lg border border-sky">
                               <strong className="text-brown-deep text-xs">Sumário para contar:</strong>
-                              <p className="text-ink text-xs italic mt-2">{exp.sumario}</p>
+                              <Texto className="text-ink text-xs italic mt-2">{exp.sumario}</Texto>
                             </div>
                           </div>
-                        </details>
+                        )}
                       </div>
                     ))}
                   </div>

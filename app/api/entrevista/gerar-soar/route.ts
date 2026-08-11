@@ -65,6 +65,15 @@ Responda SOMENTE com JSON válido, sem crases, sem markdown e sem texto antes ou
   "tratamento_gaps": "string"
 }
 
+REGRA MAIS IMPORTANTE — PRIMEIRA PESSOA:
+Os campos "abertura", "historiasAncora", "sumario", "resposta_por_que_sair", "resposta_por_que_vaga" e "tratamento_gaps" são falas que a pessoa vai dizer em voz alta na entrevista. Escreva TUDO em PRIMEIRA PESSOA, como se fosse a própria pessoa falando.
+NUNCA use o nome da pessoa nem terceira pessoa nesses campos.
+Errado: "Jaqueline está em um momento de transição e apresenta 3 gaps."
+Certo: "Estou em um momento de transição. Vejo três pontos que ainda estou desenvolvendo."
+Use tom natural e falado, como numa conversa profissional — nada de linguagem de relatório.
+
+DESTAQUES: dentro desses textos, marque com **asteriscos duplos** as métricas, números e decisões estratégicas mais importantes (ex.: "reduzi o churn em **32%**"). Use no máximo 3 destaques por texto, só no que realmente importa.
+
 Regras: no máximo 4 experiências (as mais relevantes para a vaga), exatamente 3 histórias âncora, "forca" é um número de 1 a 5. Seja específico, use números e métricas quando existirem no currículo, e conecte cada experiência com a vaga alvo. Escreva em português do Brasil.`;
 
     const resposta = await anthropic.messages.create({

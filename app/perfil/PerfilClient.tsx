@@ -96,19 +96,20 @@ export default function PerfilClient({
     if (!perfil) return;
       const path = `${perfil.id}/perfil.${ext}`;
 
-      const { error: deleteError } = await supabase.storage
-        .from('fotos-perfil')
-        .remove([path]);
-
+      // O bucket se chama "avatar". upsert evita o erro de "já existe"
+      // quando a pessoa troca a foto uma segunda vez.
       const { error: uploadError } = await supabase.storage
-        .from('fotos-perfil')
-        .upload(path, file);
+        .from('avatar')
+        .upload(path, file, { upsert: true, contentType: file.type });
 
       if (uploadError) {
-        setMensagem('Erro ao enviar foto');
+        setMensagem(`Erro ao enviar foto: ${uploadError.message}`);
       } else {
-        const { data } = supabase.storage.from('fotos-perfil').getPublicUrl(path);
-        await supabase.from('profiles').update({ foto_url: data.publicUrl }).eq('id', perfil.id);
+        const { data } = supabase.storage.from('avatar').getPublicUrl(path);
+        // O caminho é sempre o mesmo, então sem o sufixo o navegador
+        // continuaria mostrando a foto antiga do cache.
+        const urlComVersao = `${data.publicUrl}?v=${Date.now()}`;
+        await supabase.from('profiles').update({ foto_url: urlComVersao }).eq('id', perfil.id);
         setMensagem('Foto atualizada com sucesso!');
         router.refresh();
       }

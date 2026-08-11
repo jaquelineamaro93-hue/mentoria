@@ -37,6 +37,9 @@ export default function VotarEncontroClient({
   const [enviado, setEnviado] = useState(false);
   const [votos, setVotos] = useState<VotoEncontro[]>([]);
   const [jaSeuVoto, setJaSeuVoto] = useState(false);
+  const [aba, setAba] = useState<'online' | 'presencial'>('presencial');
+
+  const ehPresencial = profile?.tipo_pacote === 'presencial';
 
   useEffect(() => {
     carregarVotos();
@@ -91,9 +94,9 @@ export default function VotarEncontroClient({
 
   if (enviado && jaSeuVoto) {
     return (
-      <div className="flex flex-col md:flex-row w-full">
+      <div className="flex flex-row w-full h-screen">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
-        <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
+        <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
           <div className="text-center py-12">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
             <h1 className="font-display text-2xl text-brown-deep mb-2">Seu voto foi registrado!</h1>
@@ -115,27 +118,65 @@ export default function VotarEncontroClient({
   }));
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
+    <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
+      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Participação</p>
         <h1 className="font-display text-3xl text-brown-deep mb-1">Qual é o melhor dia?</h1>
         <p className="text-sm text-ink-faint max-w-xl mb-8">
           Vote no sábado que funciona melhor para você. Encontro em {LOCAL}, das {HORARIO}.
         </p>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8 flex gap-3">
-          <AlertCircle size={18} className="text-amber-700 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-900">
-            <p className="font-medium mb-1">Atenção importante</p>
-            <p>
-              Você pode votar uma única vez. Essa votação encerra na terça, 4 de agosto, às 23h.
-              Se você não votar até lá e está no plano presencial, receberá um aviso final.
-            </p>
-          </div>
+        <div className="flex gap-4 mb-8 border-b border-line">
+          <button
+            onClick={() => setAba('online')}
+            className={`pb-3 px-4 font-medium transition ${
+              aba === 'online'
+                ? 'border-b-2 border-brown text-brown-deep'
+                : 'text-ink-soft hover:text-ink'
+            }`}
+          >
+            Encontros Online
+          </button>
+          <button
+            onClick={() => setAba('presencial')}
+            className={`pb-3 px-4 font-medium transition ${
+              aba === 'presencial'
+                ? 'border-b-2 border-brown text-brown-deep'
+                : 'text-ink-soft hover:text-ink'
+            }`}
+          >
+            Encontros Presenciais
+          </button>
         </div>
 
+        {aba === 'online' && (
+          <div className="bg-paper border border-line rounded-2xl p-6 mb-8">
+            <h2 className="font-display text-lg text-brown-deep mb-2">Encontros online</h2>
+            <p className="text-sm text-ink-soft">
+              Os encontros online são marcados direto pela mentora e avisados no seu Início.
+              Não há votação de data aqui por enquanto.
+            </p>
+          </div>
+        )}
+
+        {aba === 'presencial' && !ehPresencial && (
+          <div className="bg-sky-tint border border-sky rounded-2xl p-6 mb-8 flex gap-3">
+            <AlertCircle size={18} className="text-sky-deep flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-sky-deep">
+              <p className="font-medium mb-1">Esta votação é do plano presencial</p>
+              <p>
+                Seu plano é o online, então você não precisa votar nesta data — e também não vai
+                receber os e-mails de lembrete do encontro presencial. Se quiser migrar de plano,
+                fale com a mentora.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {aba === 'presencial' && ehPresencial && (
+          <>
         {jaSeuVoto && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-8">
             <p className="text-sm text-green-900">
@@ -203,6 +244,8 @@ export default function VotarEncontroClient({
                 ))}
               </div>
             </div>
+          </>
+        )}
           </>
         )}
       </main>

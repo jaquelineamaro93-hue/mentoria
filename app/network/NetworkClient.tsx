@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Upload, MessageCircle, Target, Network, Copy, CheckCircle2, Plus, X } from 'lucide-react';
+import { Users, Upload, Target, Network, Copy, CheckCircle2, Plus, X, Trash2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import Sidebar from '@/components/Sidebar';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types';
 
 interface Contact {
+  id?: string;
   nome: string;
   relacao: string;
   potencial: string;
@@ -22,46 +23,41 @@ const CIRCULOS = [
     id: 'raiz',
     label: 'Círculo da Raiz',
     descricao: 'Pessoas que me conhecem profundamente e confiam em mim',
-    cor: 'bg-red-50 border-red-200',
-    bgPanel: 'bg-red-50 border-red-200',
-    textColor: 'text-red-700',
-    icon: '🌱',
+    cor: 'bg-paper border-line',
+    bgPanel: 'bg-paper border-line',
+    textColor: 'text-brown-deep',
   },
   {
     id: 'ponte',
     label: 'Círculo da Ponte',
     descricao: 'Pessoas que podem me apresentar para outras oportunidades',
-    cor: 'bg-blue-50 border-blue-200',
-    bgPanel: 'bg-blue-50 border-blue-200',
-    textColor: 'text-blue-700',
-    icon: '🌉',
+    cor: 'bg-paper border-line',
+    bgPanel: 'bg-paper border-line',
+    textColor: 'text-brown-deep',
   },
   {
     id: 'presenca',
     label: 'Círculo da Presença',
     descricao: 'Pessoas que me seguem mas com quem não conversei profundamente',
-    cor: 'bg-yellow-50 border-yellow-200',
-    bgPanel: 'bg-yellow-50 border-yellow-200',
-    textColor: 'text-yellow-700',
-    icon: '👁️',
+    cor: 'bg-paper border-line',
+    bgPanel: 'bg-paper border-line',
+    textColor: 'text-brown-deep',
   },
   {
     id: 'futuro',
     label: 'Círculo do Futuro',
     descricao: 'Pessoas que admiro mas ainda não tenho relação',
-    cor: 'bg-purple-50 border-purple-200',
-    bgPanel: 'bg-purple-50 border-purple-200',
-    textColor: 'text-purple-700',
-    icon: '⭐',
+    cor: 'bg-paper border-line',
+    bgPanel: 'bg-paper border-line',
+    textColor: 'text-brown-deep',
   },
   {
     id: 'recomeço',
     label: 'Círculo do Recomeço',
     descricao: 'Pessoas que me conheceram em fases travadas - hora de mostrar quem sou',
-    cor: 'bg-green-50 border-green-200',
-    bgPanel: 'bg-green-50 border-green-200',
-    textColor: 'text-green-700',
-    icon: '🔄',
+    cor: 'bg-paper border-line',
+    bgPanel: 'bg-paper border-line',
+    textColor: 'text-brown-deep',
   },
 ];
 
@@ -70,6 +66,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   const supabase = createClient();
   const [aba, setAba] = useState<'circulo' | 'importar' | 'analise'>('circulo');
   const [contatos, setContatos] = useState<Contact[]>([]);
+  const [salvando, setSalvando] = useState(false);
+  const [carregando, setCarregando] = useState(true);
   const [copiado, setCopiado] = useState<string | null>(null);
   const [mostraFormulario, setMostraFormulario] = useState(false);
   const [circuloSelecionado, setCirculoSelecionado] = useState<'raiz' | 'ponte' | 'presenca' | 'futuro' | 'recomeço'>('raiz');
@@ -123,13 +121,48 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
     setTimeout(() => setCopiado(null), 2000);
   };
 
-  const handleAdicionarContatoManual = () => {
+  useEffect(() => {
+    async function carregarContatos() {
+      const { data, error } = await supabase
+        .from('contatos_rede')
+        .select('id, nome, relacao, potencial, circulo, acao')
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        setContatos(data as Contact[]);
+      }
+      setCarregando(false);
+    }
+    carregarContatos();
+  }, []);
+
+  const handleAdicionarContatoManual = async () => {
     if (!novoContato.nome.trim()) {
       alert('O nome é obrigatório');
       return;
     }
 
-    setContatos([...contatos, novoContato]);
+    setSalvando(true);
+    const { data, error } = await supabase
+      .from('contatos_rede')
+      .insert({
+        user_id: userId,
+        nome: novoContato.nome.trim(),
+        relacao: novoContato.relacao,
+        potencial: novoContato.potencial,
+        circulo: novoContato.circulo,
+        acao: novoContato.acao,
+      })
+      .select()
+      .single();
+    setSalvando(false);
+
+    if (error) {
+      alert(`Não consegui salvar o contato: ${error.message}`);
+      return;
+    }
+
+    setContatos([...contatos, { ...novoContato, id: data.id }]);
 
     setNovoContato({
       nome: '',
@@ -140,6 +173,18 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
     });
     setMostraFormulario(false);
     setAba('circulo');
+  };
+
+  const handleRemoverContato = async (id?: string) => {
+    if (!id) return;
+    if (!confirm('Remover este contato?')) return;
+
+    const { error } = await supabase.from('contatos_rede').delete().eq('id', id);
+    if (error) {
+      alert(`Não consegui remover: ${error.message}`);
+      return;
+    }
+    setContatos(contatos.filter((c) => c.id !== id));
   };
 
   const contatosPorCirculo = (circulo: string) => {
@@ -197,23 +242,29 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
         </div>
 
         {aba === 'circulo' && (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {CIRCULOS.map((circulo) => {
               const count = contatosPorCirculo(circulo.id);
               return (
-                <Panel key={circulo.id} className={`border-2 ${circulo.cor}`}>
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-display text-brown-deep flex items-center gap-2 mb-1">
-                          <span className="text-2xl">{circulo.icon}</span>
+                <Panel key={circulo.id} className="border border-line bg-paper shadow-sm">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="min-w-0">
+                        <h3 className="text-base font-display text-brown-deep flex items-center gap-2 mb-1">
                           {circulo.label}
+                          <span className="bg-sky-tint text-brown-deep border border-sky px-2 py-0.5 rounded-full text-xs font-medium tabular-nums">
+                            {count.length}
+                          </span>
                         </h3>
-                        <p className="text-sm text-ink-soft">{circulo.descricao}</p>
+                        <p className="text-xs text-ink-soft">{circulo.descricao}</p>
                       </div>
-                      <div className="bg-brown-deep text-paper px-4 py-2 rounded-full font-bold text-sm shrink-0">
-                        {count.length}
-                      </div>
+                      <button
+                        onClick={() => abrirFormularioParaCirculo(circulo.id)}
+                        className="flex items-center gap-1 text-xs font-medium text-brown-deep border border-line rounded-lg px-2.5 py-1.5 hover:bg-cream transition shrink-0"
+                      >
+                        <Plus size={14} />
+                        Adicionar
+                      </button>
                     </div>
 
                     <div className="space-y-3">
@@ -231,15 +282,19 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                                     <p className="text-xs text-ink-soft">{contato.relacao}</p>
                                   )}
                                 </div>
-                                <button className="text-brown-deep hover:text-brown-deep/80 shrink-0">
-                                  <MessageCircle size={18} />
+                                <button
+                                  onClick={() => handleRemoverContato(contato.id)}
+                                  title="Remover contato"
+                                  className="text-ink-faint hover:text-brown-deep shrink-0"
+                                >
+                                  <Trash2 size={16} />
                                 </button>
                               </div>
                               {contato.potencial && (
                                 <p className="text-xs text-ink-soft mt-2 italic">{contato.potencial}</p>
                               )}
                               {contato.acao && (
-                                <div className="bg-yellow-50 p-2 rounded mt-2 text-xs text-brown-deep">
+                                <div className="bg-sky-tint p-2 rounded mt-2 text-xs text-brown-deep">
                                   <strong>Ação:</strong> {contato.acao}
                                 </div>
                               )}
@@ -248,17 +303,11 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                         </div>
                       )}
 
-                      <button
-                        onClick={() => abrirFormularioParaCirculo(circulo.id)}
-                        className={`w-full py-2.5 px-4 rounded-lg font-medium transition flex items-center justify-center gap-2 text-sm ${
-                          count.length === 0
-                            ? 'bg-brown-deep text-paper hover:bg-brown'
-                            : 'border-2 border-dashed border-brown-deep text-brown-deep hover:bg-brown-deep/5'
-                        }`}
-                      >
-                        <Plus size={16} />
-                        {count.length === 0 ? 'Adicionar Primeiro Contato' : 'Adicionar Contato'}
-                      </button>
+                      {count.length === 0 && !carregando && (
+                        <p className="text-xs text-ink-faint italic py-2">
+                          Nenhum contato mapeado neste círculo.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </Panel>
@@ -300,8 +349,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
               </div>
 
               {contatos.length > 0 && (
-                <div className="bg-green-50 border border-green-200 p-4 rounded-lg mt-6">
-                  <p className="text-sm text-green-700">
+                <div className="bg-sky-tint border border-sky p-4 rounded-lg mt-6">
+                  <p className="text-sm text-sky-deep">
                     <strong>✅ Contatos adicionados:</strong> {contatos.length}
                   </p>
                 </div>
@@ -331,7 +380,6 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 <div>
                   <h2 className="font-display text-2xl text-brown-deep">Adicionar Contato</h2>
                   <p className="text-sm text-ink-soft mt-1">
-                    {CIRCULOS.find((c) => c.id === novoContato.circulo)?.icon}{' '}
                     {CIRCULOS.find((c) => c.id === novoContato.circulo)?.label}
                   </p>
                 </div>
@@ -410,9 +458,10 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={handleAdicionarContatoManual}
-                    className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors font-medium"
+                    disabled={salvando}
+                    className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors font-medium disabled:opacity-50"
                   >
-                    Adicionar Contato
+                    {salvando ? 'Salvando...' : 'Adicionar Contato'}
                   </button>
                   <button
                     onClick={() => setMostraFormulario(false)}
@@ -446,7 +495,6 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 return (
                   <div key={circulo.id} className={`border-2 rounded-lg p-4 ${circulo.bgPanel}`}>
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">{circulo.icon}</span>
                       <h4 className="font-medium text-brown-deep">{circulo.label}</h4>
                     </div>
                     <p className="text-sm text-ink-soft mb-3">

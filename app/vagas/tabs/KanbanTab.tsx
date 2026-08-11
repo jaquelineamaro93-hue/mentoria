@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { GripVertical, X, Zap, Plus, ChevronLeft, ChevronRight, Download, Upload, FileUp } from 'lucide-react';
+import { GripVertical, X, Zap, Plus, ChevronLeft, ChevronRight, Download, Upload, FileDown } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import * as XLSX from 'xlsx';
 
@@ -136,15 +136,52 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(worksheet);
 
+      // Aceita tanto o template oficial (EMPRESA, NOME DA VAGA...) quanto o
+      // arquivo exportado daqui (Empresa, Título da Vaga...), ignorando
+      // acentos, maiúsculas e espaços extras nos cabeçalhos.
+      const normaliza = (s: string) =>
+        s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+      const campo = (row: any, nomes: string[]) => {
+        const mapa = new Map(Object.keys(row).map((k) => [normaliza(k), k]));
+        for (const nome of nomes) {
+          const chave = mapa.get(normaliza(nome));
+          if (chave && row[chave] != null && row[chave].toString().trim() !== '') {
+            return row[chave].toString().trim();
+          }
+        }
+        return '';
+      };
+
       let importadas = 0;
       for (const row of rows) {
-        const empresa = (row as any)['Empresa']?.toString().trim();
-        const cargo = (row as any)['Título da Vaga']?.toString().trim();
+        const empresa = campo(row, ['Empresa', 'EMPRESA']);
+        const cargo = campo(row, ['Título da Vaga', 'NOME DA VAGA', 'Cargo', 'Vaga']);
 
         if (!empresa || !cargo) continue;
 
-        const etapaLabel = (row as any)['Etapa']?.toString().trim();
-        const etapaId = ETAPAS.find((e) => e.label === etapaLabel)?.id || 'para_aplicar';
+        const etapaLabel = campo(row, ['Etapa', 'ETAPA DO PROCESSO']);
+        const etapaId =
+          ETAPAS.find((e) => normaliza(e.label) === normaliza(etapaLabel))?.id || 'para_aplicar';
+
+        // O template tem colunas que o Kanban não guarda em campo próprio.
+        // Em vez de descartar, elas viram texto rotulado nos campos existentes.
+        const descricao = [
+          campo(row, ['Descrição', 'Descricao']),
+          campo(row, ['HARD SKILL']) && `Hard skills: ${campo(row, ['HARD SKILL'])}`,
+          campo(row, ['SOFT SKILL']) && `Soft skills: ${campo(row, ['SOFT SKILL'])}`,
+        ]
+          .filter(Boolean)
+          .join('\n');
+
+        const observacoes = [
+          campo(row, ['Observações', 'OBSERVAÇÃO', 'Observacoes']),
+          campo(row, ['DATA CANDIDATURA']) &&
+            `Candidatura em ${campo(row, ['DATA CANDIDATURA'])}`,
+          campo(row, ['ONDE VIU A VAGA']) && `Vista em ${campo(row, ['ONDE VIU A VAGA'])}`,
+        ]
+          .filter(Boolean)
+          .join('\n');
 
         try {
           await fetch('/api/vagas', {
@@ -153,14 +190,14 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             body: JSON.stringify({
               empresa,
               cargo,
-              descricao_vaga: (row as any)['Descrição']?.toString() || '',
-              link_vaga: (row as any)['Link']?.toString() || '',
-              contato: (row as any)['Contato']?.toString() || '',
+              descricao_vaga: descricao,
+              link_vaga: campo(row, ['Link', 'LINK DA VAGA']),
+              contato: campo(row, ['Contato']),
               etapa: etapaId,
-              fit_score: parseInt((row as any)['Fit Score']) || null,
-              proximo_passo: (row as any)['Próximo Passo']?.toString() || '',
-              observacoes: (row as any)['Observações']?.toString() || '',
-              origem: (row as any)['Origem']?.toString() || 'organico',
+              fit_score: parseInt(campo(row, ['Fit Score', 'FIT'])) || null,
+              proximo_passo: campo(row, ['Próximo Passo']),
+              observacoes: observacoes,
+              origem: campo(row, ['Origem']) || 'organico',
             }),
           });
           importadas++;
@@ -287,24 +324,32 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={exportarVagasComoTemplate}
-            className="flex items-center gap-2 bg-brown-deep text-paper px-4 py-2.5 rounded-lg hover:bg-brown transition-colors font-medium"
-            title="Exporta suas vagas atuais como arquivo para backup ou importação posterior"
+            className="flex items-center gap-2 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors text-sm font-medium"
+            title="Baixa suas vagas atuais como planilha"
           >
-            <FileUp size={18} />
-            📤 Baixar Minhas Vagas
+            <Download size={16} />
+            Baixar Minhas Vagas
           </button>
+          <a
+            href="/api/download-template-vagas"
+            className="flex items-center gap-2 bg-paper text-brown-deep border border-line px-4 py-2 rounded-lg hover:bg-cream transition-colors text-sm font-medium"
+            title="Baixa uma planilha em branco, já com as colunas certas"
+          >
+            <FileDown size={16} />
+            Baixar Modelo Excel
+          </a>
           <button
             onClick={() => setMostraImportacao(true)}
-            className="flex items-center gap-2 bg-sky-deep text-white px-4 py-2.5 rounded-lg hover:bg-sky-deep/90 transition-colors font-medium"
+            className="flex items-center gap-2 bg-sky-tint text-brown-deep border border-sky px-4 py-2 rounded-lg hover:bg-sky-tint/70 transition-colors text-sm font-medium"
           >
-            <Upload size={18} />
-            📥 Importar Planilha
+            <Upload size={16} />
+            Importar Planilha
           </button>
           <button
             onClick={() => setMostraModalNova(true)}
-            className="flex items-center gap-2 border-2 border-brown-deep text-brown-deep px-4 py-2.5 rounded-lg hover:bg-cream transition-colors font-medium"
+            className="flex items-center gap-2 bg-paper text-brown-deep border border-brown-deep px-4 py-2 rounded-lg hover:bg-cream transition-colors text-sm font-medium"
           >
-            <Plus size={18} />
+            <Plus size={16} />
             Adicionar Vaga
           </button>
         </div>

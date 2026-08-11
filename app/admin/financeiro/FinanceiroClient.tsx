@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Wallet, TrendingUp, Users, AlertTriangle, Gift, Target, Loader2 } from 'lucide-react';
+import { Wallet, TrendingUp, Users, AlertTriangle, Gift, Target, Loader2, ArrowLeft } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -120,6 +120,13 @@ export default function FinanceiroClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+        <button
+          onClick={() => router.push('/admin')}
+          className="flex items-center gap-1.5 text-sm text-ink-soft hover:text-brown-deep transition mb-4"
+        >
+          <ArrowLeft size={16} />
+          Voltar
+        </button>
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Área administrativa</p>
         <h1 className="font-display text-3xl text-brown-deep mb-1">Financeiro</h1>
         <p className="text-sm text-ink-faint mb-8">
