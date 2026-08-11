@@ -22,6 +22,7 @@ import {
   ListChecks,
   UserCog,
   Briefcase,
+  Users,
 } from 'lucide-react';
 import { NotificationBadge } from './NotificationBadge';
 import type { Profile } from '@/lib/types';
