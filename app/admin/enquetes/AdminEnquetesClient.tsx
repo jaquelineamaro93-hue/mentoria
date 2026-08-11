@@ -131,16 +131,19 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
       if (editando) {
         const { error } = await supabase.from('enquetes').update(payload).eq('id', editando.id);
         if (error) throw error;
+        enqueteId = editando.id;
         await supabase.from('enquete_opcoes').delete().eq('enquete_id', editando.id);
         setEnquetes((prev) => prev.map((e) => (e.id === editando.id ? { ...e, ...payload } : e)));
       } else {
         const { data, error } = await supabase.from('enquetes').insert([payload]).select().single();
         if (error) throw error;
-        if (data) {
-          enqueteId = data.id;
-          setEnquetes((prev) => [data, ...prev]);
-        }
+        if (!data?.id) throw new Error('ID da enquete não retornou do servidor');
+        enqueteId = data.id;
+        setEnquetes((prev) => [data, ...prev]);
       }
+
+      if (!enqueteId) throw new Error('ID da enquete não foi definido');
+
       const opcoesPayload = opcoes.filter((op) => op.texto.trim()).map((op, i) => ({ enquete_id: enqueteId, texto: op.texto, ordem: i }));
       if (opcoesPayload.length > 0) {
         const { error } = await supabase.from('enquete_opcoes').insert(opcoesPayload);
