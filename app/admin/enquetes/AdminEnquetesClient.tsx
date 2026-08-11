@@ -80,13 +80,14 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
     }
     setSalvando(true);
     try {
-      const payload = {
+      const payload: Enquete = {
+        id: '',
         titulo: form.titulo,
         descricao: form.descricao || null,
         data_inicio: form.data_inicio,
         data_fim: form.data_fim,
-        tipo: form.tipo,
-        ativo: form.ativo,
+        tipo: form.tipo as 'online' | 'presencial',
+        ativo: form.ativo !== false,
         horario: form.horario || null,
         local: form.local || null,
       };
@@ -102,7 +103,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
       setEditando(null);
       setForm({});
       setErro(null);
-          prev.map((e) => (e.id === editando.id ? { ...e, ...payload } as Enquete : e))
+    } catch (err) {
       setErro(err instanceof Error ? err.message : 'Erro ao salvar');
     } finally {
       setSalvando(false);
@@ -147,9 +148,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
         {editando !== undefined && (
           <Panel className="p-6 mb-8 border-sky">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-xl text-brown-deep">
-                {editando ? 'Editar votação' : 'Nova votação'}
-              </h2>
+              <h2 className="font-display text-xl text-brown-deep">{editando ? 'Editar votação' : 'Nova votação'}</h2>
               <button onClick={() => setEditando(undefined)} className="text-ink-faint hover:text-brown-deep">
                 <X size={20} />
               </button>
@@ -157,43 +156,23 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
             <div className="grid gap-4 mb-6">
               <div>
                 <label className="block text-xs font-medium text-brown-deep mb-2">Título *</label>
-                <input
-                  type="text"
-                  value={form.titulo || ''}
-                  onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-                  className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                  placeholder="ex: Qual é o melhor dia?"
-                />
+                <input type="text" value={form.titulo || ''} onChange={(e) => setForm({ ...form, titulo: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" placeholder="ex: Qual é o melhor dia?" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-brown-deep mb-2">Descrição</label>
-                <textarea
-                  value={form.descricao || ''}
-                  onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                  className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                  rows={3}
-                  placeholder="ex: Vote no sábado que funciona melhor para você"
-                />
+                <textarea value={form.descricao || ''} onChange={(e) => setForm({ ...form, descricao: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" rows={3} placeholder="ex: Vote no sábado que funciona melhor para você" />
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-brown-deep mb-2">Tipo *</label>
-                  <select
-                    value={form.tipo || 'presencial'}
-                    onChange={(e) => setForm({ ...form, tipo: e.target.value as 'online' | 'presencial' })}
-                    className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                  >
+                  <select value={form.tipo || 'presencial'} onChange={(e) => setForm({ ...form, tipo: e.target.value as 'online' | 'presencial' })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep">
                     <option value="presencial">Presencial</option>
                     <option value="online">Online</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-brown-deep mb-2">Status</label>
-                  <select
-                    value={form.ativo ? 'ativo' : 'inativo'}
-                    onChange={(e) => setForm({ ...form, ativo: e.target.value === 'ativo' })}
-                    className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                  >
+                  <select value={form.ativo ? 'ativo' : 'inativo'} onChange={(e) => setForm({ ...form, ativo: e.target.value === 'ativo' })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep">
                     <option value="ativo">Ativo</option>
                     <option value="inativo">Inativo</option>
                   </select>
@@ -202,60 +181,31 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-brown-deep mb-2">Início *</label>
-                  <input
-                    type="date"
-                    value={form.data_inicio || ''}
-                    onChange={(e) => setForm({ ...form, data_inicio: e.target.value })}
-                    className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                  />
+                  <input type="date" value={form.data_inicio || ''} onChange={(e) => setForm({ ...form, data_inicio: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-brown-deep mb-2">Fim *</label>
-                  <input
-                    type="date"
-                    value={form.data_fim || ''}
-                    onChange={(e) => setForm({ ...form, data_fim: e.target.value })}
-                    className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                  />
+                  <input type="date" value={form.data_fim || ''} onChange={(e) => setForm({ ...form, data_fim: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" />
                 </div>
               </div>
               {form.tipo === 'presencial' && (
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-brown-deep mb-2">Horário</label>
-                    <input
-                      type="text"
-                      value={form.horario || ''}
-                      onChange={(e) => setForm({ ...form, horario: e.target.value })}
-                      className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                      placeholder="ex: 11:30 às 17h"
-                    />
+                    <input type="text" value={form.horario || ''} onChange={(e) => setForm({ ...form, horario: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" placeholder="ex: 11:30 às 17h" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-brown-deep mb-2">Local</label>
-                    <input
-                      type="text"
-                      value={form.local || ''}
-                      onChange={(e) => setForm({ ...form, local: e.target.value })}
-                      className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
-                      placeholder="ex: Pinheiros, São Paulo"
-                    />
+                    <input type="text" value={form.local || ''} onChange={(e) => setForm({ ...form, local: e.target.value })} className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brown-deep" placeholder="ex: Pinheiros, São Paulo" />
                   </div>
                 </div>
               )}
             </div>
             <div className="flex gap-3">
-              <button
-                onClick={handleSalvar}
-                disabled={salvando}
-                className="bg-brown-deep hover:bg-brown text-white font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-60"
-              >
+              <button onClick={handleSalvar} disabled={salvando} className="bg-brown-deep hover:bg-brown text-white font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-60">
                 {salvando ? 'Salvando...' : editando ? 'Atualizar' : 'Criar'}
               </button>
-              <button
-                onClick={() => setEditando(undefined)}
-                className="border border-brown-deep text-brown-deep hover:bg-brown-deep/10 font-medium px-6 py-2.5 rounded-lg transition-colors"
-              >
+              <button onClick={() => setEditando(undefined)} className="border border-brown-deep text-brown-deep hover:bg-brown-deep/10 font-medium px-6 py-2.5 rounded-lg transition-colors">
                 Cancelar
               </button>
             </div>
@@ -265,10 +215,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
           <div className="flex items-center justify-between mb-4">
             <Eyebrow>Votações cadastradas</Eyebrow>
             {editando === undefined && (
-              <button
-                onClick={iniciarNova}
-                className="flex items-center gap-1.5 text-sm font-medium bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors"
-              >
+              <button onClick={iniciarNova} className="flex items-center gap-1.5 text-sm font-medium bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors">
                 <Plus size={16} />
                 Nova votação
               </button>
@@ -279,30 +226,18 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
               <Panel className="p-6 text-center text-ink-faint">Nenhuma votação cadastrada</Panel>
             ) : (
               enquetes.map((enquete) => (
-                <Panel
-                  key={enquete.id}
-                  className={`p-5 flex items-start justify-between gap-4 ${!enquete.ativo ? 'opacity-60' : ''}`}
-                >
+                <Panel key={enquete.id} className={`p-5 flex items-start justify-between gap-4 ${!enquete.ativo ? 'opacity-60' : ''}`}>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-medium text-brown-deep">{enquete.titulo}</h3>
-                      <span
-                        className={`text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide ${
-                          enquete.ativo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
+                      <span className={`text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide ${enquete.ativo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                         {enquete.ativo ? 'Ativo' : 'Inativo'}
                       </span>
-                      <span className="text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide bg-sky-tint text-brown-deep">
-                        {enquete.tipo}
-                      </span>
+                      <span className="text-[10px] font-medium px-2 py-1 rounded-full uppercase tracking-wide bg-sky-tint text-brown-deep">{enquete.tipo}</span>
                     </div>
                     {enquete.descricao && <p className="text-sm text-ink-soft mb-2">{enquete.descricao}</p>}
                     <div className="text-xs text-ink-faint space-y-1">
-                      <p>
-                        📅 {new Date(enquete.data_inicio).toLocaleDateString('pt-BR')} até{' '}
-                        {new Date(enquete.data_fim).toLocaleDateString('pt-BR')}
-                      </p>
+                      <p>📅 {new Date(enquete.data_inicio).toLocaleDateString('pt-BR')} até {new Date(enquete.data_fim).toLocaleDateString('pt-BR')}</p>
                       {enquete.tipo === 'presencial' && (
                         <>
                           {enquete.horario && <p>⏰ {enquete.horario}</p>}
@@ -312,26 +247,13 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => iniciarEdicao(enquete)}
-                      className="text-ink-faint hover:text-brown-deep transition p-2"
-                      title="Editar"
-                    >
+                    <button onClick={() => iniciarEdicao(enquete)} className="text-ink-faint hover:text-brown-deep transition p-2" title="Editar">
                       <Edit2 size={16} />
                     </button>
-                    <button
-                      onClick={() => handleToggleAtivo(enquete.id, enquete.ativo)}
-                      className="text-ink-faint hover:text-brown-deep transition p-2"
-                      title={enquete.ativo ? 'Desativar' : 'Ativar'}
-                    >
+                    <button onClick={() => handleToggleAtivo(enquete.id, enquete.ativo)} className="text-ink-faint hover:text-brown-deep transition p-2" title={enquete.ativo ? 'Desativar' : 'Ativar'}>
                       <Check size={16} className={enquete.ativo ? 'text-green-600' : ''} />
                     </button>
-                    <button
-                      onClick={() => handleDeletar(enquete.id)}
-                      disabled={deletando === enquete.id}
-                      className="text-ink-faint hover:text-red-600 transition p-2 disabled:opacity-60"
-                      title="Deletar"
-                    >
+                    <button onClick={() => handleDeletar(enquete.id)} disabled={deletando === enquete.id} className="text-ink-faint hover:text-red-600 transition p-2 disabled:opacity-60" title="Deletar">
                       <Trash2 size={16} />
                     </button>
                   </div>
