@@ -37,6 +37,8 @@ const NAV_ITEMS = [
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
   { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
   { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
+  { href: '/entrevista', label: 'SOAR Builder', icon: Sparkles },
+  { href: '/network', label: 'Círculos de Influência', icon: Users },
   { href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
   { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin, notificationKey: 'naoVotou' },
   { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
