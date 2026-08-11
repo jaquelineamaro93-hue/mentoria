@@ -42,10 +42,10 @@ export default function DashboardClient({ profile, announcements }: Props) {
   const primeiroNome = profile?.nome?.split(' ')[0] ?? 'Mentorada';
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
+    <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
+      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
         {/* Header de boas-vindas */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-10">
           <div className="w-16 h-16 rounded-full bg-sky-tint border border-sky flex items-center justify-center text-brown-deep text-xl font-display shrink-0">

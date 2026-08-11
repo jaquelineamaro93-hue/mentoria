@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+export const maxDuration = 120;
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +11,13 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { error: 'Serviço de IA não configurado. Avise o suporte.' },
+        { status: 503 }
+      );
     }
 
     const { curriculo, descricaoVaga } = await request.json();
@@ -24,7 +29,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `Você é um especialista em entrevistas corporativas. Analise o currículo e a descrição da vaga usando SOAR (Situation, Obstacle, Action, Result).
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    const prompt = `Você é um especialista em entrevistas corporativas. Analise o currículo e a descrição da vaga usando o framework SOAR (Situation, Obstacle, Action, Result).
 
 CURRÍCULO:
 ${curriculo}
@@ -32,22 +39,72 @@ ${curriculo}
 DESCRIÇÃO DA VAGA:
 ${descricaoVaga}
 
-Retorne JSON com: experiencias[], mapaCompetencias{}, abertura, historiasAncora[], resposta_por_que_sair, resposta_por_que_vaga, tratamento_gaps`;
+Responda SOMENTE com JSON válido, sem crases, sem markdown e sem texto antes ou depois, exatamente neste formato:
+{
+  "experiencias": [
+    {
+      "periodo": "string",
+      "empresa": "string",
+      "cargo": "string",
+      "situacao": "string",
+      "acoes": "string",
+      "resultados": "string",
+      "sumario": "string",
+      "competencias": ["string"],
+      "aprendizado": "string",
+      "gap": "string",
+      "conexaoVaga": "string",
+      "forca": 4
+    }
+  ],
+  "mapaCompetencias": { "competencia": "descrição" },
+  "abertura": "string",
+  "historiasAncora": ["string", "string", "string"],
+  "resposta_por_que_sair": "string",
+  "resposta_por_que_vaga": "string",
+  "tratamento_gaps": "string"
+}
 
-    const message = await client.messages.create({
+Regras: no máximo 4 experiências (as mais relevantes para a vaga), exatamente 3 histórias âncora, "forca" é um número de 1 a 5. Seja específico, use números e métricas quando existirem no currículo, e conecte cada experiência com a vaga alvo. Escreva em português do Brasil.`;
+
+    const resposta = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 8000,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Resposta inválida');
+    const textoResposta = resposta.content
+      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+      .map((b) => b.text)
+      .join('\n')
+      .trim()
+      .replace(/^```json\s*/i, '')
+      .replace(/```$/i, '')
+      .trim();
 
-    const analise = JSON.parse(jsonMatch[0]);
+    let analise;
+    try {
+      analise = JSON.parse(textoResposta);
+    } catch {
+      console.error('🔴 [SOAR] JSON inválido. stop_reason:', resposta.stop_reason);
+      return NextResponse.json(
+        {
+          error:
+            resposta.stop_reason === 'max_tokens'
+              ? 'A análise ficou longa demais. Resuma um pouco o currículo e tente de novo.'
+              : 'A IA devolveu um formato inválido. Tente gerar novamente.',
+        },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({ analise });
   } catch (erro) {
-    console.error('🔴 SOAR Error:', erro);
-    return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
+    const detalhe = erro instanceof Error ? erro.message : String(erro);
+    console.error('🔴 [SOAR-POST] Erro:', detalhe);
+    return NextResponse.json(
+      { error: 'Erro ao gerar a análise SOAR.', detalhe },
+      { status: 500 }
+    );
   }
 }

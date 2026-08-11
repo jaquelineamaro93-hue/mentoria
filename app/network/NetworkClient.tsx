@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Upload, MessageCircle, Target, Network, Copy, CheckCircle2 } from 'lucide-react';
+import { Users, Upload, MessageCircle, Target, Network, Copy, CheckCircle2, Plus, X } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import Sidebar from '@/components/Sidebar';
 import { createClient } from '@/lib/supabase/client';
@@ -10,14 +10,11 @@ import type { Profile } from '@/lib/types';
 
 interface Contact {
   nome: string;
-  empresa: string;
-  cargo: string;
+  relacao: string;
+  potencial: string;
   circulo: 'raiz' | 'ponte' | 'presenca' | 'futuro' | 'recomeço';
-  justificativa: string;
   acao: string;
   linkedinUrl?: string;
-  email?: string;
-  telefone?: string;
 }
 
 const CIRCULOS = [
@@ -73,8 +70,28 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   const supabase = createClient();
   const [aba, setAba] = useState<'circulo' | 'importar' | 'analise'>('circulo');
   const [contatos, setContatos] = useState<Contact[]>([]);
-  const [filtroCirculo, setFiltroCirculo] = useState<string | null>(null);
   const [copiado, setCopiado] = useState<string | null>(null);
+  const [mostraFormulario, setMostraFormulario] = useState(false);
+  const [circuloSelecionado, setCirculoSelecionado] = useState<'raiz' | 'ponte' | 'presenca' | 'futuro' | 'recomeço'>('raiz');
+  const [novoContato, setNovoContato] = useState<Contact>({
+    nome: '',
+    relacao: '',
+    potencial: '',
+    circulo: 'raiz',
+    acao: '',
+  });
+
+  const abrirFormularioParaCirculo = (circuloId: string) => {
+    setCirculoSelecionado(circuloId as Contact['circulo']);
+    setNovoContato({
+      nome: '',
+      relacao: '',
+      potencial: '',
+      circulo: circuloId as Contact['circulo'],
+      acao: '',
+    });
+    setMostraFormulario(true);
+  };
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -106,15 +123,34 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
     setTimeout(() => setCopiado(null), 2000);
   };
 
+  const handleAdicionarContatoManual = () => {
+    if (!novoContato.nome.trim()) {
+      alert('O nome é obrigatório');
+      return;
+    }
+
+    setContatos([...contatos, novoContato]);
+
+    setNovoContato({
+      nome: '',
+      relacao: '',
+      potencial: '',
+      circulo: circuloSelecionado,
+      acao: '',
+    });
+    setMostraFormulario(false);
+    setAba('circulo');
+  };
+
   const contatosPorCirculo = (circulo: string) => {
     return contatos.filter((c) => c.circulo === circulo);
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
+    <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
+      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Network size={14} />
           Círculos de Influência
@@ -180,44 +216,50 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                       </div>
                     </div>
 
-                    {count.length === 0 ? (
-                      <div className="text-center py-8 text-ink-faint">
-                        <p className="text-sm">Nenhum contato neste círculo ainda</p>
-                        <button
-                          onClick={() => setAba('importar')}
-                          className="text-brown-deep hover:text-brown transition underline mt-2 text-sm font-medium"
-                        >
-                          Importar seus contatos do LinkedIn
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {count.map((contato, idx) => (
-                          <div
-                            key={idx}
-                            className="bg-white p-3 rounded border border-line hover:shadow-sm hover:border-brown/30 transition"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <p className="font-medium text-brown-deep">{contato.nome}</p>
-                                <p className="text-xs text-ink-soft">
-                                  {contato.cargo} • {contato.empresa}
-                                </p>
+                    <div className="space-y-3">
+                      {count.length > 0 && (
+                        <div className="space-y-2">
+                          {count.map((contato, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-white p-3 rounded border border-line hover:shadow-sm hover:border-brown/30 transition"
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <p className="font-medium text-brown-deep">{contato.nome}</p>
+                                  {contato.relacao && (
+                                    <p className="text-xs text-ink-soft">{contato.relacao}</p>
+                                  )}
+                                </div>
+                                <button className="text-brown-deep hover:text-brown-deep/80 shrink-0">
+                                  <MessageCircle size={18} />
+                                </button>
                               </div>
-                              <button className="text-brown-deep hover:text-brown-deep/80 shrink-0">
-                                <MessageCircle size={18} />
-                              </button>
+                              {contato.potencial && (
+                                <p className="text-xs text-ink-soft mt-2 italic">{contato.potencial}</p>
+                              )}
+                              {contato.acao && (
+                                <div className="bg-yellow-50 p-2 rounded mt-2 text-xs text-brown-deep">
+                                  <strong>Ação:</strong> {contato.acao}
+                                </div>
+                              )}
                             </div>
-                            <p className="text-xs text-ink-soft mt-2 italic">{contato.justificativa}</p>
-                            {contato.acao && (
-                              <div className="bg-yellow-50 p-2 rounded mt-2 text-xs text-brown-deep">
-                                <strong>Ação:</strong> {contato.acao}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => abrirFormularioParaCirculo(circulo.id)}
+                        className={`w-full py-2.5 px-4 rounded-lg font-medium transition flex items-center justify-center gap-2 text-sm ${
+                          count.length === 0
+                            ? 'bg-brown-deep text-paper hover:bg-brown'
+                            : 'border-2 border-dashed border-brown-deep text-brown-deep hover:bg-brown-deep/5'
+                        }`}
+                      >
+                        <Plus size={16} />
+                        {count.length === 0 ? 'Adicionar Primeiro Contato' : 'Adicionar Contato'}
+                      </button>
+                    </div>
                   </div>
                 </Panel>
               );
@@ -226,33 +268,162 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
         )}
 
         {aba === 'importar' && (
-          <Panel className="p-12 text-center">
-            <Upload size={48} className="mx-auto text-brown-deep mb-4" />
-            <h3 className="font-display text-2xl text-brown-deep mb-2">Importe seus contatos do LinkedIn</h3>
-            <p className="text-ink-soft mb-8 max-w-md mx-auto">
-              Exporte suas conexões do LinkedIn e suba aqui para categorizar automaticamente em Círculos de Influência.
-            </p>
+          <div className="space-y-6">
+            <Panel className="p-8 border-2 border-sky max-w-2xl mx-auto">
+              <h3 className="font-display text-2xl text-brown-deep mb-2 flex items-center gap-2">
+                <Upload size={24} />
+                Importar do LinkedIn
+              </h3>
+              <p className="text-sm text-ink-soft mb-6">
+                Exporte suas conexões do LinkedIn em bulk e categorize automaticamente em Círculos de Influência.
+              </p>
 
-            <button
-              onClick={handleImportarCSV}
-              className="bg-brown-deep text-paper px-8 py-3 rounded-lg font-medium hover:bg-brown transition mb-8 inline-flex items-center gap-2"
-            >
-              <Upload size={18} />
-              Selecionar arquivo CSV
-            </button>
+              <button
+                onClick={handleImportarCSV}
+                className="w-full bg-brown-deep text-paper px-6 py-3 rounded-lg font-medium hover:bg-brown transition mb-8 inline-flex items-center justify-center gap-2"
+              >
+                <Upload size={18} />
+                Selecionar arquivo CSV
+              </button>
 
-            <div className="bg-sky-tint border border-sky p-6 rounded-lg text-left text-sm text-sky-deep space-y-3 max-w-md mx-auto">
-              <p className="font-medium mb-4">Como exportar do LinkedIn:</p>
-              <ol className="space-y-2 list-decimal list-inside text-sm">
-                <li>Faça login no LinkedIn</li>
-                <li>Clique na foto de perfil → Configurações e privacidade</li>
-                <li>Vá em Privacidade de dados</li>
-                <li>Clique em "Obter uma cópia dos seus dados"</li>
-                <li>Selecione "Conexões" e solicite o arquivo</li>
-                <li>Você receberá um CSV por email em ~10 minutos</li>
-              </ol>
-            </div>
-          </Panel>
+              <div className="bg-sky-tint border border-sky p-4 rounded-lg text-left text-sm text-sky-deep space-y-2">
+                <p className="font-medium mb-3">📋 Como exportar do LinkedIn:</p>
+                <ol className="space-y-1.5 list-decimal list-inside">
+                  <li>Faça login no LinkedIn</li>
+                  <li>Clique na foto do perfil → Configurações e privacidade</li>
+                  <li>Vá em "Privacidade de dados"</li>
+                  <li>Clique em "Obter cópia dos seus dados"</li>
+                  <li>Selecione "Conexões" e solicite download</li>
+                  <li>Você receberá um CSV por email</li>
+                  <li>Importe aqui e categorize nos círculos</li>
+                </ol>
+              </div>
+
+              {contatos.length > 0 && (
+                <div className="bg-green-50 border border-green-200 p-4 rounded-lg mt-6">
+                  <p className="text-sm text-green-700">
+                    <strong>✅ Contatos adicionados:</strong> {contatos.length}
+                  </p>
+                </div>
+              )}
+            </Panel>
+
+            <Panel className="p-6 bg-brown-deep/5 border-2 border-dashed border-brown-deep text-center">
+              <p className="text-brown-deep font-medium mb-2">💡 Prefere adicionar manualmente?</p>
+              <p className="text-sm text-ink-soft mb-4">
+                Acesse "Meus Círculos" e clique em "Adicionar Contato" em cada círculo.
+              </p>
+              <button
+                onClick={() => setAba('circulo')}
+                className="inline-flex items-center gap-2 text-brown-deep hover:text-brown font-medium transition"
+              >
+                Ir para Meus Círculos
+                <span>→</span>
+              </button>
+            </Panel>
+          </div>
+        )}
+
+        {mostraFormulario && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Panel className="max-w-2xl w-full border border-line">
+              <div className="bg-paper border-b border-line p-6 flex items-start justify-between">
+                <div>
+                  <h2 className="font-display text-2xl text-brown-deep">Adicionar Contato</h2>
+                  <p className="text-sm text-ink-soft mt-1">
+                    {CIRCULOS.find((c) => c.id === novoContato.circulo)?.icon}{' '}
+                    {CIRCULOS.find((c) => c.id === novoContato.circulo)?.label}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setMostraFormulario(false)}
+                  className="text-ink-faint hover:text-ink transition"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-brown-deep mb-2">Nome *</label>
+                  <input
+                    type="text"
+                    value={novoContato.nome}
+                    onChange={(e) => setNovoContato({ ...novoContato, nome: e.target.value })}
+                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    placeholder="Nome completo"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-deep mb-2">
+                    Relação — onde vocês trabalharam juntos
+                  </label>
+                  <input
+                    type="text"
+                    value={novoContato.relacao}
+                    onChange={(e) => setNovoContato({ ...novoContato, relacao: e.target.value })}
+                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    placeholder="Ex: Itaú, time de Dados, 2021–2023"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-deep mb-2">Círculo de Influência *</label>
+                  <select
+                    value={novoContato.circulo}
+                    onChange={(e) => setNovoContato({ ...novoContato, circulo: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  >
+                    {CIRCULOS.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-deep mb-2">
+                    Potencial de influência / insight
+                  </label>
+                  <textarea
+                    value={novoContato.potencial}
+                    onChange={(e) => setNovoContato({ ...novoContato, potencial: e.target.value })}
+                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    placeholder="Como essa pessoa pode te abrir portas? O que ela sabe sobre você?"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-deep mb-2">Próxima ação</label>
+                  <input
+                    type="text"
+                    value={novoContato.acao}
+                    onChange={(e) => setNovoContato({ ...novoContato, acao: e.target.value })}
+                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    placeholder="Ex: Marcar um café, enviar mensagem..."
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={handleAdicionarContatoManual}
+                    className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors font-medium"
+                  >
+                    Adicionar Contato
+                  </button>
+                  <button
+                    onClick={() => setMostraFormulario(false)}
+                    className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </Panel>
+          </div>
         )}
 
         {aba === 'analise' && (
@@ -279,7 +450,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                       <h4 className="font-medium text-brown-deep">{circulo.label}</h4>
                     </div>
                     <p className="text-sm text-ink-soft mb-3">
-                      <strong>Contato:</strong> {contato.nome} ({contato.empresa})
+                      <strong>Contato:</strong> {contato.nome}
+                      {contato.relacao ? ` (${contato.relacao})` : ''}
                     </p>
                     <p className="bg-white p-3 rounded text-sm text-ink border-l-4 border-brown-deep mb-4">
                       "{mensagens[circulo.id] || 'Mensagem personalizada'}"

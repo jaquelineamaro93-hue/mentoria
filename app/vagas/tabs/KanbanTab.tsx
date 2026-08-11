@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { GripVertical, X, Zap, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { GripVertical, X, Zap, Plus, ChevronLeft, ChevronRight, Download, Upload, FileUp } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import * as XLSX from 'xlsx';
 
 interface Vaga {
   id: string;
@@ -48,6 +49,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
   const [editandoVaga, setEditandoVaga] = useState(false);
   const [vagaEditada, setVagaEditada] = useState<Partial<Vaga>>({});
   const [deletando, setDeletando] = useState(false);
+  const [mostraImportacao, setMostraImportacao] = useState(false);
   const [novaVaga, setNovaVaga] = useState({
     empresa: '',
     cargo: '',
@@ -94,6 +96,85 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       moveVaga(vaga, ETAPAS[currentIndex - 1].id);
     } else if (direction === 'next' && currentIndex < ETAPAS.length - 1) {
       moveVaga(vaga, ETAPAS[currentIndex + 1].id);
+    }
+  }
+
+  function exportarVagasComoTemplate() {
+    if (vagas.length === 0) {
+      alert('Nenhuma vaga para exportar');
+      return;
+    }
+
+    const dados = vagas.map((vaga) => ({
+      'Título da Vaga': vaga.cargo,
+      'Empresa': vaga.empresa,
+      'Descrição': vaga.descricao_vaga || '',
+      'Link': vaga.link_vaga || '',
+      'Contato': vaga.contato || '',
+      'Etapa': ETAPAS.find((e) => e.id === vaga.etapa)?.label || vaga.etapa,
+      'Fit Score': vaga.fit_score || '',
+      'Próximo Passo': vaga.proximo_passo || '',
+      'Observações': vaga.observacoes || '',
+      'Origem': vaga.origem || 'organico',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Vagas');
+
+    const fileName = `Minhas_Vagas_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+  }
+
+  async function handleImportarArquivo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(worksheet);
+
+      let importadas = 0;
+      for (const row of rows) {
+        const empresa = (row as any)['Empresa']?.toString().trim();
+        const cargo = (row as any)['Título da Vaga']?.toString().trim();
+
+        if (!empresa || !cargo) continue;
+
+        const etapaLabel = (row as any)['Etapa']?.toString().trim();
+        const etapaId = ETAPAS.find((e) => e.label === etapaLabel)?.id || 'para_aplicar';
+
+        try {
+          await fetch('/api/vagas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              empresa,
+              cargo,
+              descricao_vaga: (row as any)['Descrição']?.toString() || '',
+              link_vaga: (row as any)['Link']?.toString() || '',
+              contato: (row as any)['Contato']?.toString() || '',
+              etapa: etapaId,
+              fit_score: parseInt((row as any)['Fit Score']) || null,
+              proximo_passo: (row as any)['Próximo Passo']?.toString() || '',
+              observacoes: (row as any)['Observações']?.toString() || '',
+              origem: (row as any)['Origem']?.toString() || 'organico',
+            }),
+          });
+          importadas++;
+        } catch (erro) {
+          console.error('Erro ao importar vaga:', erro);
+        }
+      }
+
+      alert(`${importadas} vaga${importadas !== 1 ? 's' : ''} importada${importadas !== 1 ? 's' : ''} com sucesso!`);
+      onVagaAtualizada();
+      setMostraImportacao(false);
+    } catch (erro) {
+      console.error('Erro ao ler arquivo:', erro);
+      alert('Erro ao ler o arquivo. Verifique se é um arquivo XLSX ou CSV válido.');
     }
   }
 
@@ -203,14 +284,119 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           </Eyebrow>
           <h2 className="font-display text-3xl text-brown-deep">Kanban</h2>
         </div>
-        <button
-          onClick={() => setMostraModalNova(true)}
-          className="flex items-center gap-2 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors"
-        >
-          <Plus size={18} />
-          Adicionar Vaga
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={exportarVagasComoTemplate}
+            className="flex items-center gap-2 bg-brown-deep text-paper px-4 py-2.5 rounded-lg hover:bg-brown transition-colors font-medium"
+            title="Exporta suas vagas atuais como arquivo para backup ou importação posterior"
+          >
+            <FileUp size={18} />
+            📤 Baixar Minhas Vagas
+          </button>
+          <button
+            onClick={() => setMostraImportacao(true)}
+            className="flex items-center gap-2 bg-sky-deep text-white px-4 py-2.5 rounded-lg hover:bg-sky-deep/90 transition-colors font-medium"
+          >
+            <Upload size={18} />
+            📥 Importar Planilha
+          </button>
+          <button
+            onClick={() => setMostraModalNova(true)}
+            className="flex items-center gap-2 border-2 border-brown-deep text-brown-deep px-4 py-2.5 rounded-lg hover:bg-cream transition-colors font-medium"
+          >
+            <Plus size={18} />
+            Adicionar Vaga
+          </button>
+        </div>
       </div>
+
+      {/* Modal de Importação com Template */}
+      {mostraImportacao && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Panel className="max-w-2xl w-full border border-line">
+            <div className="sticky top-0 bg-paper border-b border-line p-6 flex items-start justify-between">
+              <h2 className="font-display text-2xl text-brown-deep">Template de Vagas</h2>
+              <button
+                onClick={() => setMostraImportacao(false)}
+                className="text-ink-faint hover:text-ink transition"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="bg-sky-tint border-2 border-sky p-4 rounded-lg">
+                <p className="text-sm text-sky-deep font-medium">
+                  💡 <strong>Como usar:</strong> Importe vagas de um arquivo Excel ou CSV (seu próprio ou do template abaixo)
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-brown-deep mb-3">O que está incluído no template:</h3>
+                  <ul className="text-sm text-ink space-y-2 ml-4">
+                    <li>✓ Empresa</li>
+                    <li>✓ Cargo</li>
+                    <li>✓ Descrição da Vaga</li>
+                    <li>✓ Link da Vaga</li>
+                    <li>✓ Contato (para referência)</li>
+                    <li>✓ Etapa (Para Aplicar, Aplicada, etc)</li>
+                    <li>✓ Fit Score (%)</li>
+                    <li>✓ Próximo Passo</li>
+                    <li>✓ Observações</li>
+                    <li>✓ Origem (Orgânico ou Indicação)</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-medium text-brown-deep mb-3">Passo a passo:</h3>
+                  <ol className="text-sm text-ink space-y-2 ml-4 list-decimal">
+                    <li>Baixe o template clicando no botão abaixo</li>
+                    <li>Abra em Excel, Google Sheets ou Numbers</li>
+                    <li>Preencha as linhas amarelas com suas vagas</li>
+                    <li>Salve como CSV</li>
+                    <li>Importe aqui na plataforma</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                  <p className="text-sm text-green-700">
+                    <strong>✅ Importar seu arquivo:</strong> Selecione um arquivo CSV ou XLSX (exportado daqui ou preenchido manualmente) para importar várias vagas de uma vez.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-deep mb-3">Selecione o arquivo para importar:</label>
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleImportarArquivo}
+                    className="w-full px-4 py-3 border border-line rounded-lg cursor-pointer hover:border-brown-deep transition"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <a
+                    href="/api/download-template-vagas"
+                    className="flex-1 bg-sky-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-sky-deep/90 transition text-center flex items-center justify-center gap-2"
+                  >
+                    <Download size={18} />
+                    Baixar Template (XLSX)
+                  </a>
+                  <button
+                    onClick={() => setMostraImportacao(false)}
+                    className="flex-1 border border-line text-ink px-6 py-3 rounded-lg font-medium hover:bg-cream transition"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Panel>
+        </div>
+      )}
 
       <div className="overflow-x-auto pb-4 border border-line rounded-lg bg-paper">
         <div className="flex gap-4 p-4 min-w-max">

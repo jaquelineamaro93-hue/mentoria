@@ -66,14 +66,17 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
         }),
       });
 
-      if (!res.ok) throw new Error('Erro ao gerar análise');
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Erro ao gerar análise SOAR');
+      }
+
       setAnalise(data.analise);
       setAba('minhas');
     } catch (erro) {
       console.error('Erro:', erro);
-      alert('Erro ao gerar análise SOAR');
+      alert(erro instanceof Error ? erro.message : 'Erro ao gerar análise SOAR');
     } finally {
       setGerando(false);
     }
@@ -86,10 +89,10 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
+    <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
+      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Sparkles size={14} />
           Preparação para Entrevistas
