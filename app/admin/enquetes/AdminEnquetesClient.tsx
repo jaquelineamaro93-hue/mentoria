@@ -40,7 +40,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
   });
 
   function iniciarNova() {
-    setEditando(null);
+    setEditando({ id: '', titulo: '', descricao: null, data_inicio: '', data_fim: '', tipo: 'presencial', ativo: true, horario: null, local: null });
     setForm({
       titulo: '',
       descricao: '',
@@ -100,7 +100,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
         if (error) throw error;
         if (data) setEnquetes((prev) => [data, ...prev]);
       }
-      setEditando(null);
+      setEditando({ id: '', titulo: '', descricao: null, data_inicio: '', data_fim: '', tipo: 'presencial', ativo: true, horario: null, local: null });
       setForm({});
       setErro(null);
     } catch (err) {
