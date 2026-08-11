@@ -35,8 +35,8 @@ ${descricaoVaga}
 Retorne JSON com: experiencias[], mapaCompetencias{}, abertura, historiasAncora[], resposta_por_que_sair, resposta_por_que_vaga, tratamento_gaps`;
 
     const message = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4096,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 8000,
       messages: [{ role: 'user', content: prompt }],
     });
 
