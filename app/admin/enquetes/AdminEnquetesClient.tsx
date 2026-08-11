@@ -145,11 +145,11 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
         {erro && (
           <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm">{erro}</div>
         )}
-        {editando !== undefined && (
+        {editando !== null && (
           <Panel className="p-6 mb-8 border-sky">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display text-xl text-brown-deep">{editando ? 'Editar votação' : 'Nova votação'}</h2>
-              <button onClick={() => setEditando(undefined)} className="text-ink-faint hover:text-brown-deep">
+              <button onClick={() => setEditando(null)} className="text-ink-faint hover:text-brown-deep">
                 <X size={20} />
               </button>
             </div>
@@ -205,7 +205,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
               <button onClick={handleSalvar} disabled={salvando} className="bg-brown-deep hover:bg-brown text-white font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-60">
                 {salvando ? 'Salvando...' : editando ? 'Atualizar' : 'Criar'}
               </button>
-              <button onClick={() => setEditando(undefined)} className="border border-brown-deep text-brown-deep hover:bg-brown-deep/10 font-medium px-6 py-2.5 rounded-lg transition-colors">
+              <button onClick={() => setEditando(null)} className="border border-brown-deep text-brown-deep hover:bg-brown-deep/10 font-medium px-6 py-2.5 rounded-lg transition-colors">
                 Cancelar
               </button>
             </div>
@@ -214,7 +214,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
         <section>
           <div className="flex items-center justify-between mb-4">
             <Eyebrow>Votações cadastradas</Eyebrow>
-            {editando === undefined && (
+            {editando === null && (
               <button onClick={iniciarNova} className="flex items-center gap-1.5 text-sm font-medium bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors">
                 <Plus size={16} />
                 Nova votação
