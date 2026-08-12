@@ -128,7 +128,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
         permitir_multiplas: form.permitir_multiplas || false,
       };
       let enqueteId = editando?.id || '';
-      if (editando) {
+      if (editando && editando.id) {
         const { error } = await supabase.from('enquetes').update(payload).eq('id', editando.id);
         if (error) throw error;
         enqueteId = editando.id;
