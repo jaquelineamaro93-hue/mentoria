@@ -353,7 +353,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
                 );
               })}
             </div>
-          </Panel>
+         </div>
 
           <div>
             <Eyebrow>
