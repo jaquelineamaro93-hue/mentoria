@@ -365,7 +365,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
                 <Panel key={idx} className="p-3 border border-sky bg-sky-tint flex gap-3">
                   <Check className="w-5 h-5 flex-shrink-0 mt-0.5 text-sky-deep" />
                   <span className="text-ink text-sm">{ponto}</span>
-                </Panel>
+                 </div>
               ))}
             </div>
           </div>
