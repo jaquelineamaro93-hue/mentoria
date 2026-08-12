@@ -234,6 +234,13 @@ export default function AdminClient({
               <Rocket size={15} />
               Boas práticas de crescimento
             </Link>
+            <Link
+              href="/admin/enquetes"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Send size={15} />
+              Gerenciar votações
+            </Link>
             <button
               onClick={enviarLembretesAgora}
               disabled={enviandoLembretes}
