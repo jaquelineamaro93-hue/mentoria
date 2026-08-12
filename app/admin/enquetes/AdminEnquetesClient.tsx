@@ -115,9 +115,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
     }
     setSalvando(true);
     try {
-      const payload: Enquete = {
-        id: '',
-        titulo: form.titulo,
+      const payloadData = {
         descricao: form.descricao || null,
         data_inicio: form.data_inicio,
         data_fim: form.data_fim,
@@ -129,13 +127,13 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
       };
       let enqueteId = editando?.id || '';
       if (editando && editando.id) {
-        const { error } = await supabase.from('enquetes').update(payload).eq('id', editando.id);
+        const { error } = await supabase.from('enquetes').update(payloadData).eq('id', editando.id);
         if (error) throw error;
         enqueteId = editando.id;
         await supabase.from('enquete_opcoes').delete().eq('enquete_id', editando.id);
-        setEnquetes((prev) => prev.map((e) => (e.id === editando.id ? { ...e, ...payload } : e)));
+        setEnquetes((prev) => prev.map((e) => (e.id === editando.id ? { ...e, ...payloadData } : e)));
       } else {
-        const { data, error } = await supabase.from('enquetes').insert([payload]).select().single();
+        const { data, error } = await supabase.from('enquetes').insert([payloadData]).select().single();
         if (error) throw error;
         if (!data?.id) throw new Error('ID da enquete não retornou do servidor');
         enqueteId = data.id;
