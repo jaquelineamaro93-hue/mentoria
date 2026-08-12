@@ -87,8 +87,11 @@ export default function VotarEncontroClient({
 
   useEffect(() => {
     carregarVotos();
-    carregarEnquetes();
   }, [profile]);
+
+  useEffect(() => {
+    carregarEnquetes(abaEnquete);
+  }, [abaEnquete]);
 
   async function carregarVotos() {
     if (!profile?.id) return;
@@ -103,11 +106,12 @@ export default function VotarEncontroClient({
     }
   }
 
-  async function carregarEnquetes() {
+  async function carregarEnquetes(tipo: 'online' | 'presencial') {
     const { data: enquetesData } = await supabase
       .from('enquetes')
       .select('*')
       .eq('ativo', true)
+      .eq('tipo', tipo)
       .order('data_inicio', { ascending: false });
 
     if (enquetesData) {
@@ -209,7 +213,7 @@ export default function VotarEncontroClient({
         opcoes: opcaoIds,
       });
       setEnviado(true);
-      await carregarEnquetes();
+      await carregarEnquetes(abaEnquete);
     } catch (e) {
       console.error(e);
     }
