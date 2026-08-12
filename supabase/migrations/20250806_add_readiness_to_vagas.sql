@@ -1,0 +1,12 @@
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS readiness_score INTEGER CHECK (readiness_score >= 0 AND readiness_score <= 100);
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS readiness_gap INTEGER CHECK (readiness_gap >= 0 AND readiness_gap <= 100);
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS weeks_to_ready INTEGER;
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS estimated_readiness_date DATE;
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS roadmap_items JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS sub_scores JSONB DEFAULT '{"experiencia": 0, "skills_tecnicas": 0, "senioridade": 0, "contexto_setor": 0}'::jsonb;
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS pontos_fortes TEXT[] DEFAULT '{}';
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS gaps JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS recomendacoes_curriculo TEXT[] DEFAULT '{}';
+ALTER TABLE vagas_candidatura ADD COLUMN IF NOT EXISTS resumo TEXT;
+CREATE INDEX IF NOT EXISTS idx_vagas_candidatura_readiness_score ON vagas_candidatura(readiness_score DESC);
+CREATE INDEX IF NOT EXISTS idx_vagas_candidatura_estimated_readiness_date ON vagas_candidatura(estimated_readiness_date);
