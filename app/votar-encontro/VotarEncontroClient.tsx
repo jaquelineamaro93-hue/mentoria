@@ -49,6 +49,7 @@ export default function VotarEncontroClient({
 
   const datasDaAba = aba === 'presencial' ? DATAS_ENCONTROS : DATAS_ONLINE;
   const votosDaAba = votos.filter((v) => v.tipo === aba);
+  const enquetesDaAba = enquetes.filter((e) => e.tipo === abaEnquete);
 
   useEffect(() => {
     carregarVotos();
