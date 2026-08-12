@@ -116,6 +116,7 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
     setSalvando(true);
     try {
       const payloadData = {
+        titulo: form.titulo,
         descricao: form.descricao || null,
         data_inicio: form.data_inicio,
         data_fim: form.data_fim,
