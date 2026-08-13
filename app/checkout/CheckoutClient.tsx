@@ -9,10 +9,10 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
   const [formaEscolhida, setFormaEscolhida] = useState<'vista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
 
-  const plano = planos.find((p) => p.id === planoSelecionado);
-
-  async function irParaMercadoPago() {
-    if (!plano || !formaEscolhida) return;
+ body: JSON.stringify({
+  planoCodigo: plano.codigo,
+  formaPagamento: formaEscolhida,
+})
 
     setProcessando(true);
 
