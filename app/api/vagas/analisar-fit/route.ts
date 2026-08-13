@@ -1,15 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import Anthropic from "@anthropic-ai/sdk";
-import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
-import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import Anthropic from '@anthropic-ai/sdk';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = await createClient();
+    const { data: user } = await supabase.auth.getUser();
 
     if (!user?.user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -21,22 +17,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'vaga_input é obrigatório' }, { status: 400 });
     }
 
-    // Buscar perfil (com select * pra ser mais tolerante com mudanças de schema)
-    const { data: profile, error: profileError } = await supabase
+    const { data: profiles, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.user.id)
-      .single();
+      .limit(1);
 
-    if (profileError || !profile) {
-      console.error('❌ Perfil não encontrado para user:', user.user.id, profileError);
-      return NextResponse.json(
-        { error: 'Seu perfil não foi encontrado. Preencha seus dados primeiro.' },
-        { status: 404 }
-      );
+    const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+
+    if (profileError) {
+      console.warn('⚠️  Erro ao buscar perfil:', profileError);
     }
 
-    // Buscar PDI (opcional, pode não existir)
     const { data: pdiPlano } = await supabase
       .from('pdi_planos')
       .select('diagnostico, equacao, pilares')
@@ -46,11 +38,10 @@ export async function POST(req: NextRequest) {
       .limit(1)
       .single();
 
-    // Campos do perfil com fallback seguro
-    const nome = profile.nome || 'Usuário';
-    const objetivo = (profile as any).objetivo_carreira || 'Não preenchido';
-    const skills = (profile as any).skills || (profile as any).skill || 'Não preenchido';
-    const experiencias = (profile as any).experiencias || (profile as any).experiencia || 'Não preenchido';
+    const nome = profile?.nome || 'Usuário';
+    const objetivo = profile?.objetivo_carreira || 'Não preenchido';
+    const skills = profile?.skills || profile?.skill || 'Não preenchido';
+    const experiencias = profile?.experiencias || profile?.experiencia || 'Não preenchido';
     const diagnostico = pdiPlano?.diagnostico || {};
 
     const anthropic = new Anthropic({
@@ -94,7 +85,7 @@ Retorne APENAS este JSON (sem markdown, sem backticks):
 
     let analise;
     try {
-      planoGerado = JSON.parse(textoResposta);
+      analise = JSON.parse(responseText);
     } catch {
       console.error('Erro ao parsear:', responseText);
       return NextResponse.json({ error: 'Erro ao processar análise de fit' }, { status: 500 });
