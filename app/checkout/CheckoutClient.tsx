@@ -6,31 +6,23 @@ import type { PlanoMentoria } from '@/lib/types';
 
 export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) {
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
-  const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' |'pix' |  null>(null);
+  const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
 
- body: JSON.stringify({
-  planoCodigo: plano.codigo,
-  formaPagamento: formaEscolhida,
-})
+  const plano = planos.find((p) => p.id === planoSelecionado);
+
+  async function irParaMercadoPago() {
+    if (!plano || !formaEscolhida) return;
 
     setProcessando(true);
 
     try {
-      const preco =
-        formaEscolhida === 'vista'
-          ? plano.preco_avista
-          : formaEscolhida === 'cartao'
-            ? plano.preco_cartao
-            : plano.preco_recorrente_total;
-
       const res = await fetch('/api/mercadopago/criar-assinatura', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          plano_id: plano.id,
-          preco,
-          forma_pagamento: formaEscolhida,
+          planoCodigo: plano.codigo,
+          formaPagamento: formaEscolhida,
         }),
       });
 
@@ -105,7 +97,7 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
               <button
                 onClick={() => setFormaEscolhida('avista')}
                 className={`border-2 rounded-xl p-4 transition-all text-center ${
-                  formaEscolhida === 'vista'
+                  formaEscolhida === 'avista'
                     ? 'border-brown-deep bg-brown-deep/5'
                     : 'border-line hover:border-brown-deep'
                 }`}
