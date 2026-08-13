@@ -6,7 +6,7 @@ import type { PlanoMentoria } from '@/lib/types';
 
 export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) {
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
-  const [formaEscolhida, setFormaEscolhida] = useState<'vista' | 'cartao' | 'recorrente' | null>(null);
+  const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' |'pix' |  null>(null);
   const [processando, setProcessando] = useState(false);
 
  body: JSON.stringify({
@@ -103,7 +103,7 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
 
             <div className="grid md:grid-cols-3 gap-4 mb-8">
               <button
-                onClick={() => setFormaEscolhida('vista')}
+                onClick={() => setFormaEscolhida('avista')}
                 className={`border-2 rounded-xl p-4 transition-all text-center ${
                   formaEscolhida === 'vista'
                     ? 'border-brown-deep bg-brown-deep/5'
