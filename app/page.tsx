@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import Link from 'next/link';
+import Link from 'next/link'; 
 import { CheckCircle2, Users, Compass, Target, Sparkles, Video, MapPin } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
