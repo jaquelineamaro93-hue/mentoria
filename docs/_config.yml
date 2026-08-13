@@ -1,0 +1,5 @@
+title: SOMA Mentoria
+description: Portal de mentoria de carreira
+theme: jekyll-theme-primer
+plugins:
+  - jekyll-seo-tag
