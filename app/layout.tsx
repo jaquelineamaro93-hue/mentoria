@@ -3,6 +3,7 @@ import './globals.css';
 import PostHogInit from '@/components/PostHogInit';
 import TermosGate from '@/components/TermosGate';
 import AcessoGate from '@/components/AcessoGate';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 export const metadata: Metadata = {
   title: 'Portal do Mentorado | Mentoria SOMA',
@@ -31,6 +32,7 @@ export default function RootLayout({
         <AcessoGate />
         <TermosGate />
         {children}
+        <WhatsAppButton />
       </body>
     </html>
   );
