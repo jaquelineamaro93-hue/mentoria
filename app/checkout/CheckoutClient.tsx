@@ -13,9 +13,7 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
 
   async function irParaMercadoPago() {
     if (!plano || !formaEscolhida) return;
-
     setProcessando(true);
-
     try {
       const res = await fetch('/api/mercadopago/criar-assinatura', {
         method: 'POST',
@@ -25,10 +23,11 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
           formaPagamento: formaEscolhida,
         }),
       });
-
       const data = await res.json();
       if (data.init_point) {
         window.location.href = data.init_point;
+      } else if (data.error) {
+        alert(`Erro: ${data.error}`);
       }
     } catch (e) {
       console.error(e);
@@ -42,11 +41,8 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl text-brown-deep mb-2">Soma — Mentoria de Carreira</h1>
-          <p className="text-lg text-ink-faint">
-            Escolha seu plano e comece sua jornada de transformação profissional.
-          </p>
+          <p className="text-lg text-ink-faint">Escolha seu plano e comece sua jornada de transformação profissional.</p>
         </div>
-
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {planos.map((p) => {
             const isSelected = planoSelecionado === p.id;
@@ -65,9 +61,7 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
                   </div>
                   {isSelected && <Check size={24} className="text-green-600" />}
                 </div>
-
                 <p className="text-sm text-ink-faint mb-6 leading-relaxed">{p.descricao_encontros}</p>
-
                 <div className="space-y-2 text-sm mb-6">
                   <p className="text-brown-deep font-medium">Opções de pagamento:</p>
                   <p className="text-ink-faint">
@@ -88,11 +82,9 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
             );
           })}
         </div>
-
         {planoSelecionado && plano && (
           <div className="bg-white border-2 border-brown-deep rounded-2xl p-8">
             <h3 className="font-display text-xl text-brown-deep mb-6">Como você prefere pagar?</h3>
-
             <div className="grid md:grid-cols-3 gap-4 mb-8">
               <button
                 onClick={() => setFormaEscolhida('avista')}
@@ -107,7 +99,6 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
                   R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </button>
-
               <button
                 onClick={() => setFormaEscolhida('cartao')}
                 className={`border-2 rounded-xl p-4 transition-all text-center ${
@@ -121,7 +112,6 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
                   R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </button>
-
               <button
                 onClick={() => setFormaEscolhida('recorrente')}
                 className={`border-2 rounded-xl p-4 transition-all text-center ${
@@ -131,9 +121,7 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
                 }`}
               >
                 <p className="font-medium text-brown-deep mb-2">Parcelado</p>
-                <p className="text-sm text-ink-faint mb-1">
-                  {plano.parcelas_recorrente}x de
-                </p>
+                <p className="text-sm text-ink-faint mb-1">{plano.parcelas_recorrente}x de</p>
                 <p className="text-lg font-display text-brown-deep">
                   R${' '}
                   {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', {
@@ -142,7 +130,6 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
                 </p>
               </button>
             </div>
-
             {formaEscolhida && (
               <button
                 onClick={irParaMercadoPago}
