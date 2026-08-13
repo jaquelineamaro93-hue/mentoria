@@ -15,10 +15,9 @@ export function verificarAssinaturaWebhook(
   const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
 
   if (!secret) {
-    // Sem o segredo configurado ainda, não bloqueia (pra não quebrar o que já
-    // está no ar), mas isso deveria ser corrigido assim que possível.
-    return { valido: true, motivo: 'MERCADOPAGO_WEBHOOK_SECRET não configurado, checagem pulada' };
-  }
+  console.error('❌ MERCADOPAGO_WEBHOOK_SECRET não configurado');
+  return { valido: false, motivo: 'MERCADOPAGO_WEBHOOK_SECRET não configurado nas variáveis de ambiente' };
+}
 
   if (!xSignature || !xRequestId || !dataId) {
     return { valido: false, motivo: 'Cabeçalhos de assinatura ausentes' };
