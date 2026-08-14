@@ -11,9 +11,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, nome, foto_url, pontos_total')
-      .order('pontos_total', { ascending: false });
+  .from('profiles')
+  .select('id, nome, foto_url, pontos_total, is_admin')
+  .eq('is_admin', false)
+  .order('pontos_total', { ascending: false });
 
     if (!profiles) {
       return NextResponse.json({ ranking: [] });
