@@ -191,7 +191,7 @@ export default function AdminClient({
   async function carregarUsuarios() {
     setUsuariosCarregando(true);
     try {
-      const res = await fetch('/api/admin/usuarios');
+      const res = await fetch('/api/admin/listar-usuarios');
       const data = await res.json();
       setUsuarios(data || []);
     } catch (error) {
