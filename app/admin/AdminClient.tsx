@@ -39,6 +39,7 @@ export default function AdminClient({
   const [usuariosCarregando, setUsuariosCarregando] = useState(false);
   const [usuarioTogglingId, setUsuarioTogglingId] = useState<string | null>(null);
   const [filtroUsuarios, setFiltroUsuarios] = useState<'todos' | 'admin' | 'geral'>('todos');
+  const [buscaUsuario, setBuscaUsuario] = useState('');
 
   async function confirmarEmailUsuario(userId: string, nome: string) {
     setConfirmandoId(userId);
@@ -227,8 +228,12 @@ export default function AdminClient({
   }, []);
 
   const usuariosFiltrados = usuarios.filter((u) => {
-    if (filtroUsuarios === 'admin') return u.is_admin;
-    if (filtroUsuarios === 'geral') return !u.is_admin;
+    if (filtroUsuarios === 'admin' && !u.is_admin) return false;
+    if (filtroUsuarios === 'geral' && u.is_admin) return false;
+    if (buscaUsuario.trim()) {
+      const termo = buscaUsuario.trim().toLowerCase();
+      if (!(u.nome?.toLowerCase().includes(termo) || u.email?.toLowerCase().includes(termo))) return false;
+    }
     return true;
   });
 
@@ -582,6 +587,13 @@ export default function AdminClient({
                     <option value="geral">Apenas Geral</option>
                   </select>
                 </div>
+                <input
+                  type="text"
+                  value={buscaUsuario}
+                  onChange={(e) => setBuscaUsuario(e.target.value)}
+                  placeholder="Buscar por nome ou e-mail..."
+                  className="w-full text-sm border border-line rounded-lg px-3 py-2 mb-3 bg-cream text-ink placeholder:text-ink-faint focus:outline-none focus:border-brown-deep"
+                />
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {usuariosFiltrados.map((usuario) => (
                     <button
@@ -600,7 +612,14 @@ export default function AdminClient({
                             {usuario.nome}
                             {usuario.is_admin && <Shield size={14} className="text-amber-600" />}
                           </p>
-                          <p className="text-xs text-ink-faint">{usuario.email}</p>
+                          <p className="text-xs text-ink-faint mb-1.5">{usuario.email}</p>
+                          <span className={`inline-block text-[10px] uppercase tracking-wide font-medium px-2.5 py-0.5 rounded-full border ${
+                            usuario.is_admin
+                              ? 'bg-amber-100 text-amber-700 border-amber-300'
+                              : 'bg-sky-50 text-sky-700 border-sky-200'
+                          }`}>
+                            {usuario.is_admin ? '👮 Admin' : '👤 Usuário'}
+                          </span>
                         </div>
                         {usuarioTogglingId === usuario.id && <Loader2 size={14} className="animate-spin text-brown-deep" />}
                       </div>
