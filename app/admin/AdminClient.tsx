@@ -41,11 +41,17 @@ export default function AdminClient({
   async function carregarUsuarios() {
     setUsuariosCarregando(true);
     try {
-      const res = await fetch('/api/admin/usuarios');
+      const res = await fetch('/api/admin/listar-usuarios');
+      if (!res.ok) {
+        console.error('Erro ao carregar usuários:', res.status, res.statusText);
+        setUsuarios([]);
+        return;
+      }
       const data = await res.json();
-      setUsuarios(data || []);
+      setUsuarios(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
+      setUsuarios([]);
     } finally {
       setUsuariosCarregando(false);
     }
