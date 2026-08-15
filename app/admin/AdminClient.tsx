@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -137,7 +137,6 @@ export default function AdminClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Copia o link para a área de transferência
       await navigator.clipboard.writeText(data.link);
 
       posthog.capture('admin_gerou_reset_senha', { usuario_alvo: userId });
@@ -166,7 +165,6 @@ export default function AdminClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Remove da lista local
       setLinhas((prev) => prev.filter((l) => l.profile.id !== userId));
       posthog.capture('admin_deletou_usuario', { usuario_alvo: userId });
       alert('Usuário deletado com sucesso!');
@@ -240,6 +238,20 @@ export default function AdminClient({
             >
               <Send size={15} />
               Gerenciar votações
+            </Link>
+            <Link
+              href="/admin/usuarios"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Shield size={15} />
+              Gerenciar usuários
+            </Link>
+            <Link
+              href="/admin/permissoes"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Lock size={15} />
+              Controle de permissões
             </Link>
             <button
               onClick={enviarLembretesAgora}
