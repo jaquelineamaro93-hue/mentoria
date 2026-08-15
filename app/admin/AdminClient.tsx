@@ -40,8 +40,6 @@ export default function AdminClient({
   const [usuarioTogglingId, setUsuarioTogglingId] = useState<string | null>(null);
   const [filtroUsuarios, setFiltroUsuarios] = useState<'todos' | 'admin' | 'geral'>('todos');
   const [buscaUsuario, setBuscaUsuario] = useState('');
-  const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
-  const [deletandoId, setDeletandoId] = useState<string | null>(null);
 
   async function confirmarEmailUsuario(userId: string, nome: string) {
     setConfirmandoId(userId);
