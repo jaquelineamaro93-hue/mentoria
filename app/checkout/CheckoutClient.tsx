@@ -50,7 +50,19 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           </div>
         )}
 
-        {git diff --statlogado === false && (
+        {logado === false && (
+          <div className="bg-lotus-cream border border-line rounded-xl p-4 mb-8 text-center text-sm text-ink">
+            Já é aluna? <a href="/login" className="text-brown-deep font-medium underline">Faça login</a> antes de contratar para vincular ao seu perfil.
+          </div>
+        )}
+
+        {planoAtualCodigo && (
+          <div className="bg-sky-tint border border-sky rounded-xl p-4 mb-8 text-center text-sm text-brown-deep">
+            Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
+          </div>
+        )}
+
+        {logado === false && (
           <div className="bg-lotus-cream border border-line rounded-xl p-4 mb-8 text-center text-sm text-ink">
             Já é aluna? <a href="/login" className="text-brown-deep font-medium underline">Faça login</a> antes de contratar para vincular ao seu perfil.
           </div>

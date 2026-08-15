@@ -185,6 +185,24 @@ export default function SimuladorCVClient({
               {creditos} crédito{creditos > 1 ? 's' : ''} extra
             </span>
           )}
+          {restantesGratis === 0 && creditos === 0 && (
+            <button
+              onClick={comprarSimulacaoExtra}
+              disabled={comprando}
+              className="text-xs px-3 py-1.5 rounded-full bg-brown text-paper hover:bg-brown-deep transition-colors disabled:opacity-60"
+            >
+              {comprando ? 'Abrindo...' : 'Comprar crédito extra (R$ 5)'}
+            </button>
+          )}
+          {restantesGratis === 0 && creditos === 0 && (
+            <button
+              onClick={comprarSimulacaoExtra}
+              disabled={comprando}
+              className="text-xs px-3 py-1.5 rounded-full bg-brown text-paper hover:bg-brown-deep transition-colors disabled:opacity-60"
+            >
+              {comprando ? 'Abrindo...' : 'Comprar crédito extra (R$ 5)'}
+            </button>
+          )}
         </div>
 
         {mostrarHistorico && (
