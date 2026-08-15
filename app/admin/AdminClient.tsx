@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock } from 'lucide-react';
@@ -37,9 +37,34 @@ export default function AdminClient({
   const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [usuariosCarregando, setUsuariosCarregando] = useState(false);
-  const [usuarioTogglingId, setUsuarioTogglingId] = useState<string | null>(null);
-  const [filtroUsuarios, setFiltroUsuarios] = useState<'todos' | 'admin' | 'geral'>('todos');
-  const [buscaUsuario, setBuscaUsuario] = useState('');
+
+  async function carregarUsuarios() {
+    setUsuariosCarregando(true);
+    try {
+      const res = await fetch('/api/admin/usuarios');
+      const data = await res.json();
+      setUsuarios(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+    } finally {
+      setUsuariosCarregando(false);
+    }
+  }
+
+  async function toggleAdmin(userId: string, currentAdmin: boolean) {
+    try {
+      const res = await fetch('/api/admin/usuarios', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, is_admin: !currentAdmin }),
+      });
+      if (!res.ok) throw new Error('Erro ao atualizar');
+      carregarUsuarios();
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao atualizar usuário');
+    }
+  }
 
   async function confirmarEmailUsuario(userId: string, nome: string) {
     setConfirmandoId(userId);
@@ -188,55 +213,6 @@ export default function AdminClient({
     router.refresh();
   }
 
-  async function carregarUsuarios() {
-    setUsuariosCarregando(true);
-    try {
-      const res = await fetch('/api/admin/listar-usuarios');
-      const data = await res.json();
-      setUsuarios(data || []);
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
-    } finally {
-      setUsuariosCarregando(false);
-    }
-  }
-
-  async function toggleAdmin(userId: string, currentAdmin: boolean) {
-    setUsuarioTogglingId(userId);
-    try {
-      const res = await fetch('/api/admin/usuarios', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, is_admin: !currentAdmin }),
-      });
-
-      if (!res.ok) throw new Error('Erro ao atualizar');
-
-      setUsuarios((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, is_admin: !currentAdmin } : u))
-      );
-    } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao atualizar usuário');
-    } finally {
-      setUsuarioTogglingId(null);
-    }
-  }
-
-  useEffect(() => {
-    carregarUsuarios();
-  }, []);
-
-  const usuariosFiltrados = usuarios.filter((u) => {
-    if (filtroUsuarios === 'admin' && !u.is_admin) return false;
-    if (filtroUsuarios === 'geral' && u.is_admin) return false;
-    if (buscaUsuario.trim()) {
-      const termo = buscaUsuario.trim().toLowerCase();
-      if (!(u.nome?.toLowerCase().includes(termo) || u.email?.toLowerCase().includes(termo))) return false;
-    }
-    return true;
-  });
-
   const total = linhas.length;
   const ativos7dias = linhas.filter((l) => {
     if (!l.profile.last_login_at) return false;
@@ -293,14 +269,6 @@ export default function AdminClient({
               <Send size={15} />
               Gerenciar votações
             </Link>
-            <button
-              onClick={carregarUsuarios}
-              disabled={usuariosCarregando}
-              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap disabled:opacity-60"
-            >
-              {usuariosCarregando ? <Loader2 size={15} className="animate-spin" /> : <Users size={15} />}
-              {usuariosCarregando ? 'Carregando...' : 'Carregar usuários'}
-            </button>
             <button
               onClick={enviarLembretesAgora}
               disabled={enviandoLembretes}
@@ -474,7 +442,7 @@ export default function AdminClient({
           </div>
         </section>
 
-        <section>
+        <section className="mb-10">
           <Eyebrow>Ações da conta</Eyebrow>
           <p className="text-xs text-ink-faint mb-4">
             Plano, forma de pagamento, valor, status, próxima cobrança, data de fim de acesso e
@@ -564,140 +532,66 @@ export default function AdminClient({
           </div>
         </section>
 
-        {usuarios.length > 0 && (
-          <section className="mt-10">
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-4">
             <Eyebrow>Gerenciar usuários e permissões</Eyebrow>
-            <p className="text-xs text-ink-faint mb-4">
-              Clique em um usuário para alternar seu status de admin. Admins não aparecem no ranking de competição.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-brown-deep flex items-center gap-2">
-                    <Users size={18} />
-                    Usuários ({usuariosFiltrados.length})
-                  </h3>
-                  <select
-                    value={filtroUsuarios}
-                    onChange={(e) => setFiltroUsuarios(e.target.value as any)}
-                    className="text-xs border border-line rounded px-2 py-1 bg-cream text-brown-deep"
-                  >
-                    <option value="todos">Todos</option>
-                    <option value="admin">Apenas Admins</option>
-                    <option value="geral">Apenas Geral</option>
-                  </select>
-                </div>
-                <input
-                  type="text"
-                  value={buscaUsuario}
-                  onChange={(e) => setBuscaUsuario(e.target.value)}
-                  placeholder="Buscar por nome ou e-mail..."
-                  className="w-full text-sm border border-line rounded-lg px-3 py-2 mb-3 bg-cream text-ink placeholder:text-ink-faint focus:outline-none focus:border-brown-deep"
-                />
+            <button
+              onClick={carregarUsuarios}
+              disabled={usuariosCarregando}
+              className="text-xs text-sky-deep hover:text-brown-deep disabled:opacity-60"
+            >
+              {usuariosCarregando ? '⟳ Carregando...' : '⟳ Recarregar'}
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-cream rounded-xl border border-line p-6">
+              <h3 className="flex items-center gap-2 font-medium text-brown-deep mb-4">
+                <Shield size={18} />
+                Usuários
+              </h3>
+              <p className="text-xs text-ink-faint mb-4">
+                Clique para promover ou remover acesso de administrador
+              </p>
+              {usuariosCarregando ? (
+                <div className="text-center py-8 text-ink-faint">Carregando usuários...</div>
+              ) : usuarios.length === 0 ? (
+                <div className="text-center py-8 text-ink-faint">Nenhum usuário encontrado</div>
+              ) : (
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {usuariosFiltrados.map((usuario) => (
-                    <div
-                      key={usuario.id}
-                      className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
-                        usuario.is_admin
-                          ? 'bg-amber-50 border-amber-300'
-                          : 'bg-cream border-line'
-                      }`}
+                  {usuarios.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => toggleAdmin(user.id, user.is_admin)}
+                      className="w-full flex items-center justify-between p-3 bg-white hover:bg-sky-tint rounded border border-line text-sm transition-colors"
                     >
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <div className="flex-1">
-                          <p className="font-medium text-ink flex items-center gap-1">
-                            {usuario.nome}
-                            {usuario.is_admin && <Shield size={14} className="text-amber-600" />}
-                          </p>
-                          <p className="text-xs text-ink-faint mb-1.5">{usuario.email}</p>
-                          <span className={`inline-block text-[10px] uppercase tracking-wide font-medium px-2.5 py-0.5 rounded-full border ${
-                            usuario.is_admin
-                              ? 'bg-amber-100 text-amber-700 border-amber-300'
-                              : 'bg-sky-50 text-sky-700 border-sky-200'
-                          }`}>
-                            {usuario.is_admin ? '👮 Admin' : '👤 Usuário'}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => toggleAdmin(usuario.id, usuario.is_admin)}
-                          disabled={usuarioTogglingId === usuario.id}
-                          className={`shrink-0 p-1.5 rounded-lg transition-colors ${
-                            usuarioTogglingId === usuario.id ? 'opacity-60' : 'hover:bg-black/5'
-                          }`}
-                          title={usuario.is_admin ? 'Remover acesso admin' : 'Conceder acesso admin'}
-                        >
-                          {usuarioTogglingId === usuario.id ? (
-                            <Loader2 size={16} className="animate-spin text-brown-deep" />
-                          ) : (
-                            <Shield size={16} className={usuario.is_admin ? 'text-amber-600' : 'text-ink-faint'} />
-                          )}
-                        </button>
+                      <div className="text-left">
+                        <p className="font-medium text-ink">{user.nome}</p>
+                        <p className="text-xs text-ink-faint">{user.email}</p>
                       </div>
-                      <div className="flex gap-2 flex-wrap">
-                        <button
-                          onClick={() => confirmarEmailUsuario(usuario.id, usuario.nome)}
-                          disabled={confirmandoId === usuario.id}
-                          className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-brown hover:bg-brown-deep text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60"
-                        >
-                          {confirmandoId === usuario.id ? <Loader2 size={12} className="animate-spin" /> : <Key size={12} />}
-                          Reset senha
-                        </button>
-                        <button
-                          onClick={() => deletarUsuario(usuario.id, usuario.nome)}
-                          disabled={deletandoId === usuario.id}
-                          className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60"
-                        >
-                          {deletandoId === usuario.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-                          Deletar
-                        </button>
-                      </div>
-                    </div>
+                      {user.is_admin && (
+                        <Shield size={16} className="text-brown-deep flex-shrink-0" />
+                      )}
+                    </button>
                   ))}
                 </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-brown-deep mb-3 flex items-center gap-2">
-                  <Lock size={18} />
-                  Tipos de acesso
-                </h3>
-                <div className="space-y-3">
-                  <div className="bg-amber-50 border border-amber-300 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Shield size={18} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-brown-deep">Usuário Admin</p>
-                        <p className="text-xs text-ink-faint mt-1">
-                          ✓ Acesso à área administrativa<br/>
-                          ✓ Gerenciar usuários e permissões<br/>
-                          ✓ Enviar lembretes em massa<br/>
-                          ✓ Não aparece no ranking
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Users size={18} className="text-sky-deep mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-brown-deep">Usuário Regular</p>
-                        <p className="text-xs text-ink-faint mt-1">
-                          ✓ Acesso ao portal do mentorado<br/>
-                          ✓ Participa do ranking<br/>
-                          ✓ Acesso a todos os módulos<br/>
-                          ✗ Sem acesso administrativo
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-ink-faint pt-2">
-                    💡 Clique em um usuário à esquerda para promover ou rebaixar seu acesso.
-                  </p>
-                </div>
+              )}
+            </div>
+
+            <div className="bg-cream rounded-xl border border-line p-6">
+              <h3 className="flex items-center gap-2 font-medium text-brown-deep mb-4">
+                <Lock size={18} />
+                Permissões
+              </h3>
+              <p className="text-xs text-ink-faint mb-4">
+                Controle granular de acesso para administradores
+              </p>
+              <div className="text-sm text-ink-faint text-center py-12">
+                Nenhuma permissão customizada configurada
               </div>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
       </main>
     </div>
   );
