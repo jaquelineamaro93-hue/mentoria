@@ -90,7 +90,6 @@ export default function DashboardClient({ profile, announcements }: Props) {
             .eq('user_id', profile.id)
             .eq('tipo', 'presencial')
             .single()
-            .catch(() => ({ data: null }));
 
           setNaoVotouEncontro(!votos);
 
@@ -100,7 +99,6 @@ export default function DashboardClient({ profile, announcements }: Props) {
             .eq('user_id', profile.id)
             .order('updated_at', { ascending: false })
             .limit(3)
-            .catch(() => ({ data: [] }));
 
           setUltimosFeedbacks(respostas || []);
         }
