@@ -36,6 +36,8 @@ export default function AdminClient({
   const [enviandoLembretes, setEnviandoLembretes] = useState(false);
   const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
   const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [buscaUsuario, setBuscaUsuario] = useState('');
+  const [filtroUsuarios, setFiltroUsuarios] = useState<'todos' | 'admin' | 'geral'>('todos');
   const [usuariosCarregando, setUsuariosCarregando] = useState(false);
 
   async function carregarUsuarios() {
