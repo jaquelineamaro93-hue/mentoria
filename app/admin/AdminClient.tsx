@@ -566,23 +566,55 @@ export default function AdminClient({
               ) : usuarios.length === 0 ? (
                 <div className="text-center py-8 text-ink-faint">Nenhum usuário encontrado</div>
               ) : (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {usuarios.map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => toggleAdmin(user.id, user.is_admin)}
-                      className="w-full flex items-center justify-between p-3 bg-white hover:bg-sky-tint rounded border border-line text-sm transition-colors"
+                <>
+                  <div className="mb-4 flex gap-3">
+                    <input
+                      type="text"
+                      value={buscaUsuario}
+                      onChange={(e) => setBuscaUsuario(e.target.value)}
+                      placeholder="Buscar por nome ou email..."
+                      className="flex-1 border border-line rounded px-3 py-2 text-sm bg-white"
+                    />
+                    <select
+                      value={filtroUsuarios}
+                      onChange={(e) => setFiltroUsuarios(e.target.value as any)}
+                      className="border border-line rounded px-3 py-2 text-sm bg-white"
                     >
-                      <div className="text-left">
-                        <p className="font-medium text-ink">{user.nome}</p>
-                        <p className="text-xs text-ink-faint">{user.email}</p>
+                      <option value="todos">Todos</option>
+                      <option value="admin">Apenas Admins</option>
+                      <option value="geral">Apenas Geral</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {usuariosFiltrados.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between p-3 bg-white rounded border border-line text-sm"
+                      >
+                        <div className="flex-1 text-left">
+                          <p className="font-medium text-ink flex items-center gap-2">
+                            {user.nome}
+                            {user.is_admin && <Shield size={14} className="text-brown-deep" />}
+                          </p>
+                          <p className="text-xs text-ink-faint mb-2">{user.email}</p>
+                          <span className={`inline-block text-[10px] uppercase px-2 py-1 rounded ${
+                            user.is_admin ? 'bg-amber-100 text-amber-700' : 'bg-sky-50 text-sky-700'
+                          }`}>
+                            {user.is_admin ? '👮 Admin' : '👤 Usuário'}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => toggleAdmin(user.id, user.is_admin)}
+                            className="px-2 py-1 text-xs bg-brown text-white rounded hover:bg-brown-deep"
+                          >
+                            Toggle
+                          </button>
+                        </div>
                       </div>
-                      {user.is_admin && (
-                        <Shield size={16} className="text-brown-deep flex-shrink-0" />
-                      )}
-                    </button>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
