@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Check } from 'lucide-react';
 import type { PlanoMentoria } from '@/lib/types';
 
-export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) {
+export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { planos: PlanoMentoria[]; logado: boolean; planoAtualCodigo: string | null }) {
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
@@ -43,6 +43,18 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
           <h1 className="font-display text-4xl text-brown-deep mb-2">Soma — Mentoria de Carreira</h1>
           <p className="text-lg text-ink-faint">Escolha seu plano e comece sua jornada de transformação profissional.</p>
         </div>
+
+        {planoAtualCodigo && (
+          <div className="bg-sky-tint border border-sky rounded-xl p-4 mb-8 text-center text-sm text-brown-deep">
+            Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
+          </div>
+        )}
+
+        {git diff --statlogado === false && (
+          <div className="bg-lotus-cream border border-line rounded-xl p-4 mb-8 text-center text-sm text-ink">
+            Já é aluna? <a href="/login" className="text-brown-deep font-medium underline">Faça login</a> antes de contratar para vincular ao seu perfil.
+          </div>
+        )}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {planos.map((p) => {
             const isSelected = planoSelecionado === p.id;
@@ -136,7 +148,7 @@ export default function CheckoutClient({ planos }: { planos: PlanoMentoria[] }) 
                 disabled={processando}
                 className="w-full bg-brown-deep text-white font-medium py-4 rounded-lg hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {processando ? 'Processando...' : 'Continuar com Mercado Pago'}
+                {processando ? 'Processando...' : planoAtualCodigo ? 'Renovar com Mercado Pago' : 'Continuar com Mercado Pago'}
               </button>
             )}
           </div>

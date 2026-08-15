@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import CheckoutClient from './CheckoutClient';
 import type { PlanoMentoria } from '@/lib/types';
@@ -9,17 +8,20 @@ export default async function CheckoutPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Se já está autenticado e ativo, redireciona pra dashboard
+  let planoAtualCodigo: string | null = null;
   if (user) {
     const { data: perfil } = await supabase
       .from('profiles')
-      .select('plano_id, status_assinatura')
+      .select('plano_id')
       .eq('id', user.id)
       .single();
-
-    // Se tem plano e tá ativo, não deixa recomprar
-    if (perfil?.plano_id && perfil?.status_assinatura === 'ativo') {
-      redirect('/dashboard');
+    if (perfil?.plano_id) {
+      const { data: planoAtual } = await supabase
+        .from('planos_mentoria')
+        .select('codigo')
+        .eq('id', perfil.plano_id)
+        .single();
+      planoAtualCodigo = planoAtual?.codigo ?? null;
     }
   }
 
@@ -30,5 +32,5 @@ export default async function CheckoutPage() {
     .eq('visivel_checkout', true)
     .order('duracao_meses', { ascending: true });
 
-  return <CheckoutClient planos={planos || []} />;
+  return <CheckoutClient planos={planos || []} logado={!!user} planoAtualCodigo={planoAtualCodigo} />;
 }
