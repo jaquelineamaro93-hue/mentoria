@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       .from('profiles')
       .select('id, nome, foto_url, pontos_total, is_admin')
       .eq('is_admin', false)
-      .order('pontos_total', { ascending: falsegit push origin claude/admin-ranking-hide-2coxmf });
+      .order('pontos_total', { ascending: false });
 
     if (!profiles) {
       return NextResponse.json({ ranking: [] });
