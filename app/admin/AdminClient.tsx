@@ -48,7 +48,7 @@ export default function AdminClient({
         return;
       }
       const data = await res.json();
-      setUsuarios(Array.isArray(data) ? data : []);
+      setUsuarios(Array.isArray(data?.profiles) ? data.profiles : []);
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
       setUsuarios([]);
