@@ -34,6 +34,7 @@ const NAV_ITEMS = [
   { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
   { href: '/pdi', label: 'Meu PDI', icon: Target },
+  { href: '/meu-pdi', label: 'PDI & Documentos', icon: Briefcase },
   { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
   { href: '/feedback-pares', label: 'Feedback entre Colegas', icon: MessageCircle },
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
