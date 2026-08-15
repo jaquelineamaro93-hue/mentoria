@@ -56,17 +56,6 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           </div>
         )}
 
-        {planoAtualCodigo && (
-          <div className="bg-sky-tint border border-sky rounded-xl p-4 mb-8 text-center text-sm text-brown-deep">
-            Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
-          </div>
-        )}
-
-        {logado === false && (
-          <div className="bg-lotus-cream border border-line rounded-xl p-4 mb-8 text-center text-sm text-ink">
-            Já é aluna? <a href="/login" className="text-brown-deep font-medium underline">Faça login</a> antes de contratar para vincular ao seu perfil.
-          </div>
-        )}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {planos.map((p) => {
             const isSelected = planoSelecionado === p.id;
