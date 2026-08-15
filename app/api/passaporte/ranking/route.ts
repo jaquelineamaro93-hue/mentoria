@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, nome, foto_url, pontos_total')
+      .select('id, nome, foto_url, pontos_total, is_admin')
+      .eq('is_admin', false)
       .order('pontos_total', { ascending: false });
 
     if (!profiles) {
