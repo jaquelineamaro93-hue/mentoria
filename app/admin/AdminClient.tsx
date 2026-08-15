@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock } from 'lucide-react';
@@ -35,6 +35,10 @@ export default function AdminClient({
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [enviandoLembretes, setEnviandoLembretes] = useState(false);
   const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [usuariosCarregando, setUsuariosCarregando] = useState(false);
+  const [usuarioTogglingId, setUsuarioTogglingId] = useState<string | null>(null);
+  const [filtroUsuarios, setFiltroUsuarios] = useState<'todos' | 'admin' | 'geral'>('todos');
 
   async function confirmarEmailUsuario(userId: string, nome: string) {
     setConfirmandoId(userId);
@@ -183,6 +187,51 @@ export default function AdminClient({
     router.refresh();
   }
 
+  async function carregarUsuarios() {
+    setUsuariosCarregando(true);
+    try {
+      const res = await fetch('/api/admin/usuarios');
+      const data = await res.json();
+      setUsuarios(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+    } finally {
+      setUsuariosCarregando(false);
+    }
+  }
+
+  async function toggleAdmin(userId: string, currentAdmin: boolean) {
+    setUsuarioTogglingId(userId);
+    try {
+      const res = await fetch('/api/admin/usuarios', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, is_admin: !currentAdmin }),
+      });
+
+      if (!res.ok) throw new Error('Erro ao atualizar');
+
+      setUsuarios((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, is_admin: !currentAdmin } : u))
+      );
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao atualizar usuário');
+    } finally {
+      setUsuarioTogglingId(null);
+    }
+  }
+
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
+
+  const usuariosFiltrados = usuarios.filter((u) => {
+    if (filtroUsuarios === 'admin') return u.is_admin;
+    if (filtroUsuarios === 'geral') return !u.is_admin;
+    return true;
+  });
+
   const total = linhas.length;
   const ativos7dias = linhas.filter((l) => {
     if (!l.profile.last_login_at) return false;
@@ -239,20 +288,14 @@ export default function AdminClient({
               <Send size={15} />
               Gerenciar votações
             </Link>
-            <Link
-              href="/admin/usuarios"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            <button
+              onClick={carregarUsuarios}
+              disabled={usuariosCarregando}
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap disabled:opacity-60"
             >
-              <Shield size={15} />
-              Gerenciar usuários
-            </Link>
-            <Link
-              href="/admin/permissoes"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Lock size={15} />
-              Controle de permissões
-            </Link>
+              {usuariosCarregando ? <Loader2 size={15} className="animate-spin" /> : <Users size={15} />}
+              {usuariosCarregando ? 'Carregando...' : 'Carregar usuários'}
+            </button>
             <button
               onClick={enviarLembretesAgora}
               disabled={enviandoLembretes}
@@ -515,6 +558,98 @@ export default function AdminClient({
             </table>
           </div>
         </section>
+
+        {usuarios.length > 0 && (
+          <section className="mt-10">
+            <Eyebrow>Gerenciar usuários e permissões</Eyebrow>
+            <p className="text-xs text-ink-faint mb-4">
+              Clique em um usuário para alternar seu status de admin. Admins não aparecem no ranking de competição.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-brown-deep flex items-center gap-2">
+                    <Users size={18} />
+                    Usuários ({usuariosFiltrados.length})
+                  </h3>
+                  <select
+                    value={filtroUsuarios}
+                    onChange={(e) => setFiltroUsuarios(e.target.value as any)}
+                    className="text-xs border border-line rounded px-2 py-1 bg-cream text-brown-deep"
+                  >
+                    <option value="todos">Todos</option>
+                    <option value="admin">Apenas Admins</option>
+                    <option value="geral">Apenas Geral</option>
+                  </select>
+                </div>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {usuariosFiltrados.map((usuario) => (
+                    <button
+                      key={usuario.id}
+                      onClick={() => toggleAdmin(usuario.id, usuario.is_admin)}
+                      disabled={usuarioTogglingId === usuario.id}
+                      className={`w-full text-left px-4 py-3 rounded-lg border transition-all disabled:opacity-60 ${
+                        usuario.is_admin
+                          ? 'bg-amber-50 border-amber-300 hover:bg-amber-100'
+                          : 'bg-cream border-line hover:border-brown-deep'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <p className="font-medium text-ink flex items-center gap-1">
+                            {usuario.nome}
+                            {usuario.is_admin && <Shield size={14} className="text-amber-600" />}
+                          </p>
+                          <p className="text-xs text-ink-faint">{usuario.email}</p>
+                        </div>
+                        {usuarioTogglingId === usuario.id && <Loader2 size={14} className="animate-spin text-brown-deep" />}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-brown-deep mb-3 flex items-center gap-2">
+                  <Lock size={18} />
+                  Tipos de acesso
+                </h3>
+                <div className="space-y-3">
+                  <div className="bg-amber-50 border border-amber-300 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Shield size={18} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-brown-deep">Usuário Admin</p>
+                        <p className="text-xs text-ink-faint mt-1">
+                          ✓ Acesso à área administrativa<br/>
+                          ✓ Gerenciar usuários e permissões<br/>
+                          ✓ Enviar lembretes em massa<br/>
+                          ✓ Não aparece no ranking
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Users size={18} className="text-sky-deep mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-brown-deep">Usuário Regular</p>
+                        <p className="text-xs text-ink-faint mt-1">
+                          ✓ Acesso ao portal do mentorado<br/>
+                          ✓ Participa do ranking<br/>
+                          ✓ Acesso a todos os módulos<br/>
+                          ✗ Sem acesso administrativo
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-ink-faint pt-2">
+                    💡 Clique em um usuário à esquerda para promover ou rebaixar seu acesso.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
