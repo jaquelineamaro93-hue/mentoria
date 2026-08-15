@@ -35,6 +35,36 @@ export default function AdminClient({
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [enviandoLembretes, setEnviandoLembretes] = useState(false);
   const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [usuariosCarregando, setUsuariosCarregando] = useState(false);
+
+  async function carregarUsuarios() {
+    setUsuariosCarregando(true);
+    try {
+      const res = await fetch('/api/admin/usuarios');
+      const data = await res.json();
+      setUsuarios(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+    } finally {
+      setUsuariosCarregando(false);
+    }
+  }
+
+  async function toggleAdmin(userId: string, currentAdmin: boolean) {
+    try {
+      const res = await fetch('/api/admin/usuarios', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, is_admin: !currentAdmin }),
+      });
+      if (!res.ok) throw new Error('Erro ao atualizar');
+      carregarUsuarios();
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao atualizar usuário');
+    }
+  }
 
   async function confirmarEmailUsuario(userId: string, nome: string) {
     setConfirmandoId(userId);
@@ -239,20 +269,6 @@ export default function AdminClient({
               <Send size={15} />
               Gerenciar votações
             </Link>
-            <Link
-              href="/admin/usuarios"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Shield size={15} />
-              Gerenciar usuários
-            </Link>
-            <Link
-              href="/admin/permissoes"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Lock size={15} />
-              Controle de permissões
-            </Link>
             <button
               onClick={enviarLembretesAgora}
               disabled={enviandoLembretes}
@@ -426,7 +442,7 @@ export default function AdminClient({
           </div>
         </section>
 
-        <section>
+        <section className="mb-10">
           <Eyebrow>Ações da conta</Eyebrow>
           <p className="text-xs text-ink-faint mb-4">
             Plano, forma de pagamento, valor, status, próxima cobrança, data de fim de acesso e
@@ -513,6 +529,67 @@ export default function AdminClient({
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <Eyebrow>Gerenciar usuários e permissões</Eyebrow>
+            <button
+              onClick={carregarUsuarios}
+              disabled={usuariosCarregando}
+              className="text-xs text-sky-deep hover:text-brown-deep disabled:opacity-60"
+            >
+              {usuariosCarregando ? '⟳ Carregando...' : '⟳ Recarregar'}
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-cream rounded-xl border border-line p-6">
+              <h3 className="flex items-center gap-2 font-medium text-brown-deep mb-4">
+                <Shield size={18} />
+                Usuários
+              </h3>
+              <p className="text-xs text-ink-faint mb-4">
+                Clique para promover ou remover acesso de administrador
+              </p>
+              {usuariosCarregando ? (
+                <div className="text-center py-8 text-ink-faint">Carregando usuários...</div>
+              ) : usuarios.length === 0 ? (
+                <div className="text-center py-8 text-ink-faint">Nenhum usuário encontrado</div>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {usuarios.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => toggleAdmin(user.id, user.is_admin)}
+                      className="w-full flex items-center justify-between p-3 bg-white hover:bg-sky-tint rounded border border-line text-sm transition-colors"
+                    >
+                      <div className="text-left">
+                        <p className="font-medium text-ink">{user.nome}</p>
+                        <p className="text-xs text-ink-faint">{user.email}</p>
+                      </div>
+                      {user.is_admin && (
+                        <Shield size={16} className="text-brown-deep flex-shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-cream rounded-xl border border-line p-6">
+              <h3 className="flex items-center gap-2 font-medium text-brown-deep mb-4">
+                <Lock size={18} />
+                Permissões
+              </h3>
+              <p className="text-xs text-ink-faint mb-4">
+                Controle granular de acesso para administradores
+              </p>
+              <div className="text-sm text-ink-faint text-center py-12">
+                Nenhuma permissão customizada configurada
+              </div>
+            </div>
           </div>
         </section>
       </main>
