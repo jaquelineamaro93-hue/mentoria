@@ -19,6 +19,7 @@ import {
   Flame,
   Gem,
   Award,
+  TrendingUp,
 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
@@ -167,39 +168,42 @@ export default function DashboardClient({
   };
   const conquistasObtidas = SOMA_ACHIEVEMENTS.filter((a) => sinaisDisponiveis[a.condicao]);
 
-  const pilarConfig = {
-    sabedoria: {
+  const pilarConfig = [
+    {
+      key: 'sabedoria',
       titulo: 'Sabedoria Interna',
-      bg: 'bg-lotus-brown/10',
-      border: 'border-lotus-brown/30',
+      style: { backgroundColor: '#EBAEE6', color: '#2D231E', borderColor: '#D98DD3' },
       texto: viaResultado?.forcas?.length
         ? viaResultado.forcas.slice(0, 3).join(' · ')
         : 'Ainda não mapeada, complete o Diagnóstico & Perfil.',
     },
-    objetividade: {
+    {
+      key: 'objetividade',
       titulo: 'Objetividade Magnética',
-      bg: 'bg-lotus-coral/10',
-      border: 'border-lotus-coral/40',
+      style: { backgroundColor: '#FF857A', color: '#FFFFFF', borderColor: '#E5685D' },
       texto: bussola?.norte
         ? bussola.norte
         : 'Sem posicionamento definido, preencha sua Bússola.',
     },
-    maestria: {
+    {
+      key: 'maestria',
       titulo: 'Maestria em Ação',
-      bg: 'bg-lotus-mint/20',
-      border: 'border-lotus-mint',
+      style: { backgroundColor: '#ADEBB3', color: '#2D231E', borderColor: '#8DD694' },
       texto:
         streakSemanas > 0
           ? `${streakSemanas} semana${streakSemanas > 1 ? 's' : ''} consecutiva${streakSemanas > 1 ? 's' : ''} de registro`
           : 'Nenhum registro no Diário de Bordo ainda.',
     },
-    alquimia: {
+    {
+      key: 'alquimia',
       titulo: 'Alquimia de Resultados',
-      bg: 'bg-lotus-lilac/15',
-      border: 'border-lotus-lilac/50',
+      style: { backgroundColor: '#6B403C', color: '#FFFFFF', borderColor: '#53302D' },
       texto: `${profile?.pontos_total ?? 0} pontos de evolução acumulados no ciclo`,
     },
-  } as const;
+  ];
+
+  const etapasConcluidas = [quemSouCompleto, viaCompleto, bussolaCompleto, pdiCompleto].filter(Boolean).length;
+  const pontosTotais = profile?.pontos_total ?? 0;
 
   return (
     <div className="flex flex-row w-full h-screen">
@@ -280,21 +284,78 @@ export default function DashboardClient({
           </Panel>
         </section>
 
-        {/* SEÇÃO 2: Matriz de diagnóstico dos 4 pilares */}
+        {/* Resumo Estratégico */}
+        <section className="mb-8">
+          <Eyebrow>
+            <TrendingUp size={13} strokeWidth={1.5} /> Resumo estratégico
+          </Eyebrow>
+          <Panel className="p-6 border-line">
+            <p className="text-sm text-ink leading-relaxed mb-4">
+              {viaResultado?.forcas?.length && bussolaCompleto
+                ? `Suas forças de assinatura (${viaResultado.forcas.slice(0, 2).join(', ')}) combinadas com o posicionamento definido na Bússola formam a base do seu ciclo. O próximo passo é transformar esse mapeamento em ações concretas no PDI.`
+                : viaResultado?.forcas?.length
+                ? `Suas forças de assinatura já estão mapeadas: ${viaResultado.forcas.slice(0, 3).join(', ')}. Complete a Bússola de Posicionamento para conectar esse perfil com sua direção de carreira.`
+                : 'Complete o Diagnóstico & Perfil para gerar sua síntese estratégica personalizada.'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+                <Target size={12} strokeWidth={1.5} />
+                {etapasConcluidas}/4 etapas concluídas
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+                <Sparkles size={12} strokeWidth={1.5} />
+                {pontosTotais} pts acumulados
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+                <NotebookPen size={12} strokeWidth={1.5} />
+                {journalNotes.length} registro{journalNotes.length !== 1 ? 's' : ''} no diário
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+                <Award size={12} strokeWidth={1.5} />
+                {conquistasObtidas.length} selo{conquistasObtidas.length !== 1 ? 's' : ''} conquistado{conquistasObtidas.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </Panel>
+        </section>
+
+        {/* Passaporte SOMA */}
+        <section className="mb-8">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Panel className="p-6 border-line flex flex-col justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Passaporte SOMA</p>
+                <p className="font-display text-4xl text-lotus-brown">{pontosTotais} <span className="text-lg">pts</span></p>
+              </div>
+              <Link href="/passaporte" className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-lotus-brown hover:underline">
+                <Award size={14} strokeWidth={1.5} /> Ver passaporte completo
+              </Link>
+            </Panel>
+            <Panel className="p-6 border-line flex flex-col justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Selos conquistados</p>
+                <p className="font-display text-4xl text-lotus-brown">{conquistasObtidas.length} <span className="text-lg">/ {SOMA_ACHIEVEMENTS.length}</span></p>
+              </div>
+              <p className="mt-4 text-[13px] text-ink-faint">
+                {conquistasObtidas.length === 0 ? 'Comece pelo Mapa Quem Sou Eu para abrir sua jornada.'
+                  : conquistasObtidas.length >= 5 ? 'Excelente progresso, continue acumulando selos.'
+                  : 'Cada etapa completa rende um novo selo.'}
+              </p>
+            </Panel>
+          </div>
+        </section>
+
+        {/* Pilares SOMA (cores vibrantes) */}
         <section className="mb-10">
           <Eyebrow>
             <Gem size={13} strokeWidth={1.5} /> Raio-X dos 4 pilares SOMA
           </Eyebrow>
           <div className="grid sm:grid-cols-2 gap-4">
-            {(Object.keys(pilarConfig) as Array<keyof typeof pilarConfig>).map((key) => {
-              const p = pilarConfig[key];
-              return (
-                <Panel key={key} className={`p-5 ${p.bg} ${p.border}`}>
-                  <p className="text-sm font-medium text-lotus-brown mb-1.5">{p.titulo}</p>
-                  <p className="text-sm text-ink-soft leading-relaxed">{p.texto}</p>
-                </Panel>
-              );
-            })}
+            {pilarConfig.map((p) => (
+              <div key={p.key} className="p-5 rounded-xl border" style={p.style}>
+                <p className="text-sm font-medium mb-1.5">{p.titulo}</p>
+                <p className="text-sm leading-relaxed" style={{ opacity: 0.85 }}>{p.texto}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -404,36 +465,7 @@ export default function DashboardClient({
           <MuralAtualizado avisos={announcements} />
         </section>
 
-        <section>
-          <Eyebrow>
-            <Award size={13} strokeWidth={1.5} /> Passaporte de Conquistas
-          </Eyebrow>
-          <Panel className="p-5 border-line">
-            {conquistasObtidas.length === 0 ? (
-              <p className="text-sm text-ink-faint">
-                Nenhum selo conquistado ainda. Comece pelo Mapa Quem Sou Eu para abrir sua jornada.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {conquistasObtidas.map((c) => (
-                  <span
-                    key={c.id}
-                    className="inline-flex items-center gap-1.5 text-[12px] text-lotus-brown bg-lotus-brown/8 border border-lotus-brown/25 px-3 py-1.5 rounded-full"
-                  >
-                    <Sparkles size={12} strokeWidth={1.5} />
-                    {c.nome}
-                  </span>
-                ))}
-              </div>
-            )}
-            <Link
-              href="/passaporte"
-              className="inline-block mt-4 text-[13px] text-lotus-brown hover:underline"
-            >
-              Ver passaporte completo →
-            </Link>
-          </Panel>
-        </section>
+
       </main>
     </div>
   );
