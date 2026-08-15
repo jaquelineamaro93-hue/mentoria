@@ -23,6 +23,11 @@ const config: Config = {
         'mustard-light': '#f4d67c',
         'gold-matte': '#d4a574',
         'emerald-light': '#b8e5d8',
+        'lotus-brown': '#6B403C',
+        'lotus-cream': '#FAF8F5',
+        'lotus-coral': '#FF857A',
+        'lotus-mint': '#ADEBB3',
+        'lotus-lilac': '#EBAEE6',
       },
       fontFamily: {
         display: ['Times New Roman', 'Times', 'serif'],
