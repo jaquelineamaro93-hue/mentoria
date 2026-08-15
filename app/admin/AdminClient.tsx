@@ -229,6 +229,16 @@ export default function AdminClient({
   }).length;
   const semAcessoNunca = linhas.filter((l) => !l.profile.last_login_at).length;
   const emailsNaoConfirmados = linhas.filter((l) => !l.emailConfirmado);
+  const usuariosFiltrados = usuarios.filter((u) => {
+    if (filtroUsuarios === "admin" && !u.is_admin) return false;
+    if (filtroUsuarios === "geral" && u.is_admin) return false;
+    if (buscaUsuario.trim()) {
+      const termo = buscaUsuario.trim().toLowerCase();
+      if (!(u.nome?.toLowerCase().includes(termo) || u.email?.toLowerCase().includes(termo))) return false;
+    }
+    return true;
+  });
+
 
   return (
     <div className="flex flex-col md:flex-row w-full">
