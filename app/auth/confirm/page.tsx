@@ -1,71 +1,102 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 function AuthConfirmContent() {
   const router = useRouter();
   const supabase = createClient();
-  const [isReady, setIsReady] = useState(false);
+  const [status, setStatus] = useState('Processando autenticação...');
 
   useEffect(() => {
-    let mounted = true;
-    let timeoutId: NodeJS.Timeout;
+    let isSubscribed = true;
 
-    // Ouve mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
+    const handleAuth = async () => {
+      // 1. Escuta eventos do Supabase
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!isSubscribed) return;
+        
+        console.log('🔔 Auth Event:', event);
 
-        console.log('🔔 Auth event:', event);
-        console.log('📊 Session user:', session?.user?.email);
-
-        // SIGNED_IN é acionado automaticamente quando Supabase sincroniza
-        if (event === 'SIGNED_IN' && session?.user) {
-          console.log('✅ AUTENTICADO! Indo pro dashboard...');
+        if (event === 'PASSWORD_RECOVERY') {
+          console.log('🔐 Password recovery detectado');
+          router.push('/reset-password'); 
+        } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+          console.log('✅ SIGNED_IN com usuário:', session.user.email);
           router.push('/dashboard');
-          return;
+        }
+      });
+
+      // 2. Lê tokens da HASH da URL
+      if (typeof window !== 'undefined' && window.location.hash) {
+        console.log('📍 Hash encontrada:', window.location.hash.substring(1, 50) + '...');
+        
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+
+        console.log('🔑 Access token:', !!accessToken);
+        console.log('🔄 Refresh token:', !!refreshToken);
+        console.log('📝 Type:', type);
+
+        if (accessToken && refreshToken) {
+          console.log('⚙️ Chamando setSession...');
+          
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (error) {
+            console.error('❌ setSession error:', error);
+          } else {
+            console.log('✅ setSession sucesso:', data.user?.email);
+            
+            if (type === 'recovery') {
+              console.log('➡️ Redirecionando para reset-password');
+              router.push('/reset-password');
+            } else {
+              console.log('➡️ Redirecionando para dashboard');
+              router.push('/dashboard');
+            }
+            return;
+          }
         }
       }
-    );
 
-    // Fallback: se não receber SIGNED_IN em 5s, checa manualmente
-    timeoutId = setTimeout(async () => {
-      if (!mounted) return;
+      // 3. Fallback após 5s
+      const timeout = setTimeout(async () => {
+        if (!isSubscribed) return;
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('⏱️ Fallback check - Session:', session?.user?.email || 'nenhuma');
+        
+        if (!session) {
+          console.log('❌ Nenhuma sessão encontrada');
+          router.push('/login?error=no_session');
+        }
+      }, 5000);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        console.log('✅ Sessão encontrada via fallback');
-        router.push('/dashboard');
-      } else {
-        console.log('❌ Sem sessão após 5s');
-        router.push('/login?error=no_session');
-      }
-    }, 5000);
+      return () => {
+        clearTimeout(timeout);
+        subscription?.unsubscribe();
+      };
+    };
 
-    setIsReady(true);
+    handleAuth();
 
     return () => {
-      mounted = false;
-      clearTimeout(timeoutId);
-      subscription?.unsubscribe();
+      isSubscribed = false;
     };
   }, [router, supabase]);
-
-  if (!isReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-ink-faint">Inicializando...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <p className="text-ink-faint mb-2">Processando autenticação...</p>
-        <p className="text-xs text-ink-faint">Abre F12 pra ver logs</p>
+        <p className="text-ink-faint mb-2">{status}</p>
+        <p className="text-xs text-ink-faint">F12 para logs completos</p>
       </div>
     </div>
   );
@@ -73,7 +104,7 @@ function AuthConfirmContent() {
 
 export default function AuthConfirmPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Carregando...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-ink-faint">Carregando...</p></div>}>
       <AuthConfirmContent />
     </Suspense>
   );
