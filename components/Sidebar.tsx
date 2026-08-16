@@ -55,6 +55,7 @@ interface SidebarProps {
 export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificacoes, setNotificacoes] = useState<Record<string, boolean>>({
     avisoNaoLido: true,
     naoVotou: false,
@@ -68,7 +69,11 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
     };
 
     window.addEventListener('clearNotification' as any, handleNotificationCleared);
-    return () => window.removeEventListener('clearNotification' as any, handleNotificationCleared);
+  return (
+    <>
+      {isMobileMenuOpen && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
+      <button className="fixed top-6 right-6 z-40 md:hidden p-2 rounded border border-line hover:bg-paper" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>{isMobileMenuOpen ? "✕" : "☰"}</button>
+        <aside className={`fixed md:sticky top-0 left-0 h-screen w-[260px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
   }, []);
 
   return (
