@@ -33,14 +33,18 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Mantém a sessão renovada (importante para Server Components)
+  // Sincroniza a sessão (IMPORTANTE: atualiza supabaseResponse com cookies)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
   const rotaLiberada =
-    path.startsWith('/login') || path === '/renovar' || path.startsWith('/api');
+    path.startsWith('/login') || path === '/renovar' || path.startsWith('/api') || path.startsWith('/auth/confirm');
 
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase
