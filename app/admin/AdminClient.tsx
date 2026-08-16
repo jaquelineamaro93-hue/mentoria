@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Profile } from '@/lib/types';
 import type { LinhaMentorado } from './page';
+import EnviarFeedbackClient from './EnviarFeedbackClient';
 
 interface Props {
   profile: Profile;
