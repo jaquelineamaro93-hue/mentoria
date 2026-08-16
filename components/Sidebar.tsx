@@ -55,7 +55,6 @@ interface SidebarProps {
 export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificacoes, setNotificacoes] = useState<Record<string, boolean>>({
     avisoNaoLido: true,
     naoVotou: false,
