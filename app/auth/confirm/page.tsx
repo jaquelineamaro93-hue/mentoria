@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -12,7 +12,6 @@ function AuthConfirmContent() {
   useEffect(() => {
     const handleConfirmation = async () => {
       try {
-        // Extrai access_token da URL
         const accessToken = searchParams.get('access_token');
         const tokenType = searchParams.get('type');
 
@@ -20,7 +19,6 @@ function AuthConfirmContent() {
         console.log('📝 Type:', tokenType);
 
         if (accessToken) {
-          // Se tem access_token, cria a sessão manualmente
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: searchParams.get('refresh_token') || '',
@@ -35,7 +33,6 @@ function AuthConfirmContent() {
           console.log('✅ Sessão criada:', data.user?.email);
         }
 
-        // Valida a sessão
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session?.user) {
@@ -62,5 +59,9 @@ function AuthConfirmContent() {
 }
 
 export default function AuthConfirmPage() {
-  return <AuthConfirmContent />;
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-ink-faint">Carregando...</p></div>}>
+      <AuthConfirmContent />
+    </Suspense>
+  );
 }
