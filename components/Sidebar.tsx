@@ -72,7 +72,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   }, []);
 
   return (
-    <aside className="fixed md:sticky top-0 left-0 h-screen w-[260px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}">
+    <aside className={`fixed md:sticky top-0 left-0 h-screen w-[260px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
       <div className="flex-1 flex flex-col p-6 md:p-7 md:max-h-screen md:overflow-y-auto">
         <div className="mb-9">
           <p className="font-display text-2xl text-brown-deep">SOMA</p>
