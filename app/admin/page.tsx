@@ -73,7 +73,7 @@ export default async function AdminPage() {
   }
 
   const linhas: LinhaMentorado[] = (perfis ?? [])
-    .filter((p): p is Profile => !p.is_admin)
+    
     .map((p) => ({
       profile: p,
       diagnosticos: contar(diagnosticos, p.id),
