@@ -23,6 +23,16 @@ export async function proxy(request: NextRequest) {
     }
   );
 
+  // Exchange automático de código para magiclink (fluxo de autenticação)
+  const code = request.nextUrl.searchParams.get('code');
+  if (code) {
+    try {
+      await supabase.auth.exchangeCodeForSession(code);
+    } catch (error) {
+      console.error('Erro ao exchanger código de autenticação:', error);
+    }
+  }
+
   // Mantém a sessão renovada (importante para Server Components)
   const {
     data: { user },
