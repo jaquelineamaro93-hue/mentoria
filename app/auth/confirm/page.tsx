@@ -1,45 +1,66 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 function AuthConfirmContent() {
   const router = useRouter();
   const supabase = createClient();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const handleConfirmation = async () => {
-      try {
-        // Supabase já colocou a sessão nos cookies via redirect 303
-        // Só precisa validar
-        await new Promise(resolve => setTimeout(resolve, 500));
+    let mounted = true;
 
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        console.log('📊 Session:', session?.user?.email || 'nenhuma');
+    // Ouve mudanças de autenticação (mais robusto que getSession)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
 
-        if (session?.user) {
-          console.log('✅ Autenticado! Redirecionando pro dashboard');
-          router.push('/dashboard');
-        } else {
-          console.error('❌ Sem sessão após exchange');
-          router.push('/login?error=no_session');
-        }
-      } catch (error) {
-        console.error('❌ Erro geral:', error);
-        router.push('/login?error=auth_error');
+      console.log('🔔 Auth event:', event);
+      console.log('📊 Session:', session?.user?.email || 'nenhuma');
+
+      if (event === 'SIGNED_IN' && session?.user) {
+        console.log('✅ Autenticado via event! Redirecionando...');
+        setIsChecking(false);
+        router.push('/dashboard');
+      } else if (event === 'SIGNED_OUT' || !session?.user) {
+        console.log('❌ Não autenticado, voltando ao login');
+        setIsChecking(false);
+        router.push('/login?error=auth_failed');
       }
-    };
+    });
 
-    handleConfirmation();
+    // Fallback: se não receber evento em 3s, valida manualmente
+    const timeout = setTimeout(async () => {
+      if (!mounted || !isChecking) return;
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        console.log('✅ Sessão validada manualmente');
+        setIsChecking(false);
+        router.push('/dashboard');
+      } else {
+        console.log('❌ Sessão não encontrada');
+        setIsChecking(false);
+        router.push('/login?error=no_session');
+      }
+    }, 3000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+      subscription?.unsubscribe();
+    };
   }, [router, supabase]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <p className="text-ink-faint mb-2">Processando autenticação...</p>
-        <p className="text-xs text-ink-faint">Abre o console (F12) pra ver os logs</p>
+        {isChecking && <p className="text-xs text-ink-faint">F12 para logs</p>}
       </div>
     </div>
   );
