@@ -69,6 +69,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
 
     window.addEventListener('clearNotification' as any, handleNotificationCleared);
     return () => window.removeEventListener('clearNotification' as any, handleNotificationCleared);
+  }, []);
   return (
     <>
       {isMobileMenuOpen && (
