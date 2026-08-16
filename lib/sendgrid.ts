@@ -4,23 +4,35 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
 export async function sendEmail({
   to,
+  para,
   subject,
+  assunto,
   html,
   from = 'noreply@somamentoria.com',
 }: {
-  to: string;
-  subject: string;
+  to?: string;
+  para?: string;
+  subject?: string;
+  assunto?: string;
   html: string;
   from?: string;
 }) {
+  const email = to || para;
+  const subj = subject || assunto;
+
+  if (!email || !subj) {
+    console.error('❌ Email ou assunto faltando');
+    return false;
+  }
+
   try {
     await sgMail.send({
-      to,
+      to: email,
       from,
-      subject,
+      subject: subj,
       html,
     });
-    console.log('✅ Email enviado para:', to);
+    console.log('✅ Email enviado para:', email);
     return true;
   } catch (error) {
     console.error('❌ Erro ao enviar email:', error);
@@ -28,7 +40,7 @@ export async function sendEmail({
   }
 }
 
-// Alias para compatibilidade com código existente
+// Alias para compatibilidade
 export const enviarEmail = sendEmail;
 
 // Templates de email
