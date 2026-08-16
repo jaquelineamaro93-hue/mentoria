@@ -40,10 +40,8 @@ export async function sendEmail({
   }
 }
 
-// Alias para compatibilidade
 export const enviarEmail = sendEmail;
 
-// Templates de email
 export const templateBoasVindas = (nome: string) => `
   <h2>Bem-vindo ao SOMA Mentoria! 🎉</h2>
   <p>Olá ${nome},</p>
@@ -58,10 +56,11 @@ export const templateInatividade = (nome: string) => `
   <p><a href="https://somamentoria.com/dashboard">Acessar Dashboard</a></p>
 `;
 
-export const templateLembreteEncontro = (nome: string, encontro: string) => `
-  <h2>Lembrete: ${encontro}</h2>
+export const templateLembreteEncontro = (nome: string, titulo: string, data: string) => `
+  <h2>Lembrete: ${titulo}</h2>
   <p>Olá ${nome},</p>
-  <p>Você tem um encontro marcado!</p>
+  <p>Você tem um encontro marcado em ${data}!</p>
+  <p><a href="https://somamentoria.com/dashboard">Ver Detalhes</a></p>
 `;
 
 export const templateOnboardingPendente = (nome: string) => `
