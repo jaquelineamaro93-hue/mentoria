@@ -1,40 +1,19 @@
 'use client';
 
 import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { exchangeCode } from '@/lib/supabase/auth-actions';
 
 function AuthConfirmContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
-  const code = searchParams.get('code');
 
   useEffect(() => {
     const handleConfirmation = async () => {
       try {
-        if (!code) {
-          console.log('⚠️ Sem code na URL');
-          router.push('/login?error=no_code');
-          return;
-        }
-
-        console.log('🔄 Exchange do código:', code.slice(0, 20) + '...');
-        
-        // Server action para fazer exchange
-        const result = await exchangeCode(code);
-        
-        if (!result.success) {
-          console.error('❌ Exchange falhou:', result.error);
-          router.push('/login?error=exchange_failed');
-          return;
-        }
-
-        console.log('✅ Code trocado, checando sessão...');
-        
-        // Pequeno delay pra sincronizar cookies
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Supabase já colocou a sessão nos cookies via redirect 303
+        // Só precisa validar
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         const { data: { session } } = await supabase.auth.getSession();
         
@@ -54,7 +33,7 @@ function AuthConfirmContent() {
     };
 
     handleConfirmation();
-  }, [code, router, supabase]);
+  }, [router, supabase]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
