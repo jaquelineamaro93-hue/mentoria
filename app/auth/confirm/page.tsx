@@ -1,25 +1,66 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+'use client';
 
-export default async function AuthConfirmPage() {
-  const supabase = await createClient();
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
-  // Tenta 3 vezes com delay (sincronização de cookies)
-  for (let i = 0; i < 3; i++) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+function AuthConfirmContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = createClient();
 
-    if (session?.user) {
-      redirect('/dashboard');
-    }
+  useEffect(() => {
+    const handleConfirmation = async () => {
+      try {
+        // Extrai access_token da URL
+        const accessToken = searchParams.get('access_token');
+        const tokenType = searchParams.get('type');
 
-    // Pequeno delay antes de tentar de novo
-    if (i < 2) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-  }
+        console.log('🔍 Access token encontrado:', !!accessToken);
+        console.log('📝 Type:', tokenType);
 
-  // Se chegou aqui, não tem sessão
-  redirect('/login?error=no_session');
+        if (accessToken) {
+          // Se tem access_token, cria a sessão manualmente
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: searchParams.get('refresh_token') || '',
+          });
+
+          if (error) {
+            console.error('❌ Erro ao setSession:', error);
+            router.push('/login?error=set_session_failed');
+            return;
+          }
+
+          console.log('✅ Sessão criada:', data.user?.email);
+        }
+
+        // Valida a sessão
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          console.log('✅ Autenticado! Redirecionando...');
+          router.push('/dashboard');
+        } else {
+          console.log('❌ Sem sessão');
+          router.push('/login?error=no_session');
+        }
+      } catch (error) {
+        console.error('❌ Erro:', error);
+        router.push('/login?error=auth_error');
+      }
+    };
+
+    handleConfirmation();
+  }, [router, supabase, searchParams]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-ink-faint">Processando...</p>
+    </div>
+  );
+}
+
+export default function AuthConfirmPage() {
+  return <AuthConfirmContent />;
 }
