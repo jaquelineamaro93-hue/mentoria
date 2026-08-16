@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
@@ -42,58 +41,56 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
   };
 
   return (
-    <div className="flex flex-col w-full bg-cream min-h-screen">
-      <div className="border-b border-line bg-paper sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex gap-8 border-b border-line overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('perguntas')}
-              className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'perguntas'
-                  ? 'border-b-2 border-brown-deep text-brown-deep'
-                  : 'text-ink-faint hover:text-brown-deep'
-              }`}
-            >
-              <HelpCircle size={16} strokeWidth={1.5} />
-              Perguntas Guia
-            </button>
-            <button
-              onClick={() => setActiveTab('plano')}
-              className={`pb-4 text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'plano'
-                  ? 'border-b-2 border-brown-deep text-brown-deep'
-                  : 'text-ink-faint hover:text-brown-deep'
-              }`}
-            >
-              Plano
-            </button>
-            <button
-              onClick={() => setActiveTab('documentos')}
-              className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'documentos'
-                  ? 'border-b-2 border-brown-deep text-brown-deep'
-                  : 'text-ink-faint hover:text-brown-deep'
-              }`}
-            >
-              <FileText size={16} strokeWidth={1.5} />
-              Documentos & Anexos
-            </button>
-            <button
-              onClick={() => setActiveTab('feedbacks')}
-              className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === 'feedbacks'
-                  ? 'border-b-2 border-brown-deep text-brown-deep'
-                  : 'text-ink-faint hover:text-brown-deep'
-              }`}
-            >
-              <MessageSquare size={16} strokeWidth={1.5} />
-              Diário de Feedbacks
-            </button>
-          </div>
+    <div className="flex flex-col w-full">
+      <div className="border-b border-line bg-paper px-6 md:px-12 py-4 sticky top-0 z-10">
+        <div className="flex gap-8 max-w-5xl mx-auto">
+          <button
+            onClick={() => setActiveTab('perguntas')}
+            className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
+              activeTab === 'perguntas'
+                ? 'border-b-2 border-brown-deep text-brown-deep'
+                : 'text-ink-faint hover:text-brown-deep'
+            }`}
+          >
+            <HelpCircle size={16} strokeWidth={1.5} />
+            Perguntas Guia
+          </button>
+          <button
+            onClick={() => setActiveTab('plano')}
+            className={`pb-4 text-sm font-medium transition-colors ${
+              activeTab === 'plano'
+                ? 'border-b-2 border-brown-deep text-brown-deep'
+                : 'text-ink-faint hover:text-brown-deep'
+            }`}
+          >
+            Plano
+          </button>
+          <button
+            onClick={() => setActiveTab('documentos')}
+            className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
+              activeTab === 'documentos'
+                ? 'border-b-2 border-brown-deep text-brown-deep'
+                : 'text-ink-faint hover:text-brown-deep'
+            }`}
+          >
+            <FileText size={16} strokeWidth={1.5} />
+            Documentos & Anexos
+          </button>
+          <button
+            onClick={() => setActiveTab('feedbacks')}
+            className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
+              activeTab === 'feedbacks'
+                ? 'border-b-2 border-brown-deep text-brown-deep'
+                : 'text-ink-faint hover:text-brown-deep'
+            }`}
+          >
+            <MessageSquare size={16} strokeWidth={1.5} />
+            Diário de Feedbacks
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+      <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
         {activeTab === 'perguntas' && (
           <PdiClientContent
             profile={profile}
@@ -158,20 +155,12 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
                     {documentos.map(doc => (
                       <tr key={doc.id} className="border-b border-line hover:bg-cream">
                         <td className="px-6 py-4 text-ink">{doc.nome}</td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${doc.categoria === 'Currículo' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'}`}>
-                            {doc.categoria}
-                          </span>
-                        </td>
+                        <td className="px-6 py-4"><span className="inline-block px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">{doc.categoria}</span></td>
                         <td className="px-6 py-4 text-ink-faint">{doc.data}</td>
                         <td className="px-6 py-4">
                           <div className="flex gap-3">
-                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-cream rounded">
-                              <ExternalLink size={16} className="text-brown-deep" />
-                            </a>
-                            <button onClick={() => handleDeleteDocumento(doc.id)} className="p-2 hover:bg-red-50 rounded">
-                              <Trash2 size={16} className="text-red-600" />
-                            </button>
+                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-cream rounded"><ExternalLink size={16} className="text-brown-deep" /></a>
+                            <button onClick={() => handleDeleteDocumento(doc.id)} className="p-2 hover:bg-red-50 rounded"><Trash2 size={16} className="text-red-600" /></button>
                           </div>
                         </td>
                       </tr>
@@ -192,7 +181,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
