@@ -72,6 +72,13 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   }, []);
 
   return (
+    <>
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+      <button className="fixed top-6 right-6 z-40 md:hidden p-2 rounded border border-line hover:bg-paper" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+        {isMobileMenuOpen ? "✕" : "☰"}
+      </button>
     <aside className={`fixed md:sticky top-0 left-0 h-screen w-[260px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
       <div className="flex-1 flex flex-col p-6 md:p-7 md:max-h-screen md:overflow-y-auto">
         <div className="mb-9">
@@ -164,5 +171,6 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
         </button>
       </div>
     </aside>
+    </>
   );
 }
