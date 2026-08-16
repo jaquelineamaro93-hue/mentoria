@@ -54,7 +54,6 @@ interface SidebarProps {
 
 export default function Sidebar({ profile, onSignOut }: SidebarProps) {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notificacoes, setNotificacoes] = useState<Record<string, boolean>>({
     avisoNaoLido: true,
     naoVotou: false,
@@ -70,17 +69,9 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
     window.addEventListener('clearNotification' as any, handleNotificationCleared);
     return () => window.removeEventListener('clearNotification' as any, handleNotificationCleared);
   }, []);
+
   return (
-    <>
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-      <aside className={`fixed md:sticky top-0 left-0 h-screen w-[260px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${
-        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      }`}>
+    <aside className="w-full md:w-[260px] shrink-0 border-r border-b md:border-b-0 border-line bg-paper flex flex-col h-screen sticky top-0">
       <div className="flex-1 flex flex-col p-6 md:p-7 md:max-h-screen md:overflow-y-auto">
         <div className="mb-9">
           <p className="font-display text-2xl text-brown-deep">SOMA</p>
