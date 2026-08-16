@@ -9,7 +9,7 @@ export async function GET() {
 
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('id, nome, email')
+      .select('id, nome, email, is_admin')
       .limit(100);
 
     console.log('Resposta do Supabase:', { data: profiles, error });
