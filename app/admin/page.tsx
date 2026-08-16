@@ -27,7 +27,7 @@ export default async function AdminPage() {
 
   const { data: meuPerfil } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, is_admin:is_admin')
     .eq('id', user.id)
     .single<Profile>();
 
@@ -44,7 +44,7 @@ export default async function AdminPage() {
     { data: via },
     { data: secoesPdiTotal },
   ] = await Promise.all([
-    supabase.from('profiles').select('*').order('nome'),
+    supabase.from('profiles').select('*, is_admin:is_admin').order('nome'),
     supabase.from('diagnostics').select('user_id'),
     supabase.from('journal_notes').select('user_id'),
     supabase.from('quem_sou_eu_respostas').select('user_id'),
