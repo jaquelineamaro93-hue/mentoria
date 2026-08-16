@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
 import FeedbackTimeline from './FeedbackTimeline';
+import FeedbackTimeline from './FeedbackTimeline';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
 interface MeuPdiClientProps {
