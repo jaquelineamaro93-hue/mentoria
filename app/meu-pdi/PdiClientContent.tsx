@@ -110,7 +110,7 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
 
         <div className="lg:col-span-3">
           <div className="bg-paper rounded-xl border border-line p-8">
-            <p className="text-ink-faint mb-6">{secao.descricao}</p>
+            <p className="text-ink-faint mb-6">{secao.instrucoes}</p>
             <textarea
               value={respostas[secao.codigo] ?? ''}
               onChange={(e) => setRespostas({ ...respostas, [secao.codigo]: e.target.value })}
