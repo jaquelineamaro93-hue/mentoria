@@ -68,7 +68,8 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
     };
 
     window.addEventListener('clearNotification' as any, handleNotificationCleared);
-    return (
+    return () => window.removeEventListener('clearNotification' as any, handleNotificationCleared);
+  }, []);
     <>
       <button
         className="fixed top-6 right-6 z-40 md:hidden p-2 rounded-lg hover:bg-paper border border-line"
