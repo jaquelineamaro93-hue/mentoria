@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import AdminClient from './AdminClient';
+import EnviarFeedbackClient from './EnviarFeedbackClient';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import type { Profile } from '@/lib/types';
 
