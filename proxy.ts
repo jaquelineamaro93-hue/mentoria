@@ -23,20 +23,8 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Exchange automático de código para magiclink (fluxo de autenticação)
-  const code = request.nextUrl.searchParams.get('code');
-  if (code) {
-    try {
-      await supabase.auth.exchangeCodeForSession(code);
-    } catch (error) {
-      console.error('Erro ao exchanger código de autenticação:', error);
-    }
-  }
-
-  // Sincroniza a sessão (IMPORTANTE: atualiza supabaseResponse com cookies)
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // Sincroniza sessão (IMPORTANTE: isso popula os cookies na response)
+  await supabase.auth.getSession();
 
   const {
     data: { user },
@@ -44,7 +32,7 @@ export async function proxy(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const rotaLiberada =
-    path.startsWith('/login') || path === '/renovar' || path.startsWith('/api') || path.startsWith('/auth/confirm');
+    path.startsWith('/login') || path === '/renovar' || path.startsWith('/api') || path.startsWith('/auth');
 
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase
