@@ -5,6 +5,7 @@ import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle } from 
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
+import FeedbackTimeline from './FeedbackTimeline';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
 interface MeuPdiClientProps {
@@ -79,15 +80,12 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
           <button
             onClick={() => setActiveTab('feedbacks')}
             className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
-              activeTab === 'feedbacks'
-                ? 'border-b-2 border-brown-deep text-brown-deep'
-                : 'text-ink-faint hover:text-brown-deep'
-            }`}
-          >
-            <MessageSquare size={16} strokeWidth={1.5} />
-            Diário de Feedbacks
-          </button>
-        </div>
+        {activeTab === "feedbacks" && (
+          <div>
+            <h2 className="text-2xl font-medium text-brown-deep mb-6">Diário de Feedbacks & Evolução</h2>
+            <FeedbackTimeline userId={userId} />
+          </div>
+        )}
       </div>
 
       <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
@@ -172,13 +170,12 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
           </div>
         )}
 
-        {activeTab === 'feedbacks' && (
+        {activeTab === "feedbacks" && (
           <div>
             <h2 className="text-2xl font-medium text-brown-deep mb-6">Diário de Feedbacks & Evolução</h2>
-            <div className="text-center py-12 bg-paper rounded-xl border border-line border-dashed">
-              <MessageSquare size={32} className="mx-auto mb-3 text-ink-faint" />
-              <p className="text-ink-faint">Timeline de feedbacks será exibida aqui</p>
-            </div>
+            <FeedbackTimeline userId={userId} />
+          </div>
+        )}
           </div>
         )}
       </main>
