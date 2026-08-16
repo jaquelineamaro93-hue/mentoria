@@ -653,8 +653,9 @@ export default function AdminClient({
               </div>
             </div>
           </div>
+        
+        <section className="mb-8">
+          <h2 className="text-2xl font-medium text-brown-deep mb-6">Enviar Feedback aos Mentorados</h2>
+          <EnviarFeedbackClient mentorados={perfis ?? []} />
         </section>
-      </main>
-    </div>
-  );
-}
+      </section>
