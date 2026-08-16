@@ -84,24 +84,6 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
           </svg>
         )}
       </button>
-      
-    <>
-      <button
-        className="fixed top-6 right-6 z-40 md:hidden p-2 rounded-lg hover:bg-paper border border-line"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        {isMobileMenuOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        )}
-      </button>
-      ) => window.removeEventListener('clearNotification' as any, handleNotificationCleared);
-  }, []);
 
   return (
     <>
