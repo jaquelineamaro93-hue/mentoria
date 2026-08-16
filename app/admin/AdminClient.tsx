@@ -481,6 +481,9 @@ export default function AdminClient({
                     E-mail
                   </th>
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    Tipo
+                  </th>
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Ações
                   </th>
                 </tr>
@@ -489,6 +492,15 @@ export default function AdminClient({
                 {linhas.map((l) => (
                   <tr key={l.profile.id} className="border-b border-line last:border-0 bg-cream">
                     <td className="px-4 py-3 text-ink">{l.profile.nome}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block text-[10px] uppercase px-2 py-0.5 rounded-full ${
+                        l.profile.is_admin
+                          ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                          : 'bg-sky-50 text-sky-700 border border-sky-200'
+                      }`}>
+                        {l.profile.is_admin ? '👮 Admin' : '👤 Usuário'}
+                      </span>
+                    </td>
                     <td className="px-4 py-3">
                       {l.emailConfirmado ? (
                         <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-300">
