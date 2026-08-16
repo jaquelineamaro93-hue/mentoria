@@ -86,7 +86,7 @@ export default function FeedbackTimeline({ userId }: { userId: string }) {
               <p className="text-sm text-ink leading-relaxed mb-3">{feedback.conteudo}</p>
               
               {feedback.arquivo_url && (
-                
+                <a
                   href={feedback.arquivo_url}
                   target="_blank"
                   rel="noopener noreferrer"
