@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { href: '/onboarding', label: 'Onboarding', icon: ListChecks },
   { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
-  { href: '/meu-pdi', label: 'PDI { href: '/pdi', label: 'Meu PDI', icon: Target } Trilha Estratégica', icon: Target },
+  { href: '/meu-pdi', label: 'PDI   { href: '/meu-pdi', label: 'PDI { href: '/pdi', label: 'Meu PDI', icon: Target } Trilha Estratégica', icon: Target }, Trilha Estratégica', icon: Target },
   { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
   { href: '/feedback-pares', label: 'Feedback entre Colegas', icon: MessageCircle },
   { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
