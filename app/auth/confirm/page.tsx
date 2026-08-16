@@ -11,7 +11,9 @@ export default function AuthConfirmPage() {
   useEffect(() => {
     const handleConfirmation = async () => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Delay pra garantir que o middleware processou o code
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           router.push('/dashboard');
