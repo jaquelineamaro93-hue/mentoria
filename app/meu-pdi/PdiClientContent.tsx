@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { Panel } from '@/components/Panel';
 import { posthog } from '@/lib/posthog';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
@@ -75,83 +76,94 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
   const foiRespondida = blocosSalvos.has(secao.codigo);
 
   return (
-    <div className="flex flex-col">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-medium text-brown-deep">{secao.titulo}</h2>
-          <span className="text-sm text-ink-faint">{concluidos} de {total} concluídos</span>
-        </div>
-        <div className="w-full bg-cream rounded-full h-2">
-          <div className="bg-brown-deep rounded-full h-2 transition-all" style={{ width: `${(concluidos / total) * 100}%` }} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
-          <nav className="space-y-2 sticky top-20">
-            {secoes.map((s, idx) => (
+    <div className="flex-1 flex">
+      <div className="hidden lg:block w-[260px] shrink-0 border-r border-line p-8 overflow-y-auto">
+        <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-4">
+          {concluidos} de {total} seções concluídas
+        </p>
+        <div className="flex flex-col gap-1">
+          {secoes.map((s, i) => {
+            const respondido = blocosSalvos.has(s.codigo);
+            const ativo = i === passo;
+            return (
               <button
                 key={s.codigo}
-                onClick={() => irParaSecao(idx)}
-                className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
-                  idx === passo
-                    ? 'bg-sky-tint text-brown-deep border border-sky'
-                    : blocosSalvos.has(s.codigo)
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'hover:bg-cream text-ink-faint'
+                onClick={() => irParaSecao(i)}
+                className={`flex items-center gap-2.5 text-left px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                  ativo ? 'bg-sky-tint text-brown-deep' : 'text-ink-soft hover:bg-cream'
                 }`}
               >
-                {blocosSalvos.has(s.codigo) && <Check size={16} />}
-                <span className="text-xs">{s.titulo}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        <div className="lg:col-span-3">
-          <div className="bg-paper rounded-xl border border-line p-8">
-            <p className="text-ink-faint mb-6">{secao.instrucoes}</p>
-            <textarea
-              value={respostas[secao.codigo] ?? ''}
-              onChange={(e) => setRespostas({ ...respostas, [secao.codigo]: e.target.value })}
-              placeholder="Digite sua resposta aqui..."
-              className="w-full h-64 border border-line rounded-lg p-4 text-sm focus:outline-none focus:ring-2 focus:ring-brown-deep resize-none"
-            />
-
-            {erro && <p className="text-red-600 text-sm mt-4">{erro}</p>}
-
-            <div className="flex gap-4 mt-6">
-              {passo > 0 && (
-                <button
-                  onClick={() => setPasso(passo - 1)}
-                  className="px-4 py-2 border border-line rounded-lg hover:bg-cream transition-colors"
+                <span
+                  className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
+                    respondido
+                      ? 'bg-brown border-brown text-paper'
+                      : 'border-line text-ink-faint'
+                  }`}
                 >
-                  ← Anterior
-                </button>
-              )}
-
-              <button
-                onClick={() => salvarSecaoAtual()}
-                disabled={salvando}
-                className="flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-white rounded-lg transition-colors disabled:opacity-50"
-              >
-                {salvando ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                {salvando ? 'Salvando...' : foiRespondida ? 'Salvo' : 'Salvar'}
+                  {respondido ? <Check size={10} /> : i + 1}
+                </span>
+                {s.titulo}
               </button>
-
-              {passo < secoes.length - 1 && (
-                <button
-                  onClick={() => irParaSecao(passo + 1)}
-                  className="ml-auto flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-white rounded-lg transition-colors"
-                >
-                  Próxima
-                  <ArrowRight size={16} />
-                </button>
-              )}
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
+
+      <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
+        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+          Meu PDI · seção {passo + 1} de {total}
+        </p>
+        <h1 className="font-display text-3xl text-brown-deep mb-4">{secao.titulo}</h1>
+
+        {erro && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-4 py-2.5 mb-4">
+            {erro}
+          </p>
+        )}
+
+        <Panel className="p-6">
+          {secao.instrucoes && (
+            <p className="text-sm text-ink leading-relaxed mb-4">{secao.instrucoes}</p>
+          )}
+
+          <textarea
+            value={respostas[secao.codigo] ?? ''}
+            onChange={(e) => setRespostas({ ...respostas, [secao.codigo]: e.target.value })}
+            placeholder="Digite sua resposta aqui..."
+            className="w-full h-64 border border-line rounded-lg p-4 text-sm focus:outline-none focus:ring-2 focus:ring-brown-deep resize-none"
+          />
+        </Panel>
+
+        <div className="flex gap-4 mt-6">
+          {passo > 0 && (
+            <button
+              onClick={() => setPasso(passo - 1)}
+              className="px-4 py-2 border border-line rounded-lg hover:bg-cream transition-colors"
+            >
+              ← Anterior
+            </button>
+          )}
+
+          <button
+            onClick={() => salvarSecaoAtual()}
+            disabled={salvando}
+            className="flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-paper rounded-lg transition-colors disabled:opacity-50"
+          >
+            {salvando ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+            {salvando ? 'Salvando...' : foiRespondida ? 'Salvo' : 'Salvar'}
+          </button>
+
+          {passo < secoes.length - 1 && (
+            <button
+              onClick={() => irParaSecao(passo + 1)}
+              className="ml-auto flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-paper rounded-lg transition-colors"
+            >
+              Próxima
+              <ArrowRight size={16} />
+            </button>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
