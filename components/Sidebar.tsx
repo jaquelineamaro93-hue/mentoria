@@ -98,6 +98,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
                     ? 'bg-sky-tint text-brown-deep border border-sky'
