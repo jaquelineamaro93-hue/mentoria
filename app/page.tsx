@@ -61,7 +61,7 @@ export default async function HomePage() {
               Entrar
             </Link>
             <Link
-              href="/checkout"
+              href="/planos"
               className="bg-brown-deep text-white px-6 py-2 rounded-lg font-medium hover:bg-brown transition-colors"
             >
               Começar
@@ -84,7 +84,7 @@ export default async function HomePage() {
           profissional alinhada.
         </p>
         <Link
-          href="/checkout"
+          href="/planos"
           className="inline-block bg-brown-deep text-white px-8 py-4 rounded-lg font-display text-lg hover:bg-brown transition-colors"
         >
           Ver Planos
@@ -322,7 +322,7 @@ export default async function HomePage() {
                   </div>
 
                   <Link
-                    href="/checkout"
+                    href="/planos"
                     className={`w-full block text-center px-6 py-3 rounded-lg font-medium transition-colors ${
                       destaque
                         ? 'bg-brown-deep text-white hover:bg-brown'
@@ -383,7 +383,7 @@ export default async function HomePage() {
             seu lugar no mundo.
           </p>
           <Link
-            href="/checkout"
+            href="/planos"
             className="inline-block bg-white text-brown-deep px-8 py-4 rounded-lg font-display text-lg hover:bg-cream transition-colors"
           >
             Ver Planos e Começar
