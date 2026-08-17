@@ -10,36 +10,33 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Inicializa SendGrid DENTRO da função
     sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
     
     const supabase = await createClient();
 
-    // Verifica se o perfil existe
-    const { data: perfil } = await supabase
+    // Remove .single() e trata corretamente
+    const { data: perfis, error: queryError } = await supabase
       .from('profiles')
       .select('id, nome')
-      .eq('email', email)
-      .single();
+      .eq('email', email);
 
-    if (!perfil) {
+    if (queryError || !perfis || perfis.length === 0) {
       return NextResponse.json({ message: 'Se o email existe, você receberá um link de reset.' });
     }
 
-    // Gera link de reset via Supabase Auth
+    const perfil = perfis[0];
+
+    // Gera link de reset
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/auth/callback?next=/reset-password`,
     });
 
     if (error) {
       console.error('Erro Supabase:', error);
-      return NextResponse.json(
-        { error: 'Erro ao gerar link de reset' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Erro ao gerar link de reset' }, { status: 500 });
     }
 
-    // Envia email customizado via SendGrid
+    // Envia email
     await sgMail.send({
       to: email,
       from: process.env.SENDGRID_FROM_EMAIL || 'noreply@soma.com',
@@ -71,6 +68,7 @@ export async function POST(request: Request) {
       `,
     });
 
+    console.log('✅ Email de reset enviado para:', email);
     return NextResponse.json({
       message: 'Se o email existe, você receberá um link de reset.',
     });
