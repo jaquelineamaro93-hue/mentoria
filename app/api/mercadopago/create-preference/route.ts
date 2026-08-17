@@ -3,8 +3,6 @@ import { NextRequest } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Precisa do seu access token do MercadoPago
     const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
