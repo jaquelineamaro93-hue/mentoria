@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     // Gera link de reset via Supabase Auth
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://mentoria-pi-taupe.vercel.app'}/reset-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/auth/callback?next=/reset-password`,
     });
 
     if (error) {
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
               Clique no botão abaixo para criar uma nova senha:
             </p>
             
-            <a href="${process.env.NEXT_PUBLIC_VERCEL_URL || 'https://mentoria-pi-taupe.vercel.app'}/reset-password" 
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'https://somamentoria.com'}/auth/callback?next=/reset-password" 
                style="display: inline-block; background: #6b4a35; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-bottom: 30px;">
               Redefinir Senha
             </a>
