@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import sgMail from '@sendgrid/mail';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
-
 export async function POST(request: Request) {
   const { email } = await request.json();
 
@@ -12,6 +10,9 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Inicializa SendGrid DENTRO da função
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
+    
     const supabase = await createClient();
 
     // Verifica se o perfil existe
@@ -22,7 +23,6 @@ export async function POST(request: Request) {
       .single();
 
     if (!perfil) {
-      // Não revela se email existe ou não (segurança)
       return NextResponse.json({ message: 'Se o email existe, você receberá um link de reset.' });
     }
 
