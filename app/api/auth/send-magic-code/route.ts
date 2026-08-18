@@ -36,7 +36,8 @@ export async function POST(request: Request) {
 
     try {
       await enviarEmail({
-        para: email,
+        from: 'consultoria@camarocrm.com',
+      to: email,
         assunto: 'Seu código de acesso - SOMA Mentoria',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
