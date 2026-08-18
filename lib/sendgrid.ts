@@ -8,7 +8,7 @@ export async function sendEmail({
   subject,
   assunto,
   html,
-  from = 'noreply@somamentoria.com',
+  from = process.env.SENDGRID_FROM_EMAIL || 'consultoria@camarocrm.com',
 }: {
   to?: string;
   para?: string;
