@@ -37,11 +37,9 @@ export default async function AdminFeedbacksPage() {
 
   return (
     
-      <div className="mb-6">
-        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel
-        </a>
-      </div>
 <main className="px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
         <div>
           <h1 className="font-display text-3xl text-brown-deep mb-1">Feedbacks da Trilha</h1>

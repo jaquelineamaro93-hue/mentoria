@@ -185,13 +185,11 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
 
   return (
     
-      <div className="mb-6">
-        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel
-        </a>
-      </div>
 <div className="flex flex-row w-full">
       <Sidebar profile={null} onSignOut={() => {}} />
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 w-full">
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+
         <div className="mb-8">
           <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Área administrativa</p>
           <h1 className="font-display text-3xl text-brown-deep mb-4">Gerenciar votações</h1>
