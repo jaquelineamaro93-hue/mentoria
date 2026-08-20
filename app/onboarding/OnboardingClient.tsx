@@ -41,7 +41,7 @@ export default function OnboardingClient({
     {
       titulo: "Configure seu perfil",
       descricao: "Adicione uma foto, confirme seu nome e defina uma senha. Acesse Meu Perfil pelo menu lateral para atualizar isso a qualquer momento.",
-      feita: bool(getattr(profile, 'foto_url', None) and getattr(profile, 'nome', None)),
+      feita: !!(profile?.foto_url && profile?.nome),
       href: "/perfil",
       cta: "Ir para Meu Perfil",
     },
