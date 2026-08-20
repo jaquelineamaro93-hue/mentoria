@@ -35,8 +35,10 @@ function AuthConfirmContent() {
         const tokenType = queryParams.get("type");
         if (tokenHash && tokenType) {
           setStatus("Verificando login com Google...");
-          const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
-          else { router.push("/login?error=token_invalid"); return; }
+          const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
+          if (otpError) { router.push('/login?error=token_invalid'); return; }
+          router.push('/dashboard');
+          return;
         }
       }
 
