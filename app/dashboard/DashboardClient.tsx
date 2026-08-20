@@ -215,14 +215,13 @@ export default function DashboardClient({
       <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full bg-lotus-cream">
         {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
-          <div className="w-16 h-16 rounded-full bg-lotus-brown/10 border border-lotus-brown/30 flex items-center justify-center text-lotus-brown text-xl font-display shrink-0">
-            {profile?.nome
-              ?.split(' ')
-              .slice(0, 2)
-              .map((n) => n[0])
-              .join('')
-              .toUpperCase() ?? <UserIcon size={24} strokeWidth={1.5} />}
-          </div>
+          {profile?.foto_url ? (
+            <img src={profile.foto_url} alt={profile.nome} className="w-16 h-16 rounded-full object-cover border border-lotus-brown/30 shrink-0" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-lotus-brown/10 border border-lotus-brown/30 flex items-center justify-center text-lotus-brown text-xl font-display shrink-0">
+              {profile?.nome?.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase() ?? <UserIcon size={24} strokeWidth={1.5} />}
+            </div>
+          )}
           <div>
             <h1 className="font-display text-3xl sm:text-4xl text-lotus-brown">
               Bem-vinda, {primeiroNome}
