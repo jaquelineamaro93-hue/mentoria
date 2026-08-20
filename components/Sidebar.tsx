@@ -48,7 +48,7 @@ const NAV_ITEMS = [
 ];
 
 interface SidebarProps {
-  profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin'> | null;
+  profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'> | null;
   onSignOut?: () => void;
 }
 
@@ -134,14 +134,13 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
       <div className="p-6 md:p-7 border-t border-line">
         {profile && (
           <div className="flex items-center gap-2.5 mb-3.5">
-            <div className="w-8 h-8 rounded-full bg-sky-tint border border-sky flex items-center justify-center text-sky-deep text-xs font-medium">
-              {profile.nome
-                .split(' ')
-                .slice(0, 2)
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()}
-            </div>
+            {profile.foto_url ? (
+              <img src={profile.foto_url} alt={profile.nome} className="w-8 h-8 rounded-full object-cover border border-sky" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-sky-tint border border-sky flex items-center justify-center text-sky-deep text-xs font-medium">
+                {profile.nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()}
+              </div>
+            )}
             <div>
               <p className="text-[13px] text-ink leading-tight">{profile.nome}</p>
               <p className="text-[10px] uppercase tracking-wide text-ink-faint leading-tight mt-0.5">
