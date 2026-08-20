@@ -30,7 +30,7 @@ interface Vaga {
 export default function VagasClient({
   profile,
 }: {
-  profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin | 'foto_url'> | null;
+  profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'> | null;
 }) {
   const [tab, setTab] = useState<Tab>('kanban');
   const [vagas, setVagas] = useState<Vaga[]>([]);
