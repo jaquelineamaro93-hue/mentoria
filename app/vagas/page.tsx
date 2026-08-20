@@ -12,9 +12,9 @@ export default async function VagasPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nome, tipo_pacote, is_admin')
+    .select('nome, tipo_pacote, is_admin, foto_url')
     .eq('id', user.user.id)
-    .single<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin'>>();
+    .single<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin | 'foto_url'>>();
 
   return <VagasClient profile={profile} />;
 }
