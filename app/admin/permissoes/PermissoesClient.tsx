@@ -52,7 +52,12 @@ export function PermissoesClient() {
   };
 
   return (
-    <div className="space-y-6">
+    
+      <div className="mb-6">
+        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors"> ← Voltar ao painel
+        </a>
+      </div>
+<div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-brown-deep flex items-center gap-2">
           <Lock size={32} />

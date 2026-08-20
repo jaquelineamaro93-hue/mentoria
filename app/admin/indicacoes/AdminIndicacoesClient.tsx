@@ -41,7 +41,12 @@ export default function AdminIndicacoesClient({ linhas }: { linhas: Linha[] }) {
   }
 
   return (
-    <main className="px-6 py-8 md:px-12 md:py-12 max-w-5xl mx-auto w-full">
+    
+      <div className="mb-6">
+        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors"> ← Voltar ao painel
+        </a>
+      </div>
+<main className="px-6 py-8 md:px-12 md:py-12 max-w-5xl mx-auto w-full">
       <h1 className="font-display text-3xl text-brown-deep mb-1">Indicações</h1>
       <p className="text-sm text-ink-faint mb-8">
         A cada 2 amigos convertidos, o mentorado libera 1 sessão individual bônus.
