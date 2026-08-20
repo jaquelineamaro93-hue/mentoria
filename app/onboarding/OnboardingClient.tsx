@@ -39,6 +39,13 @@ export default function OnboardingClient({
 
   const etapas = [
     {
+      titulo: "Configure seu perfil",
+      descricao: "Adicione uma foto, confirme seu nome e defina uma senha. Acesse Meu Perfil pelo menu lateral para atualizar isso a qualquer momento.",
+      feita: bool(getattr(profile, 'foto_url', None) and getattr(profile, 'nome', None)),
+      href: "/perfil",
+      cta: "Ir para Meu Perfil",
+    },
+    {
       titulo: 'Sessão de onboarding',
       descricao: 'Um encontro rápido para alinharmos seus objetivos no início da jornada.',
       feita: progresso.onboardingFeito,
