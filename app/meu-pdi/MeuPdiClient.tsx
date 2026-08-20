@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle } from 'lucide-react';
+import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle, Star } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
@@ -15,6 +15,101 @@ interface MeuPdiClientProps {
 }
 
 type Tab = 'perguntas' | 'plano' | 'documentos' | 'feedbacks';
+
+
+function CheckinMensal({ userId }: { userId: string }) {
+  const supabase = createClient();
+  const [nota, setNota] = useState(0);
+  const [hoverNota, setHoverNota] = useState(0);
+  const [feedbackTexto, setFeedbackTexto] = useState('');
+  const [sugestao, setSugestao] = useState('');
+  const [salvando, setSalvando] = useState(false);
+  const [sucesso, setSucesso] = useState(false);
+  const [erro, setErro] = useState('');
+  const [historico, setHistorico] = useState<any[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const mesAtual = new Date().toISOString().slice(0, 7);
+
+  useState(() => { carregarHistorico(); });
+
+  async function carregarHistorico() {
+    const { data } = await supabase.from('checkins_mensais').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    setHistorico(data ?? []);
+    setCarregando(false);
+  }
+
+  const jaEnviouEsteMes = historico.some(c => c.mes_referencia === mesAtual);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (nota === 0) { setErro('Selecione uma nota de 1 a 5'); return; }
+    setSalvando(true); setErro('');
+    const res = await fetch('/api/checkin-mensal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mes_referencia: mesAtual, nota, feedback_texto: feedbackTexto || null, sugestao_melhoria: sugestao || null }),
+    });
+    if (res.ok) { setSucesso(true); setNota(0); setFeedbackTexto(''); setSugestao(''); carregarHistorico(); }
+    else { const d = await res.json(); setErro(d.error || 'Erro ao enviar'); }
+    setSalvando(false);
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-medium text-brown-deep mb-6">Diário de Feedbacks</h2>
+      {!jaEnviouEsteMes ? (
+        <div className="bg-white border border-line rounded-xl p-6 mb-8">
+          <h3 className="font-medium text-brown-deep mb-1">Check-in deste mês</h3>
+          <p className="text-xs text-ink-faint mb-4">{new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
+          {sucesso && <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-sm text-green-700">Feedback enviado!</div>}
+          {erro && <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-600">{erro}</div>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm text-ink-soft mb-2">Como voce avalia sua evolucao este mes?</label>
+              <div className="flex gap-2">
+                {[1,2,3,4,5].map((n) => (
+                  <button key={n} type="button" onClick={() => setNota(n)} onMouseEnter={() => setHoverNota(n)} onMouseLeave={() => setHoverNota(0)} className="p-1">
+                    <Star size={28} className={(hoverNota || nota) >= n ? 'fill-amber-400 text-amber-400' : 'text-line'} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-ink-soft mb-2">Como esta sendo sua experiencia na mentoria?</label>
+              <textarea value={feedbackTexto} onChange={(e) => setFeedbackTexto(e.target.value)} className="w-full border border-line rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-brown-deep resize-none" rows={3} placeholder="Compartilhe como esta sendo sua jornada..." />
+            </div>
+            <div>
+              <label className="block text-sm text-ink-soft mb-2">Alguma sugestao de melhoria?</label>
+              <textarea value={sugestao} onChange={(e) => setSugestao(e.target.value)} className="w-full border border-line rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-brown-deep resize-none" rows={2} placeholder="O que poderia ser diferente?" />
+            </div>
+            <button type="submit" disabled={salvando} className="bg-brown-deep text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-brown transition-colors disabled:opacity-50">
+              {salvando ? 'Enviando...' : 'Enviar feedback'}
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-8 text-sm text-green-700">Voce ja enviou seu check-in deste mes!</div>
+      )}
+      {!carregando && historico.length > 0 && (
+        <div>
+          <h3 className="font-medium text-brown-deep mb-4">Historico de check-ins</h3>
+          <div className="space-y-3">
+            {historico.map((c) => (
+              <div key={c.id} className="bg-white border border-line rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-ink-faint">{new Date(c.mes_referencia + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
+                  <div className="flex gap-0.5">{[1,2,3,4,5].map((n) => (<Star key={n} size={12} className={n <= c.nota ? 'fill-amber-400 text-amber-400' : 'text-line'} />))}</div>
+                </div>
+                {c.feedback_texto && <p className="text-sm text-ink mb-1">{c.feedback_texto}</p>}
+                {c.sugestao_melhoria && <p className="text-xs text-ink-faint">Sugestao: {c.sugestao_melhoria}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MeuPdiClient({ userId, profile, secoes, respostasIniciais }: MeuPdiClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>('perguntas');
@@ -173,13 +268,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         )}
 
         {activeTab === 'feedbacks' && (
-          <div>
-            <h2 className="text-2xl font-medium text-brown-deep mb-6">Diário de Feedbacks & Evolução</h2>
-            <div className="text-center py-12 bg-paper rounded-xl border border-line border-dashed">
-              <MessageSquare size={32} className="mx-auto mb-3 text-ink-faint" />
-              <p className="text-ink-faint">Timeline de feedbacks será exibida aqui</p>
-            </div>
-          </div>
+          <CheckinMensal userId={userId} />
         )}
       </main>
     </div>

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { Star } from 'lucide-react';
+import EnviarFeedbackClient from '../EnviarFeedbackClient';
 
 export default async function AdminFeedbacksPage() {
   const supabase = await createClient();
@@ -17,6 +18,12 @@ export default async function AdminFeedbacksPage() {
     .single();
 
   if (!perfilAdmin?.is_admin) redirect('/dashboard');
+
+  const { data: mentorados } = await supabase
+    .from('profiles')
+    .select('id, nome')
+    .eq('is_admin', false)
+    .order('nome');
 
   const { data: checkins } = await supabase
     .from('checkins_mensais')
@@ -41,6 +48,11 @@ export default async function AdminFeedbacksPage() {
         </div>
       </div>
 
+      <div className="mb-10">
+        <EnviarFeedbackClient mentorados={mentorados ?? []} />
+      </div>
+
+      <h2 className="font-display text-xl text-brown-deep mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
         <p className="text-sm text-ink-faint">Ninguém enviou check-in ainda.</p>
       ) : (

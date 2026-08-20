@@ -79,10 +79,10 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
       <button className="fixed top-6 right-6 z-40 md:hidden p-2 rounded border border-line hover:bg-paper" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
         {isMobileMenuOpen ? "✕" : "☰"}
       </button>
-    <aside className={`fixed md:sticky top-0 left-0 h-screen w-[260px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+    <aside className={`fixed md:sticky top-0 left-0 h-screen w-[280px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
       <div className="flex-1 flex flex-col p-6 md:p-7 md:max-h-screen md:overflow-y-auto">
         <div className="mb-9">
-          <p className="font-display text-2xl text-brown-deep">SOMA</p>
+          <p className="font-display text-3xl text-brown-deep">SOMA</p>
           <div className="h-px w-8 bg-brown my-2.5" />
           <p className="text-[10px] uppercase tracking-[0.2em] text-ink-faint">
             Portal do Mentorado
@@ -99,7 +99,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
+                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors ${
                   isActive
                     ? 'bg-sky-tint text-brown-deep border border-sky'
                     : 'text-ink-soft border border-transparent hover:bg-cream'
@@ -118,7 +118,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
             <div className="h-px bg-line my-4" />
             <Link
               href="/admin"
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-colors ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors ${
                 pathname === '/admin'
                   ? 'bg-sky-tint text-brown-deep border border-sky'
                   : 'text-ink-soft border border-transparent hover:bg-cream'
