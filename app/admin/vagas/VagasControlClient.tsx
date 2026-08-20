@@ -83,7 +83,7 @@ export default function VagasControlClient() {
   return (
     
       <div className="mb-6">
-        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors"> ← Voltar ao painel
+        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel
         </a>
       </div>
 <div className="p-8 max-w-6xl mx-auto">

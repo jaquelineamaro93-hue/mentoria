@@ -118,7 +118,7 @@ export default function FinanceiroClient({
   return (
     
       <div className="mb-6">
-        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors"> ← Voltar ao painel
+        <a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel
         </a>
       </div>
 <div className="flex flex-col md:flex-row w-full">
