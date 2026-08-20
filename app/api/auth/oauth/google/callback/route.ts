@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       type: 'magiclink',
       email: googleUser.email,
       options: {
-        redirectTo: `${siteUrl}/dashboard`,
+        redirectTo: `${siteUrl}/auth/confirm`,
       },
     });
 

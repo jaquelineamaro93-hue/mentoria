@@ -28,7 +28,19 @@ function AuthConfirmContent() {
         }
       });
 
-      // 2. Lê tokens da HASH da URL
+      // 2a. Lê token_hash da QUERY (OAuth Google)
+      if (typeof window !== "undefined") {
+        const queryParams = new URLSearchParams(window.location.search);
+        const tokenHash = queryParams.get("token_hash");
+        const tokenType = queryParams.get("type");
+        if (tokenHash && tokenType) {
+          setStatus("Verificando login com Google...");
+          const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
+          else { router.push("/login?error=token_invalid"); return; }
+        }
+      }
+
+      // 2b. Lê tokens da HASH da URL (magic link - NAO MEXER)
       if (typeof window !== 'undefined' && window.location.hash) {
         console.log('📍 Hash encontrada:', window.location.hash.substring(1, 50) + '...');
         
