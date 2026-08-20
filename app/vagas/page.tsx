@@ -14,7 +14,7 @@ export default async function VagasPage() {
     .from('profiles')
     .select('nome, tipo_pacote, is_admin, foto_url')
     .eq('id', user.user.id)
-    .single<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin | 'foto_url'>>();
+    .single<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'>>();
 
   return <VagasClient profile={profile} />;
 }
