@@ -127,9 +127,10 @@ export async function POST(req: NextRequest) {
       .filter((b): b is Anthropic.TextBlock => b.type === "text")
       .map((b) => b.text)
       .join("\n")
-      .trim()
-      .replace(/^```json\s*/i, "")
-      .replace(/```$/i, "");
+      .trim();
+
+    const jsonMatch = textoResposta.match(/\{[\s\S]*\}/);
+    const textoJson = jsonMatch ? jsonMatch[0] : textoResposta.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
 
     let planoGerado: {
       diagnostico: { sintese: string; conflito_central: string | null; alertas_sobrecarga: string[] };
@@ -144,7 +145,7 @@ export async function POST(req: NextRequest) {
     };
 
     try {
-      planoGerado = JSON.parse(textoResposta);
+      planoGerado = JSON.parse(textoJson);
     } catch {
       return NextResponse.json(
         { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
