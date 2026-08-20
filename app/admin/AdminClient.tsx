@@ -414,15 +414,22 @@ export default function AdminClient({
                         : 'Nunca'}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                      <button
+                        onClick={async () => {
+                          const { createClient } = await import('@/lib/supabase/client');
+                          const sb = createClient();
+                          await sb.from('profiles').update({ onboarding_concluido: !l.profile.onboarding_concluido }).eq('id', l.profile.id);
+                          window.location.reload();
+                        }}
+                        className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 ${
                           l.profile.onboarding_concluido
                             ? 'bg-green-50 text-green-700 border border-green-300'
                             : 'bg-amber-50 text-amber-700 border border-amber-300'
                         }`}
+                        title="Clique para alternar"
                       >
                         {l.profile.onboarding_concluido ? 'Feito' : 'Pendente'}
-                      </span>
+                      </button>
                     </td>
                     <td className="px-4 py-3 text-center text-ink-soft">
                       {l.diagnosticos}
