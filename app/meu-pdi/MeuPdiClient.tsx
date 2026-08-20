@@ -43,6 +43,7 @@ function CheckinMensal({ userId }: { userId: string }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (nota === 0) { setErro('Selecione uma nota de 1 a 5'); return; }
+    if (!feedbackTexto.trim()) { setErro('Por favor, escreva sobre sua experiencia este mes'); return; }
     setSalvando(true); setErro('');
     const res = await fetch('/api/checkin-mensal', {
       method: 'POST',

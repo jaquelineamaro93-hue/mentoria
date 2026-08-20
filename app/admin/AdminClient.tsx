@@ -10,7 +10,6 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Profile } from '@/lib/types';
 import type { LinhaMentorado } from './page';
-import EnviarFeedbackClient from './EnviarFeedbackClient';
 
 interface Props {
   profile: Profile;
@@ -661,11 +660,6 @@ export default function AdminClient({
               </div>
             </div>
           </div>
-
-        <section className="mb-8">
-          <h2 className="text-2xl font-medium text-brown-deep mb-6">Enviar Feedback aos Mentorados</h2>
-          <EnviarFeedbackClient mentorados={linhas.map(l => l.profile)} />
-        </section>
         </section>
       </main>
     </div>
