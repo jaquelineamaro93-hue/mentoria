@@ -428,22 +428,22 @@ export default function AdminClient({
                         : 'Nunca'}
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={async () => {
-                          const { createClient } = await import('@/lib/supabase/client');
-                          const sb = createClient();
-                          await sb.from('profiles').update({ onboarding_concluido: !l.profile.onboarding_concluido }).eq('id', l.profile.id);
-                          window.location.reload();
-                        }}
-                        className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 ${
-                          l.profile.onboarding_concluido
-                            ? 'bg-green-50 text-green-700 border border-green-300'
-                            : 'bg-amber-50 text-amber-700 border border-amber-300'
-                        }`}
-                        title="Clique para alternar"
-                      >
-                        {l.profile.onboarding_concluido ? 'Feito' : 'Pendente'}
-                      </button>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={l.profile.onboarding_concluido}
+                          onChange={async () => {
+                            const { createClient } = await import('@/lib/supabase/client');
+                            const sb = createClient();
+                            await sb.from('profiles').update({ onboarding_concluido: !l.profile.onboarding_concluido }).eq('id', l.profile.id);
+                            window.location.reload();
+                          }}
+                          className="w-4 h-4 accent-green-600 cursor-pointer"
+                        />
+                        <span className={`text-[10px] uppercase ${l.profile.onboarding_concluido ? 'text-green-700' : 'text-amber-700'}`}>
+                          {l.profile.onboarding_concluido ? 'Feito' : 'Pendente'}
+                        </span>
+                      </label>
                     </td>
                     <td className="px-4 py-3 text-center text-ink-soft">
                       {l.diagnosticos}
