@@ -42,6 +42,42 @@ const PLANOS = {
       recorrente: { valor: 100, vezes: 12, periodo: 'mês' },
     },
   },
+  'soma-6m-online': {
+    title: 'SOMA 6 meses',
+    subtitle: 'Movimento e Posicionamento (100% online)',
+    duracao: '6 MESES',
+    encontros: '20 encontros: 14 online individuais, 6 online em grupo',
+    features: [
+      'Diagnóstico de Perfil e Carreira',
+      'Mapeamento de Talentos',
+      'Plano de Ação 90 dias',
+      'Presença Profissional (revisão de LinkedIn ou Currículo)',
+      'Bônus: Guia Dream Board',
+    ],
+    precos: {
+      vista: 600,
+      cartao: 700,
+      recorrente: { valor: 212.50, vezes: 4, periodo: 'mês' },
+    },
+  },
+  'soma-12m-online': {
+    title: 'SOMA 12 meses',
+    subtitle: 'Consistência e Alta Performance (100% online)',
+    duracao: '12 MESES',
+    encontros: '28 encontros: 16 online individuais, 12 online em grupo',
+    features: [
+      'Diagnóstico de Perfil e Carreira',
+      'Mapeamento de Talentos',
+      'Plano de Ação 90 dias',
+      'Presença Profissional (revisão de LinkedIn ou Currículo)',
+      'Bônus: Guia Dream Board',
+    ],
+    precos: {
+      vista: 800,
+      cartao: 900,
+      recorrente: { valor: 230, vezes: 5, periodo: 'mês' },
+    },
+  },
   'teste': {
     title: 'SOMA Teste',
     subtitle: 'Plano de teste (OCULTAR DEPOIS)',
