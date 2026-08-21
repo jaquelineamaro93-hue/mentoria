@@ -185,15 +185,18 @@ export default function PassaporteClient({
                       <div className="flex flex-wrap gap-2">
                         {badgesDosPilar.map((badge) => {
                           const BadgeIcon = ICON_MAP[badge.icon] || Star;
+                          const badgeColor = cores[pilar as keyof typeof cores];
                           return (
                             <div
                               key={badge.id}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
-                              style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
+                              style={{ borderColor: badgeColor, backgroundColor: badgeColor + '10' }}
                               title={badge.descricao}
                             >
-                              <BadgeIcon size={14} className="flex-shrink-0" style={{ color: cores[pilar as keyof typeof cores] }} />
-                              <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
+                              <div style={{ color: badgeColor, display: 'flex' }}>
+                                <BadgeIcon size={14} className="flex-shrink-0" />
+                              </div>
+                              <span style={{ color: badgeColor }}>{badge.nome}</span>
                             </div>
                           );
                         })}
