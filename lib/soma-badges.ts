@@ -20,7 +20,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
   {
     id: 'diagnostico-feito',
     nome: 'Diagnóstico Realizado',
-    descricao: 'Completou o Diagnóstico & Perfil com VIA Character Strengths',
+    descricao: 'Completou o Diagnóstico e Perfil com VIA Character Strengths',
     icon: 'BarChart3',
     pilar: 'sabedoria',
     condicao: 'diagnostico_completo',
@@ -147,10 +147,10 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
 
 export function getCoresDosPilares() {
   return {
-    sabedoria: '#2E6F40',    // verde-floresta
-    objetividade: '#8E0A1E', // cranberry
-    maestria: '#31606F',     // azul-gelo profundo
-    alquimia: '#8A6800',     // mostarda
+    sabedoria: '#2E6F40',
+    objetividade: '#8E0A1E',
+    maestria: '#31606F',
+    alquimia: '#8A6800',
   };
 }
 
@@ -160,6 +160,15 @@ export function getFundosDosPilares() {
     objetividade: '#FBEBED',
     maestria: '#EAF4F8',
     alquimia: '#FDF3D4',
+  };
+}
+
+export function getBordasDosPilares() {
+  return {
+    sabedoria: '#CBDFD0',
+    objetividade: '#EBC9CE',
+    maestria: '#C3D9E2',
+    alquimia: '#F2DFA0',
   };
 }
 
