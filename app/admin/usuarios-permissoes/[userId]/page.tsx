@@ -40,7 +40,7 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
     .single();
 
   if (!usuarioProfile) {
-    return redirect('/admin/usuarios-permissoes');
+    return redirect('/admin');
   }
 
   const { data: permissoes } = await supabase
