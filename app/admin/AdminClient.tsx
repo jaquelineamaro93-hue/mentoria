@@ -677,18 +677,7 @@ export default function AdminClient({
               )}
             </div>
 
-            <div className="bg-cream rounded-xl border border-line p-6">
-              <h3 className="flex items-center gap-2 font-medium text-brown-deep mb-4">
-                <Lock size={18} />
-                Permissões
-              </h3>
-              <p className="text-xs text-ink-faint mb-4">
-                Controle granular de acesso para administradores
-              </p>
-              <div className="text-sm text-ink-faint text-center py-12">
-                Nenhuma permissão customizada configurada
-              </div>
-            </div>
+
           </div>
         </section>
       </main>
