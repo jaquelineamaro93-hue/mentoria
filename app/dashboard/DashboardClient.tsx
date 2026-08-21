@@ -27,7 +27,12 @@ import { Panel, Eyebrow } from '@/components/Panel';
 import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
-import { SOMA_ACHIEVEMENTS } from '@/lib/soma-badges';
+import {
+  SOMA_ACHIEVEMENTS,
+  getCoresDosPilares,
+  getFundosDosPilares,
+  getBordasDosPilares,
+} from '@/lib/soma-badges';
 import type {
   Announcement,
   Profile,
@@ -155,7 +160,7 @@ export default function DashboardClient({
     : !bussolaCompleto
     ? '/exercicios'
     : !pdiCompleto
-    ? '/pdi'
+    ? '/meu-pdi'
     : '/diario';
 
   // ---- Passaporte de conquistas (apenas o que dá para verificar com os dados carregados) ----
@@ -169,11 +174,16 @@ export default function DashboardClient({
   };
   const conquistasObtidas = SOMA_ACHIEVEMENTS.filter((a) => sinaisDisponiveis[a.condicao]);
 
+  const coresPilar = getCoresDosPilares();
+  const fundosPilar = getFundosDosPilares();
+  const bordasPilar = getBordasDosPilares();
+
   const pilarConfig = [
     {
       key: 'sabedoria',
       titulo: 'Sabedoria Interna',
-      style: { backgroundColor: '#EBAEE6', color: '#2D231E', borderColor: '#D98DD3' },
+      cor: coresPilar.sabedoria,
+      style: { backgroundColor: fundosPilar.sabedoria, borderColor: bordasPilar.sabedoria },
       texto: viaResultado?.forcas?.length
         ? viaResultado.forcas.slice(0, 3).join(' · ')
         : 'Ainda não mapeada, complete o Diagnóstico & Perfil.',
@@ -181,7 +191,8 @@ export default function DashboardClient({
     {
       key: 'objetividade',
       titulo: 'Objetividade Magnética',
-      style: { backgroundColor: '#FF857A', color: '#FFFFFF', borderColor: '#E5685D' },
+      cor: coresPilar.objetividade,
+      style: { backgroundColor: fundosPilar.objetividade, borderColor: bordasPilar.objetividade },
       texto: bussola?.norte
         ? bussola.norte
         : 'Sem posicionamento definido, preencha sua Bússola.',
@@ -189,7 +200,8 @@ export default function DashboardClient({
     {
       key: 'maestria',
       titulo: 'Maestria em Ação',
-      style: { backgroundColor: '#ADEBB3', color: '#2D231E', borderColor: '#8DD694' },
+      cor: coresPilar.maestria,
+      style: { backgroundColor: fundosPilar.maestria, borderColor: bordasPilar.maestria },
       texto:
         streakSemanas > 0
           ? `${streakSemanas} semana${streakSemanas > 1 ? 's' : ''} consecutiva${streakSemanas > 1 ? 's' : ''} de registro`
@@ -198,7 +210,8 @@ export default function DashboardClient({
     {
       key: 'alquimia',
       titulo: 'Alquimia de Resultados',
-      style: { backgroundColor: '#6B403C', color: '#FFFFFF', borderColor: '#53302D' },
+      cor: coresPilar.alquimia,
+      style: { backgroundColor: fundosPilar.alquimia, borderColor: bordasPilar.alquimia },
       texto: `${profile?.pontos_total ?? 0} pontos de evolução acumulados no ciclo`,
     },
   ];
@@ -324,7 +337,7 @@ export default function DashboardClient({
             <Panel className="p-6 border-line flex flex-col justify-between">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Passaporte SOMA</p>
-                <p className="font-display text-4xl text-lotus-brown">{pontosTotais} <span className="text-lg">pts</span></p>
+                <p className="font-display text-4xl text-gold-ink">{pontosTotais} <span className="text-lg">pts</span></p>
               </div>
               <Link href="/passaporte" className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-lotus-brown hover:underline">
                 <Award size={14} strokeWidth={1.5} /> Ver passaporte completo
@@ -333,7 +346,7 @@ export default function DashboardClient({
             <Panel className="p-6 border-line flex flex-col justify-between">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Selos conquistados</p>
-                <p className="font-display text-4xl text-lotus-brown">{conquistasObtidas.length} <span className="text-lg">/ {SOMA_ACHIEVEMENTS.length}</span></p>
+                <p className="font-display text-4xl text-gold-ink">{conquistasObtidas.length} <span className="text-lg">/ {SOMA_ACHIEVEMENTS.length}</span></p>
               </div>
               <p className="mt-4 text-[13px] text-ink-faint">
                 {conquistasObtidas.length === 0 ? 'Comece pelo Mapa Quem Sou Eu para abrir sua jornada.'
@@ -344,7 +357,7 @@ export default function DashboardClient({
           </div>
         </section>
 
-        {/* Pilares SOMA (cores vibrantes) */}
+        {/* Pilares SOMA */}
         <section className="mb-10">
           <Eyebrow>
             <Gem size={13} strokeWidth={1.5} /> Raio-X dos 4 pilares SOMA
@@ -352,8 +365,8 @@ export default function DashboardClient({
           <div className="grid sm:grid-cols-2 gap-4">
             {pilarConfig.map((p) => (
               <div key={p.key} className="p-5 rounded-xl border" style={p.style}>
-                <p className="text-sm font-medium mb-1.5">{p.titulo}</p>
-                <p className="text-sm leading-relaxed" style={{ opacity: 0.85 }}>{p.texto}</p>
+                <p className="text-sm font-medium mb-1.5" style={{ color: p.cor }}>{p.titulo}</p>
+                <p className="text-sm leading-relaxed text-ink-soft">{p.texto}</p>
               </div>
             ))}
           </div>
@@ -385,7 +398,7 @@ export default function DashboardClient({
               { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
               { label: 'Teste VIA Character Strengths', done: viaCompleto, href: '/exercicios' },
               { label: 'Bússola de Posicionamento', done: bussolaCompleto, href: '/exercicios' },
-              { label: 'PDI, Plano de Desenvolvimento Individual', done: pdiCompleto, href: '/pdi' },
+              { label: 'PDI, Plano de Desenvolvimento Individual', done: pdiCompleto, href: '/meu-pdi' },
             ].map((tarefa) => (
               <Link
                 key={tarefa.label}
@@ -457,15 +470,13 @@ export default function DashboardClient({
           </div>
         </section>
 
-        {/* SEÇÃO 4: Mural de avisos e passaporte de conquistas */}
+        {/* SEÇÃO 4: Mural de avisos */}
         <section className="mb-10">
           <Eyebrow>
             <Calendar size={13} strokeWidth={1.5} /> Mural de avisos & próximos encontros
           </Eyebrow>
           <MuralAtualizado avisos={announcements} />
         </section>
-
-
       </main>
     </div>
   );
