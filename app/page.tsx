@@ -1,6 +1,6 @@
 "use client";
 
-import { Sidebar } from "@/components/Sidebar";
+import Sidebar from "@/components/Sidebar";
 import { useConfetti } from "@/components/useConfetti";
 
 export default function Home() {
