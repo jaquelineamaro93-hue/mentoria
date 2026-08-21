@@ -47,7 +47,7 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
     .from('admin_permissoes')
     .select('*')
     .eq('user_id', params.userId)
-    .catch(() => ({ data: [] }));
+    ;
 
   return (
     <div className="flex min-h-screen bg-white">
