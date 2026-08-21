@@ -103,9 +103,7 @@ export default function MinhaTrilhaClient({
         </p>
         <h1 className="font-display text-3xl text-brown-deep mb-1">Minha Trilha</h1>
         <p className="text-sm text-ink-faint max-w-xl mb-10">
-          Uma vez por mês, deixa para seu mentor uma nota de 0 a 5 e um comentário sobre
-          como está sendo a mentoria. Isso ajuda a ajustar o que for preciso ao longo
-          do caminho.
+          Uma vez por mês, deixa para seu mentor uma nota de 0 a 5 e um comentário. Isso ajuda a ajustar a mentoria conforme necessário.
         </p>
 
         <div className="relative pl-8 space-y-8">

@@ -95,8 +95,7 @@ export default function OnboardingClient({
         <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Sua jornada</p>
         <h1 className="font-display text-3xl text-brown-deep mb-2">Onboarding</h1>
         <p className="text-sm text-ink-faint mb-8">
-          {concluidas} de {etapas.length} etapas concluídas. Siga essa ordem para aproveitar melhor
-          a mentoria desde o começo.
+          {concluidas} de {etapas.length} etapas concluídas. Complete as etapas nesta ordem. Cada uma prepara você para a próxima.
         </p>
 
         <div className="flex flex-col gap-4">
@@ -131,6 +130,25 @@ export default function OnboardingClient({
             </Panel>
           ))}
         </div>
+
+        {profile?.is_admin && (
+          <div className="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-6">
+            <p className="text-xs uppercase tracking-wide text-amber-900 font-medium mb-3">🔧 Administrador</p>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                defaultChecked={false}
+                onChange={async (e) => {
+                  const supabase = createClient();
+                  await supabase.from('profiles').update({ onboarding_concluido: e.target.checked }).eq('id', profile.id);
+                  router.refresh();
+                }}
+                className="w-4 h-4 accent-amber-700"
+              />
+              <span className="text-sm text-amber-900">Marcar onboarding como concluído para este mentorado</span>
+            </label>
+          </div>
+        )}
 
         {concluidas === etapas.length && (
           <div className="mt-8 bg-sky-tint border border-sky rounded-lg p-6 text-center">
