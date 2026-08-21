@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -511,7 +511,7 @@ export default function AdminClient({
                   <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
                     Tipo
                   </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide text-center">
                     Ações
                   </th>
                 </tr>
@@ -542,21 +542,30 @@ export default function AdminClient({
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        {!l.emailConfirmado && (
-                          <button
-                            onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
-                            disabled={confirmandoId === l.profile.id}
-                            className="flex items-center gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                      <div className="relative group inline-block">
+                        <button className="p-2 hover:bg-cream rounded-lg transition-colors">
+                          <MoreVertical size={16} className="text-ink-faint" />
+                        </button>
+                        
+                        <div className="absolute right-0 mt-1 w-48 bg-white border border-line rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                          
+                            href={`/admin/usuarios-permissoes/${l.profile.id}`}
+                            className="block px-4 py-2 text-sm text-ink hover:bg-cream border-b border-line"
                           >
-                            {confirmandoId === l.profile.id ? (
-                              <Loader2 size={12} className="animate-spin" />
-                            ) : (
-                              <MailWarning size={12} />
-                            )}
-                            Confirmar e-mail
-                          </button>
-                        )}
+                            ✏️ Editar Permissões
+                          </a>
+                          {!l.emailConfirmado && (
+                            <button
+                              onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
+                              disabled={confirmandoId === l.profile.id}
+                              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-cream border-b border-line disabled:opacity-60"
+                            >
+                              📧 Confirmar e-mail
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 hidden group-hover:flex">
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
                           disabled={resetandoId === l.profile.id}
