@@ -7,54 +7,75 @@
 
   /* Base */
   --color-cream: #f7f6f1;
+  --color-canvas: #f7f6f1;
   --color-paper: #fdfcf8;
   --color-ink: #16281a;
+  --color-ink-deep: #0f1d12;
   --color-ink-soft: #2c3a2e;
   --color-ink-faint: #5c6b5f;
-
-  --color-brown: #2e6f40;
-  --color-brown-deep: #1f4f2c;
-  --color-sky: #2e6f40;
-  --color-sky-deep: #1f4f2c;
-  --color-sky-tint: #eaf3ec;
   --color-line: #e0e6e1;
   --color-line-soft: #e0e6e1;
 
-  --color-lotus-brown: #31606f;
-  --color-lotus-cream: #f7f6f1;
-  --color-lotus-coral: #8e0a1e;
-  --color-lotus-mint: #3f7a44;
-  --color-lotus-lilac: #ffce1b;
+  /* Marca: verde-floresta. A unica cor de acao. */
+  --color-brand: #2e6f40;
+  --color-brand-deep: #1f4f2c;
+  --color-brand-soft: #eaf3ec;
+  --color-brand-border: #cbdfd0;
 
+  /* Conquista: mostarda. Pontos, selos, marcos. */
+  --color-gold: #ffce1b;
+  --color-gold-ink: #8a6800;
+  --color-gold-deep: #7a5c00;
+  --color-gold-light: #fdf3d4;
+  --color-gold-soft: #fdf3d4;
+  --color-gold-border: #f2dfa0;
+
+  /* Alerta: cranberry. Prazo e pendencia. */
+  --color-coral: #8e0a1e;
+  --color-coral-deep: #6d0716;
+  --color-coral-soft: #fbebed;
+  --color-coral-border: #ebc9ce;
+  --color-berry: #8e0a1e;
+  --color-berry-light: #fbebed;
+  --color-berry-border: #ebc9ce;
+
+  /* Informacao: azul-gelo. */
+  --color-ice: #add8e6;
+  --color-ice-deep: #31606f;
+  --color-ice-light: #eaf4f8;
+  --color-ice-soft: #eaf4f8;
+  --color-ice-border: #c3d9e2;
+
+  /* Verde em variantes */
   --color-forest: #2e6f40;
   --color-forest-dark: #1f4f2c;
   --color-forest-mid: #3f7a44;
   --color-forest-light: #eaf3ec;
   --color-forest-border: #cbdfd0;
 
-  --color-gold: #ffce1b;
-  --color-gold-ink: #8a6800;
-  --color-gold-deep: #7a5c00;
-  --color-gold-light: #fdf3d4;
-  --color-gold-border: #f2dfa0;
-
-  --color-berry: #8e0a1e;
-  --color-berry-light: #fbebed;
-  --color-berry-border: #ebc9ce;
-
-  --color-ice: #add8e6;
-  --color-ice-deep: #31606f;
-  --color-ice-light: #eaf4f8;
-  --color-ice-border: #c3d9e2;
+  /* Nomes antigos, apontando para a paleta nova */
+  --color-brown: #2e6f40;
+  --color-brown-deep: #1f4f2c;
+  --color-sky: #2e6f40;
+  --color-sky-deep: #1f4f2c;
+  --color-sky-tint: #eaf3ec;
+  --color-lotus-brown: #2e6f40;
+  --color-lotus-cream: #f7f6f1;
+  --color-lotus-coral: #8e0a1e;
+  --color-lotus-mint: #3f7a44;
+  --color-lotus-lilac: #ffce1b;
 }
 
 html { scroll-behavior: smooth; }
 body { background: var(--color-cream); color: var(--color-ink); font-family: var(--font-body); font-weight: 300; }
 .font-display { font-family: var(--font-display); font-style: italic; }
-::selection { background: rgba(46, 111, 64, 0.22); color: var(--color-forest-dark); }
+
+.bg-gradient-brand { background-image: linear-gradient(135deg, #2e6f40 0%, #1f4f2c 100%); }
+
+::selection { background: rgba(46, 111, 64, 0.22); color: var(--color-brand-deep); }
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--color-cream); }
 ::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-forest); }
-a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--color-forest-dark); outline-offset: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-brand); }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--color-brand-deep); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
