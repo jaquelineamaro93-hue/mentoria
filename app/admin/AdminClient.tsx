@@ -565,7 +565,7 @@ export default function AdminClient({
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2 hidden group-hover:flex">
+                      <div className="flex gap-2 hidden flex">
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
                           disabled={resetandoId === l.profile.id}

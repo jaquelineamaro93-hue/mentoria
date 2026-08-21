@@ -2,7 +2,7 @@
 
 import { HelpCircle, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { HelpCircle, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Compass,
@@ -25,7 +25,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { HelpCircle, NotificationBadge } from './NotificationBadge';
+import { NotificationBadge } from './NotificationBadge';
 import type { Profile } from '@/lib/types';
 
 const NAV_ITEMS = [
