@@ -15,11 +15,11 @@ interface Props {
 }
 
 const MODULOS = [
-  { id: 'dashboard', nome: 'Dashboard', 'Painel principal com resumo',, descricao: 'Acesso ao painel principal' },
-  { id: 'onboarding', nome: 'Onboarding', 'Gerenciar primeiros passos',, descricao: 'Gerenciar onboarding' },
-  { id: 'pdi', nome: 'PDI & Trilha', 'Plano de Desenvolvimento Individual',, descricao: 'Editar PDI' },
-  { id: 'diario', nome: 'Diário de Bordo', 'Anotações privadas do mentorado',, descricao: 'Visualizar anotações' },
-  { id: 'minha-trilha', nome: 'Minha Trilha', 'Checkins e feedback mensal',, descricao: 'Checkins mensais' },
+  { id: 'dashboard', nome: 'Dashboard', descricao: 'Acesso ao painel principal' },
+  { id: 'onboarding', nome: 'Onboarding', descricao: 'Gerenciar onboarding' },
+  { id: 'pdi', nome: 'PDI & Trilha', descricao: 'Editar PDI' },
+  { id: 'diario', nome: 'Diário de Bordo', descricao: 'Visualizar anotações' },
+  { id: 'minha-trilha', nome: 'Minha Trilha', descricao: 'Checkins mensais' },
   { id: 'passos', nome: 'Passos', descricao: 'Acesso a passos e milhas' },
   { id: 'admin', nome: 'Painel Admin', descricao: 'Acesso completo a admin' },
 ];
