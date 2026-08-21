@@ -5,27 +5,32 @@
   --font-display: 'Times New Roman', Times, serif;
   --font-body: 'Poppins', sans-serif;
 
-  --color-cream: #F1F5F9;
-  --color-paper: #FFFFFF;
-  --color-ink: #0F172A;
+  --color-cream: #f1f5f9;
+  --color-paper: #ffffff;
+  --color-ink: #0f172a;
   --color-ink-soft: #475569;
-  --color-ink-faint: #64748B;
+  --color-ink-faint: #94a3b8;
 
-  --color-brown: #6b4a35;
-  --color-brown-deep: #3c2c1f;
+  --color-brown: #334155;
+  --color-brown-deep: #0f172a;
 
   --color-sky: #7ea0c4;
   --color-sky-deep: #4f7196;
   --color-sky-tint: #e7eff6;
 
-  --color-line: #E2E8F0;
-  --color-line-soft: #E8ECF1;
+  --color-line: #e2e8f0;
+  --color-line-soft: #f1f5f9;
 
   --color-lotus-brown: #6B403C;
-  --color-lotus-cream: #FFFFFF;
+  --color-lotus-cream: #f1f5f9;
   --color-lotus-coral: #FF857A;
   --color-lotus-mint: #ADEBB3;
   --color-lotus-lilac: #EBAEE6;
+
+  --color-m3-surface: #f1f5f9;
+  --color-m3-card: #ffffff;
+  --color-m3-text: #0f172a;
+  --color-m3-border: #e2e8f0;
 }
 
 html {
@@ -60,7 +65,7 @@ body {
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-brown);
+  background: var(--color-ink-faint);
 }
 
 a:focus-visible,
