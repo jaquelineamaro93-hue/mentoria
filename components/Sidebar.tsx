@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Sidebar() {
+export default function Sidebar() {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
 
@@ -45,17 +45,6 @@ export function Sidebar() {
             <div className="text-sm font-semibold text-ink-deep">Jaqueline</div>
             <div className="text-xs text-ink-faint">Mentora</div>
           </div>
-        </div>
-        <div className="space-y-2">
-          <button className="w-full text-left px-3 py-2 text-sm text-ink-faint hover:text-brand transition">
-            Meu Perfil
-          </button>
-          <button className="w-full text-left px-3 py-2 text-sm text-ink-faint hover:text-brand transition">
-            Termos
-          </button>
-          <button className="w-full text-left px-3 py-2 text-sm text-ink-faint hover:text-brand transition">
-            Sair
-          </button>
         </div>
       </div>
     </aside>
