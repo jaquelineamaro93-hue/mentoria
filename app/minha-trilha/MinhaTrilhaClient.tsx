@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import Sidebar from '@/components/Sidebar';
+import { Tooltip } from '@/components/Tooltip';
 import { Check, Circle, Lock, Star } from 'lucide-react';
 import type { CheckinMensal, Profile } from '@/lib/types';
 
