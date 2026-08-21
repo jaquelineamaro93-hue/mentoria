@@ -1,413 +1,188 @@
-import { Metadata } from 'next';
-import Link from 'next/link'; 
-import { CheckCircle2, Users, Compass, Target, Sparkles, Video, MapPin } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
-import type { PlanoMentoria } from '@/lib/types';
+"use client";
 
-export const metadata: Metadata = {
-  title: 'SOMA Mentoria - Transforme sua Carreira',
-  description:
-    'Mentoria de carreira e estratégia com Jaqueline Amaro. Metodologia SOMA: sabedoria interna, objetividade magnética, maestria em ação e alquimia de resultados.',
-};
+import { Sidebar } from "@/components/Sidebar";
+import { useConfetti } from "@/components/useConfetti";
 
-const PILARES_SOMA = [
-  {
-    letra: 'S',
-    titulo: 'Sabedoria Interna',
-    texto:
-      'A base de tudo é o acesso à sua verdade. Identificar seus diferenciais únicos e silenciar o ruído externo para ouvir o que sua trajetória e seus valores dizem sobre o seu próximo passo.',
-  },
-  {
-    letra: 'O',
-    titulo: 'Objetividade Magnética',
-    texto:
-      'Ter propósito sem direção é apenas sonho. Transformamos sua essência em metas claras, com uma estratégia que atrai as oportunidades certas porque você sabe exatamente o que está buscando.',
-  },
-  {
-    letra: 'M',
-    titulo: 'Maestria em Ação',
-    texto:
-      'O conhecimento só se torna poder quando aplicado. Excelência na execução, refinamento das suas habilidades e coragem de agir com autoridade e presença no mercado.',
-  },
-  {
-    letra: 'A',
-    titulo: 'Alquimia de Resultados',
-    texto:
-      'Onde a estratégia encontra a realização. O estágio de colheita e expansão, onde você transforma desafios em crescimento contínuo e sustenta o sucesso com equilíbrio e propósito.',
-  },
-];
-
-export default async function HomePage() {
-  const supabase = await createClient();
-  const { data: planosRaw } = await supabase
-    .from('planos_mentoria')
-    .select('*')
-    .eq('ativo', true)
-    .eq('visivel_checkout', true)
-    .order('duracao_meses', { ascending: true });
-
-  // A página pública de checkout mantém, às vezes, um plano de R$ 0,01 só
-  // pra validar o webhook do Mercado Pago. Isso não deve aparecer aqui.
-  const planos = (planosRaw ?? []).filter((p: PlanoMentoria) => Number(p.preco_avista) >= 100);
+export default function Home() {
+  const triggerConfetti = useConfetti();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream to-white">
-      {/* Header */}
-      <header className="border-b border-line">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-          <h1 className="font-display text-2xl text-brown-deep">SOMA Mentoria</h1>
-          <div className="space-x-4">
-            <Link href="/login" className="text-brown-deep hover:underline font-medium">
-              Entrar
-            </Link>
-            <Link
-              href="/planos"
-              className="bg-brown-deep text-white px-6 py-2 rounded-lg font-medium hover:bg-brown transition-colors"
-            >
-              Começar
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <p className="text-xs uppercase tracking-[0.25em] text-sky-deep mb-4">
-          Mentoria de Carreira e Estratégia
+    <div className="min-h-screen bg-canvas">
+      {/* HERO */}
+      <section className="min-h-screen bg-gradient-to-b from-brand-soft to-white flex flex-col items-center justify-center px-4 text-center">
+        <h1 className="font-display text-6xl text-ink-deep mb-4 max-w-3xl">
+          Sua Totalidade Integrada
+        </h1>
+        <p className="text-xl text-ink-faint max-w-2xl mb-10">
+          Transforme sua carreira e vida pessoal com mentoria integral alinhada aos 4 pilares SOMA
         </p>
-        <h2 className="font-display text-5xl text-brown-deep mb-6">
-          Se você sente que precisa destravar a sua carreira, essa mentoria é para você
-        </h2>
-        <p className="text-xl text-ink-faint mb-8 max-w-2xl mx-auto">
-          A Metodologia SOMA une autodescoberta, estratégia de carreira e execução de alto nível.
-          Para quem cansou de se sentir &quot;em partes&quot; e deseja a plenitude de uma vida
-          profissional alinhada.
-        </p>
-        <Link
-          href="/planos"
-          className="inline-block bg-brown-deep text-white px-8 py-4 rounded-lg font-display text-lg hover:bg-brown transition-colors"
+        <button
+          onClick={triggerConfetti}
+          className="bg-gradient-brand text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transition-all"
         >
-          Ver Planos
-        </Link>
+          Conheça o Programa
+        </button>
       </section>
 
-      {/* Sobre a mentora */}
-      <section className="bg-white py-20 border-t border-b border-line">
-        <div className="max-w-4xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-3 text-center">
-            Sobre a mentora
-          </p>
-          <h3 className="font-display text-3xl text-brown-deep text-center mb-8">
-            Jaqueline Amaro
-          </h3>
-          <div className="text-ink-soft leading-relaxed space-y-4 text-center max-w-2xl mx-auto">
-            <p>
-              Administradora e Head de CRM, com uma trajetória construída na intersecção entre
-              dados, tecnologia e negócios. Passagens em empresas como Banco do Brasil, Loft,
-              Ansell e Guanabara Rodoviário.
-            </p>
-            <p>
-              Como head de agência e mentora, já vivi na prática o desafio de transformar
-              arquiteturas em resultados reais e carreiras estagnadas em trajetórias de alta
-              performance.
-            </p>
-            <p>
-              Hoje coloco toda essa vivência de mercado a serviço de profissionais que desejam
-              impulsionar a carreira com intenção estratégica. Através da Metodologia SOMA, entrego
-              o mapa para você sair da execução automática, ganhar autoridade e construir um futuro
-              com propósito e ROI pessoal.
-            </p>
-          </div>
+      {/* METODOLOGIA */}
+      <section className="py-20 px-4 max-w-6xl mx-auto">
+        <h2 className="font-display text-4xl text-ink-deep text-center mb-16">
+          A Metodologia SOMA
+        </h2>
+        <div className="grid grid-cols-4 gap-6">
+          {[
+            { letter: "S", title: "Situação", desc: "Diagnóstico real onde você está" },
+            { letter: "O", title: "Objetivo", desc: "Visão clara do que deseja" },
+            { letter: "M", title: "Método", desc: "Plano estruturado de ação" },
+            { letter: "A", title: "Acompanhamento", desc: "Suporte contínuo e evolução" },
+          ].map((item) => (
+            <div key={item.letter} className="bg-white p-6 rounded-2xl border border-line text-center">
+              <div className="text-4xl font-bold text-brand mb-3">{item.letter}</div>
+              <h3 className="font-semibold text-ink-deep mb-2">{item.title}</h3>
+              <p className="text-sm text-ink-faint">{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Metodologia SOMA */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-3 text-center">
-            A metodologia
-          </p>
-          <h3 className="font-display text-3xl text-brown-deep text-center mb-4">
-            SOMA: sua totalidade
-          </h3>
-          <p className="text-ink-faint text-center max-w-2xl mx-auto mb-12">
-            A palavra SOMA vem do grego e representa a totalidade do ser: a união entre mente,
-            corpo e espírito. Um chamado para você integrar todas as suas potências e parar de
-            fragmentar quem você é.
-          </p>
-
-          <div className="grid sm:grid-cols-2 gap-6">
-            {PILARES_SOMA.map((pilar) => (
-              <div key={pilar.letra} className="border border-line rounded-2xl p-6 bg-white">
-                <div className="w-10 h-10 rounded-full bg-brown-deep text-white flex items-center justify-center font-display text-lg mb-4">
-                  {pilar.letra}
-                </div>
-                <h4 className="font-display text-lg text-brown-deep mb-2">{pilar.titulo}</h4>
-                <p className="text-sm text-ink-faint leading-relaxed">{pilar.texto}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Como funciona */}
-      <section className="bg-white py-20 border-t border-b border-line">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-3 text-center">
-            Como funciona
-          </p>
-          <h3 className="font-display text-3xl text-brown-deep text-center mb-12">
-            Um programa híbrido em dois tempos
-          </h3>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="border border-line rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full bg-sky-tint border border-sky flex items-center justify-center">
-                  <Video size={18} className="text-sky-deep" />
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-sky-deep">Etapa 1 · Online</p>
-                  <h4 className="font-display text-lg text-brown-deep">
-                    Alinhamento e mapa individual
-                  </h4>
-                </div>
-              </div>
-              <ul className="space-y-3 text-sm text-ink-faint">
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Mergulho nas metas:</strong> sessão individual para
-                    entender seus desejos, o que te bloqueia e onde você quer chegar.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">DISC &amp; forças de caráter:</strong> descubra
-                    como seu comportamento dita seus resultados.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Motivadores e energia:</strong> o que realmente te
-                    faz entrar em movimento.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Preparação de rota:</strong> saia com a clareza
-                    necessária para aproveitar ao máximo o encontro presencial.
-                  </span>
-                </li>
+      {/* COMO FUNCIONA */}
+      <section className="py-20 px-4 bg-brand-soft">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-display text-4xl text-ink-deep text-center mb-16">
+            Como Funciona
+          </h2>
+          <div className="grid grid-cols-2 gap-12">
+            <div>
+              <h3 className="font-semibold text-ink-deep mb-4">Fase Online</h3>
+              <ul className="space-y-3">
+                {["Diagnóstico inicial dos 4 pilares", "Sessões de mentoria estruturadas", "Comunidade de apoio"].map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <span className="text-brand">✓</span>
+                    <span className="text-ink-soft">{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
-
-            <div className="border border-line rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full bg-sky-tint border border-sky flex items-center justify-center">
-                  <MapPin size={18} className="text-sky-deep" />
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-sky-deep">
-                    Etapa 2 · Presencial
-                  </p>
-                  <h4 className="font-display text-lg text-brown-deep">
-                    Fluxo, presença e ambiência
-                  </h4>
-                </div>
-              </div>
-              <ul className="space-y-3 text-sm text-ink-faint">
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Encontro com membros:</strong> o poder da troca,
-                    discutindo contextos de carreira e desafios reais de ambientes corporativos.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Estratégia de posicionamento:</strong> revisão de
-                    LinkedIn e currículo sob a ótica de quem precisa se destacar no mercado.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Networking estratégico:</strong> aprenda a se
-                    colocar e a construir alianças para sua ascensão.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong className="text-ink">Ajuste de foco:</strong> revisão das metas
-                    individuais dentro da dinâmica do grupo.
-                  </span>
-                </li>
+            <div>
+              <h3 className="font-semibold text-ink-deep mb-4">Fase Presencial</h3>
+              <ul className="space-y-3">
+                {["Encontros em grupo para networking", "Workshops de desenvolvimento", "Celebração de conquistas"].map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <span className="text-brand">✓</span>
+                    <span className="text-ink-soft">{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Planos */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h3 className="font-display text-3xl text-brown-deep text-center mb-2">
-            Escolha seu Plano
-          </h3>
-          <p className="text-sm text-ink-faint text-center mb-12">
-            Preços e parcelamentos exatamente como no checkout, sem letras miúdas.
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {planos.map((plano, i) => {
-              const destaque = i === planos.length - 1 && planos.length > 1;
-              return (
-                <div
-                  key={plano.id}
-                  className={`rounded-2xl p-8 border-2 ${
-                    destaque ? 'border-brown-deep bg-brown-deep/5' : 'border-line'
-                  }`}
-                >
-                  {destaque && (
-                    <div className="mb-4">
-                      <span className="bg-brown-deep text-white text-xs font-medium px-3 py-1 rounded-full">
-                        Mais completo
-                      </span>
-                    </div>
-                  )}
-
-                  <h4 className="font-display text-2xl text-brown-deep mb-1">{plano.nome}</h4>
-                  {plano.foco && <p className="text-sm text-ink-faint mb-6">{plano.foco}</p>}
-
-                  <div className="mb-6">
-                    <p className="font-display text-3xl text-brown-deep mb-1">
-                      R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-xs text-ink-faint">à vista</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-ink-faint">
-                      <span>
-                        R${' '}
-                        {Number(plano.preco_cartao).toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                        })}{' '}
-                        no cartão
-                      </span>
-                      <span>
-                        {plano.parcelas_recorrente}x de R${' '}
-                        {(
-                          Number(plano.preco_recorrente_total) / plano.parcelas_recorrente
-                        ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}{' '}
-                        no recorrente
-                      </span>
-                    </div>
-                  </div>
-
-                  {plano.descricao_encontros && (
-                    <p className="text-sm text-ink-soft mb-4">{plano.descricao_encontros}</p>
-                  )}
-
-                  <div className="space-y-2.5 mb-8 text-sm text-ink-faint">
-                    {(plano.itens_inclusos ?? []).map((item: string) => (
-                      <div key={item} className="flex items-start gap-2">
-                        <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Link
-                    href="/planos"
-                    className={`w-full block text-center px-6 py-3 rounded-lg font-medium transition-colors ${
-                      destaque
-                        ? 'bg-brown-deep text-white hover:bg-brown'
-                        : 'bg-brown-deep/10 text-brown-deep hover:bg-brown-deep hover:text-white'
-                    }`}
-                  >
-                    Escolher Plano
-                  </Link>
+      {/* PLANOS */}
+      <section className="py-20 px-4 max-w-4xl mx-auto">
+        <h2 className="font-display text-4xl text-ink-deep text-center mb-16">
+          Planos de Investimento
+        </h2>
+        <div className="grid grid-cols-2 gap-8">
+          {[
+            { months: "6 meses", price: "R$ 650", badge: false },
+            { months: "12 meses", price: "R$ 850", badge: true },
+          ].map((plan) => (
+            <div key={plan.months} className="bg-white p-8 rounded-2xl border border-line relative">
+              {plan.badge && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-brand text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  MAIS COMPLETO
                 </div>
-              );
-            })}
+              )}
+              <h3 className="font-semibold text-ink-deep text-lg mb-2">{plan.months}</h3>
+              <div className="text-3xl font-bold text-brand mb-6">{plan.price}</div>
+              <button className="w-full bg-brand text-white py-3 rounded-lg font-semibold hover:bg-brand-deep transition">
+                💳 Mercado Pago
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* POR QUE SOMA */}
+      <section className="py-20 px-4 bg-canvas max-w-4xl mx-auto">
+        <h2 className="font-display text-4xl text-ink-deep text-center mb-16">
+          Por Que SOMA?
+        </h2>
+        <div className="grid grid-cols-3 gap-6">
+          {[
+            { title: "Diagnóstico Real", desc: "Entendimento profundo de quem você é" },
+            { title: "Comunidade", desc: "Conecte-se com outras mulheres em transformação" },
+            { title: "Plano de Ação", desc: "Roadmap claro para suas metas" },
+          ].map((card) => (
+            <div key={card.title} className="bg-white p-6 rounded-2xl border border-line">
+              <h3 className="font-semibold text-ink-deep mb-2">{card.title}</h3>
+              <p className="text-sm text-ink-faint">{card.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* JAQUELINE */}
+      <section className="py-20 px-4 bg-brand-soft max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="w-80 h-80 rounded-2xl border-4 border-brand bg-gradient-to-br from-brand-soft to-coral-soft overflow-hidden">
+              <img src="/jaqueline.jpg" alt="Jaqueline" className="w-full h-full object-cover" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-display text-3xl text-ink-deep mb-4">Jaqueline Amaro</h2>
+            <p className="text-ink-deep font-semibold mb-4">
+              Mentora de Carreira & Facilitadora de Transformação
+            </p>
+            <p className="text-ink-soft leading-relaxed">
+              Com mais de 15 anos de experiência em desenvolvimento pessoal e carreira, Jaqueline combina conhecimento técnico com inteligência emocional para guiar mulheres na jornada de integração dos 4 pilares SOMA.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Benefícios */}
-      <section className="bg-white py-20 border-t border-b border-line">
-        <div className="max-w-6xl mx-auto px-6">
-          <h3 className="font-display text-3xl text-brown-deep text-center mb-12">Por que SOMA?</h3>
+      {/* FINAL CTA */}
+      <section className="py-20 px-4 bg-ink-deep text-white text-center">
+        <h2 className="font-display text-4xl mb-4">
+          É o momento de somar suas forças
+        </h2>
+        <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
+          Sua transformação começa aqui. Conecte-se com a comunidade SOMA e redesenhe sua vida.
+        </p>
+        <button
+          onClick={triggerConfetti}
+          className="bg-gradient-brand text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all"
+        >
+          Começar Agora
+        </button>
+      </section>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <Compass size={32} className="text-brown-deep mx-auto mb-4" />
-              <h4 className="font-display text-lg text-brown-deep mb-2">Diagnóstico real</h4>
-              <p className="text-sm text-ink-faint">
-                Análise de perfil e carreira feita por quem já viveu o mercado, não um teste
-                genérico.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <Users size={32} className="text-brown-deep mx-auto mb-4" />
-              <h4 className="font-display text-lg text-brown-deep mb-2">Comunidade</h4>
-              <p className="text-sm text-ink-faint">
-                Encontros presenciais com quem busca o mesmo nível de excelência que você.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <Target size={32} className="text-brown-deep mx-auto mb-4" />
-              <h4 className="font-display text-lg text-brown-deep mb-2">Plano de ação</h4>
-              <p className="text-sm text-ink-faint">
-                Roteiro prático de 90 dias, não só teoria: você sai de cada etapa sabendo o próximo
-                passo.
-              </p>
+      {/* FOOTER */}
+      <footer className="bg-black text-white py-12 px-4">
+        <div className="max-w-4xl mx-auto grid grid-cols-3 gap-12 mb-8">
+          <div>
+            <h4 className="font-semibold mb-4">Pagamento</h4>
+            <p className="text-sm text-gray-300">Mercado Pago</p>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Segurança</h4>
+            <ul className="text-sm text-gray-300 space-y-1">
+              <li>✓ Dados protegidos</li>
+              <li>✓ Privacidade garantida</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4">Redes Sociais</h4>
+            <div className="flex gap-4">
+              <a href="#" className="text-gray-300 hover:text-white">Instagram</a>
+              <a href="#" className="text-gray-300 hover:text-white">LinkedIn</a>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="bg-brown-deep text-white py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <Sparkles size={28} className="mx-auto mb-4 opacity-80" />
-          <h3 className="font-display text-3xl mb-4">É o momento de somar suas forças</h3>
-          <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto">
-            Para quem não aceita mais perder, busca integrar quem é com o que faz e quer ocupar o
-            seu lugar no mundo.
-          </p>
-          <Link
-            href="/planos"
-            className="inline-block bg-white text-brown-deep px-8 py-4 rounded-lg font-display text-lg hover:bg-cream transition-colors"
-          >
-            Ver Planos e Começar
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-line py-8 text-center text-sm text-ink-faint">
-        <div className="max-w-6xl mx-auto px-6">
-          <p>© 2026 SOMA Mentoria. Todos os direitos reservados.</p>
-          <div className="mt-4 space-x-6">
-            <Link href="/termos" className="hover:text-brown-deep">
-              Termos
-            </Link>
-            <a
-              href="https://instagram.com/jaquedocrm1112"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-brown-deep"
-            >
-              Instagram
-            </a>
-          </div>
+        <div className="border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
+          © 2012–2026 SOMA. Todos os direitos reservados.
         </div>
       </footer>
     </div>
