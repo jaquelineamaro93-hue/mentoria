@@ -528,14 +528,18 @@ export default function AdminClient({
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       <div className="relative group inline-block">
                         <button className="p-2 hover:bg-cream rounded-lg transition-colors">
                           <MoreVertical size={16} className="text-ink-faint" />
                         </button>
-                        
                         <div className="absolute right-0 mt-1 w-48 bg-white border border-line rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                          <a href={`/admin/usuarios-permissoes/${l.profile.id}`} className="block px-3 py-2 text-sm text-ink hover:bg-cream border-b border-line">✏️ Editar</a>
+                          <button
+                            onClick={() => window.location.href = `/admin/usuarios-permissoes/${l.profile.id}`}
+                            className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-cream border-b border-line"
+                          >
+                            ✏️ Editar Permissões
+                          </button>
                           {!l.emailConfirmado && (
                             <button
                               onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
@@ -547,6 +551,8 @@ export default function AdminClient({
                           )}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
