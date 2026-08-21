@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Sidebar from '@/components/Sidebar';
-import UsuariosPermissoesClient from './UsuariosPermissoesClient';
+import UsuariosListaClient from './UsuariosListaClient';
 import type { Profile } from '@/lib/types';
 
 export const metadata = {
@@ -34,19 +34,10 @@ export default async function UsuariosPermissoesPage() {
     .select('*')
     .order('nome');
 
-  const { data: permissoes } = await supabase
-    .from('admin_permissoes')
-    .select('*')
-    .catch(() => ({ data: [] }));
-
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar profile={profile as Profile} />
-      <UsuariosPermissoesClient
-        profile={profile as Profile}
-        usuarios={profiles || []}
-        permissoes={permissoes || []}
-      />
+      <UsuariosListaClient profile={profile as Profile} usuarios={profiles || []} />
     </div>
   );
 }
