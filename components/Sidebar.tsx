@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function Sidebar() {
+export default function Sidebar({ profile, onSignOut }: any) {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
 
@@ -39,13 +39,18 @@ export default function Sidebar() {
       <div className="border-t border-line p-4 space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand to-coral-deep text-white flex items-center justify-center font-semibold">
-            JA
+            {profile?.name?.charAt(0) || "JA"}
           </div>
           <div>
-            <div className="text-sm font-semibold text-ink-deep">Jaqueline</div>
+            <div className="text-sm font-semibold text-ink-deep">{profile?.name || "Jaqueline"}</div>
             <div className="text-xs text-ink-faint">Mentora</div>
           </div>
         </div>
+        {onSignOut && (
+          <button onClick={onSignOut} className="w-full text-left px-3 py-2 text-sm text-ink-faint hover:text-brand transition">
+            Sair
+          </button>
+        )}
       </div>
     </aside>
   );
