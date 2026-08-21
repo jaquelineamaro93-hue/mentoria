@@ -535,7 +535,7 @@ export default function AdminClient({
                         </button>
                         
                         <div className="absolute right-0 mt-1 w-48 bg-white border border-line rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-<a
+                          <a href={`/admin/usuarios-permissoes/${l.profile.id}`} className="block px-3 py-2 text-sm text-ink hover:bg-cream border-b border-line">✏️ Editar</a>
                           {!l.emailConfirmado && (
                             <button
                               onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
