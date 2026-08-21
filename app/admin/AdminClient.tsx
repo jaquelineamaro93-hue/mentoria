@@ -529,24 +529,6 @@ export default function AdminClient({
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="relative group inline-block">
-                        <button className="p-2 hover:bg-cream rounded-lg transition-colors">
-                          <MoreVertical size={16} className="text-ink-faint" />
-                        </button>
-                        
-                        <div className="absolute right-0 mt-1 w-48 bg-white border border-line rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-<a
-                          {!l.emailConfirmado && (
-                            <button
-                              onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
-                              disabled={confirmandoId === l.profile.id}
-                              className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-cream border-b border-line disabled:opacity-60"
-                            >
-                              📧 Confirmar e-mail
-                            </button>
-                          )}
-                        </div>
-                      </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
