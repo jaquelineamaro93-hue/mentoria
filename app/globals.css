@@ -5,11 +5,11 @@
   --font-display: 'Times New Roman', Times, serif;
   --font-body: 'Poppins', sans-serif;
 
-  --color-cream: #f6f2e9;
-  --color-paper: #fbf8f2;
-  --color-ink: #362b21;
-  --color-ink-soft: #6b5d4f;
-  --color-ink-faint: #9c8f7e;
+  --color-cream: #F1F5F9;
+  --color-paper: #FFFFFF;
+  --color-ink: #0F172A;
+  --color-ink-soft: #475569;
+  --color-ink-faint: #64748B;
 
   --color-brown: #6b4a35;
   --color-brown-deep: #3c2c1f;
@@ -18,11 +18,11 @@
   --color-sky-deep: #4f7196;
   --color-sky-tint: #e7eff6;
 
-  --color-line: #ded4c3;
-  --color-line-soft: #ded4c3;
+  --color-line: #E2E8F0;
+  --color-line-soft: #E8ECF1;
 
   --color-lotus-brown: #6B403C;
-  --color-lotus-cream: #FAF8F5;
+  --color-lotus-cream: #FFFFFF;
   --color-lotus-coral: #FF857A;
   --color-lotus-mint: #ADEBB3;
   --color-lotus-lilac: #EBAEE6;
