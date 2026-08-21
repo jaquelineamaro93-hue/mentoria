@@ -303,7 +303,7 @@ export default function DashboardClient({
                 {etapasConcluidas}/4 etapas concluídas
               </span>
               <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
-                <span className="flex items-center gap-1"><Sparkles size={12} strokeWidth={1.5} />
+                <Sparkles size={12} strokeWidth={1.5} />
                 {pontosTotais} pts acumulados
               </span>
               <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
