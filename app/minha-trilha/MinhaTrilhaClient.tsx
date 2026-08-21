@@ -63,6 +63,10 @@ export default function MinhaTrilhaClient({
       setErro('Escolhe uma nota de 0 a 5 antes de enviar.');
       return;
     }
+    if (!feedbackTexto.trim()) {
+      setErro('Por favor, escreva um comentario sobre esse mes.');
+      return;
+    }
     setEnviando(true);
     setErro(null);
     try {
@@ -179,7 +183,7 @@ export default function MinhaTrilhaClient({
                     <textarea
                       value={feedbackTexto}
                       onChange={(e) => setFeedbackTexto(e.target.value)}
-                      placeholder="Como está sendo a mentoria para você esse mês? (opcional)"
+                      placeholder="Como está sendo a mentoria para você esse mês? *"
                       className="w-full text-sm border border-line rounded-lg px-3 py-2 min-h-[70px] focus:outline-none focus:border-brown-deep"
                     />
                     <textarea
