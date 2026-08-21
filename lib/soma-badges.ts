@@ -2,7 +2,7 @@ export interface SomaAchievement {
   id: string;
   nome: string;
   descricao: string;
-  emoji: string;
+  icon: string; // nome do ícone lucide-react
   pilar: 'sabedoria' | 'objetividade' | 'maestria' | 'alquimia';
   condicao: string;
 }
@@ -13,7 +13,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'autoconhecimento-inicio',
     nome: 'Jornada do Autoconhecimento',
     descricao: 'Completou o Mapa Quem Sou Eu',
-    emoji: '🔍',
+    icon: 'Search',
     pilar: 'sabedoria',
     condicao: 'quem_sou_eu_completo',
   },
@@ -21,7 +21,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'diagnostico-feito',
     nome: 'Diagnóstico Realizado',
     descricao: 'Completou o Diagnóstico & Perfil com VIA Character Strengths',
-    emoji: '📊',
+    icon: 'BarChart3',
     pilar: 'sabedoria',
     condicao: 'diagnostico_completo',
   },
@@ -29,7 +29,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'essencia-mapeada',
     nome: 'Essência Mapeada',
     descricao: 'Preencheu o Mapa de Essência completo',
-    emoji: '✨',
+    icon: 'Sparkles',
     pilar: 'sabedoria',
     condicao: 'essencia_completa',
   },
@@ -37,7 +37,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'bussola-encontrada',
     nome: 'Bússola Encontrada',
     descricao: 'Definiu sua Bússola de Posicionamento',
-    emoji: '🧭',
+    icon: 'Compass',
     pilar: 'sabedoria',
     condicao: 'bussola_completa',
   },
@@ -47,7 +47,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'pdi-estruturado',
     nome: 'PDI Estruturado',
     descricao: 'Criou seu Plano de Desenvolvimento Individual completo',
-    emoji: '📋',
+    icon: 'ClipboardList',
     pilar: 'objetividade',
     condicao: 'pdi_completo',
   },
@@ -55,7 +55,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'objetivos-claros',
     nome: 'Objetivos em Foco',
     descricao: 'Definiu metas claras e mensuráveis',
-    emoji: '🎯',
+    icon: 'Target',
     pilar: 'objetividade',
     condicao: 'metas_definidas',
   },
@@ -63,7 +63,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'primeira-indicacao',
     nome: 'Influenciador',
     descricao: 'Indicou 1 amigo para a Mentoria SOMA',
-    emoji: '👥',
+    icon: 'Users',
     pilar: 'objetividade',
     condicao: 'uma_indicacao',
   },
@@ -71,7 +71,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'rede-forte',
     nome: 'Multiplicador',
     descricao: 'Indicou 2 amigos para a Mentoria SOMA',
-    emoji: '🚀',
+    icon: 'Rocket',
     pilar: 'objetividade',
     condicao: 'duas_indicacoes',
   },
@@ -81,7 +81,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'diario-iniciado',
     nome: 'Diário da Jornada',
     descricao: 'Iniciou seu Diário de Bordo',
-    emoji: '📔',
+    icon: 'NotebookPen',
     pilar: 'maestria',
     condicao: 'diario_comecado',
   },
@@ -89,7 +89,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'reflexao-consistente',
     nome: 'Reflexão Constante',
     descricao: 'Mantém registro ativo no Diário há 1 mês',
-    emoji: '🪞',
+    icon: 'RefreshCw',
     pilar: 'maestria',
     condicao: 'diario_ativo_30dias',
   },
@@ -97,7 +97,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'encontro-presencial-1',
     nome: 'Presença Real',
     descricao: 'Participou de 1 encontro presencial',
-    emoji: '🤝',
+    icon: 'Handshake',
     pilar: 'maestria',
     condicao: 'um_encontro_presencial',
   },
@@ -105,7 +105,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'encontro-presencial-3',
     nome: 'Compromisso Confirmado',
     descricao: 'Participou de 3 encontros presenciais',
-    emoji: '💪',
+    icon: 'ShieldCheck',
     pilar: 'maestria',
     condicao: 'tres_encontros_presenciais',
   },
@@ -115,7 +115,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'simulador-cv-usado',
     nome: 'Potencial Revelado',
     descricao: 'Usou o Simulador de CV para análise',
-    emoji: '💼',
+    icon: 'Briefcase',
     pilar: 'alquimia',
     condicao: 'simulador_cv_usado',
   },
@@ -123,7 +123,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'feedback-trocado',
     nome: 'Feedback Genuíno',
     descricao: 'Trocou feedback com colegas da mentoria',
-    emoji: '💬',
+    icon: 'MessageCircle',
     pilar: 'alquimia',
     condicao: 'feedback_trocado',
   },
@@ -131,7 +131,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'mes-completo',
     nome: 'Mês Reflexivo',
     descricao: 'Completou check-in de feedback mensal',
-    emoji: '⭐',
+    icon: 'Star',
     pilar: 'alquimia',
     condicao: 'checkin_mensal_completo',
   },
@@ -139,7 +139,7 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
     id: 'transformacao-visivel',
     nome: 'Transformação em Curso',
     descricao: 'Progrediu significativamente na jornada SOMA',
-    emoji: '🌱',
+    icon: 'Sprout',
     pilar: 'alquimia',
     condicao: 'transformacao_30porcento',
   },
@@ -147,10 +147,19 @@ export const SOMA_ACHIEVEMENTS: SomaAchievement[] = [
 
 export function getCoresDosPilares() {
   return {
-    sabedoria: '#9e8b7e', // castanho claro
-    objetividade: '#8c7a6b', // castanho institucional
-    maestria: '#6b5d4f', // castanho médio
-    alquimia: '#3c2c1f', // castanho escuro
+    sabedoria: '#2E6F40',    // verde-floresta
+    objetividade: '#8E0A1E', // cranberry
+    maestria: '#31606F',     // azul-gelo profundo
+    alquimia: '#8A6800',     // mostarda
+  };
+}
+
+export function getFundosDosPilares() {
+  return {
+    sabedoria: '#EAF3EC',
+    objetividade: '#FBEBED',
+    maestria: '#EAF4F8',
+    alquimia: '#FDF3D4',
   };
 }
 
