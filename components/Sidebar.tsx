@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { HelpCircle, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { HelpCircle, usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Compass,
@@ -25,7 +25,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { NotificationBadge } from './NotificationBadge';
+import { HelpCircle, NotificationBadge } from './NotificationBadge';
 import type { Profile } from '@/lib/types';
 
 const NAV_ITEMS = [
@@ -44,6 +44,7 @@ const NAV_ITEMS = [
   { href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
   { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin, notificationKey: 'naoVotou' },
   { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
+  { href: '/faq', label: 'Perguntas Frequentes', icon: HelpCircle },
   { href: '/minha-trilha', label: 'Minha Trilha', icon: TrendingUp, notificationKey: 'atividadesPendentes' },
 ];
 
