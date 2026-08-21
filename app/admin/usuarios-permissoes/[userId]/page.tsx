@@ -9,10 +9,11 @@ export const metadata = {
 };
 
 interface Props {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }
 
 export default async function UsuarioPermissoesPage({ params }: Props) {
+  const { userId } = await params;
   const supabase = await createClient();
 
   const {
@@ -36,7 +37,7 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
   const { data: usuarioProfile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', params.userId)
+    .eq('id', userId)
     .single();
 
   if (!usuarioProfile) {
@@ -46,7 +47,7 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
   const { data: permissoes } = await supabase
     .from('admin_permissoes')
     .select('*')
-    .eq('user_id', params.userId);
+    .eq('user_id', userId);
 
   return (
     <div className="flex min-h-screen bg-white">
