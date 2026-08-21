@@ -22,6 +22,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
+import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
 import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
@@ -302,7 +303,7 @@ export default function DashboardClient({
                 {etapasConcluidas}/4 etapas concluídas
               </span>
               <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
-                <Sparkles size={12} strokeWidth={1.5} />
+                <span className="flex items-center gap-1"><Sparkles size={12} strokeWidth={1.5} />
                 {pontosTotais} pts acumulados
               </span>
               <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
@@ -322,7 +323,7 @@ export default function DashboardClient({
           <div className="grid sm:grid-cols-2 gap-4">
             <Panel className="p-6 border-line flex flex-col justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Passaporte SOMA</p>
+                <div className="flex items-center gap-1"><p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Passaporte SOMA</p><Tooltip texto="Acumule pontos em checkins e atividades" /></div>
                 <p className="font-display text-4xl text-lotus-brown">{pontosTotais} <span className="text-lg">pts</span></p>
               </div>
               <Link href="/passaporte" className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-lotus-brown hover:underline">

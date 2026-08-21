@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
+import { Tooltip } from '@/components/Tooltip';
 import type { Profile } from '@/lib/types';
 
 interface Props {
@@ -14,11 +15,11 @@ interface Props {
 }
 
 const MODULOS = [
-  { id: 'dashboard', nome: 'Dashboard', descricao: 'Acesso ao painel principal' },
-  { id: 'onboarding', nome: 'Onboarding', descricao: 'Gerenciar onboarding' },
-  { id: 'pdi', nome: 'PDI & Trilha', descricao: 'Editar PDI' },
-  { id: 'diario', nome: 'Diário de Bordo', descricao: 'Visualizar anotações' },
-  { id: 'minha-trilha', nome: 'Minha Trilha', descricao: 'Checkins mensais' },
+  { id: 'dashboard', nome: 'Dashboard', tooltip: 'Painel principal com resumo',, descricao: 'Acesso ao painel principal' },
+  { id: 'onboarding', nome: 'Onboarding', tooltip: 'Gerenciar primeiros passos',, descricao: 'Gerenciar onboarding' },
+  { id: 'pdi', nome: 'PDI & Trilha', tooltip: 'Plano de Desenvolvimento Individual',, descricao: 'Editar PDI' },
+  { id: 'diario', nome: 'Diário de Bordo', tooltip: 'Anotações privadas do mentorado',, descricao: 'Visualizar anotações' },
+  { id: 'minha-trilha', nome: 'Minha Trilha', tooltip: 'Checkins e feedback mensal',, descricao: 'Checkins mensais' },
   { id: 'passos', nome: 'Passos', descricao: 'Acesso a passos e milhas' },
   { id: 'admin', nome: 'Painel Admin', descricao: 'Acesso completo a admin' },
 ];

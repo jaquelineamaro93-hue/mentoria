@@ -161,7 +161,7 @@ export default function MinhaTrilhaClient({
                 ) : ehMesAtual && !jaEnviouEsseMes ? (
                   <div className="bg-white border border-brown-deep/30 rounded-xl p-4 space-y-3">
                     <div>
-                      <p className="text-xs text-ink-faint mb-2">Como está sendo esse mês para você?</p>
+                      <div className="flex items-center gap-1 mb-2"><p className="text-xs text-ink-faint">Como está sendo esse mês para você?</p><Tooltip texto="De 0 a 5: como foi a mentoria este mês" /></div>
                       <div className="flex gap-1.5">
                         {[0, 1, 2, 3, 4, 5].map((n) => (
                           <button
