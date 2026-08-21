@@ -46,8 +46,7 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
   const { data: permissoes } = await supabase
     .from('admin_permissoes')
     .select('*')
-    .eq('user_id', params.userId)
-    ;
+    .eq('user_id', params.userId);
 
   return (
     <div className="flex min-h-screen bg-white">
