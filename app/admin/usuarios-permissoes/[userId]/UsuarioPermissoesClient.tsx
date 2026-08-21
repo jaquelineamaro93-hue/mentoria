@@ -61,7 +61,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
       }
 
       alert('✅ Permissões salvas!');
-      router.push('/admin/usuarios-permissoes');
+      router.push('/admin');
     } catch (err) {
       alert('❌ Erro: ' + (err instanceof Error ? err.message : 'desconhecido'));
     } finally {
@@ -71,7 +71,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
 
   return (
     <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-      <Link href="/admin/usuarios-permissoes" className="text-sky-deep hover:text-brown-deep text-sm mb-6 inline-flex items-center gap-1">
+      <Link href="/admin" className="text-sky-deep hover:text-brown-deep text-sm mb-6 inline-flex items-center gap-1">
         <ArrowLeft size={14} /> Voltar
       </Link>
 
@@ -115,7 +115,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
           )}
         </button>
         <Link
-          href="/admin/usuarios-permissoes"
+          href="/admin"
           className="px-4 py-2.5 rounded-lg border border-line hover:border-lotus-brown text-sm font-medium text-ink hover:text-brown-deep transition-colors"
         >
           Cancelar
