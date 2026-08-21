@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Lock, Loader2, Award, ShoppingBag, Zap } from 'lucide-react';
+import { Check, Lock, Loader2, Award, ShoppingBag, Zap, Search, BarChart3, Sparkles, Compass, ClipboardList, Target, Users, Rocket, NotebookPen, RefreshCw, Handshake, ShieldCheck, Briefcase, MessageCircle, Star, Sprout } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
@@ -10,6 +10,11 @@ import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
 import RankingComunidade from './components/RankingComunidade';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
+
+const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  Search, BarChart3, Sparkles, Compass, ClipboardList, Target, Users, Rocket,
+  NotebookPen, RefreshCw, Handshake, ShieldCheck, Briefcase, MessageCircle, Star, Sprout,
+};
 
 type Tab = 'conquistas' | 'loja' | 'ranking';
 
@@ -125,7 +130,8 @@ export default function PassaporteClient({
                   {conquistas.map((c) => {
                     const desbloqueada = idsDesbloqueadas.has(c.id);
                     const pillarAchievement = SOMA_ACHIEVEMENTS.find(s => s.id === c.codigo);
-                    const emoji = pillarAchievement?.emoji || '⭐';
+                    const iconName = pillarAchievement?.icon || 'Star';
+                    const IconComponent = ICON_MAP[iconName] || Star;
                     return (
                       <div key={c.id} className="flex flex-col items-center text-center gap-2.5">
                         {/* Medal/Shield Badge */}
@@ -141,7 +147,7 @@ export default function PassaporteClient({
                               clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
                             }}
                           >
-                            <span className="text-2xl leading-none">{emoji}</span>
+                            <IconComponent size={32} className="text-current" />
                           </div>
                           {/* Gold Accent (only for unlocked) */}
                           {desbloqueada && (
@@ -177,17 +183,20 @@ export default function PassaporteClient({
                         {getNomePilar(pilar)}
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {badgesDosPilar.map((badge) => (
-                          <div
-                            key={badge.id}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
-                            style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
-                            title={badge.descricao}
-                          >
-                            <span>{badge.emoji}</span>
-                            <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
-                          </div>
-                        ))}
+                        {badgesDosPilar.map((badge) => {
+                          const BadgeIcon = ICON_MAP[badge.icon] || Star;
+                          return (
+                            <div
+                              key={badge.id}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
+                              style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
+                              title={badge.descricao}
+                            >
+                              <BadgeIcon size={14} className="flex-shrink-0" style={{ color: cores[pilar as keyof typeof cores] }} />
+                              <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
