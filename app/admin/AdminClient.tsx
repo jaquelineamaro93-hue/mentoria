@@ -294,6 +294,13 @@ export default function AdminClient({
               <MessageSquare size={15} />
               Feedbacks do PDI
             </Link>
+            <Link
+              href="/admin/permissoes"
+              className="flex items-center justify-center gap-2 border border-brown-deep text-brown-deep hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Shield size={15} />
+              Permissoes
+            </Link>
             <button
               onClick={enviarLembretesAgora}
               disabled={enviandoLembretes}
