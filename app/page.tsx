@@ -105,7 +105,8 @@ const PLANOS = [
 
 export default function Home() {
   return (
-    <div       {/* HEADER */}
+    <div className="min-h-screen bg-cream">
+  {/* HEADER */}
       <header className="fixed top-0 right-0 z-50 p-6 flex gap-4">
         <Link
           href="/planos"
