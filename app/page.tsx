@@ -105,7 +105,21 @@ const PLANOS = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-cream">
+    <div       {/* HEADER */}
+      <header className="fixed top-0 right-0 z-50 p-6 flex gap-4">
+        <Link
+          href="/planos"
+          className="px-6 py-2 rounded-lg font-medium text-ink hover:bg-white transition"
+        >
+          Planos
+        </Link>
+        <Link
+          href="/login"
+          className="px-6 py-2 bg-brand text-white rounded-lg font-medium hover:bg-brand-deep transition"
+        >
+          Portal do Mentorado
+        </Link>
+      </header>
       {/* HERO */}
       <section className="px-6 pt-24 pb-20 md:pt-32 md:pb-28 max-w-4xl mx-auto text-center">
         <p className="text-[11px] uppercase tracking-[0.28em] text-ink-faint mb-6">
