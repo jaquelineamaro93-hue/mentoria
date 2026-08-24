@@ -35,11 +35,11 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
           Biblioteca de encontros
         </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Gravações</h1>
-        <p className="text-sm text-ink-faint mb-8">
+        <h1 className="font-display text-3xl text-black mb-1">Gravações</h1>
+        <p className="text-sm text-gray-text mb-8">
           Reveja as sessões sempre que precisar. Tudo fica salvo no Drive do programa.
         </p>
 
@@ -50,8 +50,8 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
               onClick={() => setFiltro(f)}
               className={`text-sm px-4 py-1.5 rounded-full border transition-colors ${
                 filtro === f
-                  ? 'bg-sky-tint border-sky text-sky-deep'
-                  : 'border-line text-ink-soft bg-paper hover:border-line'
+                  ? 'bg-mint-light border-mint text-mint'
+                  : 'border-gray-faint text-gray-text bg-white hover:border-gray-faint'
               }`}
             >
               {f === 'todas' ? 'Todas' : f === 'individual' ? 'Individuais' : 'Em grupo'}
@@ -60,7 +60,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
         </div>
 
         {filtradas.length === 0 ? (
-          <div className="rounded-xl border border-line bg-paper p-6 text-sm text-ink-faint text-center">
+          <div className="rounded-xl border border-gray-faint bg-white p-6 text-sm text-gray-text text-center">
             Nenhuma gravação por aqui ainda. As gravações aparecerão nesta lista quando estiverem disponíveis.
           </div>
         ) : (
@@ -71,18 +71,18 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
                 href={g.drive_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 rounded-xl border border-line bg-paper px-5 py-4 hover:border-sky transition-colors"
+                className="flex items-center gap-4 rounded-xl border border-gray-faint bg-white px-5 py-4 hover:border-mint transition-colors"
               >
-                <div className="w-12 h-12 rounded-lg bg-sky-tint flex items-center justify-center text-sky-deep shrink-0">
+                <div className="w-12 h-12 rounded-lg bg-mint-light flex items-center justify-center text-mint shrink-0">
                   <PlayCircle size={22} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-ink mb-1">{g.titulo}</p>
+                  <p className="text-sm text-black mb-1">{g.titulo}</p>
                   <div className="flex items-center gap-2">
                     <span
                       className={`flex items-center gap-1 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${
                         g.tipo === 'individual'
-                          ? 'bg-sky-tint text-sky-deep'
+                          ? 'bg-mint-light text-mint'
                           : 'bg-[#f1e6d6] text-brown'
                       }`}
                     >
@@ -90,13 +90,13 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
                       {g.tipo === 'individual' ? 'Individual' : 'Grupo'}
                     </span>
                     {g.data_encontro && (
-                      <span className="text-xs text-ink-faint">
+                      <span className="text-xs text-gray-text">
                         {new Date(g.data_encontro + 'T00:00:00').toLocaleDateString('pt-BR')}
                       </span>
                     )}
                   </div>
                 </div>
-                <span className="text-xs text-brown shrink-0">Abrir no Drive</span>
+                <span className="text-xs text-orange shrink-0">Abrir no Drive</span>
               </a>
             ))}
           </div>

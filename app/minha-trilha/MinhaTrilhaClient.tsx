@@ -99,11 +99,11 @@ export default function MinhaTrilhaClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
           Sua jornada
         </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Minha Trilha</h1>
-        <p className="text-sm text-ink-faint max-w-xl mb-10">
+        <h1 className="font-display text-3xl text-black mb-1">Minha Trilha</h1>
+        <p className="text-sm text-gray-text max-w-xl mb-10">
           Uma vez por mês, deixa para seu mentor uma nota de 0 a 5 e um comentário. Isso ajuda a ajustar a mentoria conforme necessário.
         </p>
 
@@ -120,27 +120,27 @@ export default function MinhaTrilhaClient({
                 <div
                   className={`absolute -left-8 top-0 w-6 h-6 rounded-full flex items-center justify-center border-2 ${
                     checkin
-                      ? 'bg-sky-deep border-sky-deep text-white'
+                      ? 'bg-mint-deep border-mint-deep text-white'
                       : ehMesAtual
                         ? 'bg-white border-brown-deep'
-                        : 'bg-white border-line'
+                        : 'bg-white border-gray-faint'
                   }`}
                 >
                   {checkin ? (
                     <Check size={13} />
                   ) : ehFuturo ? (
-                    <Lock size={11} className="text-ink-faint" />
+                    <Lock size={11} className="text-gray-text" />
                   ) : (
-                    <Circle size={9} className="text-brown-deep" />
+                    <Circle size={9} className="text-black" />
                   )}
                 </div>
 
-                <p className="text-xs uppercase tracking-wide text-ink-faint mb-1">
+                <p className="text-xs uppercase tracking-wide text-gray-text mb-1">
                   Mês {indice} · {nomeDoMes(referencia)}
                 </p>
 
                 {checkin ? (
-                  <div className="bg-white border border-line rounded-xl p-4">
+                  <div className="bg-white border border-gray-faint rounded-xl p-4">
                     <div className="flex items-center gap-1 mb-2">
                       {Array.from({ length: 5 }).map((_, idx) => (
                         <Star
@@ -151,10 +151,10 @@ export default function MinhaTrilhaClient({
                       ))}
                     </div>
                     {checkin.feedback_texto && (
-                      <p className="text-sm text-brown-deep mb-1">{checkin.feedback_texto}</p>
+                      <p className="text-sm text-black mb-1">{checkin.feedback_texto}</p>
                     )}
                     {checkin.sugestao_melhoria && (
-                      <p className="text-xs text-ink-faint">
+                      <p className="text-xs text-gray-text">
                         Sugestão: {checkin.sugestao_melhoria}
                       </p>
                     )}
@@ -162,7 +162,7 @@ export default function MinhaTrilhaClient({
                 ) : ehMesAtual && !jaEnviouEsseMes ? (
                   <div className="bg-white border border-brown-deep/30 rounded-xl p-4 space-y-3">
                     <div>
-                      <div className="flex items-center gap-1 mb-2"><p className="text-xs text-ink-faint">Como está sendo esse mês para você?</p><Tooltip texto="De 0 a 5: como foi a mentoria este mês" /></div>
+                      <div className="flex items-center gap-1 mb-2"><p className="text-xs text-gray-text">Como está sendo esse mês para você?</p><Tooltip texto="De 0 a 5: como foi a mentoria este mês" /></div>
                       <div className="flex gap-1.5">
                         {[0, 1, 2, 3, 4, 5].map((n) => (
                           <button
@@ -171,7 +171,7 @@ export default function MinhaTrilhaClient({
                             className={`w-9 h-9 rounded-full text-sm border transition-colors ${
                               nota === n
                                 ? 'bg-brown-deep text-white border-brown-deep'
-                                : 'border-line text-brown-deep hover:border-brown-deep'
+                                : 'border-gray-faint text-black hover:border-brown-deep'
                             }`}
                           >
                             {n}
@@ -183,13 +183,13 @@ export default function MinhaTrilhaClient({
                       value={feedbackTexto}
                       onChange={(e) => setFeedbackTexto(e.target.value)}
                       placeholder="Como está sendo a mentoria para você esse mês? *"
-                      className="w-full text-sm border border-line rounded-lg px-3 py-2 min-h-[70px] focus:outline-none focus:border-brown-deep"
+                      className="w-full text-sm border border-gray-faint rounded-lg px-3 py-2 min-h-[70px] focus:outline-none focus:border-brown-deep"
                     />
                     <textarea
                       value={sugestaoMelhoria}
                       onChange={(e) => setSugestaoMelhoria(e.target.value)}
                       placeholder="Alguma sugestão de melhoria? (opcional)"
-                      className="w-full text-sm border border-line rounded-lg px-3 py-2 min-h-[60px] focus:outline-none focus:border-brown-deep"
+                      className="w-full text-sm border border-gray-faint rounded-lg px-3 py-2 min-h-[60px] focus:outline-none focus:border-brown-deep"
                     />
                     {erro && <p className="text-xs text-red-600">{erro}</p>}
                     <button
@@ -201,9 +201,9 @@ export default function MinhaTrilhaClient({
                     </button>
                   </div>
                 ) : ehFuturo ? (
-                  <p className="text-sm text-ink-faint">Disponível em {nomeDoMes(referencia)}</p>
+                  <p className="text-sm text-gray-text">Disponível em {nomeDoMes(referencia)}</p>
                 ) : (
-                  <p className="text-sm text-ink-faint">Sem check-in registrado nesse mês</p>
+                  <p className="text-sm text-gray-text">Sem check-in registrado nesse mês</p>
                 )}
               </div>
             );

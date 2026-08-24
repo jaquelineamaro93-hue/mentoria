@@ -53,21 +53,21 @@ export default function IndiqueUmAmigoClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
           Comunidade SOMA
         </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Indique um Amigo</h1>
-        <p className="text-sm text-ink-faint max-w-xl mb-8">
+        <h1 className="font-display text-3xl text-black mb-1">Indique um Amigo</h1>
+        <p className="text-sm text-gray-text max-w-xl mb-8">
           A cada 2 amigos que assinarem a Mentoria SOMA através do seu link, você
           ganha 1 sessão individual extra comigo.
         </p>
 
-        <div className="bg-white border border-line rounded-2xl p-6 mb-8">
-          <p className="text-xs uppercase tracking-wide text-ink-faint mb-2">
+        <div className="bg-white border border-gray-faint rounded-2xl p-6 mb-8">
+          <p className="text-xs uppercase tracking-wide text-gray-text mb-2">
             Seu link de indicação
           </p>
           <div className="flex items-center gap-2 flex-wrap">
-            <code className="flex-1 min-w-[200px] bg-cream border border-line rounded-lg px-4 py-3 text-sm text-brown-deep break-all">
+            <code className="flex-1 min-w-[200px] bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black break-all">
               {linkIndicacao || 'Gerando seu link...'}
             </code>
             <button
@@ -82,29 +82,29 @@ export default function IndiqueUmAmigoClient({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white border border-line rounded-2xl p-5">
-            <Users size={18} className="text-sky-deep mb-2" />
-            <p className="text-2xl font-display text-brown-deep">{convertidas.length}</p>
-            <p className="text-xs text-ink-faint">amigos convertidos</p>
+          <div className="bg-white border border-gray-faint rounded-2xl p-5">
+            <Users size={18} className="text-mint mb-2" />
+            <p className="text-2xl font-display text-black">{convertidas.length}</p>
+            <p className="text-xs text-gray-text">amigos convertidos</p>
           </div>
-          <div className="bg-white border border-line rounded-2xl p-5">
-            <Gift size={18} className="text-sky-deep mb-2" />
-            <p className="text-2xl font-display text-brown-deep">{sessoesDisponiveis}</p>
-            <p className="text-xs text-ink-faint">
+          <div className="bg-white border border-gray-faint rounded-2xl p-5">
+            <Gift size={18} className="text-mint mb-2" />
+            <p className="text-2xl font-display text-black">{sessoesDisponiveis}</p>
+            <p className="text-xs text-gray-text">
               {sessoesDisponiveis === 1 ? 'sessão liberada' : 'sessões liberadas'} para usar
             </p>
           </div>
-          <div className="bg-white border border-line rounded-2xl p-5">
-            <p className="text-2xl font-display text-brown-deep">{faltamParaProxima}</p>
-            <p className="text-xs text-ink-faint">
+          <div className="bg-white border border-gray-faint rounded-2xl p-5">
+            <p className="text-2xl font-display text-black">{faltamParaProxima}</p>
+            <p className="text-xs text-gray-text">
               {faltamParaProxima === 1 ? 'amigo falta' : 'amigos faltam'} para próxima sessão
             </p>
           </div>
         </div>
 
         {sessoesDisponiveis > 0 && (
-          <div className="bg-sky-deep/10 border border-sky-deep/30 rounded-2xl p-5 mb-8">
-            <p className="text-sm text-brown-deep">
+          <div className="bg-mint-deep/10 border border-mint-deep/30 rounded-2xl p-5 mb-8">
+            <p className="text-sm text-black">
               Você tem {sessoesDisponiveis}{' '}
               {sessoesDisponiveis === 1 ? 'sessão bônus disponível' : 'sessões bônus disponíveis'}.
               Me chama para combinarmos o horário.
@@ -112,9 +112,9 @@ export default function IndiqueUmAmigoClient({
           </div>
         )}
 
-        <h2 className="font-display text-xl text-brown-deep mb-4">Seus indicados</h2>
+        <h2 className="font-display text-xl text-black mb-4">Seus indicados</h2>
         {indicacoesIniciais.length === 0 ? (
-          <p className="text-sm text-ink-faint">
+          <p className="text-sm text-gray-text">
             Ainda não tem ninguém indicado. Compartilha seu link acima para começar.
           </p>
         ) : (
@@ -122,11 +122,11 @@ export default function IndiqueUmAmigoClient({
             {pendentes.map((i) => (
               <div
                 key={i.id}
-                className="flex items-center justify-between bg-white border border-line rounded-xl px-4 py-3"
+                className="flex items-center justify-between bg-white border border-gray-faint rounded-xl px-4 py-3"
               >
                 <div>
-                  <p className="text-sm text-brown-deep">{i.indicado_nome}</p>
-                  <p className="text-xs text-ink-faint">{i.indicado_email}</p>
+                  <p className="text-sm text-black">{i.indicado_nome}</p>
+                  <p className="text-xs text-gray-text">{i.indicado_email}</p>
                 </div>
                 <span className="text-xs bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">
                   Aguardando pagamento
@@ -136,11 +136,11 @@ export default function IndiqueUmAmigoClient({
             {convertidas.map((i) => (
               <div
                 key={i.id}
-                className="flex items-center justify-between bg-white border border-line rounded-xl px-4 py-3"
+                className="flex items-center justify-between bg-white border border-gray-faint rounded-xl px-4 py-3"
               >
                 <div>
-                  <p className="text-sm text-brown-deep">{i.indicado_nome}</p>
-                  <p className="text-xs text-ink-faint">{i.indicado_email}</p>
+                  <p className="text-sm text-black">{i.indicado_nome}</p>
+                  <p className="text-xs text-gray-text">{i.indicado_email}</p>
                 </div>
                 <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full">
                   Assinante confirmado

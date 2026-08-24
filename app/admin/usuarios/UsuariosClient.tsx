@@ -78,14 +78,14 @@ export function UsuariosClient() {
   return (
     
 <div className="space-y-6">
-      <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+      <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-display text-brown-deep flex items-center gap-2">
+          <h1 className="text-2xl font-display text-black flex items-center gap-2">
             <Users size={24} />
             Gerenciar Usuários
           </h1>
-          <p className="text-sm text-ink-faint mt-1">
+          <p className="text-sm text-gray-text mt-1">
             {totalOnboarding} de {mentoradas.length} mentoradas fizeram o onboarding inicial
           </p>
         </div>
@@ -100,23 +100,23 @@ export function UsuariosClient() {
       </div>
 
       {loading ? (
-        <div className="text-center py-8 text-ink-faint">Carregando...</div>
+        <div className="text-center py-8 text-gray-text">Carregando...</div>
       ) : (
-        <div className="bg-white rounded-xl border border-line overflow-x-auto">
+        <div className="bg-white rounded-xl border border-gray-faint overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b border-line">
+            <thead className="border-b border-gray-faint">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-ink-faint uppercase tracking-wide">Nome</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-ink-faint uppercase tracking-wide">Email</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-ink-faint uppercase tracking-wide">Sessão Inicial</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-ink-faint uppercase tracking-wide">Admin</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-text uppercase tracking-wide">Nome</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-text uppercase tracking-wide">Email</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-text uppercase tracking-wide">Sessão Inicial</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-text uppercase tracking-wide">Admin</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {usuarios.map((user) => (
-                <tr key={user.id} className="hover:bg-cream/50">
-                  <td className="px-6 py-4 text-sm text-ink">{user.nome}</td>
-                  <td className="px-6 py-4 text-sm text-ink-faint">{user.email}</td>
+                <tr key={user.id} className="hover:bg-white/50">
+                  <td className="px-6 py-4 text-sm text-black">{user.nome}</td>
+                  <td className="px-6 py-4 text-sm text-gray-text">{user.email}</td>
                   <td className="px-6 py-4 text-center">
                     {!user.is_admin && (
                       <button
@@ -124,8 +124,8 @@ export function UsuariosClient() {
                         className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border transition-colors"
                         style={{
                           background: user.onboarding_concluido ? '#f0fdf4' : '#fafaf9',
-                          borderColor: user.onboarding_concluido ? '#86efac' : '#ded4c3',
-                          color: user.onboarding_concluido ? '#16a34a' : '#9c8f7e',
+                          borderColor: user.onboarding_concluido ? '#86efac' : '#E8E8E8',
+                          color: user.onboarding_concluido ? '#16a34a' : '#999999',
                         }}
                       >
                         {user.onboarding_concluido
@@ -140,8 +140,8 @@ export function UsuariosClient() {
                       onClick={() => toggleAdmin(user.id, user.is_admin)}
                       className={`inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border transition-colors ${
                         user.is_admin
-                          ? 'bg-sky-tint border-sky text-sky-deep'
-                          : 'border-line text-ink-faint hover:border-brown-deep hover:text-brown-deep'
+                          ? 'bg-mint-light border-mint text-mint'
+                          : 'border-gray-faint text-gray-text hover:border-brown-deep hover:text-black'
                       }`}
                     >
                       <Shield size={13} />

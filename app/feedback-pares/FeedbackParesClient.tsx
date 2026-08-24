@@ -74,13 +74,13 @@ export default function FeedbackParesClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
           Comunidade
         </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">
+        <h1 className="font-display text-3xl text-black mb-1">
           Feedback entre Colegas
         </h1>
-        <p className="text-sm text-ink-faint mb-8">
+        <p className="text-sm text-gray-text mb-8">
           A mentoria fica mais rica quando vocês trocam entre si. Deixe um feedback pra
           alguém da turma, sobre o que você percebeu, admirou ou aprendeu com essa pessoa.
         </p>
@@ -91,20 +91,20 @@ export default function FeedbackParesClient({
           </Eyebrow>
           <Panel className="p-6">
             {colegas.length === 0 ? (
-              <p className="text-sm text-ink-faint">
+              <p className="text-sm text-gray-text">
                 Ainda não tem outras pessoas cadastradas na mentoria para você dar
                 feedback. Assim que mais gente entrar, aparece aqui.
               </p>
             ) : (
               <>
                 <label className="flex flex-col gap-1.5 mb-4 max-w-xs">
-                  <span className="text-xs uppercase tracking-wide text-ink-faint">
+                  <span className="text-xs uppercase tracking-wide text-gray-text">
                     Para quem
                   </span>
                   <select
                     value={paraUserId}
                     onChange={(e) => setParaUserId(e.target.value)}
-                    className="bg-cream border border-line rounded-lg px-4 py-2.5 text-sm text-ink focus:border-sky-deep"
+                    className="bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                   >
                     <option value="">Selecione uma colega...</option>
                     {colegas.map((c) => (
@@ -116,7 +116,7 @@ export default function FeedbackParesClient({
                 </label>
 
                 <label className="flex flex-col gap-1.5 mb-4">
-                  <span className="text-xs uppercase tracking-wide text-ink-faint">
+                  <span className="text-xs uppercase tracking-wide text-gray-text">
                     Sua mensagem
                   </span>
                   <textarea
@@ -124,7 +124,7 @@ export default function FeedbackParesClient({
                     onChange={(e) => setMensagem(e.target.value)}
                     rows={4}
                     placeholder="O que você admira, aprendeu ou percebeu nessa pessoa durante a mentoria?"
-                    className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+                    className="bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
                   />
                 </label>
 
@@ -157,8 +157,8 @@ export default function FeedbackParesClient({
               onClick={() => setAba('recebidos')}
               className={`flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border transition-colors ${
                 aba === 'recebidos'
-                  ? 'bg-sky-tint border-sky text-sky-deep'
-                  : 'border-line text-ink-soft bg-paper'
+                  ? 'bg-mint-light border-mint text-mint'
+                  : 'border-gray-faint text-gray-text bg-white'
               }`}
             >
               <Inbox size={13} /> Recebidos ({recebidos.length})
@@ -167,8 +167,8 @@ export default function FeedbackParesClient({
               onClick={() => setAba('enviados')}
               className={`flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border transition-colors ${
                 aba === 'enviados'
-                  ? 'bg-sky-tint border-sky text-sky-deep'
-                  : 'border-line text-ink-soft bg-paper'
+                  ? 'bg-mint-light border-mint text-mint'
+                  : 'border-gray-faint text-gray-text bg-white'
               }`}
             >
               <Users size={13} /> Enviados ({enviados.length})
@@ -177,18 +177,18 @@ export default function FeedbackParesClient({
 
           {aba === 'recebidos' ? (
             recebidos.length === 0 ? (
-              <Panel className="p-6 text-sm text-ink-faint text-center">
+              <Panel className="p-6 text-sm text-gray-text text-center">
                 Você ainda não recebeu nenhum feedback. Que tal ser a primeira a mandar um?
               </Panel>
             ) : (
               <div className="flex flex-col gap-3">
                 {recebidos.map((f) => (
                   <Panel key={f.id} className="p-5">
-                    <p className="text-xs text-sky-deep uppercase tracking-wide mb-1.5">
+                    <p className="text-xs text-mint uppercase tracking-wide mb-1.5">
                       {nomesPorId[f.de_user_id] ?? 'Alguém da turma'}
                     </p>
-                    <p className="text-sm text-ink leading-relaxed">{f.mensagem}</p>
-                    <p className="text-xs text-ink-faint mt-2">
+                    <p className="text-sm text-black leading-relaxed">{f.mensagem}</p>
+                    <p className="text-xs text-gray-text mt-2">
                       {new Date(f.created_at).toLocaleDateString('pt-BR')}
                     </p>
                   </Panel>
@@ -196,18 +196,18 @@ export default function FeedbackParesClient({
               </div>
             )
           ) : enviados.length === 0 ? (
-            <Panel className="p-6 text-sm text-ink-faint text-center">
+            <Panel className="p-6 text-sm text-gray-text text-center">
               Você ainda não enviou nenhum feedback.
             </Panel>
           ) : (
             <div className="flex flex-col gap-3">
               {enviados.map((f) => (
                 <Panel key={f.id} className="p-5">
-                  <p className="text-xs text-ink-faint uppercase tracking-wide mb-1.5">
+                  <p className="text-xs text-gray-text uppercase tracking-wide mb-1.5">
                     Para {nomesPorId[f.para_user_id] ?? 'alguém da turma'}
                   </p>
-                  <p className="text-sm text-ink leading-relaxed">{f.mensagem}</p>
-                  <p className="text-xs text-ink-faint mt-2">
+                  <p className="text-sm text-black leading-relaxed">{f.mensagem}</p>
+                  <p className="text-xs text-gray-text mt-2">
                     {new Date(f.created_at).toLocaleDateString('pt-BR')}
                   </p>
                 </Panel>

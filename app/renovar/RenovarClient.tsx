@@ -53,16 +53,16 @@ export default function RenovarClient({ profile, planos }: Props) {
   }
 
   return (
-    <div className="min-h-screen w-full px-6 py-12 bg-cream">
+    <div className="min-h-screen w-full px-6 py-12 bg-white">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
-          <div className="w-14 h-14 rounded-full bg-sky-tint border border-sky flex items-center justify-center mx-auto mb-6">
-            <Lock size={22} className="text-sky-deep" />
+          <div className="w-14 h-14 rounded-full bg-mint-light border border-mint flex items-center justify-center mx-auto mb-6">
+            <Lock size={22} className="text-mint" />
           </div>
-          <p className="font-display text-4xl text-brown-deep mb-2">
+          <p className="font-display text-4xl text-black mb-2">
             Escolha seu plano na Mentoria SOMA
           </p>
-          <p className="text-sm text-ink-faint max-w-lg mx-auto">
+          <p className="text-sm text-gray-text max-w-lg mx-auto">
             Olá, {profile?.nome?.split(' ')[0] ?? 'futura mentorada'}. Escolha o plano e a
             forma de pagamento que fazem mais sentido para você.
           </p>
@@ -80,24 +80,24 @@ export default function RenovarClient({ profile, planos }: Props) {
             return (
               <div
                 key={plano.id}
-                className="bg-paper border border-line rounded-2xl p-6 flex flex-col"
+                className="bg-white border border-gray-faint rounded-2xl p-6 flex flex-col"
               >
-                <p className="text-xs uppercase tracking-wide text-sky-deep mb-1">
+                <p className="text-xs uppercase tracking-wide text-mint mb-1">
                   {plano.duracao_meses} meses
                 </p>
-                <p className="font-display text-2xl text-brown-deep mb-1">{plano.nome}</p>
+                <p className="font-display text-2xl text-black mb-1">{plano.nome}</p>
                 {plano.foco && (
-                  <p className="text-sm text-ink-faint mb-4">{plano.foco}</p>
+                  <p className="text-sm text-gray-text mb-4">{plano.foco}</p>
                 )}
 
                 {plano.descricao_encontros && (
-                  <p className="text-sm text-ink mb-4">{plano.descricao_encontros}</p>
+                  <p className="text-sm text-black mb-4">{plano.descricao_encontros}</p>
                 )}
 
                 <ul className="flex flex-col gap-1.5 mb-6">
                   {plano.itens_inclusos.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-ink-soft">
-                      <Check size={14} className="text-sky-deep mt-0.5 shrink-0" />
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-text">
+                      <Check size={14} className="text-mint mt-0.5 shrink-0" />
                       {item}
                     </li>
                   ))}
@@ -121,7 +121,7 @@ export default function RenovarClient({ profile, planos }: Props) {
                   <button
                     onClick={() => assinar(plano.codigo, 'cartao')}
                     disabled={carregando !== null}
-                    className="w-full flex items-center justify-between gap-2 border border-brown text-brown-deep hover:bg-brown hover:text-paper disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
+                    className="w-full flex items-center justify-between gap-2 border border-brown text-black hover:bg-brown hover:text-paper disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
                   >
                     <span>Cartão (1x)</span>
                     <span className="flex items-center gap-1.5">
@@ -135,7 +135,7 @@ export default function RenovarClient({ profile, planos }: Props) {
                   <button
                     onClick={() => assinar(plano.codigo, 'recorrente')}
                     disabled={carregando !== null}
-                    className="w-full flex items-center justify-between gap-2 border border-line text-ink-soft hover:border-sky hover:text-sky-deep disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
+                    className="w-full flex items-center justify-between gap-2 border border-gray-faint text-gray-text hover:border-mint hover:text-mint disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
                   >
                     <span>Recorrente ({plano.parcelas_recorrente}x)</span>
                     <span className="flex items-center gap-1.5">
@@ -152,12 +152,12 @@ export default function RenovarClient({ profile, planos }: Props) {
         </div>
 
         <div className="text-center mt-10">
-          <p className="text-xs text-ink-faint mb-3">
+          <p className="text-xs text-gray-text mb-3">
             Você vai ser levada ao Mercado Pago para concluir o pagamento.
           </p>
           <button
             onClick={handleSignOut}
-            className="text-xs text-ink-faint hover:text-brown transition-colors"
+            className="text-xs text-gray-text hover:text-orange transition-colors"
           >
             Sair
           </button>

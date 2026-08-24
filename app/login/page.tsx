@@ -203,16 +203,16 @@ function LoginPageContent() {
     <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden">
       <div className="w-full max-w-md relative">
         <div className="text-center mb-10">
-          <p className="font-display text-4xl tracking-wide text-brown-deep">
-            SOMA <span className="text-sky-deep">MENTORIA</span>
+          <p className="font-display text-4xl tracking-wide text-black">
+            SOMA <span className="text-mint">MENTORIA</span>
           </p>
           <div className="h-px w-12 bg-brown mx-auto my-3" />
-          <p className="text-xs uppercase tracking-[0.25em] text-ink-faint">
+          <p className="text-xs uppercase tracking-[0.25em] text-gray-text">
             Portal do Mentorado
           </p>
         </div>
 
-        <div className="rounded-xl border border-line bg-paper overflow-hidden">
+        <div className="rounded-xl border border-gray-faint bg-white overflow-hidden">
           <div className="grid grid-cols-2">
             <button
               onClick={() => {
@@ -222,8 +222,8 @@ function LoginPageContent() {
               }}
               className={`py-4 text-sm tracking-wide transition-colors ${
                 modo === 'entrar'
-                  ? 'text-brown-deep border-b-2 border-brown bg-sky-tint'
-                  : 'text-ink-faint border-b border-line hover:text-ink-soft'
+                  ? 'text-black border-b-2 border-brown bg-mint-light'
+                  : 'text-gray-text border-b border-gray-faint hover:text-gray-text'
               }`}
             >
               Entrar
@@ -236,8 +236,8 @@ function LoginPageContent() {
               }}
               className={`py-4 text-sm tracking-wide transition-colors ${
                 modo === 'cadastrar'
-                  ? 'text-brown-deep border-b-2 border-brown bg-sky-tint'
-                  : 'text-ink-faint border-b border-line hover:text-ink-soft'
+                  ? 'text-black border-b-2 border-brown bg-mint-light'
+                  : 'text-gray-text border-b border-gray-faint hover:text-gray-text'
               }`}
             >
               Criar Conta
@@ -271,7 +271,7 @@ function LoginPageContent() {
                     <button
                       type="button"
                       onClick={() => setMostrarSenha(!mostrarSenha)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-text hover:text-black"
                     >
                       {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -286,7 +286,7 @@ function LoginPageContent() {
 
                 <button
                   type="button"
-                  className="text-xs text-ink-faint hover:text-brown transition-colors text-center mt-1"
+                  className="text-xs text-gray-text hover:text-orange transition-colors text-center mt-1"
                   onClick={() => router.push('/magic-login')}
                 >
                   Esqueci a senha
@@ -294,10 +294,10 @@ function LoginPageContent() {
 
                 <div className="my-4 relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-line"></div>
+                    <div className="w-full border-t border-gray-faint"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-paper text-ink-faint">ou</span>
+                    <span className="px-2 bg-white text-gray-text">ou</span>
                   </div>
                 </div>
 
@@ -350,7 +350,7 @@ function LoginPageContent() {
                     <button
                       type="button"
                       onClick={() => setMostrarSenha(!mostrarSenha)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-text hover:text-black"
                     >
                       {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -406,7 +406,7 @@ function LoginPageContent() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-xs uppercase tracking-wide text-ink-faint">{label}</span>
+      <span className="text-xs uppercase tracking-wide text-gray-text">{label}</span>
       {children}
     </label>
   );
@@ -439,7 +439,7 @@ function LoadingFallback() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center">
       <div className="text-center">
-        <p className="text-ink-soft">Carregando...</p>
+        <p className="text-gray-text">Carregando...</p>
       </div>
     </div>
   );

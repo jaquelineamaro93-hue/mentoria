@@ -62,10 +62,10 @@ export default function PassaporteClient({
 
       <main className="flex-1 overflow-auto">
         <div className="px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
             Sua jornada em pontos
           </p>
-          <h1 className="font-display text-3xl text-brown-deep mb-8">Meu Passaporte</h1>
+          <h1 className="font-display text-3xl text-black mb-8">Meu Passaporte</h1>
 
           <div className="rounded-2xl bg-brown-deep px-8 py-7 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -79,13 +79,13 @@ export default function PassaporteClient({
             </p>
           </div>
 
-          <div className="flex gap-1 mb-6 border-b border-line overflow-x-auto">
+          <div className="flex gap-1 mb-6 border-b border-gray-faint overflow-x-auto">
             <button
               onClick={() => setTab('conquistas')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
                 tab === 'conquistas'
-                  ? 'border-sky-deep text-sky-deep'
-                  : 'border-transparent text-ink-soft hover:text-ink'
+                  ? 'border-mint-deep text-mint'
+                  : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
               <Award className="w-4 h-4" />
@@ -96,8 +96,8 @@ export default function PassaporteClient({
               onClick={() => setTab('loja')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
                 tab === 'loja'
-                  ? 'border-sky-deep text-sky-deep'
-                  : 'border-transparent text-ink-soft hover:text-ink'
+                  ? 'border-mint-deep text-mint'
+                  : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
               <ShoppingBag className="w-4 h-4" />
@@ -108,8 +108,8 @@ export default function PassaporteClient({
               onClick={() => setTab('ranking')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
                 tab === 'ranking'
-                  ? 'border-sky-deep text-sky-deep'
-                  : 'border-transparent text-ink-soft hover:text-ink'
+                  ? 'border-mint-deep text-mint'
+                  : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
               <Zap className="w-4 h-4" />
@@ -135,7 +135,7 @@ export default function PassaporteClient({
                             className={`w-20 h-20 rounded-t-3xl rounded-b-lg border-2 flex items-center justify-center shadow-lg transition-all overflow-hidden ${
                               desbloqueada
                                 ? 'bg-gradient-to-br from-brown-emblem to-ink-soft border-brown-deep text-paper'
-                                : 'bg-gradient-to-br from-paper to-cream border-line text-ink-faint opacity-60'
+                                : 'bg-gradient-to-br from-paper to-cream border-gray-faint text-gray-text opacity-60'
                             }`}
                             style={{
                               clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
@@ -154,11 +154,11 @@ export default function PassaporteClient({
                           )}
                         </div>
                         <p
-                          className={`text-xs font-medium ${desbloqueada ? 'text-ink' : 'text-ink-faint'}`}
+                          className={`text-xs font-medium ${desbloqueada ? 'text-black' : 'text-gray-text'}`}
                         >
                           {c.titulo}
                         </p>
-                        <p className="text-[10px] text-ink-faint">+{c.pontos} Impulsos</p>
+                        <p className="text-[10px] text-gray-text">+{c.pontos} Impulsos</p>
                       </div>
                     );
                   })}
@@ -205,17 +205,17 @@ export default function PassaporteClient({
                   const jaResgatado = resgatados.includes(r.id);
                   return (
                     <Panel key={r.id} className="p-4 flex items-center gap-4">
-                      <span className="text-sm font-medium text-brown-deep min-w-[76px]">
+                      <span className="text-sm font-medium text-black min-w-[76px]">
                         {r.custo_pontos.toLocaleString('pt-BR')} pts
                       </span>
                       <div className="flex-1">
-                        <p className="text-sm text-ink mb-0.5">{r.titulo}</p>
-                        <p className="text-[11px] uppercase tracking-wide text-ink-faint">
+                        <p className="text-sm text-black mb-0.5">{r.titulo}</p>
+                        <p className="text-[11px] uppercase tracking-wide text-gray-text">
                           {r.categoria}
                         </p>
                       </div>
                       {jaResgatado ? (
-                        <span className="text-xs text-sky-deep flex items-center gap-1">
+                        <span className="text-xs text-mint flex items-center gap-1">
                           <Check size={13} /> Resgatado
                         </span>
                       ) : disponivel ? (
@@ -228,7 +228,7 @@ export default function PassaporteClient({
                           Resgatar
                         </button>
                       ) : (
-                        <span className="text-xs text-ink-faint whitespace-nowrap">
+                        <span className="text-xs text-gray-text whitespace-nowrap">
                           Faltam {(r.custo_pontos - pontos).toLocaleString('pt-BR')}
                         </span>
                       )}

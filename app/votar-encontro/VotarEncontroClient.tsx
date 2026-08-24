@@ -227,19 +227,19 @@ export default function VotarEncontroClient({
         <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
           <div className="text-center py-12">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
-            <h1 className="font-display text-2xl text-brown-deep mb-2">Seu voto foi registrado!</h1>
+            <h1 className="font-display text-2xl text-black mb-2">Seu voto foi registrado!</h1>
             {aba === 'encontros' && (
               <>
-                <p className="text-sm text-ink-faint mb-8">
+                <p className="text-sm text-gray-text mb-8">
                   Você escolheu {datasDaAba.find((d) => d.id === voto)?.label}.
                 </p>
-                <p className="text-sm text-ink-faint">
+                <p className="text-sm text-gray-text">
                   Acompanhe aqui quem mais já votou e qual data está vencendo. 💪
                 </p>
               </>
             )}
             {aba === 'enquetes' && (
-              <p className="text-sm text-ink-faint">
+              <p className="text-sm text-gray-text">
                 Obrigado por participar desta enquete!
               </p>
             )}
@@ -259,11 +259,11 @@ export default function VotarEncontroClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Participação</p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Participação</p>
+        <h1 className="font-display text-3xl text-black mb-1">
           {aba === 'encontros' ? 'Qual é o melhor dia?' : 'Enquetes e Votações'}
         </h1>
-        <p className="text-sm text-ink-faint max-w-xl mb-8">
+        <p className="text-sm text-gray-text max-w-xl mb-8">
           {aba === 'encontros'
             ? abaDados === 'presencial'
               ? `Vote na data que funciona melhor para você. Encontro em ${LOCAL}, das ${HORARIO}.`
@@ -271,13 +271,13 @@ export default function VotarEncontroClient({
             : `Participar das enquetes ${abaEnquete === 'presencial' ? 'presenciais' : 'online'} que importam para nossa comunidade.`}
         </p>
 
-        <div className="flex gap-4 mb-8 border-b border-line">
+        <div className="flex gap-4 mb-8 border-b border-gray-faint">
           <button
             onClick={() => setAba('encontros')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'encontros'
-                ? 'border-b-2 border-brown text-brown-deep'
-                : 'text-ink-soft hover:text-ink'
+                ? 'border-b-2 border-brown text-black'
+                : 'text-gray-text hover:text-black'
             }`}
           >
             Encontros
@@ -286,8 +286,8 @@ export default function VotarEncontroClient({
             onClick={() => setAba('enquetes')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'enquetes'
-                ? 'border-b-2 border-brown text-brown-deep'
-                : 'text-ink-soft hover:text-ink'
+                ? 'border-b-2 border-brown text-black'
+                : 'text-gray-text hover:text-black'
             }`}
           >
             Enquetes
@@ -295,13 +295,13 @@ export default function VotarEncontroClient({
         </div>
 
         {aba === 'encontros' && (
-          <div className="flex gap-4 mb-8 border-b border-line">
+          <div className="flex gap-4 mb-8 border-b border-gray-faint">
             <button
               onClick={() => setAbaDados('online')}
               className={`pb-3 px-4 font-medium transition ${
                 abaDados === 'online'
-                  ? 'border-b-2 border-brown text-brown-deep'
-                  : 'text-ink-soft hover:text-ink'
+                  ? 'border-b-2 border-brown text-black'
+                  : 'text-gray-text hover:text-black'
               }`}
             >
               Encontros Online
@@ -310,8 +310,8 @@ export default function VotarEncontroClient({
               onClick={() => setAbaDados('presencial')}
               className={`pb-3 px-4 font-medium transition ${
                 abaDados === 'presencial'
-                  ? 'border-b-2 border-brown text-brown-deep'
-                  : 'text-ink-soft hover:text-ink'
+                  ? 'border-b-2 border-brown text-black'
+                  : 'text-gray-text hover:text-black'
               }`}
             >
               Encontros Presenciais
@@ -322,9 +322,9 @@ export default function VotarEncontroClient({
         {aba === 'encontros' && (
           <>
             {abaDados === 'online' && DATAS_ONLINE.length === 0 && (
-              <div className="bg-sky-tint border border-sky rounded-2xl p-6 mb-8 flex gap-3">
-                <AlertCircle size={18} className="text-sky-deep flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-sky-deep">
+              <div className="bg-mint-light border border-mint rounded-2xl p-6 mb-8 flex gap-3">
+                <AlertCircle size={18} className="text-mint flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-mint">
                   <p className="font-medium mb-1">Votação ainda não aberta</p>
                   <p>
                     As datas dos próximos encontros online ainda não foram definidas. Assim que
@@ -335,9 +335,9 @@ export default function VotarEncontroClient({
             )}
 
             {abaDados === 'presencial' && !ehPresencial && (
-              <div className="bg-sky-tint border border-sky rounded-2xl p-6 mb-8 flex gap-3">
-                <AlertCircle size={18} className="text-sky-deep flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-sky-deep">
+              <div className="bg-mint-light border border-mint rounded-2xl p-6 mb-8 flex gap-3">
+                <AlertCircle size={18} className="text-mint flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-mint">
                   <p className="font-medium mb-1">Votação exclusiva do Plano Presencial</p>
                   <p>
                     Esta votação é exclusiva para membros do Plano Presencial SOMA. Caso deseje fazer
@@ -351,21 +351,21 @@ export default function VotarEncontroClient({
               datasDaAba.length > 0 && (
               <>
         {jaSeuVoto && (
-          <div className="bg-sky-tint border border-sky rounded-2xl p-5 mb-8">
-            <p className="text-sm text-sky-deep">
+          <div className="bg-mint-light border border-mint rounded-2xl p-5 mb-8">
+            <p className="text-sm text-mint">
               Você já votou em {datasDaAba.find((d) => d.id === voto)?.label}
             </p>
           </div>
         )}
 
-        <h2 className="font-display text-lg text-brown-deep mb-4">Escolha seu dia</h2>
+        <h2 className="font-display text-lg text-black mb-4">Escolha seu dia</h2>
         <div className="space-y-3 mb-8">
           {datasDaAba.map((data) => {
             const count = contagemVotos.find((c) => c.id === data.id)?.count || 0;
             return (
               <label
                 key={data.id}
-                className="flex items-center gap-3 p-4 border border-line rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
+                className="flex items-center gap-3 p-4 border border-gray-faint rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
               >
                 <input
                   type="radio"
@@ -374,17 +374,17 @@ export default function VotarEncontroClient({
                   checked={voto === data.id}
                   onChange={(e) => setVoto(e.target.value)}
                   disabled={jaSeuVoto}
-                  className="w-4 h-4 text-brown-deep cursor-pointer"
+                  className="w-4 h-4 text-black cursor-pointer"
                 />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-brown-deep">{data.label}</p>
+                  <p className="text-sm font-medium text-black">{data.label}</p>
                   {abaDados === 'presencial' && (
-                    <p className="text-xs text-ink-faint">{HORARIO}</p>
+                    <p className="text-xs text-gray-text">{HORARIO}</p>
                   )}
                 </div>
-                <div className="flex items-center gap-1 bg-sky-deep/10 px-2.5 py-1 rounded-full">
-                  <Users size={13} className="text-sky-deep" />
-                  <span className="text-xs font-medium text-sky-deep">{count}</span>
+                <div className="flex items-center gap-1 bg-mint-deep/10 px-2.5 py-1 rounded-full">
+                  <Users size={13} className="text-mint" />
+                  <span className="text-xs font-medium text-mint">{count}</span>
                 </div>
               </label>
             );
@@ -403,16 +403,16 @@ export default function VotarEncontroClient({
 
         {votosDaAba.length > 0 && (
           <>
-            <h3 className="font-display text-sm text-brown-deep mt-8 mb-4">Quem já votou</h3>
-            <div className="bg-white border border-line rounded-xl p-4 max-h-64 overflow-y-auto">
+            <h3 className="font-display text-sm text-black mt-8 mb-4">Quem já votou</h3>
+            <div className="bg-white border border-gray-faint rounded-xl p-4 max-h-64 overflow-y-auto">
               <div className="space-y-2">
                 {votosDaAba.map((v) => (
                   <div
                     key={v.id}
-                    className="flex items-center justify-between text-sm py-2 border-b border-line last:border-b-0"
+                    className="flex items-center justify-between text-sm py-2 border-b border-gray-faint last:border-b-0"
                   >
-                    <span className="text-brown-deep font-medium">{v.nome_mentorado}</span>
-                    <span className="text-xs text-ink-faint">
+                    <span className="text-black font-medium">{v.nome_mentorado}</span>
+                    <span className="text-xs text-gray-text">
                       {datasDaAba.find((d) => d.id === v.data_escolhida)?.label}
                     </span>
                   </div>
@@ -428,13 +428,13 @@ export default function VotarEncontroClient({
 
         {aba === 'enquetes' && (
           <>
-            <div className="flex gap-4 mb-8 border-b border-line">
+            <div className="flex gap-4 mb-8 border-b border-gray-faint">
               <button
                 onClick={() => setAbaEnquete('online')}
                 className={`pb-3 px-4 font-medium transition ${
                   abaEnquete === 'online'
-                    ? 'border-b-2 border-brown text-brown-deep'
-                    : 'text-ink-soft hover:text-ink'
+                    ? 'border-b-2 border-brown text-black'
+                    : 'text-gray-text hover:text-black'
                 }`}
               >
                 Enquetes Online
@@ -443,8 +443,8 @@ export default function VotarEncontroClient({
                 onClick={() => setAbaEnquete('presencial')}
                 className={`pb-3 px-4 font-medium transition ${
                   abaEnquete === 'presencial'
-                    ? 'border-b-2 border-brown text-brown-deep'
-                    : 'text-ink-soft hover:text-ink'
+                    ? 'border-b-2 border-brown text-black'
+                    : 'text-gray-text hover:text-black'
                 }`}
               >
                 Enquetes Presenciais
@@ -452,9 +452,9 @@ export default function VotarEncontroClient({
             </div>
 
             {enquetesDaAba.length === 0 ? (
-              <div className="bg-sky-tint border border-sky rounded-2xl p-6 mb-8 flex gap-3">
-                <AlertCircle size={18} className="text-sky-deep flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-sky-deep">
+              <div className="bg-mint-light border border-mint rounded-2xl p-6 mb-8 flex gap-3">
+                <AlertCircle size={18} className="text-mint flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-mint">
                   <p className="font-medium mb-1">Nenhuma enquete ativa</p>
                   <p>
                     Não há enquetes ativas no momento. Volte em breve para participar de novas
@@ -479,14 +479,14 @@ export default function VotarEncontroClient({
 
                       return (
                         <div key={enquete.id}>
-                          <h2 className="font-display text-lg text-brown-deep mb-2">{enquete.titulo}</h2>
+                          <h2 className="font-display text-lg text-black mb-2">{enquete.titulo}</h2>
                           {enquete.descricao && (
-                            <p className="text-sm text-ink-faint mb-4">{enquete.descricao}</p>
+                            <p className="text-sm text-gray-text mb-4">{enquete.descricao}</p>
                           )}
 
                           {jaSeuVotoEnquete && (
-                            <div className="bg-sky-tint border border-sky rounded-2xl p-4 mb-4">
-                              <p className="text-sm text-sky-deep">Você já votou nesta enquete</p>
+                            <div className="bg-mint-light border border-mint rounded-2xl p-4 mb-4">
+                              <p className="text-sm text-mint">Você já votou nesta enquete</p>
                             </div>
                           )}
 
@@ -495,7 +495,7 @@ export default function VotarEncontroClient({
                               opcoesEnquete.map((opcao) => (
                                 <label
                                   key={opcao.id}
-                                  className="flex items-center gap-3 p-4 border border-line rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
+                                  className="flex items-center gap-3 p-4 border border-gray-faint rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
                                 >
                                   <input
                                     type="checkbox"
@@ -526,12 +526,12 @@ export default function VotarEncontroClient({
                                       }
                                     }}
                                     disabled={jaSeuVotoEnquete}
-                                    className="w-4 h-4 text-brown-deep cursor-pointer"
+                                    className="w-4 h-4 text-black cursor-pointer"
                                   />
-                                  <span className="text-sm text-brown-deep font-medium">
+                                  <span className="text-sm text-black font-medium">
                                     {opcao.texto}
                                   </span>
-                                  <span className="ml-auto text-xs text-ink-faint">
+                                  <span className="ml-auto text-xs text-gray-text">
                                     {votosEnqueteAtual.filter((v) => v.opcao_id === opcao.id)
                                       .length}{' '}
                                     voto
@@ -546,7 +546,7 @@ export default function VotarEncontroClient({
                               opcoesEnquete.map((opcao) => (
                                 <label
                                   key={opcao.id}
-                                  className="flex items-center gap-3 p-4 border border-line rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
+                                  className="flex items-center gap-3 p-4 border border-gray-faint rounded-lg hover:border-brown-deep cursor-pointer transition-colors"
                                 >
                                   <input
                                     type="radio"
@@ -560,12 +560,12 @@ export default function VotarEncontroClient({
                                       }));
                                     }}
                                     disabled={jaSeuVotoEnquete}
-                                    className="w-4 h-4 text-brown-deep cursor-pointer"
+                                    className="w-4 h-4 text-black cursor-pointer"
                                   />
-                                  <span className="text-sm text-brown-deep font-medium">
+                                  <span className="text-sm text-black font-medium">
                                     {opcao.texto}
                                   </span>
-                                  <span className="ml-auto text-xs text-ink-faint">
+                                  <span className="ml-auto text-xs text-gray-text">
                                     {votosEnqueteAtual.filter((v) => v.opcao_id === opcao.id)
                                       .length}{' '}
                                     voto
@@ -591,20 +591,20 @@ export default function VotarEncontroClient({
 
                           {votosEnqueteAtual.length > 0 && (
                             <>
-                              <h3 className="font-display text-sm text-brown-deep mt-6 mb-3">
+                              <h3 className="font-display text-sm text-black mt-6 mb-3">
                                 Quem votou
                               </h3>
-                              <div className="bg-white border border-line rounded-xl p-4 max-h-64 overflow-y-auto">
+                              <div className="bg-white border border-gray-faint rounded-xl p-4 max-h-64 overflow-y-auto">
                                 <div className="space-y-2">
                                   {votosEnqueteAtual.map((v) => (
                                     <div
                                       key={v.id}
-                                      className="flex items-center justify-between text-sm py-2 border-b border-line last:border-b-0"
+                                      className="flex items-center justify-between text-sm py-2 border-b border-gray-faint last:border-b-0"
                                     >
-                                      <span className="text-brown-deep font-medium">
+                                      <span className="text-black font-medium">
                                         {v.nome_mentorado}
                                       </span>
-                                      <span className="text-xs text-ink-faint">
+                                      <span className="text-xs text-gray-text">
                                         {opcoesEnquete.find((o) => o.id === v.opcao_id)?.texto}
                                       </span>
                                     </div>

@@ -121,18 +121,18 @@ export default function FinanceiroClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
         <button
           onClick={() => router.push('/admin')}
-          className="flex items-center gap-1.5 text-sm text-ink-soft hover:text-brown-deep transition mb-4"
+          className="flex items-center gap-1.5 text-sm text-gray-text hover:text-black transition mb-4"
         >
           <ArrowLeft size={16} />
           Voltar
         </button>
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Área administrativa</p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Financeiro</h1>
-        <p className="text-sm text-ink-faint mb-8">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Área administrativa</p>
+        <h1 className="font-display text-3xl text-black mb-1">Financeiro</h1>
+        <p className="text-sm text-gray-text mb-8">
           Como os pagamentos atuais são controlados manualmente (sem um extrato de transações no
           portal), os valores de receita aqui são uma estimativa baseada no plano e status de cada
           mentorado, não um extrato bancário. Para conferência exata, use o Mercado Pago.
@@ -140,26 +140,26 @@ export default function FinanceiroClient({
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Panel className="p-5">
-            <Wallet size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{formatarMoeda(receitaRealizada)}</p>
-            <p className="text-xs text-ink-faint">Já entrou (estimado, mentorados ativos pagantes)</p>
+            <Wallet size={18} className="text-mint mb-2" />
+            <p className="font-display text-2xl text-black">{formatarMoeda(receitaRealizada)}</p>
+            <p className="text-xs text-gray-text">Já entrou (estimado, mentorados ativos pagantes)</p>
           </Panel>
           <Panel className="p-5">
-            <TrendingUp size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{formatarMoeda(mrr)}</p>
-            <p className="text-xs text-ink-faint">Receita mensal recorrente equivalente (MRR)</p>
+            <TrendingUp size={18} className="text-mint mb-2" />
+            <p className="font-display text-2xl text-black">{formatarMoeda(mrr)}</p>
+            <p className="text-xs text-gray-text">Receita mensal recorrente equivalente (MRR)</p>
           </Panel>
           <Panel className="p-5">
             <AlertTriangle size={18} className="text-amber-600 mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{inadimplentes.length}</p>
-            <p className="text-xs text-ink-faint">
+            <p className="font-display text-2xl text-black">{inadimplentes.length}</p>
+            <p className="text-xs text-gray-text">
               Inadimplentes ({formatarMoeda(totalInadimplente)} em aberto)
             </p>
           </Panel>
           <Panel className="p-5">
-            <Gift size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{gratuitos.length}</p>
-            <p className="text-xs text-ink-faint">Em cortesia/gratuito</p>
+            <Gift size={18} className="text-mint mb-2" />
+            <p className="font-display text-2xl text-black">{gratuitos.length}</p>
+            <p className="text-xs text-gray-text">Em cortesia/gratuito</p>
           </Panel>
         </div>
 
@@ -170,7 +170,7 @@ export default function FinanceiroClient({
           <Panel className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-6">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-brown-deep mb-1.5">
+                <label className="block text-xs font-medium text-black mb-1.5">
                   Suas despesas mensais fixas (estrutura, ferramentas, custo do seu tempo etc.)
                 </label>
                 <input
@@ -179,7 +179,7 @@ export default function FinanceiroClient({
                   value={inputDespesas}
                   onChange={(e) => setInputDespesas(e.target.value)}
                   placeholder="Ex: 3000"
-                  className="w-full sm:w-56 px-3 py-2 border border-line rounded-lg text-sm"
+                  className="w-full sm:w-56 px-3 py-2 border border-gray-faint rounded-lg text-sm"
                 />
               </div>
               <button
@@ -195,19 +195,19 @@ export default function FinanceiroClient({
             {despesasMensais > 0 ? (
               <div className="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-xs text-ink-faint mb-1">Ticket médio mensal por mentorado</p>
-                  <p className="font-display text-xl text-brown-deep">
+                  <p className="text-xs text-gray-text mb-1">Ticket médio mensal por mentorado</p>
+                  <p className="font-display text-xl text-black">
                     {formatarMoeda(ticketMedioMensal)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-ink-faint mb-1">Mentorados pagantes necessários</p>
-                  <p className="font-display text-xl text-brown-deep">
+                  <p className="text-xs text-gray-text mb-1">Mentorados pagantes necessários</p>
+                  <p className="font-display text-xl text-black">
                     {mentoradosNecessarios} (você tem {pagantesAtivos.length})
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-ink-faint mb-1">Saldo mensal projetado</p>
+                  <p className="text-xs text-gray-text mb-1">Saldo mensal projetado</p>
                   <p
                     className={`font-display text-xl ${
                       saldoMensal >= 0 ? 'text-green-700' : 'text-red-600'
@@ -216,7 +216,7 @@ export default function FinanceiroClient({
                     {formatarMoeda(saldoMensal)}
                   </p>
                 </div>
-                <div className="sm:col-span-3 text-sm text-ink-soft border-t border-line pt-4">
+                <div className="sm:col-span-3 text-sm text-gray-text border-t border-gray-faint pt-4">
                   {margemMentorados !== null && margemMentorados >= 0 ? (
                     <>
                       Você está <strong>{margemMentorados} mentorado(s) acima</strong> do ponto de
@@ -234,7 +234,7 @@ export default function FinanceiroClient({
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-ink-faint">
+              <p className="text-sm text-gray-text">
                 Informa suas despesas mensais acima pra ver o cálculo de quantos mentorados pagantes
                 você precisa manter pra ficar com o caixa positivo.
               </p>
@@ -245,30 +245,30 @@ export default function FinanceiroClient({
         {despesasMensais > 0 && (
           <section className="mb-10">
             <Eyebrow>Projeção simples (mantendo a base atual, sem considerar crescimento ou cancelamento)</Eyebrow>
-            <div className="overflow-x-auto rounded-xl border border-line">
+            <div className="overflow-x-auto rounded-xl border border-gray-faint">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-paper border-b border-line text-left">
-                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                  <tr className="bg-white border-b border-gray-faint text-left">
+                    <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                       Período
                     </th>
-                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                       Receita projetada
                     </th>
-                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                       Despesas projetadas
                     </th>
-                    <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                    <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                       Saldo acumulado
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {meses.map((m) => (
-                    <tr key={m} className="border-b border-line last:border-0 bg-cream">
-                      <td className="px-4 py-3 text-ink">{m} meses</td>
-                      <td className="px-4 py-3 text-ink-soft">{formatarMoeda(mrr * m)}</td>
-                      <td className="px-4 py-3 text-ink-soft">{formatarMoeda(despesasMensais * m)}</td>
+                    <tr key={m} className="border-b border-gray-faint last:border-0 bg-white">
+                      <td className="px-4 py-3 text-black">{m} meses</td>
+                      <td className="px-4 py-3 text-gray-text">{formatarMoeda(mrr * m)}</td>
+                      <td className="px-4 py-3 text-gray-text">{formatarMoeda(despesasMensais * m)}</td>
                       <td
                         className={`px-4 py-3 font-medium ${
                           saldoMensal * m >= 0 ? 'text-green-700' : 'text-red-600'
@@ -288,34 +288,34 @@ export default function FinanceiroClient({
           <Eyebrow>
             <TrendingUp size={13} /> Receita por plano
           </Eyebrow>
-          <div className="overflow-x-auto rounded-xl border border-line">
+          <div className="overflow-x-auto rounded-xl border border-gray-faint">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-paper border-b border-line text-left">
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                <tr className="bg-white border-b border-gray-faint text-left">
+                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                     Plano
                   </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide text-center">
+                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
                     Mentorados
                   </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                     Total contratado
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {Array.from(porPlano.values()).map((linha) => (
-                  <tr key={linha.nome} className="border-b border-line last:border-0 bg-cream">
-                    <td className="px-4 py-3 text-ink">{linha.nome}</td>
-                    <td className="px-4 py-3 text-center text-ink-soft">{linha.quantidade}</td>
-                    <td className="px-4 py-3 text-brown-deep font-medium">
+                  <tr key={linha.nome} className="border-b border-gray-faint last:border-0 bg-white">
+                    <td className="px-4 py-3 text-black">{linha.nome}</td>
+                    <td className="px-4 py-3 text-center text-gray-text">{linha.quantidade}</td>
+                    <td className="px-4 py-3 text-black font-medium">
                       {formatarMoeda(linha.total)}
                     </td>
                   </tr>
                 ))}
                 {porPlano.size === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-6 text-center text-ink-faint text-sm">
+                    <td colSpan={3} className="px-4 py-6 text-center text-gray-text text-sm">
                       Nenhum mentorado com plano atribuído ainda.
                     </td>
                   </tr>
@@ -327,36 +327,36 @@ export default function FinanceiroClient({
 
         <section>
           <Eyebrow>Próximas cobranças cadastradas</Eyebrow>
-          <div className="overflow-x-auto rounded-xl border border-line">
+          <div className="overflow-x-auto rounded-xl border border-gray-faint">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-paper border-b border-line text-left">
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                <tr className="bg-white border-b border-gray-faint text-left">
+                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                     Nome
                   </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                     Data
                   </th>
-                  <th className="px-4 py-3 font-medium text-ink-faint text-xs uppercase tracking-wide">
+                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                     Valor
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {proximasCobrancas.map((m) => (
-                  <tr key={m.id} className="border-b border-line last:border-0 bg-cream">
-                    <td className="px-4 py-3 text-ink">{m.nome}</td>
-                    <td className="px-4 py-3 text-ink-soft">
+                  <tr key={m.id} className="border-b border-gray-faint last:border-0 bg-white">
+                    <td className="px-4 py-3 text-black">{m.nome}</td>
+                    <td className="px-4 py-3 text-gray-text">
                       {new Date(m.proxima_cobranca!).toLocaleDateString('pt-BR')}
                     </td>
-                    <td className="px-4 py-3 text-brown-deep font-medium">
+                    <td className="px-4 py-3 text-black font-medium">
                       {formatarMoeda(valorContratado(m))}
                     </td>
                   </tr>
                 ))}
                 {proximasCobrancas.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-6 text-center text-ink-faint text-sm">
+                    <td colSpan={3} className="px-4 py-6 text-center text-gray-text text-sm">
                       Nenhuma cobrança futura cadastrada.
                     </td>
                   </tr>

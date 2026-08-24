@@ -38,16 +38,16 @@ export default async function AdminFeedbacksPage() {
   return (
     
 <main className="px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
         <div>
-          <h1 className="font-display text-3xl text-brown-deep mb-1">Feedbacks da Trilha</h1>
-          <p className="text-sm text-ink-faint">Check-ins mensais enviados pelos mentorados.</p>
+          <h1 className="font-display text-3xl text-black mb-1">Feedbacks da Trilha</h1>
+          <p className="text-sm text-gray-text">Check-ins mensais enviados pelos mentorados.</p>
         </div>
-        <div className="bg-white border border-line rounded-2xl px-5 py-3 text-center">
-          <p className="text-2xl font-display text-brown-deep">{mediaGeral}</p>
-          <p className="text-xs text-ink-faint">nota média geral</p>
+        <div className="bg-white border border-gray-faint rounded-2xl px-5 py-3 text-center">
+          <p className="text-2xl font-display text-black">{mediaGeral}</p>
+          <p className="text-xs text-gray-text">nota média geral</p>
         </div>
       </div>
 
@@ -55,19 +55,19 @@ export default async function AdminFeedbacksPage() {
         <EnviarFeedbackClient mentorados={mentorados ?? []} />
       </div>
 
-      <h2 className="font-display text-xl text-brown-deep mb-4">Check-ins dos mentorados</h2>
+      <h2 className="font-display text-xl text-black mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
-        <p className="text-sm text-ink-faint">Ninguém enviou check-in ainda.</p>
+        <p className="text-sm text-gray-text">Ninguém enviou check-in ainda.</p>
       ) : (
         <div className="space-y-3">
           {checkins.map((c) => (
-            <div key={c.id} className="bg-white border border-line rounded-xl p-4">
+            <div key={c.id} className="bg-white border border-gray-faint rounded-xl p-4">
               <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
                 <div>
-                  <p className="text-sm font-medium text-brown-deep">
+                  <p className="text-sm font-medium text-black">
                     {(c as unknown as { profiles: { nome: string } }).profiles?.nome}
                   </p>
-                  <p className="text-xs text-ink-faint">
+                  <p className="text-xs text-gray-text">
                     {new Date(c.mes_referencia + 'T00:00:00').toLocaleDateString('pt-BR', {
                       month: 'long',
                       year: 'numeric',
@@ -85,10 +85,10 @@ export default async function AdminFeedbacksPage() {
                 </div>
               </div>
               {c.feedback_texto && (
-                <p className="text-sm text-brown-deep mb-1">{c.feedback_texto}</p>
+                <p className="text-sm text-black mb-1">{c.feedback_texto}</p>
               )}
               {c.sugestao_melhoria && (
-                <p className="text-xs text-ink-faint">
+                <p className="text-xs text-gray-text">
                   Sugestão de melhoria: {c.sugestao_melhoria}
                 </p>
               )}

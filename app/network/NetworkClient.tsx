@@ -23,41 +23,41 @@ const CIRCULOS = [
     id: 'raiz',
     label: 'Círculo da Raiz',
     descricao: 'Pessoas que me conhecem profundamente e confiam em mim',
-    cor: 'bg-paper border-line',
-    bgPanel: 'bg-paper border-line',
-    textColor: 'text-brown-deep',
+    cor: 'bg-white border-gray-faint',
+    bgPanel: 'bg-white border-gray-faint',
+    textColor: 'text-black',
   },
   {
     id: 'ponte',
     label: 'Círculo da Ponte',
     descricao: 'Pessoas que podem me apresentar para outras oportunidades',
-    cor: 'bg-paper border-line',
-    bgPanel: 'bg-paper border-line',
-    textColor: 'text-brown-deep',
+    cor: 'bg-white border-gray-faint',
+    bgPanel: 'bg-white border-gray-faint',
+    textColor: 'text-black',
   },
   {
     id: 'presenca',
     label: 'Círculo da Presença',
     descricao: 'Pessoas que me seguem mas com quem não conversei profundamente',
-    cor: 'bg-paper border-line',
-    bgPanel: 'bg-paper border-line',
-    textColor: 'text-brown-deep',
+    cor: 'bg-white border-gray-faint',
+    bgPanel: 'bg-white border-gray-faint',
+    textColor: 'text-black',
   },
   {
     id: 'futuro',
     label: 'Círculo do Futuro',
     descricao: 'Pessoas que admiro mas ainda não tenho relação',
-    cor: 'bg-paper border-line',
-    bgPanel: 'bg-paper border-line',
-    textColor: 'text-brown-deep',
+    cor: 'bg-white border-gray-faint',
+    bgPanel: 'bg-white border-gray-faint',
+    textColor: 'text-black',
   },
   {
     id: 'recomeço',
     label: 'Círculo do Recomeço',
     descricao: 'Pessoas que me conheceram em fases travadas - hora de mostrar quem sou',
-    cor: 'bg-paper border-line',
-    bgPanel: 'bg-paper border-line',
-    textColor: 'text-brown-deep',
+    cor: 'bg-white border-gray-faint',
+    bgPanel: 'bg-white border-gray-faint',
+    textColor: 'text-black',
   },
 ];
 
@@ -200,18 +200,18 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
           <Network size={14} />
           Círculos de Influência
         </Eyebrow>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Sua Rede Estratégica</h1>
-        <p className="text-sm text-ink-faint max-w-xl mb-8">
+        <h1 className="font-display text-3xl text-black mb-1">Sua Rede Estratégica</h1>
+        <p className="text-sm text-gray-text max-w-xl mb-8">
           Mapeie seus contatos em círculos de influência e receba um plano de ação personalizado para 72 horas.
         </p>
 
-        <div className="flex gap-4 mb-8 border-b border-line">
+        <div className="flex gap-4 mb-8 border-b border-gray-faint">
           <button
             onClick={() => setAba('circulo')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'circulo'
-                ? 'border-b-2 border-brown text-brown-deep'
-                : 'text-ink-soft hover:text-ink'
+                ? 'border-b-2 border-brown text-black'
+                : 'text-gray-text hover:text-black'
             }`}
           >
             <Users size={18} className="inline mr-2" />
@@ -221,8 +221,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             onClick={() => setAba('importar')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'importar'
-                ? 'border-b-2 border-brown text-brown-deep'
-                : 'text-ink-soft hover:text-ink'
+                ? 'border-b-2 border-brown text-black'
+                : 'text-gray-text hover:text-black'
             }`}
           >
             <Upload size={18} className="inline mr-2" />
@@ -232,8 +232,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             onClick={() => setAba('analise')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'analise'
-                ? 'border-b-2 border-brown text-brown-deep'
-                : 'text-ink-soft hover:text-ink'
+                ? 'border-b-2 border-brown text-black'
+                : 'text-gray-text hover:text-black'
             }`}
           >
             <Target size={18} className="inline mr-2" />
@@ -246,21 +246,21 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             {CIRCULOS.map((circulo) => {
               const count = contatosPorCirculo(circulo.id);
               return (
-                <Panel key={circulo.id} className="border border-line bg-paper shadow-sm">
+                <Panel key={circulo.id} className="border border-gray-faint bg-white shadow-sm">
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3 mb-4">
                       <div className="min-w-0">
-                        <h3 className="text-base font-display text-brown-deep flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-display text-black flex items-center gap-2 mb-1">
                           {circulo.label}
-                          <span className="bg-sky-tint text-brown-deep border border-sky px-2 py-0.5 rounded-full text-xs font-medium tabular-nums">
+                          <span className="bg-mint-light text-black border border-mint px-2 py-0.5 rounded-full text-xs font-medium tabular-nums">
                             {count.length}
                           </span>
                         </h3>
-                        <p className="text-xs text-ink-soft">{circulo.descricao}</p>
+                        <p className="text-xs text-gray-text">{circulo.descricao}</p>
                       </div>
                       <button
                         onClick={() => abrirFormularioParaCirculo(circulo.id)}
-                        className="flex items-center gap-1 text-xs font-medium text-brown-deep border border-line rounded-lg px-2.5 py-1.5 hover:bg-cream transition shrink-0"
+                        className="flex items-center gap-1 text-xs font-medium text-black border border-gray-faint rounded-lg px-2.5 py-1.5 hover:bg-white transition shrink-0"
                       >
                         <Plus size={14} />
                         Adicionar
@@ -273,28 +273,28 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                           {count.map((contato, idx) => (
                             <div
                               key={idx}
-                              className="bg-white p-3 rounded border border-line hover:shadow-sm hover:border-brown/30 transition"
+                              className="bg-white p-3 rounded border border-gray-faint hover:shadow-sm hover:border-brown/30 transition"
                             >
                               <div className="flex justify-between items-start">
                                 <div className="flex-1">
-                                  <p className="font-medium text-brown-deep">{contato.nome}</p>
+                                  <p className="font-medium text-black">{contato.nome}</p>
                                   {contato.relacao && (
-                                    <p className="text-xs text-ink-soft">{contato.relacao}</p>
+                                    <p className="text-xs text-gray-text">{contato.relacao}</p>
                                   )}
                                 </div>
                                 <button
                                   onClick={() => handleRemoverContato(contato.id)}
                                   title="Remover contato"
-                                  className="text-ink-faint hover:text-brown-deep shrink-0"
+                                  className="text-gray-text hover:text-black shrink-0"
                                 >
                                   <Trash2 size={16} />
                                 </button>
                               </div>
                               {contato.potencial && (
-                                <p className="text-xs text-ink-soft mt-2 italic">{contato.potencial}</p>
+                                <p className="text-xs text-gray-text mt-2 italic">{contato.potencial}</p>
                               )}
                               {contato.acao && (
-                                <div className="bg-sky-tint p-2 rounded mt-2 text-xs text-brown-deep">
+                                <div className="bg-mint-light p-2 rounded mt-2 text-xs text-black">
                                   <strong>Ação:</strong> {contato.acao}
                                 </div>
                               )}
@@ -304,7 +304,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                       )}
 
                       {count.length === 0 && !carregando && (
-                        <p className="text-xs text-ink-faint italic py-2">
+                        <p className="text-xs text-gray-text italic py-2">
                           Nenhum contato mapeado neste círculo.
                         </p>
                       )}
@@ -318,12 +318,12 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
         {aba === 'importar' && (
           <div className="space-y-6">
-            <Panel className="p-8 border-2 border-sky max-w-2xl mx-auto">
-              <h3 className="font-display text-2xl text-brown-deep mb-2 flex items-center gap-2">
+            <Panel className="p-8 border-2 border-mint max-w-2xl mx-auto">
+              <h3 className="font-display text-2xl text-black mb-2 flex items-center gap-2">
                 <Upload size={24} />
                 Importar do LinkedIn
               </h3>
-              <p className="text-sm text-ink-soft mb-6">
+              <p className="text-sm text-gray-text mb-6">
                 Exporte suas conexões do LinkedIn em bulk e categorize automaticamente em Círculos de Influência.
               </p>
 
@@ -335,7 +335,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 Selecionar arquivo CSV
               </button>
 
-              <div className="bg-sky-tint border border-sky p-4 rounded-lg text-left text-sm text-sky-deep space-y-2">
+              <div className="bg-mint-light border border-mint p-4 rounded-lg text-left text-sm text-mint space-y-2">
                 <p className="font-medium mb-3">📋 Como exportar do LinkedIn:</p>
                 <ol className="space-y-1.5 list-decimal list-inside">
                   <li>Faça login no LinkedIn</li>
@@ -349,8 +349,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
               </div>
 
               {contatos.length > 0 && (
-                <div className="bg-sky-tint border border-sky p-4 rounded-lg mt-6">
-                  <p className="text-sm text-sky-deep">
+                <div className="bg-mint-light border border-mint p-4 rounded-lg mt-6">
+                  <p className="text-sm text-mint">
                     <strong>✅ Contatos adicionados:</strong> {contatos.length}
                   </p>
                 </div>
@@ -358,13 +358,13 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             </Panel>
 
             <Panel className="p-6 bg-brown-deep/5 border-2 border-dashed border-brown-deep text-center">
-              <p className="text-brown-deep font-medium mb-2">💡 Prefere adicionar manualmente?</p>
-              <p className="text-sm text-ink-soft mb-4">
+              <p className="text-black font-medium mb-2">💡 Prefere adicionar manualmente?</p>
+              <p className="text-sm text-gray-text mb-4">
                 Acesse "Meus Círculos" e clique em "Adicionar Contato" em cada círculo.
               </p>
               <button
                 onClick={() => setAba('circulo')}
-                className="inline-flex items-center gap-2 text-brown-deep hover:text-brown font-medium transition"
+                className="inline-flex items-center gap-2 text-black hover:text-orange font-medium transition"
               >
                 Ir para Meus Círculos
                 <span>→</span>
@@ -375,17 +375,17 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
         {mostraFormulario && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Panel className="max-w-2xl w-full border border-line">
-              <div className="bg-paper border-b border-line p-6 flex items-start justify-between">
+            <Panel className="max-w-2xl w-full border border-gray-faint">
+              <div className="bg-white border-b border-gray-faint p-6 flex items-start justify-between">
                 <div>
-                  <h2 className="font-display text-2xl text-brown-deep">Adicionar Contato</h2>
-                  <p className="text-sm text-ink-soft mt-1">
+                  <h2 className="font-display text-2xl text-black">Adicionar Contato</h2>
+                  <p className="text-sm text-gray-text mt-1">
                     {CIRCULOS.find((c) => c.id === novoContato.circulo)?.label}
                   </p>
                 </div>
                 <button
                   onClick={() => setMostraFormulario(false)}
-                  className="text-ink-faint hover:text-ink transition"
+                  className="text-gray-text hover:text-black transition"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -393,35 +393,35 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-brown-deep mb-2">Nome *</label>
+                  <label className="block text-sm font-medium text-black mb-2">Nome *</label>
                   <input
                     type="text"
                     value={novoContato.nome}
                     onChange={(e) => setNovoContato({ ...novoContato, nome: e.target.value })}
-                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     placeholder="Nome completo"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-deep mb-2">
+                  <label className="block text-sm font-medium text-black mb-2">
                     Relação — onde vocês trabalharam juntos
                   </label>
                   <input
                     type="text"
                     value={novoContato.relacao}
                     onChange={(e) => setNovoContato({ ...novoContato, relacao: e.target.value })}
-                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     placeholder="Ex: Itaú, time de Dados, 2021–2023"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-deep mb-2">Círculo de Influência *</label>
+                  <label className="block text-sm font-medium text-black mb-2">Círculo de Influência *</label>
                   <select
                     value={novoContato.circulo}
                     onChange={(e) => setNovoContato({ ...novoContato, circulo: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                   >
                     {CIRCULOS.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -432,25 +432,25 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-deep mb-2">
+                  <label className="block text-sm font-medium text-black mb-2">
                     Potencial de influência / insight
                   </label>
                   <textarea
                     value={novoContato.potencial}
                     onChange={(e) => setNovoContato({ ...novoContato, potencial: e.target.value })}
-                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     placeholder="Como essa pessoa pode te abrir portas? O que ela sabe sobre você?"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-deep mb-2">Próxima ação</label>
+                  <label className="block text-sm font-medium text-black mb-2">Próxima ação</label>
                   <input
                     type="text"
                     value={novoContato.acao}
                     onChange={(e) => setNovoContato({ ...novoContato, acao: e.target.value })}
-                    className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     placeholder="Ex: Marcar um café, enviar mensagem..."
                   />
                 </div>
@@ -465,7 +465,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                   </button>
                   <button
                     onClick={() => setMostraFormulario(false)}
-                    className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                    className="flex-1 border border-gray-faint text-black px-4 py-2 rounded-lg hover:bg-white transition-colors"
                   >
                     Cancelar
                   </button>
@@ -477,8 +477,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
         {aba === 'analise' && (
           <div className="space-y-6">
-            <Panel className="bg-sky-tint border border-sky p-6">
-              <h3 className="font-display text-xl text-sky-deep mb-6">Seu Plano de Ação de 72 Horas</h3>
+            <Panel className="bg-mint-light border border-mint p-6">
+              <h3 className="font-display text-xl text-mint mb-6">Seu Plano de Ação de 72 Horas</h3>
 
               {CIRCULOS.map((circulo) => {
                 const contato = contatosPorCirculo(circulo.id)[0];
@@ -495,13 +495,13 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 return (
                   <div key={circulo.id} className={`border-2 rounded-lg p-4 ${circulo.bgPanel}`}>
                     <div className="flex items-center gap-2 mb-3">
-                      <h4 className="font-medium text-brown-deep">{circulo.label}</h4>
+                      <h4 className="font-medium text-black">{circulo.label}</h4>
                     </div>
-                    <p className="text-sm text-ink-soft mb-3">
+                    <p className="text-sm text-gray-text mb-3">
                       <strong>Contato:</strong> {contato.nome}
                       {contato.relacao ? ` (${contato.relacao})` : ''}
                     </p>
-                    <p className="bg-white p-3 rounded text-sm text-ink border-l-4 border-brown-deep mb-4">
+                    <p className="bg-white p-3 rounded text-sm text-black border-l-4 border-brown-deep mb-4">
                       "{mensagens[circulo.id] || 'Mensagem personalizada'}"
                     </p>
                     <div className="flex gap-2">
@@ -525,7 +525,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                           </>
                         )}
                       </button>
-                      <button className="flex-1 border border-brown-deep text-brown-deep py-2 px-3 rounded text-sm font-medium hover:bg-cream transition">
+                      <button className="flex-1 border border-brown-deep text-black py-2 px-3 rounded text-sm font-medium hover:bg-white transition">
                         Enviar no LinkedIn
                       </button>
                     </div>
@@ -534,8 +534,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
               })}
             </Panel>
 
-            <Panel className="bg-cream p-4">
-              <p className="text-sm text-ink">
+            <Panel className="bg-white p-4">
+              <p className="text-sm text-black">
                 <strong>💡 Dica:</strong> Não precisa enviar para todos de uma vez. Comece pelos 5 do Círculo da Raiz, depois ponte, e assim por diante. Consistência &gt; Velocidade.
               </p>
             </Panel>

@@ -102,25 +102,25 @@ export default async function FaqPage() {
   }
 
   return (
-    <div className="flex h-screen bg-cream overflow-hidden">
+    <div className="flex h-screen bg-white overflow-hidden">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
       <main className="flex-1 overflow-auto px-6 py-8 md:px-12 md:py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-display text-3xl text-brown-deep mb-2">Perguntas Frequentes</h1>
-          <p className="text-ink-faint mb-10">Tudo o que voce precisa saber para aproveitar ao maximo a mentoria.</p>
+          <h1 className="font-display text-3xl text-black mb-2">Perguntas Frequentes</h1>
+          <p className="text-gray-text mb-10">Tudo o que voce precisa saber para aproveitar ao maximo a mentoria.</p>
 
           <div className="space-y-8">
             {FAQS.map((cat) => (
               <div key={cat.categoria}>
-                <h2 className="text-xs uppercase tracking-widest text-ink-faint mb-4">{cat.categoria}</h2>
+                <h2 className="text-xs uppercase tracking-widest text-gray-text mb-4">{cat.categoria}</h2>
                 <div className="space-y-3">
                   {cat.perguntas.map((faq) => (
-                    <details key={faq.pergunta} className="bg-white border border-line rounded-xl group">
-                      <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none font-medium text-brown-deep hover:text-brown transition-colors">
+                    <details key={faq.pergunta} className="bg-white border border-gray-faint rounded-xl group">
+                      <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none font-medium text-black hover:text-orange transition-colors">
                         {faq.pergunta}
-                        <ChevronDown size={16} className="text-ink-faint group-open:rotate-180 transition-transform shrink-0 ml-4" />
+                        <ChevronDown size={16} className="text-gray-text group-open:rotate-180 transition-transform shrink-0 ml-4" />
                       </summary>
-                      <div className="px-5 pb-4 text-sm text-ink-soft leading-relaxed">
+                      <div className="px-5 pb-4 text-sm text-gray-text leading-relaxed">
                         {faq.resposta}
                       </div>
                     </details>

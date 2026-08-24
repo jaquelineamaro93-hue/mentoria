@@ -92,9 +92,9 @@ export default function OnboardingClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Sua jornada</p>
-        <h1 className="font-display text-3xl text-brown-deep mb-2">Onboarding</h1>
-        <p className="text-sm text-ink-faint mb-8">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Sua jornada</p>
+        <h1 className="font-display text-3xl text-black mb-2">Onboarding</h1>
+        <p className="text-sm text-gray-text mb-8">
           {concluidas} de {etapas.length} etapas concluídas. Complete as etapas nesta ordem. Cada uma prepara você para a próxima.
         </p>
 
@@ -108,21 +108,21 @@ export default function OnboardingClient({
                 className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border ${
                   etapa.feita
                     ? 'bg-brown border-brown text-paper'
-                    : 'border-line text-ink-faint'
+                    : 'border-gray-faint text-gray-text'
                 }`}
               >
                 {etapa.feita ? <Check size={16} /> : <span className="text-sm">{i + 1}</span>}
               </div>
 
               <div className="flex-1">
-                <p className="text-ink font-medium mb-0.5">{etapa.titulo}</p>
-                <p className="text-sm text-ink-faint">{etapa.descricao}</p>
+                <p className="text-black font-medium mb-0.5">{etapa.titulo}</p>
+                <p className="text-sm text-gray-text">{etapa.descricao}</p>
               </div>
 
               {!etapa.feita && (
                 <Link
                   href={etapa.href}
-                  className="shrink-0 flex items-center gap-1.5 text-sm text-brown-deep hover:text-brown font-medium whitespace-nowrap"
+                  className="shrink-0 flex items-center gap-1.5 text-sm text-black hover:text-orange font-medium whitespace-nowrap"
                 >
                   {etapa.cta} <ArrowRight size={14} />
                 </Link>
@@ -151,9 +151,9 @@ export default function OnboardingClient({
         )}
 
         {concluidas === etapas.length && (
-          <div className="mt-8 bg-sky-tint border border-sky rounded-lg p-6 text-center">
-            <p className="text-brown-deep font-medium mb-1">🎉 Você concluiu todo o onboarding!</p>
-            <p className="text-sm text-ink-soft">
+          <div className="mt-8 bg-mint-light border border-mint rounded-lg p-6 text-center">
+            <p className="text-black font-medium mb-1">🎉 Você concluiu todo o onboarding!</p>
+            <p className="text-sm text-gray-text">
               Agora é seguir acompanhando sua trilha e seu plano de desenvolvimento.
             </p>
           </div>

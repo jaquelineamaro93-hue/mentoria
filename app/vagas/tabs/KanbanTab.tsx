@@ -25,14 +25,14 @@ interface Props {
 }
 
 const ETAPAS = [
-  { id: 'para_aplicar', label: 'Para Aplicar', bg: 'bg-cream', border: 'border-line' },
-  { id: 'aplicada', label: 'Aplicada', bg: 'bg-sky-tint', border: 'border-sky' },
-  { id: 'entrevista_agendada', label: 'Entrevista Agendada', bg: 'bg-sky-tint', border: 'border-sky' },
-  { id: 'aguardando_retorno', label: 'Aguardando Retorno', bg: 'bg-sky-tint', border: 'border-sky' },
-  { id: 'entrevista_decisor', label: 'Entrevista c/ Decisor', bg: 'bg-sky-tint', border: 'border-sky-deep' },
-  { id: 'case', label: 'Case', bg: 'bg-cream', border: 'border-brown' },
-  { id: 'oferta', label: 'Oferta', bg: 'bg-sky-tint', border: 'border-sky-deep' },
-  { id: 'lost', label: 'Lost', bg: 'bg-cream', border: 'border-line' },
+  { id: 'para_aplicar', label: 'Para Aplicar', bg: 'bg-white', border: 'border-gray-faint' },
+  { id: 'aplicada', label: 'Aplicada', bg: 'bg-mint-light', border: 'border-mint' },
+  { id: 'entrevista_agendada', label: 'Entrevista Agendada', bg: 'bg-mint-light', border: 'border-mint' },
+  { id: 'aguardando_retorno', label: 'Aguardando Retorno', bg: 'bg-mint-light', border: 'border-mint' },
+  { id: 'entrevista_decisor', label: 'Entrevista c/ Decisor', bg: 'bg-mint-light', border: 'border-mint-deep' },
+  { id: 'case', label: 'Case', bg: 'bg-white', border: 'border-brown' },
+  { id: 'oferta', label: 'Oferta', bg: 'bg-mint-light', border: 'border-mint-deep' },
+  { id: 'lost', label: 'Lost', bg: 'bg-white', border: 'border-gray-faint' },
 ];
 
 const ORIGEM_COLORS: Record<string, string> = {
@@ -319,7 +319,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             <Zap size={14} />
             Jornada de Candidaturas
           </Eyebrow>
-          <h2 className="font-display text-3xl text-brown-deep">Kanban</h2>
+          <h2 className="font-display text-3xl text-black">Kanban</h2>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -332,7 +332,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           </button>
           <a
             href="/api/download-template-vagas"
-            className="flex items-center gap-2 bg-paper text-brown-deep border border-line px-4 py-2 rounded-lg hover:bg-cream transition-colors text-sm font-medium"
+            className="flex items-center gap-2 bg-white text-black border border-gray-faint px-4 py-2 rounded-lg hover:bg-white transition-colors text-sm font-medium"
             title="Baixa uma planilha em branco, já com as colunas certas"
           >
             <FileDown size={16} />
@@ -340,14 +340,14 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
           </a>
           <button
             onClick={() => setMostraImportacao(true)}
-            className="flex items-center gap-2 bg-sky-tint text-brown-deep border border-sky px-4 py-2 rounded-lg hover:bg-sky-tint/70 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 bg-mint-light text-black border border-mint px-4 py-2 rounded-lg hover:bg-mint-light/70 transition-colors text-sm font-medium"
           >
             <Upload size={16} />
             Importar Planilha
           </button>
           <button
             onClick={() => setMostraModalNova(true)}
-            className="flex items-center gap-2 bg-paper text-brown-deep border border-brown-deep px-4 py-2 rounded-lg hover:bg-cream transition-colors text-sm font-medium"
+            className="flex items-center gap-2 bg-white text-black border border-brown-deep px-4 py-2 rounded-lg hover:bg-white transition-colors text-sm font-medium"
           >
             <Plus size={16} />
             Adicionar Vaga
@@ -358,28 +358,28 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       {/* Modal de Importação com Template */}
       {mostraImportacao && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Panel className="max-w-2xl w-full border border-line">
-            <div className="sticky top-0 bg-paper border-b border-line p-6 flex items-start justify-between">
-              <h2 className="font-display text-2xl text-brown-deep">Template de Vagas</h2>
+          <Panel className="max-w-2xl w-full border border-gray-faint">
+            <div className="sticky top-0 bg-white border-b border-gray-faint p-6 flex items-start justify-between">
+              <h2 className="font-display text-2xl text-black">Template de Vagas</h2>
               <button
                 onClick={() => setMostraImportacao(false)}
-                className="text-ink-faint hover:text-ink transition"
+                className="text-gray-text hover:text-black transition"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="p-6 space-y-6">
-              <div className="bg-sky-tint border-2 border-sky p-4 rounded-lg">
-                <p className="text-sm text-sky-deep font-medium">
+              <div className="bg-mint-light border-2 border-mint p-4 rounded-lg">
+                <p className="text-sm text-mint font-medium">
                   💡 <strong>Como usar:</strong> Importe vagas de um arquivo Excel ou CSV (seu próprio ou do template abaixo)
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium text-brown-deep mb-3">O que está incluído no template:</h3>
-                  <ul className="text-sm text-ink space-y-2 ml-4">
+                  <h3 className="font-medium text-black mb-3">O que está incluído no template:</h3>
+                  <ul className="text-sm text-black space-y-2 ml-4">
                     <li>✓ Empresa</li>
                     <li>✓ Cargo</li>
                     <li>✓ Descrição da Vaga</li>
@@ -394,8 +394,8 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </div>
 
                 <div>
-                  <h3 className="font-medium text-brown-deep mb-3">Passo a passo:</h3>
-                  <ol className="text-sm text-ink space-y-2 ml-4 list-decimal">
+                  <h3 className="font-medium text-black mb-3">Passo a passo:</h3>
+                  <ol className="text-sm text-black space-y-2 ml-4 list-decimal">
                     <li>Baixe o template clicando no botão abaixo</li>
                     <li>Abra em Excel, Google Sheets ou Numbers</li>
                     <li>Preencha as linhas amarelas com suas vagas</li>
@@ -413,26 +413,26 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-deep mb-3">Selecione o arquivo para importar:</label>
+                  <label className="block text-sm font-medium text-black mb-3">Selecione o arquivo para importar:</label>
                   <input
                     type="file"
                     accept=".csv,.xlsx,.xls"
                     onChange={handleImportarArquivo}
-                    className="w-full px-4 py-3 border border-line rounded-lg cursor-pointer hover:border-brown-deep transition"
+                    className="w-full px-4 py-3 border border-gray-faint rounded-lg cursor-pointer hover:border-brown-deep transition"
                   />
                 </div>
 
                 <div className="flex gap-3">
                   <a
                     href="/api/download-template-vagas"
-                    className="flex-1 bg-sky-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-sky-deep/90 transition text-center flex items-center justify-center gap-2"
+                    className="flex-1 bg-mint-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-mint-deep/90 transition text-center flex items-center justify-center gap-2"
                   >
                     <Download size={18} />
                     Baixar Template (XLSX)
                   </a>
                   <button
                     onClick={() => setMostraImportacao(false)}
-                    className="flex-1 border border-line text-ink px-6 py-3 rounded-lg font-medium hover:bg-cream transition"
+                    className="flex-1 border border-gray-faint text-black px-6 py-3 rounded-lg font-medium hover:bg-white transition"
                   >
                     Fechar
                   </button>
@@ -443,7 +443,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
         </div>
       )}
 
-      <div className="overflow-x-auto pb-4 border border-line rounded-lg bg-paper">
+      <div className="overflow-x-auto pb-4 border border-gray-faint rounded-lg bg-white">
         <div className="flex gap-4 p-4 min-w-max">
           {ETAPAS.map((etapa, etapaIndex) => {
             const vagasEtapa = vagas.filter((v) => v.etapa === etapa.id);
@@ -454,17 +454,17 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 className={`flex-shrink-0 w-80 ${etapa.bg} rounded-xl p-4 border-2 ${etapa.border}`}
               >
                 <div className="mb-4">
-                  <h3 className="font-medium text-brown-deep">{etapa.label}</h3>
-                  <p className="text-xs text-ink-faint mt-1">{vagasEtapa.length} vaga{vagasEtapa.length !== 1 ? 's' : ''}</p>
+                  <h3 className="font-medium text-black">{etapa.label}</h3>
+                  <p className="text-xs text-gray-text mt-1">{vagasEtapa.length} vaga{vagasEtapa.length !== 1 ? 's' : ''}</p>
                 </div>
 
                 <div
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, etapa.id)}
-                  className="space-y-3 min-h-[400px] rounded-lg border-2 border-dashed border-line p-3"
+                  className="space-y-3 min-h-[400px] rounded-lg border-2 border-dashed border-gray-faint p-3"
                 >
                   {vagasEtapa.length === 0 ? (
-                    <div className="text-center text-ink-faint text-sm py-12">
+                    <div className="text-center text-gray-text text-sm py-12">
                       Nenhuma vaga
                     </div>
                   ) : (
@@ -474,18 +474,18 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                         draggable
                         onDragStart={() => setDraggedVaga(vaga)}
                         onDragEnd={() => setDraggedVaga(null)}
-                        className="bg-paper p-3 rounded-lg border border-line cursor-move hover:shadow-md hover:border-sky transition group"
+                        className="bg-white p-3 rounded-lg border border-gray-faint cursor-move hover:shadow-md hover:border-mint transition group"
                       >
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-ink truncate text-sm">
+                            <p className="font-medium text-black truncate text-sm">
                               {vaga.cargo}
                             </p>
-                            <p className="text-xs text-ink-soft truncate">{vaga.empresa}</p>
+                            <p className="text-xs text-gray-text truncate">{vaga.empresa}</p>
                           </div>
                           <button
                             onClick={() => setModalVaga(vaga)}
-                            className="text-ink-faint hover:text-ink text-xs shrink-0"
+                            className="text-gray-text hover:text-black text-xs shrink-0"
                           >
                             ✎
                           </button>
@@ -504,11 +504,11 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                         )}
 
                         {vaga.contato && (
-                          <p className="text-xs text-ink-soft mt-2 truncate">📱 {vaga.contato}</p>
+                          <p className="text-xs text-gray-text mt-2 truncate">📱 {vaga.contato}</p>
                         )}
 
                         {vaga.descricao_vaga && (
-                          <p className="text-xs text-ink-soft mt-2 line-clamp-2">
+                          <p className="text-xs text-gray-text mt-2 line-clamp-2">
                             {vaga.descricao_vaga}
                           </p>
                         )}
@@ -520,9 +520,9 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                               moveToColumn(vaga, 'prev');
                             }}
                             disabled={etapaIndex === 0 || atualizando}
-                            className="p-1 hover:bg-sky hover:bg-opacity-20 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-1 hover:bg-mint hover:bg-opacity-20 rounded disabled:opacity-30 disabled:cursor-not-allowed"
                           >
-                            <ChevronLeft size={16} className="text-sky-deep" />
+                            <ChevronLeft size={16} className="text-mint" />
                           </button>
                           <button
                             onClick={(e) => {
@@ -530,9 +530,9 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                               moveToColumn(vaga, 'next');
                             }}
                             disabled={etapaIndex === ETAPAS.length - 1 || atualizando}
-                            className="p-1 hover:bg-sky hover:bg-opacity-20 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-1 hover:bg-mint hover:bg-opacity-20 rounded disabled:opacity-30 disabled:cursor-not-allowed"
                           >
-                            <ChevronRight size={16} className="text-sky-deep" />
+                            <ChevronRight size={16} className="text-mint" />
                           </button>
                         </div>
                       </div>
@@ -547,12 +547,12 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
       {mostraModalNova && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Panel className="max-w-2xl w-full border border-line">
-            <div className="bg-paper border-b border-line p-6 flex items-start justify-between">
-              <h2 className="font-display text-2xl text-brown-deep">Adicionar Nova Vaga</h2>
+          <Panel className="max-w-2xl w-full border border-gray-faint">
+            <div className="bg-white border-b border-gray-faint p-6 flex items-start justify-between">
+              <h2 className="font-display text-2xl text-black">Adicionar Nova Vaga</h2>
               <button
                 onClick={() => setMostraModalNova(false)}
-                className="text-ink-faint hover:text-ink transition"
+                className="text-gray-text hover:text-black transition"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -560,56 +560,56 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-brown-deep mb-2">Empresa *</label>
+                <label className="block text-sm font-medium text-black mb-2">Empresa *</label>
                 <input
                   type="text"
                   value={novaVaga.empresa}
                   onChange={(e) => setNovaVaga({ ...novaVaga, empresa: e.target.value })}
-                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                   placeholder="Nome da empresa"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-brown-deep mb-2">Cargo *</label>
+                <label className="block text-sm font-medium text-black mb-2">Cargo *</label>
                 <input
                   type="text"
                   value={novaVaga.cargo}
                   onChange={(e) => setNovaVaga({ ...novaVaga, cargo: e.target.value })}
-                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                   placeholder="Descrição do cargo"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-brown-deep mb-2">Link da Vaga</label>
+                <label className="block text-sm font-medium text-black mb-2">Link da Vaga</label>
                 <input
                   type="url"
                   value={novaVaga.link_vaga}
                   onChange={(e) => setNovaVaga({ ...novaVaga, link_vaga: e.target.value })}
-                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                   placeholder="https://..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-brown-deep mb-2">Contato</label>
+                <label className="block text-sm font-medium text-black mb-2">Contato</label>
                 <input
                   type="text"
                   value={novaVaga.contato}
                   onChange={(e) => setNovaVaga({ ...novaVaga, contato: e.target.value })}
-                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                   placeholder="Email, telefone ou nome do contato"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-brown-deep mb-2">Descrição da Vaga</label>
+                <label className="block text-sm font-medium text-black mb-2">Descrição da Vaga</label>
                 <textarea
                   value={novaVaga.descricao_vaga}
                   onChange={(e) => setNovaVaga({ ...novaVaga, descricao_vaga: e.target.value })}
                   rows={4}
-                  className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                   placeholder="Cole a descrição completa da vaga..."
                 />
               </div>
@@ -624,7 +624,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 </button>
                 <button
                   onClick={() => setMostraModalNova(false)}
-                  className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                  className="flex-1 border border-gray-faint text-black px-4 py-2 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancelar
                 </button>
@@ -636,28 +636,28 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
       {modalVaga && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Panel className="max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-line">
-            <div className="sticky top-0 bg-paper border-b border-line p-6 flex items-start justify-between">
+          <Panel className="max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-faint">
+            <div className="sticky top-0 bg-white border-b border-gray-faint p-6 flex items-start justify-between">
               <div>
                 {editandoVaga ? (
                   <input
                     type="text"
                     value={vagaEditada.cargo ?? modalVaga.cargo}
                     onChange={(e) => setVagaEditada({ ...vagaEditada, cargo: e.target.value })}
-                    className="text-2xl font-display text-brown-deep w-full mb-2 px-3 py-2 border border-line rounded-lg"
+                    className="text-2xl font-display text-black w-full mb-2 px-3 py-2 border border-gray-faint rounded-lg"
                   />
                 ) : (
-                  <h2 className="font-display text-2xl text-brown-deep">{modalVaga.cargo}</h2>
+                  <h2 className="font-display text-2xl text-black">{modalVaga.cargo}</h2>
                 )}
                 {editandoVaga ? (
                   <input
                     type="text"
                     value={vagaEditada.empresa ?? modalVaga.empresa}
                     onChange={(e) => setVagaEditada({ ...vagaEditada, empresa: e.target.value })}
-                    className="text-sm text-ink-soft w-full px-3 py-2 border border-line rounded-lg mt-2"
+                    className="text-sm text-gray-text w-full px-3 py-2 border border-gray-faint rounded-lg mt-2"
                   />
                 ) : (
-                  <p className="text-ink-soft text-sm mt-1">{modalVaga.empresa}</p>
+                  <p className="text-gray-text text-sm mt-1">{modalVaga.empresa}</p>
                 )}
               </div>
               <button
@@ -669,7 +669,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                     setModalVaga(null);
                   }
                 }}
-                className="text-ink-faint hover:text-ink transition"
+                className="text-gray-text hover:text-black transition"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -677,61 +677,61 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
             <div className="p-6 space-y-6">
               {modalVaga.fit_score !== null && (
-                <Panel className="p-4 bg-sky-tint border border-sky">
-                  <p className="text-sm text-sky-deep font-medium">Compatibilidade</p>
-                  <p className="text-4xl font-display text-sky-deep mt-1">{modalVaga.fit_score}%</p>
+                <Panel className="p-4 bg-mint-light border border-mint">
+                  <p className="text-sm text-mint font-medium">Compatibilidade</p>
+                  <p className="text-4xl font-display text-mint mt-1">{modalVaga.fit_score}%</p>
                 </Panel>
               )}
 
               {editandoVaga ? (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-brown-deep mb-2">Descrição da Vaga</label>
+                    <label className="block text-sm font-medium text-black mb-2">Descrição da Vaga</label>
                     <textarea
                       value={vagaEditada.descricao_vaga ?? modalVaga.descricao_vaga ?? ''}
                       onChange={(e) => setVagaEditada({ ...vagaEditada, descricao_vaga: e.target.value })}
                       rows={4}
-                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-brown-deep mb-2">Link da Vaga</label>
+                    <label className="block text-sm font-medium text-black mb-2">Link da Vaga</label>
                     <input
                       type="url"
                       value={vagaEditada.link_vaga ?? modalVaga.link_vaga ?? ''}
                       onChange={(e) => setVagaEditada({ ...vagaEditada, link_vaga: e.target.value })}
-                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-brown-deep mb-2">Contato</label>
+                    <label className="block text-sm font-medium text-black mb-2">Contato</label>
                     <input
                       type="text"
                       value={vagaEditada.contato ?? modalVaga.contato ?? ''}
                       onChange={(e) => setVagaEditada({ ...vagaEditada, contato: e.target.value })}
-                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-brown-deep mb-2">Próximo Passo</label>
+                    <label className="block text-sm font-medium text-black mb-2">Próximo Passo</label>
                     <input
                       type="text"
                       value={vagaEditada.proximo_passo ?? modalVaga.proximo_passo ?? ''}
                       onChange={(e) => setVagaEditada({ ...vagaEditada, proximo_passo: e.target.value })}
-                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-brown-deep mb-2">Observações</label>
+                    <label className="block text-sm font-medium text-black mb-2">Observações</label>
                     <textarea
                       value={vagaEditada.observacoes ?? modalVaga.observacoes ?? ''}
                       onChange={(e) => setVagaEditada({ ...vagaEditada, observacoes: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-brown-deep focus:border-transparent"
                     />
                   </div>
 
@@ -748,7 +748,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                         setEditandoVaga(false);
                         setVagaEditada({});
                       }}
-                      className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                      className="flex-1 border border-gray-faint text-black px-4 py-2 rounded-lg hover:bg-white transition-colors"
                     >
                       Cancelar
                     </button>
@@ -765,8 +765,8 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 <>
                   {modalVaga.descricao_vaga && (
                     <div>
-                      <h3 className="font-medium text-brown-deep mb-2">Descrição da Vaga</h3>
-                      <p className="text-ink whitespace-pre-wrap text-sm leading-relaxed">
+                      <h3 className="font-medium text-black mb-2">Descrição da Vaga</h3>
+                      <p className="text-black whitespace-pre-wrap text-sm leading-relaxed">
                         {modalVaga.descricao_vaga}
                       </p>
                     </div>
@@ -774,12 +774,12 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
                   {modalVaga.link_vaga && (
                     <div>
-                      <h3 className="font-medium text-brown-deep mb-2">Link da Vaga</h3>
+                      <h3 className="font-medium text-black mb-2">Link da Vaga</h3>
                       <a
                         href={modalVaga.link_vaga}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sky-deep hover:text-sky-deep/80 underline break-all text-sm"
+                        className="text-mint hover:text-mint/80 underline break-all text-sm"
                       >
                         {modalVaga.link_vaga}
                       </a>
@@ -788,22 +788,22 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
                   {modalVaga.contato && (
                     <div>
-                      <h3 className="font-medium text-brown-deep mb-2">Contato</h3>
-                      <p className="text-ink text-sm">{modalVaga.contato}</p>
+                      <h3 className="font-medium text-black mb-2">Contato</h3>
+                      <p className="text-black text-sm">{modalVaga.contato}</p>
                     </div>
                   )}
 
                   {modalVaga.proximo_passo && (
                     <div>
-                      <h3 className="font-medium text-brown-deep mb-2">Próximo Passo</h3>
-                      <p className="text-ink text-sm">{modalVaga.proximo_passo}</p>
+                      <h3 className="font-medium text-black mb-2">Próximo Passo</h3>
+                      <p className="text-black text-sm">{modalVaga.proximo_passo}</p>
                     </div>
                   )}
 
                   {modalVaga.observacoes && (
                     <div>
-                      <h3 className="font-medium text-brown-deep mb-2">Observações</h3>
-                      <p className="text-ink text-sm">{modalVaga.observacoes}</p>
+                      <h3 className="font-medium text-black mb-2">Observações</h3>
+                      <p className="text-black text-sm">{modalVaga.observacoes}</p>
                     </div>
                   )}
 
@@ -816,7 +816,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                     </button>
                     <button
                       onClick={() => setModalVaga(null)}
-                      className="flex-1 border border-line text-ink px-4 py-2 rounded-lg hover:bg-cream transition-colors"
+                      className="flex-1 border border-gray-faint text-black px-4 py-2 rounded-lg hover:bg-white transition-colors"
                     >
                       Fechar
                     </button>

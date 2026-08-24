@@ -71,19 +71,19 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
 
   return (
     <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-      <Link href="/admin" className="text-sky-deep hover:text-brown-deep text-sm mb-6 inline-flex items-center gap-1">
+      <Link href="/admin" className="text-mint hover:text-black text-sm mb-6 inline-flex items-center gap-1">
         <ArrowLeft size={14} /> Voltar
       </Link>
 
       <Eyebrow>Editar Permissões</Eyebrow>
-      <h1 className="font-display text-3xl text-brown-deep mb-1">{usuario.nome}</h1>
-      <p className="text-sm text-ink-faint mb-8">{usuario.email}</p>
+      <h1 className="font-display text-3xl text-black mb-1">{usuario.nome}</h1>
+      <p className="text-sm text-gray-text mb-8">{usuario.email}</p>
 
-      <Panel className="p-6 border-line mb-6">
-        <p className="text-xs uppercase tracking-wide text-ink-faint font-medium mb-4">Módulos de acesso</p>
+      <Panel className="p-6 border-gray-faint mb-6">
+        <p className="text-xs uppercase tracking-wide text-gray-text font-medium mb-4">Módulos de acesso</p>
         <div className="space-y-3">
           {MODULOS.map((mod) => (
-            <label key={mod.id} className="flex items-start gap-3 p-2 rounded hover:bg-cream cursor-pointer">
+            <label key={mod.id} className="flex items-start gap-3 p-2 rounded hover:bg-white cursor-pointer">
               <input
                 type="checkbox"
                 checked={permissoes[mod.id] ?? false}
@@ -91,8 +91,8 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
                 className="w-4 h-4 mt-0.5 accent-lotus-brown"
               />
               <div className="flex-1 text-sm">
-                <p className="font-medium text-ink">{mod.nome}</p>
-                <p className="text-xs text-ink-faint">{mod.descricao}</p>
+                <p className="font-medium text-black">{mod.nome}</p>
+                <p className="text-xs text-gray-text">{mod.descricao}</p>
               </div>
             </label>
           ))}
@@ -116,7 +116,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
         </button>
         <Link
           href="/admin"
-          className="px-4 py-2.5 rounded-lg border border-line hover:border-lotus-brown text-sm font-medium text-ink hover:text-brown-deep transition-colors"
+          className="px-4 py-2.5 rounded-lg border border-gray-faint hover:border-lotus-brown text-sm font-medium text-black hover:text-black transition-colors"
         >
           Cancelar
         </Link>

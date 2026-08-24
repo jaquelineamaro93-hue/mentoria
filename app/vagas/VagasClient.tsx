@@ -61,7 +61,7 @@ export default function VagasClient({
   };
 
   return (
-    <div className="flex h-screen bg-cream">
+    <div className="flex h-screen bg-white">
       <Sidebar profile={profile} />
 
       <div className="flex-1 overflow-auto">
@@ -72,20 +72,20 @@ export default function VagasClient({
               <Briefcase size={14} />
               Gestão de Candidaturas
             </Eyebrow>
-            <h1 className="font-display text-4xl text-brown-deep mb-2">Controle de Vagas</h1>
-            <p className="text-ink-soft text-sm">
+            <h1 className="font-display text-4xl text-black mb-2">Controle de Vagas</h1>
+            <p className="text-gray-text text-sm">
               Acompanhe suas candidaturas a vagas de emprego durante sua jornada de transição de carreira
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-1 mb-6 border-b border-line">
+          <div className="flex gap-1 mb-6 border-b border-gray-faint">
             <button
               onClick={() => setTab('analise')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'analise'
-                  ? 'border-sky-deep text-sky-deep'
-                  : 'border-transparent text-ink-soft hover:text-ink'
+                  ? 'border-mint-deep text-mint'
+                  : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
               <Zap className="w-4 h-4" />
@@ -96,8 +96,8 @@ export default function VagasClient({
               onClick={() => setTab('kanban')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'kanban'
-                  ? 'border-sky-deep text-sky-deep'
-                  : 'border-transparent text-ink-soft hover:text-ink'
+                  ? 'border-mint-deep text-mint'
+                  : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
               <BarChart3 className="w-4 h-4" />
@@ -108,8 +108,8 @@ export default function VagasClient({
               onClick={() => setTab('ranking')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'ranking'
-                  ? 'border-sky-deep text-sky-deep'
-                  : 'border-transparent text-ink-soft hover:text-ink'
+                  ? 'border-mint-deep text-mint'
+                  : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
               <TrendingUp className="w-4 h-4" />
@@ -121,7 +121,7 @@ export default function VagasClient({
           <Panel className="p-6">
             {loading ? (
               <div className="text-center py-12">
-                <div className="text-ink-soft">Carregando vagas...</div>
+                <div className="text-gray-text">Carregando vagas...</div>
               </div>
             ) : (
               <>

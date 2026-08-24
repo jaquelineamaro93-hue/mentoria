@@ -60,7 +60,7 @@ export default function RankingComunidade() {
   if (carregando) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader className="w-6 h-6 animate-spin text-brown-deep" />
+        <Loader className="w-6 h-6 animate-spin text-black" />
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function RankingComunidade() {
         <Zap size={14} />
         Ranking de Aceleração SOMA
       </Eyebrow>
-      <p className="text-sm text-ink-soft mb-6">
+      <p className="text-sm text-gray-text mb-6">
         Mentores e mentorados mais engajados com a própria evolução.
       </p>
 
@@ -80,29 +80,29 @@ export default function RankingComunidade() {
           <div className="flex items-flex-end justify-center gap-3">
             {top3[1] && (
               <div className="text-center flex flex-col items-center">
-                <div className="w-24 h-60 bg-gradient-to-b from-paper to-cream rounded-t-xl border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
+                <div className="w-24 h-60 bg-gradient-to-b from-paper to-cream rounded-t-xl border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
                   <span className="text-4xl mb-3">🥈</span>
                   {top3[1].foto_url ? (
                     <img
                       src={top3[1].foto_url}
                       alt={top3[1].nome}
-                      className="w-12 h-12 rounded-full object-cover mb-3 border border-line"
+                      className="w-12 h-12 rounded-full object-cover mb-3 border border-gray-faint"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-brown text-white text-xs font-bold flex items-center justify-center mb-3 border border-line">
+                    <div className="w-12 h-12 rounded-full bg-brown text-white text-xs font-bold flex items-center justify-center mb-3 border border-gray-faint">
                       {getIniciais(top3[1].nome)}
                     </div>
                   )}
-                  <p className="text-xs font-bold text-brown-deep text-center px-2 line-clamp-2">
+                  <p className="text-xs font-bold text-black text-center px-2 line-clamp-2">
                     {top3[1].nome}
                   </p>
-                  <p className="text-[10px] text-brown-deep mt-2 font-bold">
+                  <p className="text-[10px] text-black mt-2 font-bold">
                     {top3[1].pontos.toLocaleString('pt-BR')}
                   </p>
-                  <p className="text-[9px] text-ink-faint">Impulsos</p>
+                  <p className="text-[9px] text-gray-text">Impulsos</p>
                 </div>
-                <div className="w-full h-6 bg-gradient-to-b from-line to-line/50 border border-line border-t-0 rounded-b-lg flex items-center justify-center">
-                  <span className="text-xs font-bold text-ink-soft">2º</span>
+                <div className="w-full h-6 bg-gradient-to-b from-line to-line/50 border border-gray-faint border-t-0 rounded-b-lg flex items-center justify-center">
+                  <span className="text-xs font-bold text-gray-text">2º</span>
                 </div>
               </div>
             )}
@@ -123,13 +123,13 @@ export default function RankingComunidade() {
                       {getIniciais(top3[0].nome)}
                     </div>
                   )}
-                  <p className="text-sm font-bold text-brown-deep text-center px-3 line-clamp-2">
+                  <p className="text-sm font-bold text-black text-center px-3 line-clamp-2">
                     {top3[0].nome}
                   </p>
-                  <p className="text-sm text-brown-deep mt-2 font-bold">
+                  <p className="text-sm text-black mt-2 font-bold">
                     {top3[0].pontos.toLocaleString('pt-BR')}
                   </p>
-                  <p className="text-xs text-brown-deep font-bold">Impulsos</p>
+                  <p className="text-xs text-black font-bold">Impulsos</p>
                 </div>
                 <div className="w-full h-8 bg-gradient-to-b from-brown-deep to-brown rounded-b-2xl border-4 border-brown-deep border-t-0 flex items-center justify-center">
                   <span className="text-lg font-bold text-paper">1º</span>
@@ -139,29 +139,29 @@ export default function RankingComunidade() {
 
             {top3[2] && (
               <div className="text-center flex flex-col items-center">
-                <div className="w-24 h-56 bg-gradient-to-b from-paper to-cream rounded-t-lg border-2 border-line flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
+                <div className="w-24 h-56 bg-gradient-to-b from-paper to-cream rounded-t-lg border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
                   <span className="text-4xl mb-3">🥉</span>
                   {top3[2].foto_url ? (
                     <img
                       src={top3[2].foto_url}
                       alt={top3[2].nome}
-                      className="w-12 h-12 rounded-full object-cover mb-3 border border-line"
+                      className="w-12 h-12 rounded-full object-cover mb-3 border border-gray-faint"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-brown text-white text-xs font-bold flex items-center justify-center mb-3 border border-line">
+                    <div className="w-12 h-12 rounded-full bg-brown text-white text-xs font-bold flex items-center justify-center mb-3 border border-gray-faint">
                       {getIniciais(top3[2].nome)}
                     </div>
                   )}
-                  <p className="text-xs font-bold text-brown-deep text-center px-2 line-clamp-2">
+                  <p className="text-xs font-bold text-black text-center px-2 line-clamp-2">
                     {top3[2].nome}
                   </p>
-                  <p className="text-[10px] text-brown-deep mt-2 font-bold">
+                  <p className="text-[10px] text-black mt-2 font-bold">
                     {top3[2].pontos.toLocaleString('pt-BR')}
                   </p>
-                  <p className="text-[9px] text-ink-faint">Impulsos</p>
+                  <p className="text-[9px] text-gray-text">Impulsos</p>
                 </div>
-                <div className="w-full h-6 bg-gradient-to-b from-line to-line/50 border border-line border-t-0 rounded-b-lg flex items-center justify-center">
-                  <span className="text-xs font-bold text-ink-soft">3º</span>
+                <div className="w-full h-6 bg-gradient-to-b from-line to-line/50 border border-gray-faint border-t-0 rounded-b-lg flex items-center justify-center">
+                  <span className="text-xs font-bold text-gray-text">3º</span>
                 </div>
               </div>
             )}
@@ -170,9 +170,9 @@ export default function RankingComunidade() {
       )}
 
       {usuarioLogado?.posicao && usuarioLogado.posicao > 3 && (
-        <Panel className="p-6 bg-sky-tint border-2 border-sky mb-8">
-          <p className="text-sm text-sky-deep font-medium">Sua Posição</p>
-          <p className="text-3xl font-display text-sky-deep mt-1">
+        <Panel className="p-6 bg-mint-light border-2 border-mint mb-8">
+          <p className="text-sm text-mint font-medium">Sua Posição</p>
+          <p className="text-3xl font-display text-mint mt-1">
             {usuarioLogado.posicao}º lugar
           </p>
         </Panel>
@@ -180,19 +180,19 @@ export default function RankingComunidade() {
 
       {resto.length > 0 && (
         <div className="space-y-4">
-          <h3 className="font-medium text-brown-deep mb-4">Próximos Classificados</h3>
-          <Panel className="p-0 overflow-hidden border border-line">
+          <h3 className="font-medium text-black mb-4">Próximos Classificados</h3>
+          <Panel className="p-0 overflow-hidden border border-gray-faint">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-cream border-b border-line">
+                <thead className="bg-white border-b border-gray-faint">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-ink-soft uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-text uppercase tracking-wider">
                       Posição
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-ink-soft uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-text uppercase tracking-wider">
                       Mentorado
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold text-ink-soft uppercase tracking-wider">
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-text uppercase tracking-wider">
                       Impulsos
                     </th>
                   </tr>
@@ -204,14 +204,14 @@ export default function RankingComunidade() {
                       key={item.userId}
                       className={`transition ${
                         item.userId === usuarioLogado?.userId
-                          ? 'bg-sky-tint border-l-4 border-sky'
+                          ? 'bg-mint-light border-l-4 border-mint'
                           : idx % 2 === 0
                             ? 'bg-white'
-                            : 'bg-cream'
+                            : 'bg-white'
                       }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-lg font-bold text-brown-deep">
+                        <span className="text-lg font-bold text-black">
                           {item.posicao}º
                         </span>
                       </td>
@@ -229,14 +229,14 @@ export default function RankingComunidade() {
                               {getIniciais(item.nome)}
                             </div>
                           )}
-                          <span className="text-sm font-medium text-ink">
+                          <span className="text-sm font-medium text-black">
                             {item.nome}
                           </span>
                         </div>
                       </td>
 
                       <td className="px-6 py-4 text-right">
-                        <span className="text-lg font-bold text-brown-deep">
+                        <span className="text-lg font-bold text-black">
                           {item.pontos.toLocaleString('pt-BR')} Impulsos
                         </span>
                       </td>
@@ -249,11 +249,11 @@ export default function RankingComunidade() {
         </div>
       )}
 
-      <Panel className="p-4 bg-emerald-light border border-line">
-        <p className="text-xs text-ink-soft mb-3 font-medium">
+      <Panel className="p-4 bg-emerald-light border border-gray-faint">
+        <p className="text-xs text-gray-text mb-3 font-medium">
           Como ganhar Impulsos:
         </p>
-        <ul className="space-y-1.5 text-xs text-ink">
+        <ul className="space-y-1.5 text-xs text-black">
           <li><span className="font-bold">+50 Impulsos</span> ao importar PDF do LinkedIn</li>
           <li><span className="font-bold">+20 Impulsos</span> por cada análise de fit realizada</li>
           <li><span className="font-bold">+100 Impulsos</span> por vaga em Entrevista Agendada</li>

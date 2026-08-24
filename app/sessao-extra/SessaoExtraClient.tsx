@@ -55,18 +55,18 @@ export default function SessaoExtraClient({
       <Sidebar profile={perfil as Profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Sessão Individual</p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Compre sua sessão extra</h1>
-        <p className="text-sm text-ink-faint max-w-xl mb-8">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Sessão Individual</p>
+        <h1 className="font-display text-3xl text-black mb-1">Compre sua sessão extra</h1>
+        <p className="text-sm text-gray-text max-w-xl mb-8">
           Você é mentorado(a) SOMA. Aqui você consegue comprar sessões individuais extras com seu mentor/mentora.
         </p>
 
         <div className="bg-white border-2 border-brown-deep rounded-2xl p-8 mb-8">
           <div className="flex items-start gap-4 mb-8">
-            <Clock size={24} className="text-brown-deep flex-shrink-0 mt-1" />
+            <Clock size={24} className="text-black flex-shrink-0 mt-1" />
             <div>
-              <h2 className="font-display text-xl text-brown-deep mb-2">Sessão Individual Extra</h2>
-              <p className="text-sm text-ink-faint mb-4">
+              <h2 className="font-display text-xl text-black mb-2">Sessão Individual Extra</h2>
+              <p className="text-sm text-gray-text mb-4">
                 Duração: 60 minutos
                 <br />
                 Formato: Online via Google Meet
@@ -76,9 +76,9 @@ export default function SessaoExtraClient({
             </div>
           </div>
 
-          <div className="bg-cream rounded-xl p-6 mb-8">
-            <p className="text-sm text-ink-faint mb-2">Valor único</p>
-            <p className="font-display text-3xl text-brown-deep">R$ 200,00</p>
+          <div className="bg-white rounded-xl p-6 mb-8">
+            <p className="text-sm text-gray-text mb-2">Valor único</p>
+            <p className="font-display text-3xl text-black">R$ 200,00</p>
           </div>
 
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8">
@@ -99,7 +99,7 @@ export default function SessaoExtraClient({
           </button>
         </div>
 
-        <p className="text-xs text-ink-faint text-center">
+        <p className="text-xs text-gray-text text-center">
           Dúvidas? Fale com seu mentor/mentora por email ou WhatsApp.
         </p>
       </main>

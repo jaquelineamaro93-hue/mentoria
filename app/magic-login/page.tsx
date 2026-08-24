@@ -71,11 +71,11 @@ function MagicLoginContent() {
     <div className="min-h-screen w-full flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <p className="font-display text-4xl tracking-wide text-brown-deep">
-            SOMA <span className="text-sky-deep">MENTORIA</span>
+          <p className="font-display text-4xl tracking-wide text-black">
+            SOMA <span className="text-mint">MENTORIA</span>
           </p>
           <div className="h-px w-12 bg-brown mx-auto my-3" />
-          <p className="text-xs uppercase tracking-[0.25em] text-ink-faint">
+          <p className="text-xs uppercase tracking-[0.25em] text-gray-text">
             Entrar com código
           </p>
         </div>
@@ -88,11 +88,11 @@ function MagicLoginContent() {
           </div>
         )}
 
-        <div className="bg-white border-2 border-line rounded-2xl p-8">
+        <div className="bg-white border-2 border-gray-faint rounded-2xl p-8">
           {stage === 'email' ? (
             <>
-              <h2 className="font-display text-xl text-brown-deep mb-1">Entrar</h2>
-              <p className="text-sm text-ink-faint mb-6">
+              <h2 className="font-display text-xl text-black mb-1">Entrar</h2>
+              <p className="text-sm text-gray-text mb-6">
                 Digite seu email para receber um código
               </p>
 
@@ -105,7 +105,7 @@ function MagicLoginContent() {
 
               <form onSubmit={handleSendCode} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-brown-deep mb-2">
+                  <label className="block text-xs font-medium text-black mb-2">
                     E-mail
                   </label>
                   <input
@@ -113,7 +113,7 @@ function MagicLoginContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
+                    className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
                     disabled={loading}
                     required
                   />
@@ -128,16 +128,16 @@ function MagicLoginContent() {
                 </button>
               </form>
 
-              <p className="text-xs text-ink-faint text-center mt-6">
-                <a href="/login" className="text-brown-deep hover:underline font-medium">
+              <p className="text-xs text-gray-text text-center mt-6">
+                <a href="/login" className="text-black hover:underline font-medium">
                   Voltar ao login
                 </a>
               </p>
             </>
           ) : (
             <>
-              <h2 className="font-display text-xl text-brown-deep mb-1">Seu código</h2>
-              <p className="text-sm text-ink-faint mb-6">
+              <h2 className="font-display text-xl text-black mb-1">Seu código</h2>
+              <p className="text-sm text-gray-text mb-6">
                 Enviamos um código para<br /><strong>{email}</strong>
               </p>
 
@@ -150,7 +150,7 @@ function MagicLoginContent() {
 
               <form onSubmit={handleVerifyCode} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-brown-deep mb-2">
+                  <label className="block text-xs font-medium text-black mb-2">
                     Código (6 dígitos)
                   </label>
                   <input
@@ -159,7 +159,7 @@ function MagicLoginContent() {
                     onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="000000"
                     maxLength={6}
-                    className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors text-center text-2xl tracking-widest font-display"
+                    className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep transition-colors text-center text-2xl tracking-widest font-display"
                     disabled={loading}
                     required
                   />
@@ -183,7 +183,7 @@ function MagicLoginContent() {
                     setErro('');
                     setCode('');
                   }}
-                  className="flex-1 text-brown-deep hover:underline font-medium"
+                  className="flex-1 text-black hover:underline font-medium"
                 >
                   Usar outro email
                 </button>
@@ -211,7 +211,7 @@ function MagicLoginContent() {
                     }
                   }}
                   disabled={loading}
-                  className="flex-1 text-brown-deep hover:underline font-medium disabled:opacity-50"
+                  className="flex-1 text-black hover:underline font-medium disabled:opacity-50"
                 >
                   Reenviar código
                 </button>

@@ -92,11 +92,11 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-brown mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
             Registro pessoal
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl text-ink">Diário de Bordo</h1>
-          <p className="text-sm text-ink-faint mt-2">
+          <h1 className="font-display text-3xl sm:text-4xl text-black">Diário de Bordo</h1>
+          <p className="text-sm text-gray-text mt-2">
             Registre aprendizados, dúvidas e sacadas dos seus encontros individuais e em
             grupo.
           </p>
@@ -111,24 +111,24 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <label className="flex flex-col gap-1.5 flex-1">
-                  <span className="text-xs uppercase tracking-wide text-ink-faint">
+                  <span className="text-xs uppercase tracking-wide text-gray-text">
                     Data do encontro
                   </span>
                   <input
                     type="date"
                     value={encontroData}
                     onChange={(e) => setEncontroData(e.target.value)}
-                    className="bg-cream border border-line rounded-lg px-4 py-2.5 text-sm text-ink focus:border-sky-deep"
+                    className="bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                   />
                 </label>
                 <label className="flex flex-col gap-1.5 flex-1">
-                  <span className="text-xs uppercase tracking-wide text-ink-faint">
+                  <span className="text-xs uppercase tracking-wide text-gray-text">
                     Tipo de encontro
                   </span>
                   <select
                     value={tipoEncontro}
                     onChange={(e) => setTipoEncontro(e.target.value as TipoEncontro)}
-                    className="bg-cream border border-line rounded-lg px-4 py-2.5 text-sm text-ink focus:border-sky-deep"
+                    className="bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                   >
                     <option value="individual">Sessão individual</option>
                     <option value="grupo">Encontro em grupo</option>
@@ -138,7 +138,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
               </div>
 
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs uppercase tracking-wide text-ink-faint">
+                <span className="text-xs uppercase tracking-wide text-gray-text">
                   Anotações
                 </span>
                 <textarea
@@ -146,7 +146,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                   onChange={(e) => setAnotacoes(e.target.value)}
                   rows={5}
                   placeholder="O que você aprendeu, quais dúvidas surgiram, quais foram as principais sacadas?"
-                  className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+                  className="bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
                 />
               </label>
 
@@ -172,7 +172,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
           <Eyebrow>Histórico</Eyebrow>
 
           {notes.length === 0 ? (
-            <Panel className="p-6 text-sm text-ink-faint">
+            <Panel className="p-6 text-sm text-gray-text">
               Nenhuma anotação ainda. Registre a primeira acima.
             </Panel>
           ) : (
@@ -184,10 +184,10 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                       <span
                         className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide px-2 py-1 rounded-full border ${
                           note.tipo_encontro === 'individual'
-                            ? 'bg-sky-tint border-sky text-brown-deep'
+                            ? 'bg-mint-light border-mint text-black'
                             : note.tipo_encontro === 'pessoal'
                               ? 'bg-[#f1e6d6] border-brown/30 text-brown'
-                              : 'bg-sky-tint border-sky text-sky-deep'
+                              : 'bg-mint-light border-mint text-mint'
                         }`}
                       >
                         {note.tipo_encontro === 'individual' ? (
@@ -203,20 +203,20 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                             ? 'Pessoal'
                             : 'Grupo'}
                       </span>
-                      <span className="text-xs text-ink-faint">
+                      <span className="text-xs text-gray-text">
                         {new Date(note.encontro_data).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-sm text-ink leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
                     {note.anotacoes}
                   </p>
 
                   {note.ai_summary ? (
-                    <div className="mt-4 flex gap-2 rounded-lg bg-sky-tint border border-sky px-4 py-3">
-                      <Sparkles size={15} className="text-brown shrink-0 mt-0.5" />
-                      <p className="text-sm text-brown-deep/90 leading-relaxed">
+                    <div className="mt-4 flex gap-2 rounded-lg bg-mint-light border border-mint px-4 py-3">
+                      <Sparkles size={15} className="text-orange shrink-0 mt-0.5" />
+                      <p className="text-sm text-black/90 leading-relaxed">
                         {note.ai_summary}
                       </p>
                     </div>
@@ -224,7 +224,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                     <button
                       onClick={() => handleAnalisar(note)}
                       disabled={analisandoId === note.id}
-                      className="mt-4 flex items-center gap-2 text-xs text-brown-deep hover:text-brown-deep transition-colors disabled:opacity-60"
+                      className="mt-4 flex items-center gap-2 text-xs text-black hover:text-black transition-colors disabled:opacity-60"
                     >
                       {analisandoId === note.id ? (
                         <Loader2 size={13} className="animate-spin" />

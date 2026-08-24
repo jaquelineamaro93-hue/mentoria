@@ -84,13 +84,13 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gradient-to-br from-cream to-white flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl text-brown-deep mb-2">SOMA Mentoria</h1>
-          <p className="text-sm text-ink-faint">Portal do Mentorado</p>
+          <h1 className="font-display text-3xl text-black mb-2">SOMA Mentoria</h1>
+          <p className="text-sm text-gray-text">Portal do Mentorado</p>
         </div>
 
         {stage === 'request' ? (
           <form onSubmit={handleSolicitarEmail} className="bg-white border-2 border-brown-light rounded-2xl p-8">
-            <h2 className="font-display text-xl text-brown-deep mb-6">Esqueci minha senha</h2>
+            <h2 className="font-display text-xl text-black mb-6">Esqueci minha senha</h2>
 
             {sucesso && (
               <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-6">
@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="w-full px-4 py-3 border-2 border-line rounded-lg mb-6 focus:outline-none focus:border-brown-deep"
+              className="w-full px-4 py-3 border-2 border-gray-faint rounded-lg mb-6 focus:outline-none focus:border-brown-deep"
               disabled={carregando}
             />
 
@@ -133,12 +133,12 @@ export default function ResetPasswordPage() {
         ) : sucesso ? (
           <div className="bg-white border-2 border-green-500 rounded-2xl p-8 text-center">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
-            <h2 className="font-display text-xl text-brown-deep mb-2">Senha redefinida!</h2>
-            <p className="text-sm text-ink-faint">Redirecionando...</p>
+            <h2 className="font-display text-xl text-black mb-2">Senha redefinida!</h2>
+            <p className="text-sm text-gray-text">Redirecionando...</p>
           </div>
         ) : (
           <form onSubmit={handleRedefinirSenha} className="bg-white border-2 border-brown-light rounded-2xl p-8">
-            <h2 className="font-display text-xl text-brown-deep mb-6">Redefinir senha</h2>
+            <h2 className="font-display text-xl text-black mb-6">Redefinir senha</h2>
 
             {erro && (
               <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4 mb-6">
@@ -150,19 +150,19 @@ export default function ResetPasswordPage() {
             )}
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-brown-deep mb-2">Nova senha</label>
+              <label className="block text-xs font-medium text-black mb-2">Nova senha</label>
               <div className="relative">
                 <input
                   type={mostraSenha ? 'text' : 'password'}
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-line rounded-lg pr-10 focus:outline-none focus:border-brown-deep"
+                  className="w-full px-4 py-3 border-2 border-gray-faint rounded-lg pr-10 focus:outline-none focus:border-brown-deep"
                   disabled={carregando}
                 />
                 <button
                   type="button"
                   onClick={() => setMostraSenha(!mostraSenha)}
-                  className="absolute right-3 top-3 text-ink-faint hover:text-brown-deep"
+                  className="absolute right-3 top-3 text-gray-text hover:text-black"
                 >
                   {mostraSenha ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -170,12 +170,12 @@ export default function ResetPasswordPage() {
             </div>
 
             <div className="mb-6">
-              <label className="block text-xs font-medium text-brown-deep mb-2">Confirmar senha</label>
+              <label className="block text-xs font-medium text-black mb-2">Confirmar senha</label>
               <input
                 type="password"
                 value={confirmaSenha}
                 onChange={(e) => setConfirmaSenha(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-line rounded-lg focus:outline-none focus:border-brown-deep"
+                className="w-full px-4 py-3 border-2 border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep"
                 disabled={carregando}
               />
             </div>

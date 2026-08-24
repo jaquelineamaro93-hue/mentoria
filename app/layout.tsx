@@ -21,12 +21,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&family=Poppins:wght@300;400;500;600&display=swap"
           rel="stylesheet"
         />
         <script async defer src="https://accounts.google.com/gsi/client"></script>
       </head>
-      <body className="min-h-full flex flex-col bg-cream text-ink">
+      <body className="min-h-full flex flex-col bg-white text-black">
         <PostHogInit />
         <AcessoGate />
         <TermosGate />

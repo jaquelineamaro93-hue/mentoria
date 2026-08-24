@@ -180,11 +180,11 @@ export default function ExerciciosClient({
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-brown mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
             Área de diagnóstico
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl text-ink">Diagnóstico & Perfil</h1>
-          <p className="text-sm text-ink-faint mt-2">
+          <h1 className="font-display text-3xl sm:text-4xl text-black">Diagnóstico & Perfil</h1>
+          <p className="text-sm text-gray-text mt-2">
             Entenda onde você está agora e acompanhe como isso muda ao longo da mentoria.
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function ExerciciosClient({
           <Panel className="p-6">
             <div className="flex flex-col gap-5">
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs uppercase tracking-wide text-ink-faint">
+                <span className="text-xs uppercase tracking-wide text-gray-text">
                   Momento atual de carreira
                 </span>
                 <textarea
@@ -205,12 +205,12 @@ export default function ExerciciosClient({
                   onChange={(e) => setMomentoCarreira(e.target.value)}
                   rows={3}
                   placeholder="Descreva onde você está profissionalmente agora..."
-                  className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+                  className="bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
                 />
               </label>
 
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs uppercase tracking-wide text-ink-faint">
+                <span className="text-xs uppercase tracking-wide text-gray-text">
                   Objetivos com a mentoria
                 </span>
                 <textarea
@@ -218,12 +218,12 @@ export default function ExerciciosClient({
                   onChange={(e) => setObjetivos(e.target.value)}
                   rows={3}
                   placeholder="O que você quer alcançar até o fim do programa?"
-                  className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+                  className="bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
                 />
               </label>
 
               <div>
-                <span className="text-xs uppercase tracking-wide text-ink-faint block mb-2">
+                <span className="text-xs uppercase tracking-wide text-gray-text block mb-2">
                   Pontos fortes (selecione quantos quiser)
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -236,8 +236,8 @@ export default function ExerciciosClient({
                         onClick={() => toggleForca(forca)}
                         className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                           ativo
-                            ? 'bg-sky-tint border-sky text-brown-deep'
-                            : 'bg-cream border-line text-ink-faint hover:border-line hover:text-ink-soft'
+                            ? 'bg-mint-light border-mint text-black'
+                            : 'bg-white border-gray-faint text-gray-text hover:border-gray-faint hover:text-gray-text'
                         }`}
                       >
                         {forca}
@@ -248,7 +248,7 @@ export default function ExerciciosClient({
               </div>
 
               {mensagem && (
-                <p className="text-sm text-brown-deep bg-sky-tint border border-sky rounded-md px-4 py-2.5">
+                <p className="text-sm text-black bg-mint-light border border-mint rounded-md px-4 py-2.5">
                   {mensagem}
                 </p>
               )}
@@ -278,7 +278,7 @@ export default function ExerciciosClient({
           {viaResultado ? (
             <Panel className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-ink-faint">
+                <p className="text-sm text-gray-text">
                   Feito em{' '}
                   {new Date(viaResultado.data_teste + 'T00:00:00').toLocaleDateString('pt-BR')}
                 </p>
@@ -287,40 +287,40 @@ export default function ExerciciosClient({
                 {viaResultado.forcas.slice(0, 5).map((f, i) => (
                   <span
                     key={f}
-                    className="text-[11px] px-2.5 py-1 rounded-full bg-sky-tint border border-sky text-sky-deep"
+                    className="text-[11px] px-2.5 py-1 rounded-full bg-mint-light border border-mint text-mint"
                   >
                     {i + 1}º {f}
                   </span>
                 ))}
               </div>
               {viaResultado.analise_ia && (
-                <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
+                <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{viaResultado.analise_ia}</ReactMarkdown>
                 </div>
               )}
             </Panel>
           ) : (
             <Panel className="p-6">
-              <p className="text-sm text-ink mb-1">
+              <p className="text-sm text-black mb-1">
                 Você já fez o VIA em{' '}
                 <a
                   href="https://www.viacharacter.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sky-deep underline"
+                  className="text-mint underline"
                 >
                   viacharacter.org
                 </a>
                 ?
               </p>
-              <p className="text-sm text-ink-faint mb-5">
+              <p className="text-sm text-gray-text mb-5">
                 Envie o PDF do seu resultado (mais rápido) ou preencha manualmente as 24
                 forças na ordem exata, da 1ª (mais natural) à 24ª (mais escondida). Você
                 receberá uma análise gerada a partir da sua combinação única.
               </p>
 
               <div className="flex items-center gap-3 mb-5 flex-wrap">
-                <label className="flex items-center gap-2 text-sm bg-sky-tint hover:bg-sky/20 text-sky-deep px-4 py-2.5 rounded-full cursor-pointer transition-colors">
+                <label className="flex items-center gap-2 text-sm bg-mint-light hover:bg-mint/20 text-mint px-4 py-2.5 rounded-full cursor-pointer transition-colors">
                   {extraindoPdf ? (
                     <Loader2 size={15} className="animate-spin" />
                   ) : (
@@ -335,25 +335,25 @@ export default function ExerciciosClient({
                     onChange={handlePdfUpload}
                   />
                 </label>
-                <span className="text-xs text-ink-faint">ou preencha manualmente abaixo</span>
+                <span className="text-xs text-gray-text">ou preencha manualmente abaixo</span>
               </div>
 
               <label className="flex flex-col gap-1.5 mb-4 max-w-[220px]">
-                <span className="text-xs uppercase tracking-wide text-ink-faint">
+                <span className="text-xs uppercase tracking-wide text-gray-text">
                   Data em que fez o teste
                 </span>
                 <input
                   type="date"
                   value={viaData}
                   onChange={(e) => setViaData(e.target.value)}
-                  className="bg-cream border border-line rounded-lg px-4 py-2.5 text-sm text-ink focus:border-sky-deep"
+                  className="bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                 />
               </label>
 
               <div className="grid sm:grid-cols-2 gap-2.5 mb-5">
                 {viaForcas.map((valor, i) => (
                   <label key={i} className="flex items-center gap-2.5">
-                    <span className="text-xs text-ink-faint w-6 text-right shrink-0">
+                    <span className="text-xs text-gray-text w-6 text-right shrink-0">
                       {i + 1}º
                     </span>
                     <select
@@ -363,7 +363,7 @@ export default function ExerciciosClient({
                         novo[i] = e.target.value;
                         setViaForcas(novo);
                       }}
-                      className="flex-1 bg-cream border border-line rounded-lg px-3 py-2 text-sm text-ink focus:border-sky-deep"
+                      className="flex-1 bg-white border border-gray-faint rounded-lg px-3 py-2 text-sm text-black focus:border-mint-deep"
                     >
                       <option value="">Selecione...</option>
                       {VIA_FORCAS.map((f) => (
@@ -413,8 +413,8 @@ export default function ExerciciosClient({
           {!resumoPerfil ? (
             <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <p className="text-ink mb-1">Cruzamento de tudo que você já preencheu</p>
-                <p className="text-sm text-ink-faint">
+                <p className="text-black mb-1">Cruzamento de tudo que você já preencheu</p>
+                <p className="text-sm text-gray-text">
                   A IA cruza seu Mapa Quem Sou Eu, o diagnóstico e o VIA para gerar um resumo
                   com características, pontos fortes, pontos de atenção e onde focar agora.
                 </p>
@@ -433,7 +433,7 @@ export default function ExerciciosClient({
               </button>
             </Panel>
           ) : (
-            <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink prose-strong:text-brown-deep">
+            <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black prose-strong:text-black">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{resumoPerfil.conteudo_markdown}</ReactMarkdown>
             </Panel>
           )}
@@ -446,24 +446,24 @@ export default function ExerciciosClient({
           </Eyebrow>
 
           {diagnostics.length === 0 ? (
-            <Panel className="p-6 text-sm text-ink-faint">
+            <Panel className="p-6 text-sm text-gray-text">
               Salve seu primeiro diagnóstico acima para começar sua linha de evolução.
             </Panel>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               <Panel className="p-6">
-                <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-3">
+                <p className="text-[11px] uppercase tracking-wide text-gray-text mb-3">
                   Diagnóstico inicial ·{' '}
                   {new Date(primeiro.created_at).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm text-ink leading-relaxed">
+                <p className="text-sm text-black leading-relaxed">
                   {primeiro.momento_carreira || 'Sem registro de momento de carreira.'}
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {((primeiro.habilidades?.forcas as string[]) ?? []).map((f) => (
                     <span
                       key={f}
-                      className="text-[11px] px-2 py-1 rounded-full bg-cream border border-line text-ink-faint"
+                      className="text-[11px] px-2 py-1 rounded-full bg-white border border-gray-faint text-gray-text"
                     >
                       {f}
                     </span>
@@ -471,19 +471,19 @@ export default function ExerciciosClient({
                 </div>
               </Panel>
 
-              <Panel className="p-6 border-sky">
-                <p className="text-[11px] uppercase tracking-wide text-brown mb-3">
+              <Panel className="p-6 border-mint">
+                <p className="text-[11px] uppercase tracking-wide text-orange mb-3">
                   Momento atual ·{' '}
                   {new Date(ultimo.created_at).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm text-ink leading-relaxed">
+                <p className="text-sm text-black leading-relaxed">
                   {ultimo.momento_carreira || 'Sem registro de momento de carreira.'}
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {((ultimo.habilidades?.forcas as string[]) ?? []).map((f) => (
                     <span
                       key={f}
-                      className="text-[11px] px-2 py-1 rounded-full bg-sky-tint border border-sky text-brown-deep"
+                      className="text-[11px] px-2 py-1 rounded-full bg-mint-light border border-mint text-black"
                     >
                       {f}
                     </span>

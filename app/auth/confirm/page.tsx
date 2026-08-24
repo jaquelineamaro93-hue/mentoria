@@ -109,8 +109,8 @@ function AuthConfirmContent() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <p className="text-ink-faint mb-2">{status}</p>
-        <p className="text-xs text-ink-faint">F12 para logs completos</p>
+        <p className="text-gray-text mb-2">{status}</p>
+        <p className="text-xs text-gray-text">F12 para logs completos</p>
       </div>
     </div>
   );
@@ -118,7 +118,7 @@ function AuthConfirmContent() {
 
 export default function AuthConfirmPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-ink-faint">Carregando...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-text">Carregando...</p></div>}>
       <AuthConfirmContent />
     </Suspense>
   );

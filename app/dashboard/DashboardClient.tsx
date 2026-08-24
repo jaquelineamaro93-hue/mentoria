@@ -60,7 +60,7 @@ function StatusBadge({ status }: { status: FaseStatus }) {
   const config = {
     concluida: { label: 'Concluída', className: 'bg-lotus-mint/40 border-lotus-mint text-lotus-brown' },
     em_andamento: { label: 'Em andamento', className: 'bg-lotus-coral/15 border-lotus-coral text-lotus-brown' },
-    pendente: { label: 'A iniciar', className: 'bg-lotus-cream border-line text-ink-faint' },
+    pendente: { label: 'A iniciar', className: 'bg-lotus-cream border-gray-faint text-gray-text' },
   }[status];
   return (
     <span
@@ -257,9 +257,9 @@ export default function DashboardClient({
               { fase: 'Fase 2 · Dias 31–60', titulo: 'Posicionamento & Execução', status: fase2Status },
               { fase: 'Fase 3 · Dias 61–90', titulo: 'Alquimia & Consolidação', status: fase3Status },
             ].map((item) => (
-              <Panel key={item.fase} className="p-4 border-line">
+              <Panel key={item.fase} className="p-4 border-gray-faint">
                 <div className="flex items-start justify-between gap-2 mb-1.5">
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{item.fase}</p>
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text">{item.fase}</p>
                   <StatusBadge status={item.status} />
                 </div>
                 <p className="text-sm text-lotus-brown">{item.titulo}</p>
@@ -271,7 +271,7 @@ export default function DashboardClient({
             <div className="flex items-center gap-3">
               <Target size={20} strokeWidth={1.5} className="text-lotus-brown shrink-0" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-0.5">Próximo marco</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-0.5">Próximo marco</p>
                 <p className="text-sm text-lotus-brown">{proximoMarco}</p>
               </div>
             </div>
@@ -289,8 +289,8 @@ export default function DashboardClient({
           <Eyebrow>
             <TrendingUp size={13} strokeWidth={1.5} /> Resumo estratégico
           </Eyebrow>
-          <Panel className="p-6 border-line">
-            <p className="text-sm text-ink leading-relaxed mb-4">
+          <Panel className="p-6 border-gray-faint">
+            <p className="text-sm text-black leading-relaxed mb-4">
               {viaResultado?.forcas?.length && bussolaCompleto
                 ? `Suas forças de assinatura (${viaResultado.forcas.slice(0, 2).join(', ')}) combinadas com o posicionamento definido na Bússola formam a base do seu ciclo. O próximo passo é transformar esse mapeamento em ações concretas no PDI.`
                 : viaResultado?.forcas?.length
@@ -298,19 +298,19 @@ export default function DashboardClient({
                 : 'Complete o Diagnóstico & Perfil para gerar sua síntese estratégica personalizada.'}
             </p>
             <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-gray-faint bg-white text-black">
                 <Target size={12} strokeWidth={1.5} />
                 {etapasConcluidas}/4 etapas concluídas
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-gray-faint bg-white text-black">
                 <Sparkles size={12} strokeWidth={1.5} />
                 {pontosTotais} pts acumulados
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-gray-faint bg-white text-black">
                 <NotebookPen size={12} strokeWidth={1.5} />
                 {journalNotes.length} registro{journalNotes.length !== 1 ? 's' : ''} no diário
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-line bg-paper text-ink">
+              <span className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-gray-faint bg-white text-black">
                 <Award size={12} strokeWidth={1.5} />
                 {conquistasObtidas.length} selo{conquistasObtidas.length !== 1 ? 's' : ''} conquistado{conquistasObtidas.length !== 1 ? 's' : ''}
               </span>
@@ -321,21 +321,21 @@ export default function DashboardClient({
         {/* Passaporte SOMA */}
         <section className="mb-8">
           <div className="grid sm:grid-cols-2 gap-4">
-            <Panel className="p-6 border-line flex flex-col justify-between">
+            <Panel className="p-6 border-gray-faint flex flex-col justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Passaporte SOMA</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1">Passaporte SOMA</p>
                 <p className="font-display text-4xl text-lotus-brown">{pontosTotais} <span className="text-lg">pts</span></p>
               </div>
               <Link href="/passaporte" className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-lotus-brown hover:underline">
                 <Award size={14} strokeWidth={1.5} /> Ver passaporte completo
               </Link>
             </Panel>
-            <Panel className="p-6 border-line flex flex-col justify-between">
+            <Panel className="p-6 border-gray-faint flex flex-col justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint mb-1">Selos conquistados</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1">Selos conquistados</p>
                 <p className="font-display text-4xl text-lotus-brown">{conquistasObtidas.length} <span className="text-lg">/ {SOMA_ACHIEVEMENTS.length}</span></p>
               </div>
-              <p className="mt-4 text-[13px] text-ink-faint">
+              <p className="mt-4 text-[13px] text-gray-text">
                 {conquistasObtidas.length === 0 ? 'Comece pelo Mapa Quem Sou Eu para abrir sua jornada.'
                   : conquistasObtidas.length >= 5 ? 'Excelente progresso, continue acumulando selos.'
                   : 'Cada etapa completa rende um novo selo.'}
@@ -380,7 +380,7 @@ export default function DashboardClient({
             </Panel>
           )}
 
-          <Panel className="divide-y divide-line border-line">
+          <Panel className="divide-y divide-line border-gray-faint">
             {[
               { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
               { label: 'Teste VIA Character Strengths', done: viaCompleto, href: '/exercicios' },
@@ -395,9 +395,9 @@ export default function DashboardClient({
                 {tarefa.done ? (
                   <CheckCircle2 size={17} strokeWidth={1.5} className="text-lotus-brown shrink-0" />
                 ) : (
-                  <Circle size={17} strokeWidth={1.5} className="text-ink-faint shrink-0" />
+                  <Circle size={17} strokeWidth={1.5} className="text-gray-text shrink-0" />
                 )}
-                <span className={`text-sm ${tarefa.done ? 'text-ink-faint line-through' : 'text-ink'}`}>
+                <span className={`text-sm ${tarefa.done ? 'text-gray-text line-through' : 'text-black'}`}>
                   {tarefa.label}
                 </span>
               </Link>
@@ -410,10 +410,10 @@ export default function DashboardClient({
           <Eyebrow>
             <FolderOpen size={13} strokeWidth={1.5} /> Trilha de aprendizado
           </Eyebrow>
-          <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-line">
+          <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-gray-faint">
             <div>
-              <p className="text-ink mb-1">Materiais da Mentoria SOMA</p>
-              <p className="text-sm text-ink-faint">
+              <p className="text-black mb-1">Materiais da Mentoria SOMA</p>
+              <p className="text-sm text-gray-text">
                 Todo o conteúdo, gravações e templates do programa, centralizados em um só lugar.
               </p>
             </div>
@@ -433,23 +433,23 @@ export default function DashboardClient({
           <Eyebrow>Continue sua jornada</Eyebrow>
           <div className="grid sm:grid-cols-2 gap-4">
             <Link href="/exercicios">
-              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors group border-line">
+              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors group border-gray-faint">
                 <Compass className="text-lotus-brown mb-3" size={22} strokeWidth={1.5} />
-                <p className="text-ink mb-1 group-hover:text-lotus-brown transition-colors">
+                <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors">
                   Diagnóstico & Perfil
                 </p>
-                <p className="text-sm text-ink-faint">
+                <p className="text-sm text-gray-text">
                   Preencha seu mapa &quot;Quem Sou&quot; e acompanhe sua evolução.
                 </p>
               </Panel>
             </Link>
             <Link href="/diario">
-              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors group border-line">
+              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors group border-gray-faint">
                 <NotebookPen className="text-lotus-brown mb-3" size={22} strokeWidth={1.5} />
-                <p className="text-ink mb-1 group-hover:text-lotus-brown transition-colors">
+                <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors">
                   Diário de Bordo
                 </p>
-                <p className="text-sm text-ink-faint">
+                <p className="text-sm text-gray-text">
                   Registre aprendizados e sacadas dos seus encontros.
                 </p>
               </Panel>

@@ -128,11 +128,11 @@ export default function PerfilClient({
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
         <div className="flex items-start justify-between gap-4 mb-8">
-          <h1 className="font-display text-3xl text-brown-deep">Meu Perfil</h1>
+          <h1 className="font-display text-3xl text-black">Meu Perfil</h1>
           {perfil && (
             <button
               onClick={() => setVerTour(true)}
-              className="flex items-center gap-1.5 text-sm font-medium text-brown-deep bg-sky-tint border border-sky rounded-lg px-3 py-2 hover:bg-sky-tint/70 transition shrink-0"
+              className="flex items-center gap-1.5 text-sm font-medium text-black bg-mint-light border border-mint rounded-lg px-3 py-2 hover:bg-mint-light/70 transition shrink-0"
             >
               <Compass size={15} />
               Rever tour do portal
@@ -156,10 +156,10 @@ export default function PerfilClient({
         )}
 
         {/* Foto de Perfil */}
-        <div className="bg-white border border-line rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-xl text-brown-deep mb-4">Foto de Perfil</h2>
+        <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
+          <h2 className="font-display text-xl text-black mb-4">Foto de Perfil</h2>
           <div className="flex items-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-sky-deep flex items-center justify-center text-white text-3xl font-display">
+            <div className="w-24 h-24 rounded-full bg-mint-deep flex items-center justify-center text-white text-3xl font-display">
               {perfil?.nome?.[0]?.toUpperCase() || 'U'}
             </div>
             <button
@@ -181,47 +181,47 @@ export default function PerfilClient({
         </div>
 
         {/* Informações Pessoais */}
-        <div className="bg-white border border-line rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-xl text-brown-deep mb-6">Informações Pessoais</h2>
+        <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
+          <h2 className="font-display text-xl text-black mb-6">Informações Pessoais</h2>
 
           <div className="mb-6">
-            <label className="block text-xs font-medium text-brown-deep mb-2">Nome</label>
+            <label className="block text-xs font-medium text-black mb-2">Nome</label>
             <input
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
+              className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep"
             />
           </div>
 
           <div className="mb-6">
-            <label className="block text-xs font-medium text-brown-deep mb-2">Email</label>
+            <label className="block text-xs font-medium text-black mb-2">Email</label>
             <input
               type="email"
               value={perfil?.email || ''}
               disabled
-              className="w-full px-4 py-3 border border-line rounded-lg bg-cream text-ink-faint"
+              className="w-full px-4 py-3 border border-gray-faint rounded-lg bg-white text-gray-text"
             />
           </div>
 
           {/* Senha */}
-          <div className="border-t border-line pt-6">
-            <h3 className="font-medium text-brown-deep mb-4">Redefinir Senha</h3>
+          <div className="border-t border-gray-faint pt-6">
+            <h3 className="font-medium text-black mb-4">Redefinir Senha</h3>
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-brown-deep mb-2">Nova Senha</label>
+              <label className="block text-xs font-medium text-black mb-2">Nova Senha</label>
               <div className="relative">
                 <input
                   type={mostraSenha ? 'text' : 'password'}
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
                   placeholder="Deixe em branco para não alterar"
-                  className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep pr-10"
+                  className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setMostraSenha(!mostraSenha)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-brown-deep"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-text hover:text-black"
                 >
                   {mostraSenha ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -229,13 +229,13 @@ export default function PerfilClient({
             </div>
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-brown-deep mb-2">Confirmar Senha</label>
+              <label className="block text-xs font-medium text-black mb-2">Confirmar Senha</label>
               <input
                 type={mostraSenha ? 'text' : 'password'}
                 value={confirmaSenha}
                 onChange={(e) => setConfirmaSenha(e.target.value)}
                 placeholder="Confirme a nova senha"
-                className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
+                className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep"
               />
             </div>
           </div>
@@ -243,16 +243,16 @@ export default function PerfilClient({
 
         {/* Meu Plano */}
         {plano && (
-          <div className="bg-white border border-line rounded-2xl p-8 mb-8">
-            <h2 className="font-display text-xl text-brown-deep mb-4">Meu Plano</h2>
+          <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
+            <h2 className="font-display text-xl text-black mb-4">Meu Plano</h2>
             <div className="space-y-2 text-sm">
               <p>
-                <span className="font-medium text-brown-deep">{plano.nome}</span>
+                <span className="font-medium text-black">{plano.nome}</span>
               </p>
-              <p className="text-ink-faint">
+              <p className="text-gray-text">
                 Duração: {plano.duracao_meses} meses
               </p>
-              <p className="text-ink-faint">
+              <p className="text-gray-text">
                 Status: <span className="text-green-600 font-medium">Ativo</span>
               </p>
             </div>
@@ -260,11 +260,11 @@ export default function PerfilClient({
         )}
 
         {/* Termos */}
-        <div className="bg-white border border-line rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-xl text-brown-deep mb-4">Documentos</h2>
+        <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
+          <h2 className="font-display text-xl text-black mb-4">Documentos</h2>
           <a
             href="#"
-            className="text-brown-deep hover:underline font-medium text-sm"
+            className="text-black hover:underline font-medium text-sm"
           >
             📄 Ler Termos de Mentoria
           </a>
@@ -282,7 +282,7 @@ export default function PerfilClient({
 
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 border-2 border-brown-deep text-brown-deep px-6 py-3 rounded-lg font-medium hover:bg-brown-deep/10 transition-colors"
+            className="flex items-center gap-2 border-2 border-brown-deep text-black px-6 py-3 rounded-lg font-medium hover:bg-brown-deep/10 transition-colors"
           >
             <LogOut size={16} />
             Sair

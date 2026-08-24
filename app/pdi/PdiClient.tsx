@@ -95,7 +95,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
       <div className="flex flex-col md:flex-row w-full">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-10 md:px-12">
-          <p className="text-sm text-ink-faint">Nenhuma seção configurada ainda.</p>
+          <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
         </main>
       </div>
     );
@@ -106,8 +106,8 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <div className="flex-1 flex">
-        <div className="hidden lg:block w-[260px] shrink-0 border-r border-line p-8 overflow-y-auto">
-          <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-4">
+        <div className="hidden lg:block w-[260px] shrink-0 border-r border-gray-faint p-8 overflow-y-auto">
+          <p className="text-[11px] uppercase tracking-wide text-gray-text mb-4">
             {concluidos} de {total} seções concluídas
           </p>
           <div className="flex flex-col gap-1">
@@ -119,14 +119,14 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
                   key={s.codigo}
                   onClick={() => irParaSecao(i)}
                   className={`flex items-center gap-2.5 text-left px-3 py-2 rounded-lg text-[13px] transition-colors ${
-                    ativo ? 'bg-sky-tint text-brown-deep' : 'text-ink-soft hover:bg-cream'
+                    ativo ? 'bg-mint-light text-black' : 'text-gray-text hover:bg-white'
                   }`}
                 >
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
                       respondido
                         ? 'bg-brown border-brown text-paper'
-                        : 'border-line text-ink-faint'
+                        : 'border-gray-faint text-gray-text'
                     }`}
                   >
                     {respondido ? <Check size={10} /> : i + 1}
@@ -139,10 +139,10 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
         </div>
 
         <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
             Meu PDI · seção {passo + 1} de {total}
           </p>
-          <h1 className="font-display text-3xl text-brown-deep mb-4">{secao.titulo}</h1>
+          <h1 className="font-display text-3xl text-black mb-4">{secao.titulo}</h1>
 
           {erro && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-4 py-2.5 mb-4">
@@ -152,7 +152,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
 
           <Panel className="p-6">
             {secao.instrucoes && (
-              <p className="text-sm text-ink leading-relaxed mb-4">{secao.instrucoes}</p>
+              <p className="text-sm text-black leading-relaxed mb-4">{secao.instrucoes}</p>
             )}
 
             <textarea
@@ -162,14 +162,14 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
               }
               rows={7}
               placeholder="Escreva sua resposta aqui..."
-              className="w-full bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+              className="w-full bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
             />
 
             <div className="flex items-center justify-between mt-5">
               <button
                 onClick={() => irParaSecao(Math.max(0, passo - 1))}
                 disabled={passo === 0}
-                className="flex items-center gap-1.5 text-sm text-ink-faint hover:text-brown disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1.5 text-sm text-gray-text hover:text-orange disabled:opacity-40 transition-colors"
               >
                 Voltar
               </button>
@@ -195,11 +195,11 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
 
           {concluidos === total && (
             <div className="mt-8">
-              <div className="bg-sky-tint border border-sky rounded-lg p-6 text-center mb-6">
-                <h2 className="text-xl font-display text-brown-deep mb-2">
+              <div className="bg-mint-light border border-mint rounded-lg p-6 text-center mb-6">
+                <h2 className="text-xl font-display text-black mb-2">
                   🎉 Você completou seu PDI!
                 </h2>
-                <p className="text-sm text-ink-soft">
+                <p className="text-sm text-gray-text">
                   Aqui embaixo está seu plano de ação, gerado a partir de tudo que você escreveu:
                   pilares, metas SMART e roadmap.
                 </p>

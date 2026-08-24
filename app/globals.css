@@ -2,32 +2,37 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-display: 'Times New Roman', Times, serif;
+  --font-display: 'Crimson Text', serif;
   --font-body: 'Poppins', sans-serif;
 
-  --color-cream: #F6F4F8;
+  /* Paleta Vibrante SOMA */
+  --color-black: #1A1A1A;
+  --color-dark: #2D2D2D;
+  --color-mint: #3DD9C8;
+  --color-mint-light: rgba(61, 217, 200, 0.1);
+  --color-mint-border: rgba(61, 217, 200, 0.2);
+  --color-orange: #FFB366;
+  --color-orange-light: rgba(255, 179, 102, 0.1);
+  --color-rose: #FF7A8A;
+  --color-rose-light: rgba(255, 122, 138, 0.1);
+  --color-gray-light: #F9F9F9;
+  --color-white: #FFFFFF;
+  --color-gray-text: #808080;
+  --color-gray-faint: #E8E8E8;
+
+  /* Fallback antigos → novos */
+  --color-cream: #F9F9F9;
   --color-paper: #FFFFFF;
-  --color-ink: #1A1025;
+  --color-ink: #1A1A1A;
   --color-ink-soft: #4A3E5C;
-  --color-ink-faint: #8C7B9E;
-
-  --color-brown: #5C3D38;
-  --color-brown-deep: #2A1715;
-
-  --color-sky: #B298E7;
-  --color-sky-deep: #7C5CBF;
-  --color-sky-tint: #F3EEFC;
-
-  --color-line: #E4DCE8;
-  --color-line-soft: #F1EDF5;
-
-  --color-lotus-brown: #6B403C;
-  --color-lotus-cream: #F6F4F8;
-  --color-lotus-coral: #FF857A;
-  --color-lotus-mint: #ADEBB3;
-  --color-lotus-lilac: #EBAEE6;
-  --color-bubblegum: #FF69B4;
-  --color-cotton-blue: #B8E3E9;
+  --color-ink-faint: #808080;
+  --color-brown: #FFB366;
+  --color-brown-deep: #1A1A1A;
+  --color-sky: #3DD9C8;
+  --color-sky-deep: #3DD9C8;
+  --color-sky-tint: rgba(61, 217, 200, 0.1);
+  --color-line: #E8E8E8;
+  --color-line-soft: #F9F9F9;
 }
 
 html {
@@ -35,8 +40,8 @@ html {
 }
 
 body {
-  background: var(--color-cream);
-  color: var(--color-ink);
+  background: var(--color-white);
+  color: var(--color-black);
   font-family: var(--font-body);
   font-weight: 300;
 }
@@ -47,22 +52,25 @@ body {
 }
 
 ::selection {
-  background: rgba(178, 152, 231, 0.3);
-  color: var(--color-brown-deep);
+  background: rgba(61, 217, 200, 0.3);
+  color: var(--color-black);
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--color-cream);
+  background: var(--color-white);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--color-line);
+  background: var(--color-mint);
   border-radius: 8px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-sky);
+  background: #2FB5B0;
 }
 
 a:focus-visible,
@@ -70,7 +78,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-sky-deep);
+  outline: 2px solid var(--color-mint);
   outline-offset: 2px;
 }
 

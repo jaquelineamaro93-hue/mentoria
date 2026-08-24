@@ -29,7 +29,7 @@ export default function MeuPlanoClient({
       <div className="flex flex-col md:flex-row w-full">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-          <p className="text-sm text-ink-faint">
+          <p className="text-sm text-gray-text">
             Seu plano será ativado em breve. Você receberá um aviso por email.
           </p>
         </main>
@@ -47,89 +47,89 @@ export default function MeuPlanoClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
           Seu investimento
         </p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">{plano.nome}</h1>
-        <p className="text-sm text-ink-faint max-w-xl mb-8">{plano.foco}</p>
+        <h1 className="font-display text-3xl text-black mb-1">{plano.nome}</h1>
+        <p className="text-sm text-gray-text max-w-xl mb-8">{plano.foco}</p>
 
-        <div className="bg-white border border-line rounded-2xl p-6 mb-8">
+        <div className="bg-white border border-gray-faint rounded-2xl p-6 mb-8">
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <p className="text-xs text-ink-faint mb-1">Duração total</p>
-              <p className="text-2xl font-display text-brown-deep">{mesesRestantes} meses</p>
+              <p className="text-xs text-gray-text mb-1">Duração total</p>
+              <p className="text-2xl font-display text-black">{mesesRestantes} meses</p>
             </div>
             <div>
-              <p className="text-xs text-ink-faint mb-1">Status</p>
+              <p className="text-xs text-gray-text mb-1">Status</p>
               <p className="text-sm font-medium text-green-600">Ativo</p>
             </div>
           </div>
           
-          <div className="bg-cream rounded-lg p-4 mb-4">
-            <p className="text-xs text-ink-faint mb-3">Opções de investimento:</p>
+          <div className="bg-white rounded-lg p-4 mb-4">
+            <p className="text-xs text-gray-text mb-3">Opções de investimento:</p>
             <div className="space-y-1 text-sm">
-              <p className="text-brown-deep">
+              <p className="text-black">
                 <span className="font-medium">À vista:</span> R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
-              <p className="text-brown-deep">
+              <p className="text-black">
                 <span className="font-medium">Cartão:</span> R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
-              <p className="text-brown-deep">
+              <p className="text-black">
                 <span className="font-medium">Recorrente:</span> {plano.parcelas_recorrente}x de R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
 
-          <div className="space-y-2 text-sm text-ink-faint">
+          <div className="space-y-2 text-sm text-gray-text">
             {plano.duracao_meses === 6 ? (
               <>
                 <p>✓ 7 encontros online individuais</p>
                 <p>✓ 6 encontros presenciais coletivos (sábados, Pinheiros/SP)</p>
                 <p>✓ 6 encontros online coletivos</p>
-                <p className="text-xs mt-3 pt-3 border-t border-line">Sessão extra individual: R$ 200,00 (cobrada via Mercado Pago)</p>
+                <p className="text-xs mt-3 pt-3 border-t border-gray-faint">Sessão extra individual: R$ 200,00 (cobrada via Mercado Pago)</p>
               </>
             ) : (
               <>
                 <p>✓ 10 encontros online individuais</p>
                 <p>✓ 12 encontros presenciais coletivos (sábados, Pinheiros/SP)</p>
                 <p>✓ 12 encontros online coletivos</p>
-                <p className="text-xs mt-3 pt-3 border-t border-line">Sessão extra individual: R$ 200,00 (cobrada via Mercado Pago)</p>
+                <p className="text-xs mt-3 pt-3 border-t border-gray-faint">Sessão extra individual: R$ 200,00 (cobrada via Mercado Pago)</p>
               </>
             )}
           </div>
         </div>
 
-        <h2 className="font-display text-xl text-brown-deep mb-4">O que você tem incluído</h2>
+        <h2 className="font-display text-xl text-black mb-4">O que você tem incluído</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white border border-line rounded-xl p-4">
-            <Video size={18} className="text-sky-deep mb-2" />
-            <p className="text-sm font-medium text-brown-deep mb-1">Encontros online</p>
-            <p className="text-2xl font-display text-brown-deep mb-2">{encontrosOnlineIndividuais + encontrosOnlineColetivos}</p>
-            <p className="text-xs text-ink-faint">{encontrosOnlineIndividuais} individual + {encontrosOnlineColetivos} coletivos</p>
+          <div className="bg-white border border-gray-faint rounded-xl p-4">
+            <Video size={18} className="text-mint mb-2" />
+            <p className="text-sm font-medium text-black mb-1">Encontros online</p>
+            <p className="text-2xl font-display text-black mb-2">{encontrosOnlineIndividuais + encontrosOnlineColetivos}</p>
+            <p className="text-xs text-gray-text">{encontrosOnlineIndividuais} individual + {encontrosOnlineColetivos} coletivos</p>
           </div>
 
-          <div className="bg-white border border-line rounded-xl p-4">
-            <Users size={18} className="text-sky-deep mb-2" />
-            <p className="text-sm font-medium text-brown-deep mb-1">Encontros presenciais</p>
-            <p className="text-2xl font-display text-brown-deep mb-2">{encontrosPresenciais}</p>
-            <p className="text-xs text-ink-faint">Troca de experiências em grupo</p>
+          <div className="bg-white border border-gray-faint rounded-xl p-4">
+            <Users size={18} className="text-mint mb-2" />
+            <p className="text-sm font-medium text-black mb-1">Encontros presenciais</p>
+            <p className="text-2xl font-display text-black mb-2">{encontrosPresenciais}</p>
+            <p className="text-xs text-gray-text">Troca de experiências em grupo</p>
           </div>
 
-          <div className="bg-white border border-line rounded-xl p-4">
-            <FileText size={18} className="text-sky-deep mb-2" />
-            <p className="text-sm font-medium text-brown-deep mb-1">Ferramentas incluídas</p>
-            <p className="text-xs text-ink-faint">PDI, Diagnóstico, Mapa Quem Sou Eu, Simulador de CV e mais</p>
+          <div className="bg-white border border-gray-faint rounded-xl p-4">
+            <FileText size={18} className="text-mint mb-2" />
+            <p className="text-sm font-medium text-black mb-1">Ferramentas incluídas</p>
+            <p className="text-xs text-gray-text">PDI, Diagnóstico, Mapa Quem Sou Eu, Simulador de CV e mais</p>
           </div>
 
-          <div className="bg-white border border-line rounded-xl p-4">
-            <Clock size={18} className="text-sky-deep mb-2" />
-            <p className="text-sm font-medium text-brown-deep mb-1">Seu ritmo</p>
-            <p className="text-xs text-ink-faint">Acesso ao portal 24/7 para trabalhar quando quiser</p>
+          <div className="bg-white border border-gray-faint rounded-xl p-4">
+            <Clock size={18} className="text-mint mb-2" />
+            <p className="text-sm font-medium text-black mb-1">Seu ritmo</p>
+            <p className="text-xs text-gray-text">Acesso ao portal 24/7 para trabalhar quando quiser</p>
           </div>
         </div>
 
-        <div className="mt-8 bg-sky-deep/10 border border-sky-deep/30 rounded-2xl p-5">
-          <p className="text-sm text-brown-deep">
+        <div className="mt-8 bg-mint-deep/10 border border-mint-deep/30 rounded-2xl p-5">
+          <p className="text-sm text-black">
             Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho pra você.
           </p>
         </div>

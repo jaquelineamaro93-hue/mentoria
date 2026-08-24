@@ -45,44 +45,44 @@ export default function CrescimentoClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
-        <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">Área administrativa</p>
-        <h1 className="font-display text-3xl text-brown-deep mb-1">Boas práticas de crescimento</h1>
-        <p className="text-sm text-ink-faint mb-8">
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Área administrativa</p>
+        <h1 className="font-display text-3xl text-black mb-1">Boas práticas de crescimento</h1>
+        <p className="text-sm text-gray-text mb-8">
           Um retrato de como as mentoradas atuais chegaram até você, e o que costuma funcionar pra
           trazer as próximas.
         </p>
 
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           <Panel className="p-5">
-            <Users2 size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{percentualIndicacao}%</p>
-            <p className="text-xs text-ink-faint">
+            <Users2 size={18} className="text-mint mb-2" />
+            <p className="font-display text-2xl text-black">{percentualIndicacao}%</p>
+            <p className="text-xs text-gray-text">
               das mentoradas vieram por indicação ({insights.viaIndicacao} de {insights.total})
             </p>
           </Panel>
           <Panel className="p-5">
-            <Gift size={18} className="text-sky-deep mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{percentualIndicadoras}%</p>
-            <p className="text-xs text-ink-faint">
+            <Gift size={18} className="text-mint mb-2" />
+            <p className="font-display text-2xl text-black">{percentualIndicadoras}%</p>
+            <p className="text-xs text-gray-text">
               já indicaram pelo menos uma pessoa ({insights.jaIndicaramAlguem} de {insights.total})
             </p>
           </Panel>
           <Panel className="p-5">
             <RotateCcw size={18} className="text-amber-600 mb-2" />
-            <p className="font-display text-2xl text-brown-deep">{insights.nuncaAcessaram}</p>
-            <p className="text-xs text-ink-faint">nunca acessaram o portal</p>
+            <p className="font-display text-2xl text-black">{insights.nuncaAcessaram}</p>
+            <p className="text-xs text-gray-text">nunca acessaram o portal</p>
           </Panel>
         </div>
 
         <div className="flex flex-col gap-6">
           <Panel className="p-6">
             <div className="flex items-center gap-2 mb-3">
-              <Gift size={17} className="text-brown-deep" />
-              <h2 className="font-display text-lg text-brown-deep">Indicação é seu canal mais barato</h2>
+              <Gift size={17} className="text-black" />
+              <h2 className="font-display text-lg text-black">Indicação é seu canal mais barato</h2>
             </div>
-            <p className="text-sm text-ink-soft leading-relaxed">
+            <p className="text-sm text-gray-text leading-relaxed">
               {percentualIndicacao < 30
                 ? `Só ${percentualIndicacao}% da sua base veio por indicação, ainda dá pra crescer bastante aqui. `
                 : `${percentualIndicacao}% já vem por indicação, é seu canal mais forte hoje. `}
@@ -95,10 +95,10 @@ export default function CrescimentoClient({
 
           <Panel className="p-6">
             <div className="flex items-center gap-2 mb-3">
-              <Star size={17} className="text-brown-deep" />
-              <h2 className="font-display text-lg text-brown-deep">Prova social do que já existe no portal</h2>
+              <Star size={17} className="text-black" />
+              <h2 className="font-display text-lg text-black">Prova social do que já existe no portal</h2>
             </div>
-            <p className="text-sm text-ink-soft leading-relaxed">
+            <p className="text-sm text-gray-text leading-relaxed">
               Você já tem PDIs gerados, mapas de essência e planos de desenvolvimento reais. Com
               autorização da mentorada, um trecho anonimizado do diagnóstico ou do "antes e depois"
               do PDI vale mais como conteúdo do que qualquer texto genérico sobre mentoria de
@@ -108,10 +108,10 @@ export default function CrescimentoClient({
 
           <Panel className="p-6">
             <div className="flex items-center gap-2 mb-3">
-              <RotateCcw size={17} className="text-brown-deep" />
-              <h2 className="font-display text-lg text-brown-deep">Reative antes de captar gente nova</h2>
+              <RotateCcw size={17} className="text-black" />
+              <h2 className="font-display text-lg text-black">Reative antes de captar gente nova</h2>
             </div>
-            <p className="text-sm text-ink-soft leading-relaxed">
+            <p className="text-sm text-gray-text leading-relaxed">
               {insights.nuncaAcessaram > 0
                 ? `${insights.nuncaAcessaram} pessoa(s) nunca acessaram o portal, ` +
                   `e ${insights.onboardingPendente} ainda não fizeram onboarding. `
@@ -124,10 +124,10 @@ export default function CrescimentoClient({
 
           <Panel className="p-6">
             <div className="flex items-center gap-2 mb-3">
-              <Megaphone size={17} className="text-brown-deep" />
-              <h2 className="font-display text-lg text-brown-deep">Um funil simples de conteúdo</h2>
+              <Megaphone size={17} className="text-black" />
+              <h2 className="font-display text-lg text-black">Um funil simples de conteúdo</h2>
             </div>
-            <p className="text-sm text-ink-soft leading-relaxed">
+            <p className="text-sm text-gray-text leading-relaxed">
               Não precisa postar todo dia. Uma cadência sustentável: 1 post por semana mostrando o
               método (os 4 pilares SOMA, a bússola de posicionamento, o PDI gerado), 1 story por
               semana com bastidor real de encontro ou call, e usar a página pública de checkout como

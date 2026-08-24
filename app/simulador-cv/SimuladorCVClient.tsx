@@ -132,7 +132,7 @@ export default function SimuladorCVClient({
   const r = resultado?.resultado_json;
 
   const corFit = !r
-    ? 'text-ink-faint'
+    ? 'text-gray-text'
     : r.fit_percentual >= 70
       ? 'text-green-600'
       : r.fit_percentual >= 45
@@ -154,11 +154,11 @@ export default function SimuladorCVClient({
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+            <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
               Ferramenta de carreira
             </p>
-            <h1 className="font-display text-3xl text-brown-deep mb-1">Simulador de CV</h1>
-            <p className="text-sm text-ink-faint max-w-xl">
+            <h1 className="font-display text-3xl text-black mb-1">Simulador de CV</h1>
+            <p className="text-sm text-gray-text max-w-xl">
               Cole seu currículo e a vaga desejada. A IA analisa como um recrutador
               exigente, otimiza para ATS e entrega um currículo e uma carta prontos.
             </p>
@@ -166,7 +166,7 @@ export default function SimuladorCVClient({
           {historico.length > 0 && (
             <button
               onClick={() => setMostrarHistorico((v) => !v)}
-              className="flex items-center gap-1.5 text-xs text-ink-faint hover:text-brown transition-colors"
+              className="flex items-center gap-1.5 text-xs text-gray-text hover:text-orange transition-colors"
             >
               <History size={13} />
               {mostrarHistorico ? 'Ocultar histórico' : `Histórico (${historico.length})`}
@@ -175,7 +175,7 @@ export default function SimuladorCVClient({
         </div>
 
         <div className="flex items-center gap-2 mb-6">
-          <span className="text-xs px-3 py-1.5 rounded-full bg-sky-tint border border-sky text-sky-deep">
+          <span className="text-xs px-3 py-1.5 rounded-full bg-mint-light border border-mint text-mint">
             {restantesGratis > 0
               ? `${restantesGratis} simulação${restantesGratis > 1 ? 'ões' : ''} grátis restante${restantesGratis > 1 ? 's' : ''} este mês`
               : 'Simulações grátis deste mês esgotadas'}
@@ -208,8 +208,8 @@ export default function SimuladorCVClient({
                 }}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                   resultado?.id === s.id
-                    ? 'bg-sky-tint border-sky text-sky-deep'
-                    : 'border-line text-ink-faint hover:border-line'
+                    ? 'bg-mint-light border-mint text-mint'
+                    : 'border-gray-faint text-gray-text hover:border-gray-faint'
                 }`}
               >
                 {new Date(s.created_at).toLocaleDateString('pt-BR', {
@@ -225,7 +225,7 @@ export default function SimuladorCVClient({
 
         <div className="grid lg:grid-cols-2 gap-4 mb-6">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs uppercase tracking-wide text-ink-faint">
+            <span className="text-xs uppercase tracking-wide text-gray-text">
               Seu currículo atual
             </span>
             <textarea
@@ -233,11 +233,11 @@ export default function SimuladorCVClient({
               onChange={(e) => setCurriculo(e.target.value)}
               rows={10}
               placeholder="Cole aqui o texto do seu currículo atual, com suas experiências, formação e conquistas..."
-              className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none font-mono"
+              className="bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none font-mono"
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs uppercase tracking-wide text-ink-faint">
+            <span className="text-xs uppercase tracking-wide text-gray-text">
               Descrição da vaga desejada
             </span>
             <textarea
@@ -245,7 +245,7 @@ export default function SimuladorCVClient({
               onChange={(e) => setVaga(e.target.value)}
               rows={10}
               placeholder="Cole aqui a descrição completa da vaga. Se for um link do LinkedIn, abra a vaga, copie o texto da descrição e cole aqui (links do LinkedIn exigem login e não funcionam direto)."
-              className="bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none font-mono"
+              className="bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none font-mono"
             />
           </label>
         </div>
@@ -259,8 +259,8 @@ export default function SimuladorCVClient({
         {limiteAtingido && (
           <Panel className="p-6 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-ink mb-1">Limite gratuito deste mês atingido</p>
-              <p className="text-sm text-ink-faint">{erro}</p>
+              <p className="text-black mb-1">Limite gratuito deste mês atingido</p>
+              <p className="text-sm text-gray-text">{erro}</p>
             </div>
             <button
               onClick={comprarSimulacaoExtra}
@@ -288,7 +288,7 @@ export default function SimuladorCVClient({
 
         {r && (
           <section>
-            <div className="flex flex-wrap gap-2 mb-6 border-b border-line">
+            <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-faint">
               {(
                 [
                   ['compatibilidade', 'Compatibilidade'],
@@ -303,8 +303,8 @@ export default function SimuladorCVClient({
                   onClick={() => setAba(valor)}
                   className={`px-4 py-2.5 text-sm border-b-2 -mb-px transition-colors ${
                     aba === valor
-                      ? 'border-brown text-brown-deep'
-                      : 'border-transparent text-ink-faint hover:text-ink-soft'
+                      ? 'border-brown text-black'
+                      : 'border-transparent text-gray-text hover:text-gray-text'
                   }`}
                 >
                   {label}
@@ -320,8 +320,8 @@ export default function SimuladorCVClient({
                       {r.fit_percentual}%
                     </p>
                     <div>
-                      <p className="text-ink font-medium">{r.fit_label}</p>
-                      <p className="text-sm text-ink-faint">
+                      <p className="text-black font-medium">{r.fit_label}</p>
+                      <p className="text-sm text-gray-text">
                         Sua compatibilidade estimada com essa vaga
                       </p>
                     </div>
@@ -341,7 +341,7 @@ export default function SimuladorCVClient({
                     </p>
                     <ul className="flex flex-col gap-2">
                       {r.pontos_fortes.map((p, i) => (
-                        <li key={i} className="text-sm text-ink leading-relaxed">
+                        <li key={i} className="text-sm text-black leading-relaxed">
                           {p}
                         </li>
                       ))}
@@ -353,7 +353,7 @@ export default function SimuladorCVClient({
                     </p>
                     <ul className="flex flex-col gap-2">
                       {r.pontos_atencao.map((p, i) => (
-                        <li key={i} className="text-sm text-ink leading-relaxed">
+                        <li key={i} className="text-sm text-black leading-relaxed">
                           {p}
                         </li>
                       ))}
@@ -362,10 +362,10 @@ export default function SimuladorCVClient({
                 </div>
 
                 <Panel className="p-5">
-                  <p className="text-xs uppercase tracking-wide text-ink-faint mb-1">
+                  <p className="text-xs uppercase tracking-wide text-gray-text mb-1">
                     Faixa salarial estimada
                   </p>
-                  <p className="text-lg text-brown-deep font-medium">
+                  <p className="text-lg text-black font-medium">
                     {r.faixa_salarial_estimada}
                   </p>
                 </Panel>
@@ -382,9 +382,9 @@ export default function SimuladorCVClient({
                             {i + 1}
                           </span>
                           <div>
-                            <p className="text-ink font-medium mb-1">{formatarTituloInsight(s.titulo)}</p>
-                            <p className="text-sm text-ink-faint mb-2">{s.motivo}</p>
-                            <p className="text-sm text-sky-deep">{s.correcao}</p>
+                            <p className="text-black font-medium mb-1">{formatarTituloInsight(s.titulo)}</p>
+                            <p className="text-sm text-gray-text mb-2">{s.motivo}</p>
+                            <p className="text-sm text-mint">{s.correcao}</p>
                           </div>
                         </div>
                       </Panel>
@@ -395,7 +395,7 @@ export default function SimuladorCVClient({
             )}
 
             {aba === 'curriculo' && (
-              <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-p:leading-relaxed prose-p:my-3 prose-strong:text-brown-deep prose-li:text-ink">
+              <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-relaxed prose-p:my-3 prose-strong:text-black prose-li:text-black">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {r.curriculo_final_markdown}
                 </ReactMarkdown>
@@ -408,14 +408,14 @@ export default function SimuladorCVClient({
 
             {aba === 'palavras' && (
               <Panel className="p-6">
-                <p className="text-sm text-ink-faint mb-4">
+                <p className="text-sm text-gray-text mb-4">
                   Inclua essas palavras no seu currículo para passar pelos filtros ATS:
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {r.palavras_chave_ausentes.map((p, i) => (
                     <span
                       key={i}
-                      className="text-sm px-3 py-1.5 rounded-full bg-sky-tint border border-sky text-sky-deep"
+                      className="text-sm px-3 py-1.5 rounded-full bg-mint-light border border-mint text-mint"
                     >
                       {p}
                     </span>
@@ -426,16 +426,16 @@ export default function SimuladorCVClient({
 
             {aba === 'entrevista' && (
               <Panel className="p-6">
-                <p className="text-sm text-ink-faint mb-4">
+                <p className="text-sm text-gray-text mb-4">
                   Perguntas prováveis com base na vaga e no seu perfil:
                 </p>
                 <div className="flex flex-col gap-3">
                   {r.perguntas_entrevista.map((p, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-sky-tint border border-sky text-sky-deep text-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-6 h-6 rounded-full bg-mint-light border border-mint text-mint text-xs flex items-center justify-center shrink-0 mt-0.5">
                         {i + 1}
                       </span>
-                      <p className="text-sm text-ink leading-relaxed">{p}</p>
+                      <p className="text-sm text-black leading-relaxed">{p}</p>
                     </div>
                   ))}
                 </div>

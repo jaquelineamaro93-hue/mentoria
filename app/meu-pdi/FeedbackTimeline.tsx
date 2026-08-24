@@ -42,10 +42,10 @@ export default function FeedbackTimeline({ userId }: { userId: string }) {
 
   if (feedbacks.length === 0) {
     return (
-      <div className="text-center py-12 bg-paper rounded-xl border border-line border-dashed">
-        <MessageSquare size={32} className="mx-auto mb-3 text-ink-faint" />
-        <p className="text-ink-faint mb-2">Nenhum feedback recebido ainda</p>
-        <p className="text-xs text-ink-faint">Seus feedbacks das sessões aparecerão aqui</p>
+      <div className="text-center py-12 bg-white rounded-xl border border-gray-faint border-dashed">
+        <MessageSquare size={32} className="mx-auto mb-3 text-gray-text" />
+        <p className="text-gray-text mb-2">Nenhum feedback recebido ainda</p>
+        <p className="text-xs text-gray-text">Seus feedbacks das sessões aparecerão aqui</p>
       </div>
     );
   }
@@ -62,11 +62,11 @@ export default function FeedbackTimeline({ userId }: { userId: string }) {
           </div>
           
           <div className="flex-1 pb-4">
-            <div className="bg-paper rounded-lg border border-line p-4">
+            <div className="bg-white rounded-lg border border-gray-faint p-4">
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h4 className="font-medium text-brown-deep">{feedback.titulo}</h4>
-                  <p className="text-xs text-ink-faint mt-1">
+                  <h4 className="font-medium text-black">{feedback.titulo}</h4>
+                  <p className="text-xs text-gray-text mt-1">
                     {new Date(feedback.data).toLocaleDateString('pt-BR', {
                       year: 'numeric',
                       month: 'long',
@@ -83,14 +83,14 @@ export default function FeedbackTimeline({ userId }: { userId: string }) {
                 </span>
               </div>
               
-              <p className="text-sm text-ink leading-relaxed mb-3">{feedback.conteudo}</p>
+              <p className="text-sm text-black leading-relaxed mb-3">{feedback.conteudo}</p>
               
               {feedback.arquivo_url && (
                 <a
                   href={feedback.arquivo_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs text-brown-deep hover:text-brown font-medium"
+                  className="inline-flex items-center gap-2 text-xs text-black hover:text-orange font-medium"
                 >
                   <Download size={14} />
                   Baixar anexo

@@ -147,8 +147,8 @@ export default function QuemSouEuClient({
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <div className="flex-1 flex">
-        <div className="hidden lg:block w-[240px] shrink-0 border-r border-line p-8">
-          <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-4">
+        <div className="hidden lg:block w-[240px] shrink-0 border-r border-gray-faint p-8">
+          <p className="text-[11px] uppercase tracking-wide text-gray-text mb-4">
             {concluidos} de {totalBlocos} blocos
           </p>
           <div className="flex flex-col gap-1">
@@ -161,15 +161,15 @@ export default function QuemSouEuClient({
                   onClick={() => irParaBloco(i)}
                   className={`flex items-center gap-2.5 text-left px-3 py-2 rounded-lg text-[13px] transition-colors ${
                     ativo
-                      ? 'bg-sky-tint text-brown-deep'
-                      : 'text-ink-soft hover:bg-cream'
+                      ? 'bg-mint-light text-black'
+                      : 'text-gray-text hover:bg-white'
                   }`}
                 >
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
                       respondido
                         ? 'bg-brown border-brown text-paper'
-                        : 'border-line text-ink-faint'
+                        : 'border-gray-faint text-gray-text'
                     }`}
                   >
                     {respondido ? <Check size={10} /> : i + 1}
@@ -182,12 +182,12 @@ export default function QuemSouEuClient({
         </div>
 
         <main className="flex-1 px-6 py-10 md:px-12 max-w-4xl xl:max-w-5xl">
-          <p className="text-xs uppercase tracking-[0.2em] text-sky-deep mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
             Mapa Quem Sou Eu · bloco {passo + 1} de {totalBlocos}
           </p>
-          <h1 className="font-display text-3xl text-brown-deep mb-1">{bloco.titulo}</h1>
+          <h1 className="font-display text-3xl text-black mb-1">{bloco.titulo}</h1>
           {bloco.subtitulo && (
-            <p className="text-sm text-ink-faint mb-6">{bloco.subtitulo}</p>
+            <p className="text-sm text-gray-text mb-6">{bloco.subtitulo}</p>
           )}
 
           {erro && (
@@ -197,8 +197,8 @@ export default function QuemSouEuClient({
           )}
 
           <Panel className="p-6 mb-8">
-            <p className="text-sm text-ink leading-relaxed mb-4">{bloco.pergunta}</p>
-            <p className="text-xs text-ink-faint italic mb-5">Exemplo: {bloco.exemplo}</p>
+            <p className="text-sm text-black leading-relaxed mb-4">{bloco.pergunta}</p>
+            <p className="text-xs text-gray-text italic mb-5">Exemplo: {bloco.exemplo}</p>
 
             <textarea
               value={respostas[bloco.codigo] ?? ''}
@@ -207,14 +207,14 @@ export default function QuemSouEuClient({
               }
               rows={7}
               placeholder="Escreva com calma, sem se preocupar em organizar. Deixe fluir."
-              className="w-full bg-cream border border-line rounded-lg px-4 py-3 text-sm text-ink focus:border-sky-deep resize-none"
+              className="w-full bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
             />
 
             <div className="flex items-center justify-between mt-5">
               <button
                 onClick={() => setPasso(Math.max(0, passo - 1))}
                 disabled={passo === 0}
-                className="flex items-center gap-1.5 text-sm text-ink-faint hover:text-brown disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1.5 text-sm text-gray-text hover:text-orange disabled:opacity-40 transition-colors"
               >
                 <ArrowLeft size={15} /> Voltar
               </button>
@@ -256,8 +256,8 @@ export default function QuemSouEuClient({
               {!mapa ? (
                 <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <p className="text-ink mb-1">Você respondeu os 9 blocos</p>
-                    <p className="text-sm text-ink-faint">
+                    <p className="text-black mb-1">Você respondeu os 9 blocos</p>
+                    <p className="text-sm text-gray-text">
                       Gere agora o seu Mapa de Essência, uma síntese visual de tudo que você
                       trouxe.
                     </p>
@@ -277,13 +277,13 @@ export default function QuemSouEuClient({
                 </Panel>
               ) : (
                 <>
-                  <Panel className="p-6 mb-3 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-brown-deep prose-p:text-ink prose-li:text-ink">
+                  <Panel className="p-6 mb-3 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{mapa.conteudo_markdown}</ReactMarkdown>
                   </Panel>
                   <button
                     onClick={gerarMapa}
                     disabled={gerandoMapa}
-                    className="flex items-center gap-1.5 text-xs text-ink-faint hover:text-brown transition-colors mb-4"
+                    className="flex items-center gap-1.5 text-xs text-gray-text hover:text-orange transition-colors mb-4"
                   >
                     {gerandoMapa ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -298,8 +298,8 @@ export default function QuemSouEuClient({
               {mapa && !bussola && (
                 <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <p className="text-ink mb-1">Mapa pronto</p>
-                    <p className="text-sm text-ink-faint">
+                    <p className="text-black mb-1">Mapa pronto</p>
+                    <p className="text-sm text-gray-text">
                       Agora gere sua Bússola de Posicionamento, a tradução do seu mapa em
                       direção estratégica de carreira.
                     </p>
@@ -307,7 +307,7 @@ export default function QuemSouEuClient({
                   <button
                     onClick={gerarBussola}
                     disabled={gerandoBussola}
-                    className="shrink-0 flex items-center gap-2 bg-sky-deep hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                    className="shrink-0 flex items-center gap-2 bg-mint-deep hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                   >
                     {gerandoBussola ? (
                       <Loader2 size={15} className="animate-spin" />
@@ -335,7 +335,7 @@ export default function QuemSouEuClient({
                   <button
                     onClick={gerarBussola}
                     disabled={gerandoBussola}
-                    className="flex items-center gap-1.5 text-xs text-ink-faint hover:text-brown transition-colors mt-3"
+                    className="flex items-center gap-1.5 text-xs text-gray-text hover:text-orange transition-colors mt-3"
                   >
                     {gerandoBussola ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -365,8 +365,8 @@ function BussolaCard({
 }) {
   return (
     <Panel className={`p-5 ${className}`}>
-      <p className="text-[11px] uppercase tracking-wide text-sky-deep mb-2">{titulo}</p>
-      <p className="text-sm text-ink leading-relaxed">{texto}</p>
+      <p className="text-[11px] uppercase tracking-wide text-mint mb-2">{titulo}</p>
+      <p className="text-sm text-black leading-relaxed">{texto}</p>
     </Panel>
   );
 }

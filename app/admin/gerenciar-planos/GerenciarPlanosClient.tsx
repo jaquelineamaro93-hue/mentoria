@@ -165,62 +165,62 @@ export default function GerenciarPlanosClient({
   return (
     
 <main className="px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-ink-faint hover:text-brown-deep transition-colors">← Voltar ao painel</a></div>
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
       <Link
         href="/admin"
-        className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-brown-deep transition mb-4"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-text hover:text-black transition mb-4"
       >
         <ArrowLeft size={16} />
         Voltar
       </Link>
       <div className="flex items-start justify-between gap-4 mb-1">
-        <h1 className="font-display text-3xl text-brown-deep">Gerenciar Planos e Pagamentos</h1>
+        <h1 className="font-display text-3xl text-black">Gerenciar Planos e Pagamentos</h1>
         <button
           onClick={() => setMostrarFormPlano((v) => !v)}
-          className="flex items-center gap-1.5 text-sm text-brown-deep border border-brown-deep px-3 py-1.5 rounded-lg hover:bg-brown-deep/10 transition-colors whitespace-nowrap"
+          className="flex items-center gap-1.5 text-sm text-black border border-brown-deep px-3 py-1.5 rounded-lg hover:bg-brown-deep/10 transition-colors whitespace-nowrap"
         >
           <Plus size={14} /> Criar novo plano
         </button>
       </div>
-      <p className="text-sm text-ink-faint mb-6">
+      <p className="text-sm text-gray-text mb-6">
         Troque o plano, tipo, origem, forma de pagamento, data de fim de acesso e status de cada
         mentorado. O valor mostrado é calculado a partir do plano + forma de pagamento escolhida.
       </p>
 
       {mostrarFormPlano && (
-        <div className="border border-line rounded-xl p-5 mb-8 bg-cream/50">
-          <p className="text-sm font-medium text-brown-deep mb-3">Novo plano</p>
+        <div className="border border-gray-faint rounded-xl p-5 mb-8 bg-white/50">
+          <p className="text-sm font-medium text-black mb-3">Novo plano</p>
           <div className="grid sm:grid-cols-5 gap-3 mb-3">
             <input
               placeholder="Nome (ex: Cortesia)"
               value={novoPlano.nome}
               onChange={(e) => setNovoPlano({ ...novoPlano, nome: e.target.value })}
-              className="text-sm border border-line rounded px-3 py-2 sm:col-span-2"
+              className="text-sm border border-gray-faint rounded px-3 py-2 sm:col-span-2"
             />
             <input
               placeholder="Duração (meses)"
               type="number"
               value={novoPlano.duracaoMeses}
               onChange={(e) => setNovoPlano({ ...novoPlano, duracaoMeses: e.target.value })}
-              className="text-sm border border-line rounded px-3 py-2"
+              className="text-sm border border-gray-faint rounded px-3 py-2"
             />
             <input
               placeholder="Preço à vista"
               type="number"
               value={novoPlano.precoAvista}
               onChange={(e) => setNovoPlano({ ...novoPlano, precoAvista: e.target.value })}
-              className="text-sm border border-line rounded px-3 py-2"
+              className="text-sm border border-gray-faint rounded px-3 py-2"
             />
             <input
               placeholder="Preço cartão (opcional)"
               type="number"
               value={novoPlano.precoCartao}
               onChange={(e) => setNovoPlano({ ...novoPlano, precoCartao: e.target.value })}
-              className="text-sm border border-line rounded px-3 py-2"
+              className="text-sm border border-gray-faint rounded px-3 py-2"
             />
           </div>
-          <label className="flex items-center gap-2 text-sm text-ink-soft mb-4">
+          <label className="flex items-center gap-2 text-sm text-gray-text mb-4">
             <input
               type="checkbox"
               checked={novoPlano.visivelCheckout}
@@ -228,7 +228,7 @@ export default function GerenciarPlanosClient({
             />
             Mostrar esse plano na página pública de checkout
           </label>
-          <p className="text-xs text-ink-faint mb-4 -mt-2">
+          <p className="text-xs text-gray-text mb-4 -mt-2">
             Desmarcado (padrão): o plano fica disponível só aqui, pra você atribuir manualmente.
             Marcado: qualquer visitante pode escolher e comprar esse plano em /checkout.
           </p>
@@ -242,21 +242,21 @@ export default function GerenciarPlanosClient({
         </div>
       )}
 
-      <div className="overflow-x-auto border border-line rounded-2xl">
+      <div className="overflow-x-auto border border-gray-faint rounded-2xl">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b-2 border-line bg-cream">
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Nome</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Plano</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Tipo</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Origem</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Forma pgto.</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Valor</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Status</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Próx. cobrança</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Acesso até</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Observação</th>
-              <th className="text-left py-3 px-4 font-medium text-brown-deep">Ação</th>
+            <tr className="border-b-2 border-gray-faint bg-white">
+              <th className="text-left py-3 px-4 font-medium text-black">Nome</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Plano</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Tipo</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Origem</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Forma pgto.</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Valor</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Status</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Próx. cobrança</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Acesso até</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Observação</th>
+              <th className="text-left py-3 px-4 font-medium text-black">Ação</th>
             </tr>
           </thead>
           <tbody>
@@ -267,13 +267,13 @@ export default function GerenciarPlanosClient({
               const temMudancas = emEdicao && Object.keys(emEdicao).length > 0;
 
               return (
-                <tr key={mentorado.id} className="border-b border-line hover:bg-cream/50">
-                  <td className="py-3 px-4 text-brown-deep font-medium whitespace-nowrap">{mentorado.nome}</td>
+                <tr key={mentorado.id} className="border-b border-gray-faint hover:bg-white/50">
+                  <td className="py-3 px-4 text-black font-medium whitespace-nowrap">{mentorado.nome}</td>
                   <td className="py-3 px-4">
                     <select
                       value={emEdicao?.plano_id || mentorado.plano_id || ''}
                       onChange={(e) => handleChange(mentorado.id, 'plano_id', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-44"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-44"
                     >
                       <option value="">Selecionar...</option>
                       {planos.map((p) => (
@@ -287,7 +287,7 @@ export default function GerenciarPlanosClient({
                     <select
                       value={emEdicao?.tipo_pacote || mentorado.tipo_pacote || 'online'}
                       onChange={(e) => handleChange(mentorado.id, 'tipo_pacote', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-28"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-28"
                     >
                       <option value="online">Online</option>
                       <option value="presencial">Presencial</option>
@@ -297,7 +297,7 @@ export default function GerenciarPlanosClient({
                     <select
                       value={emEdicao?.origem_assinatura || mentorado.origem_assinatura || 'manual'}
                       onChange={(e) => handleChange(mentorado.id, 'origem_assinatura', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-32"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-32"
                     >
                       <option value="manual">Manual</option>
                       <option value="mercadopago">Mercado Pago</option>
@@ -307,7 +307,7 @@ export default function GerenciarPlanosClient({
                     <select
                       value={emEdicao?.forma_pagamento_escolhida ?? mentorado.forma_pagamento_escolhida ?? ''}
                       onChange={(e) => handleChange(mentorado.id, 'forma_pagamento_escolhida', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-28"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-28"
                     >
                       <option value="">—</option>
                       <option value="avista">À vista</option>
@@ -315,14 +315,14 @@ export default function GerenciarPlanosClient({
                       <option value="recorrente">Recorrente</option>
                     </select>
                   </td>
-                  <td className="py-3 px-4 text-ink-soft whitespace-nowrap">
+                  <td className="py-3 px-4 text-gray-text whitespace-nowrap">
                     {formatarMoeda(valorContratado(mentorado, planoAtual, emEdicao))}
                   </td>
                   <td className="py-3 px-4">
                     <select
                       value={emEdicao?.status_pagamento || mentorado.status_assinatura || 'ativo'}
                       onChange={(e) => handleChange(mentorado.id, 'status_pagamento', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-28"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-28"
                     >
                       <option value="ativo">Ativo</option>
                       <option value="inadimplente">Inadimplente</option>
@@ -333,7 +333,7 @@ export default function GerenciarPlanosClient({
                       type="date"
                       value={emEdicao?.proxima_cobranca ?? mentorado.proxima_cobranca ?? ''}
                       onChange={(e) => handleChange(mentorado.id, 'proxima_cobranca', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-36"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-36"
                     />
                   </td>
                   <td className="py-3 px-4">
@@ -341,7 +341,7 @@ export default function GerenciarPlanosClient({
                       type="date"
                       value={emEdicao?.data_fim_acesso ?? mentorado.data_fim_acesso ?? ''}
                       onChange={(e) => handleChange(mentorado.id, 'data_fim_acesso', e.target.value)}
-                      className="text-xs border border-line rounded px-2 py-1 w-36"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-36"
                     />
                   </td>
                   <td className="py-3 px-4">
@@ -350,7 +350,7 @@ export default function GerenciarPlanosClient({
                       value={emEdicao?.observacao_pagamento ?? mentorado.observacao_pagamento ?? ''}
                       onChange={(e) => handleChange(mentorado.id, 'observacao_pagamento', e.target.value)}
                       placeholder="Nota opcional..."
-                      className="text-xs border border-line rounded px-2 py-1 w-36"
+                      className="text-xs border border-gray-faint rounded px-2 py-1 w-36"
                     />
                   </td>
                   <td className="py-3 px-4">
@@ -363,7 +363,7 @@ export default function GerenciarPlanosClient({
                         {salvando === mentorado.id ? 'Salvando...' : 'Salvar'}
                       </button>
                     ) : (
-                      <span className="text-xs text-ink-faint">—</span>
+                      <span className="text-xs text-gray-text">—</span>
                     )}
                   </td>
                 </tr>
@@ -374,7 +374,7 @@ export default function GerenciarPlanosClient({
       </div>
 
       {mentorados.length === 0 && (
-        <p className="text-sm text-ink-faint text-center py-8">Nenhum mentorado cadastrado ainda.</p>
+        <p className="text-sm text-gray-text text-center py-8">Nenhum mentorado cadastrado ainda.</p>
       )}
     </main>
   );

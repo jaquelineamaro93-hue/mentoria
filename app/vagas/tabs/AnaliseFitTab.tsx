@@ -232,13 +232,13 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
 
   const renderBarraCompatibilidade = (valor: number, label: string) => {
     const percentual = Math.min(Math.max(valor, 0), 100);
-    const cor = percentual >= 70 ? 'bg-emerald-light' : percentual >= 50 ? 'bg-sky-deep' : 'bg-orange-500';
+    const cor = percentual >= 70 ? 'bg-emerald-light' : percentual >= 50 ? 'bg-mint-deep' : 'bg-orange-500';
 
     return (
       <div className="space-y-1.5">
         <div className="flex justify-between items-center">
-          <span className="text-sm font-medium text-ink">{label}</span>
-          <span className="text-sm font-bold text-sky-deep">{percentual}%</span>
+          <span className="text-sm font-medium text-black">{label}</span>
+          <span className="text-sm font-bold text-mint">{percentual}%</span>
         </div>
         <div className="w-full bg-line rounded-full h-2 overflow-hidden">
           <div
@@ -256,7 +256,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         <Sparkles size={14} />
         Análise de Compatibilidade com IA
       </Eyebrow>
-      <h2 className="font-display text-3xl text-brown-deep mb-8">Controle de Vagas</h2>
+      <h2 className="font-display text-3xl text-black mb-8">Controle de Vagas</h2>
 
       {!analise ? (
         <div className="space-y-4">
@@ -264,10 +264,10 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
 
           <Panel className="p-6 bg-mustard-light border border-yellow-400">
             <div className="flex items-start gap-3">
-              <Upload size={18} className="text-brown-deep flex-shrink-0 mt-1" />
+              <Upload size={18} className="text-black flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <h3 className="font-medium text-brown-deep mb-2">Passo 1: Sincronize seu Perfil</h3>
-                <p className="text-sm text-brown-deep mb-3">
+                <h3 className="font-medium text-black mb-2">Passo 1: Sincronize seu Perfil</h3>
+                <p className="text-sm text-black mb-3">
                   Importe seu PDF do LinkedIn para que a IA analise sua compatibilidade com as vagas.
                 </p>
                 <button
@@ -293,44 +293,44 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
           </Panel>
 
           <Panel className="p-6">
-            <h3 className="font-medium text-brown-deep mb-4">Passo 2: Insira a Vaga</h3>
+            <h3 className="font-medium text-black mb-4">Passo 2: Insira a Vaga</h3>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-ink mb-2">Empresa</label>
+                <label className="block text-sm font-medium text-black mb-2">Empresa</label>
                 <input
                   type="text"
                   value={empresa}
                   onChange={(e) => setEmpresa(e.target.value)}
                   placeholder="Ex: Nubank, Google, Uber"
-                  className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-cream text-ink"
+                  className="w-full px-4 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-white text-black"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-ink mb-2">Cargo</label>
+                <label className="block text-sm font-medium text-black mb-2">Cargo</label>
                 <input
                   type="text"
                   value={cargo}
                   onChange={(e) => setCargo(e.target.value)}
                   placeholder="Ex: Analista de Marketing"
-                  className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-cream text-ink"
+                  className="w-full px-4 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-white text-black"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-ink mb-2">Descrição da Vaga</label>
+              <label className="block text-sm font-medium text-black mb-2">Descrição da Vaga</label>
               <textarea
                 value={descricao_vaga}
                 onChange={(e) => setDescricaoVaga(e.target.value)}
                 placeholder="Cole aqui a descrição completa da vaga..."
                 rows={6}
-                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-cream text-ink"
+                className="w-full px-4 py-2 border border-gray-faint rounded-lg focus:ring-2 focus:ring-sky-deep focus:border-transparent bg-white text-black"
               />
             </div>
 
             <button
               onClick={analisarFit}
               disabled={analisando}
-              className="mt-6 w-full bg-sky-deep text-white py-3 rounded-lg font-medium hover:bg-sky transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              className="mt-6 w-full bg-mint-deep text-white py-3 rounded-lg font-medium hover:bg-mint transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {analisando && <Loader size={16} className="animate-spin" />}
               {analisando ? 'Analisando...' : '⚡ Analisar Compatibilidade'}
@@ -341,20 +341,20 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
         <div className="space-y-6">
           {mensagem && renderMensagem(mensagem)}
 
-          <Panel className="p-8 bg-sky-tint border border-sky text-center">
+          <Panel className="p-8 bg-mint-light border border-mint text-center">
             <div className="mb-4">
-              <div className="w-32 h-32 rounded-full border-4 border-sky-deep flex items-center justify-center mx-auto mb-4">
-                <div className="font-display text-5xl text-sky-deep">
+              <div className="w-32 h-32 rounded-full border-4 border-mint-deep flex items-center justify-center mx-auto mb-4">
+                <div className="font-display text-5xl text-mint">
                   {analise.fit_score}%
                 </div>
               </div>
-              <h3 className="font-display text-2xl text-sky-deep mb-2">Compatibilidade: {analise.fit_score}%</h3>
-              <p className="text-sky-deep text-sm">{analise.resumo}</p>
+              <h3 className="font-display text-2xl text-mint mb-2">Compatibilidade: {analise.fit_score}%</h3>
+              <p className="text-mint text-sm">{analise.resumo}</p>
             </div>
           </Panel>
 
           <Panel className="p-6">
-            <h3 className="font-medium text-brown-deep mb-4">Breakdown por Categoria</h3>
+            <h3 className="font-medium text-black mb-4">Breakdown por Categoria</h3>
             <div className="space-y-4">
               {analise.breakdown_por_categoria && (
                 <>
@@ -394,10 +394,10 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
           </div>
 
           <Panel className="p-6">
-            <h3 className="font-medium text-brown-deep mb-4">Otimizações para ATS (Currículo)</h3>
+            <h3 className="font-medium text-black mb-4">Otimizações para ATS (Currículo)</h3>
             <div className="space-y-2">
               {analise.palavras_chave_ats?.map((keyword, idx) => (
-                <div key={idx} className="inline-block px-3 py-1 rounded-full bg-sky-tint text-sky-deep text-xs font-medium mr-2 mb-2">
+                <div key={idx} className="inline-block px-3 py-1 rounded-full bg-mint-light text-mint text-xs font-medium mr-2 mb-2">
                   {keyword}
                 </div>
               ))}
@@ -420,7 +420,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
               setCargo('');
               setDescricaoVaga('');
             }}
-            className="w-full border border-line text-ink py-3 rounded-lg font-medium hover:bg-cream transition-colors"
+            className="w-full border border-gray-faint text-black py-3 rounded-lg font-medium hover:bg-white transition-colors"
           >
             Analisar Outra Vaga
           </button>

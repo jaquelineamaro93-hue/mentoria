@@ -134,20 +134,20 @@ function CheckoutContent() {
     <>
       <Script src="https://sdk.mercadopago.com/js/v2" strategy="afterInteractive" />
 
-      <div className="min-h-screen bg-cream p-6">
+      <div className="min-h-screen bg-white p-6">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-display text-brown-deep mb-2">{plan.title}</h1>
-          <p className="text-sm text-ink-faint mb-8">{plan.subtitle}</p>
+          <h1 className="text-3xl font-display text-black mb-2">{plan.title}</h1>
+          <p className="text-sm text-gray-text mb-8">{plan.subtitle}</p>
 
-          <div className="bg-white border-2 border-line rounded-2xl p-8">
+          <div className="bg-white border-2 border-gray-faint rounded-2xl p-8">
             {/* Detalhes do plano */}
             <div className="mb-8">
               <p className="text-xs font-medium text-blue-600 mb-2">{plan.duracao}</p>
-              <p className="text-sm text-ink-faint mb-4">{plan.encontros}</p>
+              <p className="text-sm text-gray-text mb-4">{plan.encontros}</p>
               
               <div className="space-y-2 mb-6">
                 {plan.features.map((feature, i) => (
-                  <div key={i} className="flex gap-2 text-sm text-ink">
+                  <div key={i} className="flex gap-2 text-sm text-black">
                     <span>✓</span>
                     <span>{feature}</span>
                   </div>
@@ -157,13 +157,13 @@ function CheckoutContent() {
 
             {/* Email */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-brown-deep mb-2">Email *</label>
+              <label className="block text-sm font-medium text-black mb-2">Email *</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep"
+                className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep"
               />
             </div>
 
@@ -174,7 +174,7 @@ function CheckoutContent() {
                 className={`w-full p-4 rounded-lg border-2 text-left transition ${
                   paymentType === 'vista'
                     ? 'border-brown-deep bg-brown-deep text-white'
-                    : 'border-line hover:border-brown-deep'
+                    : 'border-gray-faint hover:border-brown-deep'
                 }`}
               >
                 <div className="flex justify-between items-center">
@@ -188,7 +188,7 @@ function CheckoutContent() {
                 className={`w-full p-4 rounded-lg border-2 text-left transition ${
                   paymentType === 'cartao'
                     ? 'border-brown-deep bg-brown-deep text-white'
-                    : 'border-line hover:border-brown-deep'
+                    : 'border-gray-faint hover:border-brown-deep'
                 }`}
               >
                 <div className="flex justify-between items-center">
@@ -202,7 +202,7 @@ function CheckoutContent() {
                 className={`w-full p-4 rounded-lg border-2 text-left transition ${
                   paymentType === 'recorrente'
                     ? 'border-brown-deep bg-brown-deep text-white'
-                    : 'border-line hover:border-brown-deep'
+                    : 'border-gray-faint hover:border-brown-deep'
                 }`}
               >
                 <div className="flex justify-between items-center">
