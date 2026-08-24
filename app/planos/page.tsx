@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { PlanoMentoria } from '@/lib/types';
 
@@ -73,6 +75,11 @@ export default function PlanosPage() {
       {/* Seção de Planos */}
       <div className="p-6">
         <div className="max-w-6xl mx-auto">
+          <Link href="/" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-8">
+            <ArrowLeft size={20} />
+            <span>Voltar</span>
+          </Link>
+
           <h1 className="text-4xl font-display text-black mb-12 text-center">Nossos Planos</h1>
 
           <div className="grid md:grid-cols-2 gap-8">
