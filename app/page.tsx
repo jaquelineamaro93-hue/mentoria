@@ -322,7 +322,7 @@ export default async function HomePage() {
                   </div>
 
                   <Link
-                    href="/checkout"
+                    href={`/checkout?plan=${plano.id}`}
                     className={`w-full block text-center px-6 py-3 rounded-lg font-medium transition-colors ${
                       destaque
                         ? 'bg-brown-deep text-white hover:bg-brown'
