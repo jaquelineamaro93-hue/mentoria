@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 
@@ -16,6 +17,11 @@ export default async function PlanosPage() {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-6xl mx-auto">
+        <Link href="/" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-8">
+          <ArrowLeft size={20} />
+          <span>Voltar</span>
+        </Link>
+
         <h1 className="text-4xl font-display text-black mb-12 text-center">Nossos Planos</h1>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -24,7 +30,13 @@ export default async function PlanosPage() {
               <div className="mb-6">
                 <p className="text-xs font-medium text-blue-600 mb-2">{plano.duracao_meses} MESES</p>
                 <h2 className="text-2xl font-display text-black mb-1">{plano.nome}</h2>
-                <p className="text-sm text-gray-text mb-4">{plano.foco}</p>
+                <p className="text-sm mb-4">
+                  {plano.codigo.includes('online') ? (
+                    <span className="text-blue-600 font-medium">100% Online</span>
+                  ) : (
+                    <span className="text-gray-text">{plano.foco}</span>
+                  )}
+                </p>
                 <p className="text-xs text-gray-text mb-6">{plano.descricao_encontros}</p>
               </div>
 
@@ -55,7 +67,7 @@ export default async function PlanosPage() {
               </div>
 
               <Link
-                href={`/checkout?plan=${plano.codigo}`}
+                href={`/checkout?plan=${plano.id}`}
                 className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown text-center transition"
               >
                 Comprar
