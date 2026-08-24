@@ -102,10 +102,10 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors border ${
                   isActive
-                    ? 'text-black border-mint'
+                    ? 'text-white border-mint'
                     : 'text-gray-text border-transparent hover:text-white'
                 }`}
-                style={{ backgroundColor: isActive ? 'rgba(61, 217, 200, 0.2)' : 'transparent' }}
+                style={{ backgroundColor: isActive ? 'rgba(61, 217, 200, 0.4)' : 'transparent' }}
               >
                 <Icon size={17} strokeWidth={1.75} />
                 <span>{item.label}</span>
@@ -122,10 +122,10 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
               href="/admin"
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors border ${
                 pathname === '/admin'
-                  ? 'text-black border-mint'
+                  ? 'text-white border-mint'
                   : 'text-gray-text border-transparent hover:text-white'
               }`}
-              style={{ backgroundColor: pathname === '/admin' ? 'rgba(61, 217, 200, 0.2)' : 'transparent' }}
+              style={{ backgroundColor: pathname === '/admin' ? 'rgba(61, 217, 200, 0.4)' : 'transparent' }}
             >
               <ShieldCheck size={17} strokeWidth={1.75} />
               Painel dos mentorados
