@@ -15,12 +15,9 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   useEffect(() => {
     const planParam = searchParams.get('plan');
     if (planParam) {
-      const plano = planos.find(p => p.codigo === planParam);
-      if (plano) {
-        setPlanoSelecionado(plano.id);
-      }
+      setPlanoSelecionado(planParam);
     }
-  }, [searchParams, planos]);
+  }, [searchParams]);
 
   const plano = planos.find((p) => p.id === planoSelecionado);
 
