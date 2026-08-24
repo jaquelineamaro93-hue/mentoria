@@ -37,7 +37,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-cream to-white py-12 px-6">
+    <main className="min-h-screen bg-gradient-to-br from-white to-white py-12 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl text-black mb-2">Soma — Mentoria de Carreira</h1>
@@ -51,7 +51,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
         )}
 
         {logado === false && (
-          <div className="bg-lotus-cream border border-gray-faint rounded-xl p-4 mb-8 text-center text-sm text-black">
+          <div className="bg-white border border-gray-faint rounded-xl p-4 mb-8 text-center text-sm text-black">
             Já é aluna? <a href="/login" className="text-black font-medium underline">Faça login</a> antes de contratar para vincular ao seu perfil.
           </div>
         )}

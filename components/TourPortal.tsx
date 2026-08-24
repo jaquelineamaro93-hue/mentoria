@@ -103,31 +103,31 @@ export default function TourPortal({
       aria-modal="true"
       aria-labelledby="tour-titulo"
     >
-      <div className="bg-paper border border-line rounded-2xl shadow-lg max-w-lg w-full p-6">
+      <div className="bg-white border border-gray-faint rounded-2xl shadow-lg max-w-lg w-full p-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-ink-faint mb-1">
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-text mb-1">
               Conhecendo o portal · {passo + 1} de {PASSOS.length}
             </p>
-            <h2 id="tour-titulo" className="font-display text-2xl text-brown-deep">
+            <h2 id="tour-titulo" className="font-display text-2xl text-black">
               {atual.titulo}
             </h2>
           </div>
           <button
             onClick={encerrar}
-            className="text-ink-faint hover:text-brown-deep transition shrink-0"
+            className="text-gray-text hover:text-black transition shrink-0"
             aria-label="Fechar tour"
           >
             <X size={20} />
           </button>
         </div>
 
-        <p className="text-sm text-ink-soft leading-relaxed mb-5">{atual.descricao}</p>
+        <p className="text-sm text-gray-text leading-relaxed mb-5">{atual.descricao}</p>
 
         <Link
           href={atual.href}
           onClick={encerrar}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-brown-deep border border-line rounded-lg px-3 py-2 hover:bg-cream transition mb-6"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-black border border-gray-faint rounded-lg px-3 py-2 hover:bg-white transition mb-6"
         >
           Ir para {atual.titulo}
           <ArrowRight size={14} />
@@ -147,7 +147,7 @@ export default function TourPortal({
         <div className="flex items-center justify-between gap-3">
           <button
             onClick={encerrar}
-            className="text-sm text-ink-faint hover:text-brown-deep transition"
+            className="text-sm text-gray-text hover:text-black transition"
           >
             Pular tour
           </button>
@@ -156,14 +156,14 @@ export default function TourPortal({
             <button
               onClick={() => setPasso((p) => Math.max(0, p - 1))}
               disabled={passo === 0}
-              className="flex items-center gap-1.5 text-sm font-medium text-brown-deep border border-line rounded-lg px-3 py-2 hover:bg-cream transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 text-sm font-medium text-black border border-gray-faint rounded-lg px-3 py-2 hover:bg-white transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ArrowLeft size={14} />
               Voltar
             </button>
             <button
               onClick={() => (ultimo ? encerrar() : setPasso((p) => p + 1))}
-              className="flex items-center gap-1.5 text-sm font-medium bg-brown-deep text-paper rounded-lg px-4 py-2 hover:bg-brown transition"
+              className="flex items-center gap-1.5 text-sm font-medium bg-brown-deep text-white rounded-lg px-4 py-2 hover:bg-brown transition"
             >
               {ultimo ? (
                 <>

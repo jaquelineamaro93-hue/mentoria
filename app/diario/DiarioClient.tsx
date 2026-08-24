@@ -159,7 +159,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
               <button
                 onClick={handleSalvar}
                 disabled={salvando || !anotacoes.trim()}
-                className="self-start bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+                className="self-start bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
               >
                 {salvando ? 'Salvando...' : 'Salvar anotação'}
               </button>

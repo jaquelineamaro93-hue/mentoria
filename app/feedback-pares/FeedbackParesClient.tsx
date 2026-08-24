@@ -137,7 +137,7 @@ export default function FeedbackParesClient({
                 <button
                   onClick={enviarFeedback}
                   disabled={enviando || !paraUserId || !mensagem.trim()}
-                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                 >
                   {enviando ? (
                     <Loader2 size={15} className="animate-spin" />

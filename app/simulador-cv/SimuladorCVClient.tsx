@@ -189,7 +189,7 @@ export default function SimuladorCVClient({
             <button
               onClick={comprarSimulacaoExtra}
               disabled={comprando}
-              className="text-xs px-3 py-1.5 rounded-full bg-brown text-paper hover:bg-brown-deep transition-colors disabled:opacity-60"
+              className="text-xs px-3 py-1.5 rounded-full bg-brown text-white hover:bg-brown-deep transition-colors disabled:opacity-60"
             >
               {comprando ? 'Abrindo...' : 'Comprar crédito extra (R$ 5)'}
             </button>
@@ -265,7 +265,7 @@ export default function SimuladorCVClient({
             <button
               onClick={comprarSimulacaoExtra}
               disabled={comprando}
-              className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+              className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
             >
               {comprando ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
               {comprando ? 'Abrindo pagamento...' : 'Comprar simulação extra (R$ 5)'}
@@ -276,7 +276,7 @@ export default function SimuladorCVClient({
         <button
           onClick={analisar}
           disabled={gerando || !curriculo.trim() || !vaga.trim() || (limiteAtingido && creditos === 0)}
-          className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-6 py-3 rounded-full transition-colors mb-10"
+          className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-6 py-3 rounded-full transition-colors mb-10"
         >
           {gerando ? (
             <Loader2 size={16} className="animate-spin" />

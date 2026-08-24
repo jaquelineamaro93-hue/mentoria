@@ -77,15 +77,15 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
-      <button className="fixed top-6 right-6 z-40 md:hidden p-2 rounded border border-line hover:bg-paper" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+      <button className="fixed top-6 right-6 z-40 md:hidden p-2 rounded border border-gray-faint hover:bg-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
         {isMobileMenuOpen ? "✕" : "☰"}
       </button>
-    <aside className={`fixed md:sticky top-0 left-0 h-screen w-[280px] shrink-0 border-r border-line bg-paper flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+    <aside className={`fixed md:sticky top-0 left-0 h-screen w-[280px] shrink-0 border-r border-gray-faint bg-white flex flex-col z-50 transition-transform md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
       <div className="flex-1 flex flex-col p-6 md:p-7 md:max-h-screen md:overflow-y-auto">
         <div className="mb-9">
-          <p className="font-display text-3xl text-brown-deep">SOMA</p>
+          <p className="font-display text-3xl text-black">SOMA</p>
           <div className="h-px w-8 bg-brown my-2.5" />
-          <p className="text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-text">
             Portal do Mentorado
           </p>
         </div>
@@ -102,8 +102,8 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors ${
                   isActive
-                    ? 'bg-sky-tint text-brown-deep border border-sky'
-                    : 'text-ink-soft border border-transparent hover:bg-cream'
+                    ? 'bg-mint-light text-black border border-mint'
+                    : 'text-gray-text border border-transparent hover:bg-white'
                 }`}
               >
                 <Icon size={17} strokeWidth={1.75} />
@@ -121,8 +121,8 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
               href="/admin"
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors ${
                 pathname === '/admin'
-                  ? 'bg-sky-tint text-brown-deep border border-sky'
-                  : 'text-ink-soft border border-transparent hover:bg-cream'
+                  ? 'bg-mint-light text-black border border-mint'
+                  : 'text-gray-text border border-transparent hover:bg-white'
               }`}
             >
               <ShieldCheck size={17} strokeWidth={1.75} />
@@ -132,19 +132,19 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
         )}
       </div>
 
-      <div className="p-6 md:p-7 border-t border-line">
+      <div className="p-6 md:p-7 border-t border-gray-faint">
         {profile && (
           <div className="flex items-center gap-2.5 mb-3.5">
             {profile.foto_url ? (
-              <img src={profile.foto_url} alt={profile.nome} className="w-8 h-8 rounded-full object-cover border border-sky" />
+              <img src={profile.foto_url} alt={profile.nome} className="w-8 h-8 rounded-full object-cover border border-mint" />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-sky-tint border border-sky flex items-center justify-center text-sky-deep text-xs font-medium">
+              <div className="w-8 h-8 rounded-full bg-mint-light border border-mint flex items-center justify-center text-mint text-xs font-medium">
                 {profile.nome.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()}
               </div>
             )}
             <div>
-              <p className="text-[13px] text-ink leading-tight">{profile.nome}</p>
-              <p className="text-[10px] uppercase tracking-wide text-ink-faint leading-tight mt-0.5">
+              <p className="text-[13px] text-black leading-tight">{profile.nome}</p>
+              <p className="text-[10px] uppercase tracking-wide text-gray-text leading-tight mt-0.5">
                 Mentorada {profile.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
               </p>
             </div>
@@ -152,20 +152,20 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
         )}
         <Link
           href="/perfil"
-          className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors mb-3"
+          className="flex items-center gap-2 text-[13px] text-gray-text hover:text-orange transition-colors mb-3"
         >
           <UserCog size={15} strokeWidth={1.75} />
           Meu Perfil
         </Link>
         <Link
           href="/termos"
-          className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors mb-3"
+          className="flex items-center gap-2 text-[13px] text-gray-text hover:text-orange transition-colors mb-3"
         >
           Termos da mentoria
         </Link>
         <button
           onClick={onSignOut}
-          className="flex items-center gap-2 text-[13px] text-ink-faint hover:text-brown transition-colors"
+          className="flex items-center gap-2 text-[13px] text-gray-text hover:text-orange transition-colors"
         >
           <LogOut size={15} strokeWidth={1.75} />
           Sair

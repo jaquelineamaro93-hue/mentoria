@@ -53,26 +53,26 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
 
   const campoEstilo = {
     width: "100%",
-    border: "1px solid #ded4c3",
+    border: "1px solid #E8E8E8",
     borderRadius: 8,
     padding: "10px 12px",
     fontFamily: "Poppins, sans-serif",
     fontSize: 14,
-    color: "#362b21",
-    background: "#fbf8f2",
+    color: "#1A1A1A",
+    background: "#FFFFFF",
     resize: "vertical" as const,
   };
 
   return (
-    <div style={{ background: "#fbf8f2", border: "1px solid #ded4c3", borderRadius: 12, padding: 24 }}>
-      <p className="display" style={{ fontSize: 20, color: "#3c2c1f", margin: "0 0 4px" }}>
+    <div style={{ background: "#FFFFFF", border: "1px solid #E8E8E8", borderRadius: 12, padding: 24 }}>
+      <p className="display" style={{ fontSize: 20, color: "#1A1A1A", margin: "0 0 4px" }}>
         Reflexão de {nomeMes}
       </p>
-      <p style={{ fontSize: 13, color: "#6b5d4f", margin: "0 0 16px" }}>
+      <p style={{ fontSize: 13, color: "#808080", margin: "0 0 16px" }}>
         Leva 5 minutos. É o que sustenta o plano no mês a mês.
       </p>
 
-      <label style={{ fontSize: 13, color: "#6b5d4f", display: "block", marginBottom: 6 }}>
+      <label style={{ fontSize: 13, color: "#808080", display: "block", marginBottom: 6 }}>
         Como está sua energia neste mês?
       </label>
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
@@ -83,9 +83,9 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
             style={{
               padding: "6px 16px",
               borderRadius: 20,
-              border: "1px solid #6b4a35",
-              background: energia === nivel ? "#6b4a35" : "transparent",
-              color: energia === nivel ? "#fbf8f2" : "#6b4a35",
+              border: "1px solid #FFB366",
+              background: energia === nivel ? "#FFB366" : "transparent",
+              color: energia === nivel ? "#FFFFFF" : "#FFB366",
               fontSize: 13,
               cursor: "pointer",
               textTransform: "capitalize",
@@ -96,7 +96,7 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
         ))}
       </div>
 
-      <label style={{ fontSize: 13, color: "#6b5d4f", display: "block", marginBottom: 6 }}>
+      <label style={{ fontSize: 13, color: "#808080", display: "block", marginBottom: 6 }}>
         O que avançou este mês?
       </label>
       <textarea
@@ -106,7 +106,7 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
         style={{ ...campoEstilo, marginBottom: 14 }}
       />
 
-      <label style={{ fontSize: 13, color: "#6b5d4f", display: "block", marginBottom: 6 }}>
+      <label style={{ fontSize: 13, color: "#808080", display: "block", marginBottom: 6 }}>
         O que travou?
       </label>
       <textarea
@@ -116,7 +116,7 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
         style={{ ...campoEstilo, marginBottom: 14 }}
       />
 
-      <label style={{ fontSize: 13, color: "#6b5d4f", display: "block", marginBottom: 6 }}>
+      <label style={{ fontSize: 13, color: "#808080", display: "block", marginBottom: 6 }}>
         Qual o ajuste para o mês que vem?
       </label>
       <textarea
@@ -133,8 +133,8 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
           padding: "10px 24px",
           borderRadius: 8,
           border: "none",
-          background: "#4f7196",
-          color: "#fbf8f2",
+          background: "#3DD9C8",
+          color: "#FFFFFF",
           fontSize: 14,
           cursor: "pointer",
         }}

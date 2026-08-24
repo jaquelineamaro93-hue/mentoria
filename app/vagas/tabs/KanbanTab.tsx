@@ -324,7 +324,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={exportarVagasComoTemplate}
-            className="flex items-center gap-2 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors text-sm font-medium"
+            className="flex items-center gap-2 bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors text-sm font-medium"
             title="Baixa suas vagas atuais como planilha"
           >
             <Download size={16} />
@@ -618,7 +618,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                 <button
                   onClick={handleAdicionarVaga}
                   disabled={salvandoNova}
-                  className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
+                  className="flex-1 bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
                 >
                   {salvandoNova ? 'Salvando...' : 'Adicionar Vaga'}
                 </button>
@@ -739,7 +739,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                     <button
                       onClick={handleSalvarEdicao}
                       disabled={atualizando}
-                      className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
+                      className="flex-1 bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
                     >
                       {atualizando ? 'Salvando...' : 'Salvar Alterações'}
                     </button>
@@ -810,7 +810,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                   <div className="flex gap-3">
                     <button
                       onClick={() => setEditandoVaga(true)}
-                      className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors"
+                      className="flex-1 bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors"
                     >
                       Editar
                     </button>

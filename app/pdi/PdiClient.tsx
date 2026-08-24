@@ -125,7 +125,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
                       respondido
-                        ? 'bg-brown border-brown text-paper'
+                        ? 'bg-brown border-brown text-white'
                         : 'border-gray-faint text-gray-text'
                     }`}
                   >
@@ -177,7 +177,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
               <button
                 onClick={irParaProximo}
                 disabled={salvando || !respostas[secao.codigo]?.trim()}
-                className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
               >
                 {salvando ? <Loader2 size={15} className="animate-spin" /> : null}
                 {passo < total - 1 ? (

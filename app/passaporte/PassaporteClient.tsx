@@ -134,8 +134,8 @@ export default function PassaporteClient({
                           <div
                             className={`w-20 h-20 rounded-t-3xl rounded-b-lg border-2 flex items-center justify-center shadow-lg transition-all overflow-hidden ${
                               desbloqueada
-                                ? 'bg-gradient-to-br from-brown-emblem to-ink-soft border-brown-deep text-paper'
-                                : 'bg-gradient-to-br from-paper to-cream border-gray-faint text-gray-text opacity-60'
+                                ? 'bg-gradient-to-br from-brown-emblem to-ink-soft border-brown-deep text-white'
+                                : 'bg-gradient-to-br from-white to-white border-gray-faint text-gray-text opacity-60'
                             }`}
                             style={{
                               clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
@@ -222,7 +222,7 @@ export default function PassaporteClient({
                         <button
                           onClick={() => resgatar(r)}
                           disabled={resgatando === r.id}
-                          className="flex items-center gap-1.5 text-xs bg-brown hover:bg-brown-deep text-paper px-3.5 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                          className="flex items-center gap-1.5 text-xs bg-brown hover:bg-brown-deep text-white px-3.5 py-1.5 rounded-full transition-colors disabled:opacity-60"
                         >
                           {resgatando === r.id && <Loader2 size={12} className="animate-spin" />}
                           Resgatar

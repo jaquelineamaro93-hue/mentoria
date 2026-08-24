@@ -107,7 +107,7 @@ export default function OnboardingClient({
               <div
                 className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border ${
                   etapa.feita
-                    ? 'bg-brown border-brown text-paper'
+                    ? 'bg-brown border-brown text-white'
                     : 'border-gray-faint text-gray-text'
                 }`}
               >

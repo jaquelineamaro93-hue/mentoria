@@ -256,7 +256,7 @@ export default function ExerciciosClient({
               <button
                 onClick={handleSalvarDiagnostico}
                 disabled={salvando}
-                className="self-start flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+                className="self-start flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
               >
                 {salvando ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -385,7 +385,7 @@ export default function ExerciciosClient({
               <button
                 onClick={enviarVia}
                 disabled={enviandoVia || viaForcas.some((f) => !f) || !viaData}
-                className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
               >
                 {enviandoVia ? (
                   <Loader2 size={15} className="animate-spin" />
@@ -422,7 +422,7 @@ export default function ExerciciosClient({
               <button
                 onClick={gerarResumoPerfil}
                 disabled={gerandoResumo}
-                className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
               >
                 {gerandoResumo ? (
                   <Loader2 size={15} className="animate-spin" />

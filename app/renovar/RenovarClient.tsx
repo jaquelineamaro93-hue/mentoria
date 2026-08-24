@@ -107,7 +107,7 @@ export default function RenovarClient({ profile, planos }: Props) {
                   <button
                     onClick={() => assinar(plano.codigo, 'avista')}
                     disabled={carregando !== null}
-                    className="w-full flex items-center justify-between gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-3 rounded-full transition-colors"
+                    className="w-full flex items-center justify-between gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-3 rounded-full transition-colors"
                   >
                     <span>À vista</span>
                     <span className="flex items-center gap-1.5">
@@ -121,7 +121,7 @@ export default function RenovarClient({ profile, planos }: Props) {
                   <button
                     onClick={() => assinar(plano.codigo, 'cartao')}
                     disabled={carregando !== null}
-                    className="w-full flex items-center justify-between gap-2 border border-brown text-black hover:bg-brown hover:text-paper disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
+                    className="w-full flex items-center justify-between gap-2 border border-brown text-black hover:bg-brown hover:text-white disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
                   >
                     <span>Cartão (1x)</span>
                     <span className="flex items-center gap-1.5">

@@ -25,7 +25,7 @@ type Plano = {
 const CORES_ALERTA: Record<string, string> = {
   vermelho: "#c85a4a",
   amarelo: "#c99a3c",
-  azul: "#4f7196",
+  azul: "#3DD9C8",
 };
 
 export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
@@ -101,20 +101,20 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
 
   if (carregando) {
     return (
-      <div style={{ padding: 32, fontFamily: "Poppins, sans-serif", color: "#6b5d4f" }}>
+      <div style={{ padding: 32, fontFamily: "Poppins, sans-serif", color: "#808080" }}>
         Carregando seu plano...
       </div>
     );
   }
 
   return (
-    <div style={{ fontFamily: "Poppins, sans-serif", color: "#362b21" }}>
+    <div style={{ fontFamily: "Poppins, sans-serif", color: "#1A1A1A" }}>
       {!plano && (
         <div style={{ textAlign: "center", padding: "48px 24px" }}>
-          <p className="display" style={{ fontSize: 24, color: "#3c2c1f", marginBottom: 12 }}>
+          <p className="display" style={{ fontSize: 24, color: "#1A1A1A", marginBottom: 12 }}>
             Seu plano ainda não foi gerado
           </p>
-          <p style={{ color: "#6b5d4f", maxWidth: 460, margin: "0 auto 28px" }}>
+          <p style={{ color: "#808080", maxWidth: 460, margin: "0 auto 28px" }}>
             Você já preencheu as 20 seções do Meu PDI. Agora é só transformar isso em um plano com
             caminho, prazos e ações que você consegue acompanhar mês a mês.
           </p>
@@ -126,8 +126,8 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
               padding: "14px 32px",
               borderRadius: 8,
               border: "none",
-              background: "#6b4a35",
-              color: "#fbf8f2",
+              background: "#FFB366",
+              color: "#FFFFFF",
               fontSize: 15,
               cursor: "pointer",
             }}
@@ -140,17 +140,17 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
       {plano && (
         <>
           <header style={{ marginBottom: 40 }}>
-            <p className="display" style={{ fontSize: 28, color: "#3c2c1f", margin: "0 0 6px" }}>
+            <p className="display" style={{ fontSize: 28, color: "#1A1A1A", margin: "0 0 6px" }}>
               Meu plano
             </p>
-            {plano.equacao && <p style={{ fontSize: 13, color: "#4f7196", margin: 0 }}>{plano.equacao}</p>}
+            {plano.equacao && <p style={{ fontSize: 13, color: "#3DD9C8", margin: 0 }}>{plano.equacao}</p>}
           </header>
 
           <section style={{ marginBottom: 36 }}>
-            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#9c8f7e", marginBottom: 8 }}>DIAGNÓSTICO</p>
-            <p style={{ lineHeight: 1.6, color: "#362b21" }}>{plano.diagnostico.sintese}</p>
+            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#999999", marginBottom: 8 }}>DIAGNÓSTICO</p>
+            <p style={{ lineHeight: 1.6, color: "#1A1A1A" }}>{plano.diagnostico.sintese}</p>
             {plano.diagnostico.conflito_central && (
-              <p style={{ lineHeight: 1.6, color: "#6b5d4f", marginTop: 10 }}>
+              <p style={{ lineHeight: 1.6, color: "#808080", marginTop: 10 }}>
                 {plano.diagnostico.conflito_central}
               </p>
             )}
@@ -162,39 +162,39 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
                 <div
                   key={i}
                   style={{
-                    borderLeft: `4px solid ${CORES_ALERTA[a.cor] ?? "#9c8f7e"}`,
-                    background: "#fbf8f2",
+                    borderLeft: `4px solid ${CORES_ALERTA[a.cor] ?? "#999999"}`,
+                    background: "#FFFFFF",
                     padding: "10px 16px",
                     borderRadius: 6,
                   }}
                 >
                   <p style={{ fontWeight: 500, margin: 0 }}>{a.tipo}</p>
-                  <p style={{ fontSize: 13, color: "#6b5d4f", margin: "4px 0 0" }}>{a.descricao}</p>
+                  <p style={{ fontSize: 13, color: "#808080", margin: "4px 0 0" }}>{a.descricao}</p>
                 </div>
               ))}
             </section>
           )}
 
           <section style={{ marginBottom: 44 }}>
-            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#9c8f7e", marginBottom: 16 }}>ROADMAP</p>
+            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#999999", marginBottom: 16 }}>ROADMAP</p>
             <RoadmapTimeline etapas={plano.roadmap} />
           </section>
 
           <section style={{ marginBottom: 44 }}>
-            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#9c8f7e", marginBottom: 16 }}>PILARES E AÇÕES</p>
+            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#999999", marginBottom: 16 }}>PILARES E AÇÕES</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
               {plano.pilares.map((pilar, i) => (
-                <div key={i} style={{ background: "#fbf8f2", border: "1px solid #ded4c3", borderRadius: 12, padding: 24 }}>
-                  <p className="display" style={{ fontSize: 19, color: "#3c2c1f", margin: "0 0 10px" }}>
+                <div key={i} style={{ background: "#FFFFFF", border: "1px solid #E8E8E8", borderRadius: 12, padding: 24 }}>
+                  <p className="display" style={{ fontSize: 19, color: "#1A1A1A", margin: "0 0 10px" }}>
                     {pilar.titulo}
                   </p>
-                  <p style={{ fontSize: 13, color: "#6b5d4f", margin: "0 0 4px" }}>
+                  <p style={{ fontSize: 13, color: "#808080", margin: "0 0 4px" }}>
                     <strong>Específico:</strong> {pilar.meta_smart.especifico}
                   </p>
-                  <p style={{ fontSize: 13, color: "#6b5d4f", margin: "0 0 4px" }}>
+                  <p style={{ fontSize: 13, color: "#808080", margin: "0 0 4px" }}>
                     <strong>Mensurável:</strong> {pilar.meta_smart.mensuravel}
                   </p>
-                  <p style={{ fontSize: 13, color: "#6b5d4f", margin: "0 0 16px" }}>
+                  <p style={{ fontSize: 13, color: "#808080", margin: "0 0 16px" }}>
                     <strong>Prazo:</strong> {pilar.meta_smart.temporal}
                   </p>
                   <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -208,7 +208,7 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
           </section>
 
           <section>
-            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#9c8f7e", marginBottom: 16 }}>
+            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#999999", marginBottom: 16 }}>
               CHECK-IN MENSAL
             </p>
             <ReflexaoMensal

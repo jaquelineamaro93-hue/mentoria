@@ -168,7 +168,7 @@ export default function QuemSouEuClient({
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
                       respondido
-                        ? 'bg-brown border-brown text-paper'
+                        ? 'bg-brown border-brown text-white'
                         : 'border-gray-faint text-gray-text'
                     }`}
                   >
@@ -223,7 +223,7 @@ export default function QuemSouEuClient({
                 <button
                   onClick={irParaProximo}
                   disabled={salvando || !respostas[bloco.codigo]?.trim()}
-                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                 >
                   {salvando ? <Loader2 size={15} className="animate-spin" /> : null}
                   Continuar <ArrowRight size={15} />
@@ -232,7 +232,7 @@ export default function QuemSouEuClient({
                 <button
                   onClick={salvarBlocoAtual}
                   disabled={salvando || !respostas[bloco.codigo]?.trim()}
-                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                  className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                 >
                   {salvando ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
                   Salvar último bloco
@@ -265,7 +265,7 @@ export default function QuemSouEuClient({
                   <button
                     onClick={gerarMapa}
                     disabled={gerandoMapa}
-                    className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                    className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                   >
                     {gerandoMapa ? (
                       <Loader2 size={15} className="animate-spin" />
@@ -307,7 +307,7 @@ export default function QuemSouEuClient({
                   <button
                     onClick={gerarBussola}
                     disabled={gerandoBussola}
-                    className="shrink-0 flex items-center gap-2 bg-mint-deep hover:bg-brown-deep disabled:opacity-60 text-paper text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                    className="shrink-0 flex items-center gap-2 bg-mint-deep hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                   >
                     {gerandoBussola ? (
                       <Loader2 size={15} className="animate-spin" />

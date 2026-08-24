@@ -557,7 +557,7 @@ export default function AdminClient({
                         <button
                           onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
                           disabled={resetandoId === l.profile.id}
-                          className="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                          className="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
                         >
                           {resetandoId === l.profile.id ? (
                             <Loader2 size={12} className="animate-spin" />
@@ -569,7 +569,7 @@ export default function AdminClient({
                         <button
                           onClick={() => deletarUsuario(l.profile.id, l.profile.nome)}
                           disabled={deletandoId === l.profile.id}
-                          className="flex items-center gap-1.5 text-xs bg-red-800 hover:bg-red-900 text-paper px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                          className="flex items-center gap-1.5 text-xs bg-red-800 hover:bg-red-900 text-white px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
                         >
                           {deletandoId === l.profile.id ? (
                             <Loader2 size={12} className="animate-spin" />

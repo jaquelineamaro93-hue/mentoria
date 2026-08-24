@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream to-white flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-white to-white flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="font-display text-3xl text-black mb-2">SOMA Mentoria</h1>

@@ -80,7 +80,7 @@ export default function RankingComunidade() {
           <div className="flex items-flex-end justify-center gap-3">
             {top3[1] && (
               <div className="text-center flex flex-col items-center">
-                <div className="w-24 h-60 bg-gradient-to-b from-paper to-cream rounded-t-xl border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
+                <div className="w-24 h-60 bg-gradient-to-b from-white to-white rounded-t-xl border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
                   <span className="text-4xl mb-3">🥈</span>
                   {top3[1].foto_url ? (
                     <img
@@ -132,14 +132,14 @@ export default function RankingComunidade() {
                   <p className="text-xs text-black font-bold">Impulsos</p>
                 </div>
                 <div className="w-full h-8 bg-gradient-to-b from-brown-deep to-brown rounded-b-2xl border-4 border-brown-deep border-t-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-paper">1º</span>
+                  <span className="text-lg font-bold text-white">1º</span>
                 </div>
               </div>
             )}
 
             {top3[2] && (
               <div className="text-center flex flex-col items-center">
-                <div className="w-24 h-56 bg-gradient-to-b from-paper to-cream rounded-t-lg border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
+                <div className="w-24 h-56 bg-gradient-to-b from-white to-white rounded-t-lg border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
                   <span className="text-4xl mb-3">🥉</span>
                   {top3[2].foto_url ? (
                     <img

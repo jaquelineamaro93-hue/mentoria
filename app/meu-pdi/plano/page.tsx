@@ -19,7 +19,7 @@ export default function MeuPlanoPage() {
 
   if (carregando) {
     return (
-      <div style={{ padding: 48, fontFamily: "Poppins, sans-serif", color: "#6b5d4f" }}>
+      <div style={{ padding: 48, fontFamily: "Poppins, sans-serif", color: "#808080" }}>
         Carregando...
       </div>
     );

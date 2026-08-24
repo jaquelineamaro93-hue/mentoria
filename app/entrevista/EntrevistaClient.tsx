@@ -269,7 +269,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
               <button
                 onClick={handleGerarSOAR}
                 disabled={gerando || !curriculo.trim() || !descricaoVaga.trim()}
-                className="bg-brown-deep text-paper px-8 py-3 rounded-lg font-medium hover:bg-brown transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-brown-deep text-white px-8 py-3 rounded-lg font-medium hover:bg-brown transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {gerando ? (
                   <>
@@ -515,7 +515,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                 </Panel>
 
                 <div className="flex justify-center gap-3">
-                  <button className="flex items-center gap-2 bg-brown-deep text-paper px-6 py-2 rounded-lg font-medium hover:bg-brown transition">
+                  <button className="flex items-center gap-2 bg-brown-deep text-white px-6 py-2 rounded-lg font-medium hover:bg-brown transition">
                     <Download size={18} />
                     Baixar em PDF
                   </button>

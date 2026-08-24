@@ -96,7 +96,7 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
                 <span
                   className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] shrink-0 ${
                     respondido
-                      ? 'bg-brown border-brown text-paper'
+                      ? 'bg-brown border-brown text-white'
                       : 'border-gray-faint text-gray-text'
                   }`}
                 >
@@ -147,7 +147,7 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
           <button
             onClick={() => salvarSecaoAtual()}
             disabled={salvando}
-            className="flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-paper rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-white rounded-lg transition-colors disabled:opacity-50"
           >
             {salvando ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
             {salvando ? 'Salvando...' : foiRespondida ? 'Salvo' : 'Salvar'}
@@ -156,7 +156,7 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
           {passo < secoes.length - 1 && (
             <button
               onClick={() => irParaSecao(passo + 1)}
-              className="ml-auto flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-paper rounded-lg transition-colors"
+              className="ml-auto flex items-center gap-2 px-6 py-2 bg-brown-deep hover:bg-brown text-white rounded-lg transition-colors"
             >
               Próxima
               <ArrowRight size={16} />

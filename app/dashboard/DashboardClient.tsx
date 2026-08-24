@@ -60,7 +60,7 @@ function StatusBadge({ status }: { status: FaseStatus }) {
   const config = {
     concluida: { label: 'Concluída', className: 'bg-lotus-mint/40 border-lotus-mint text-lotus-brown' },
     em_andamento: { label: 'Em andamento', className: 'bg-lotus-coral/15 border-lotus-coral text-lotus-brown' },
-    pendente: { label: 'A iniciar', className: 'bg-lotus-cream border-gray-faint text-gray-text' },
+    pendente: { label: 'A iniciar', className: 'bg-white border-gray-faint text-gray-text' },
   }[status];
   return (
     <span
@@ -213,7 +213,7 @@ export default function DashboardClient({
       )}
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full bg-lotus-cream">
+      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full bg-white">
         {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (
@@ -277,7 +277,7 @@ export default function DashboardClient({
             </div>
             <Link
               href={proximoMarcoHref}
-              className="shrink-0 text-sm font-medium text-lotus-brown border border-lotus-brown/40 hover:bg-lotus-brown hover:text-paper transition-colors px-4 py-2 rounded-lg"
+              className="shrink-0 text-sm font-medium text-lotus-brown border border-lotus-brown/40 hover:bg-lotus-brown hover:text-white transition-colors px-4 py-2 rounded-lg"
             >
               Continuar
             </Link>
@@ -373,7 +373,7 @@ export default function DashboardClient({
               </div>
               <Link
                 href="/votar-encontro"
-                className="shrink-0 text-sm font-medium bg-lotus-brown hover:bg-lotus-brown/90 text-paper px-4 py-2 rounded-lg transition-colors"
+                className="shrink-0 text-sm font-medium bg-lotus-brown hover:bg-lotus-brown/90 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 Votar agora
               </Link>
@@ -390,7 +390,7 @@ export default function DashboardClient({
               <Link
                 key={tarefa.label}
                 href={tarefa.href}
-                className="flex items-center gap-3 px-5 py-3.5 hover:bg-lotus-cream transition-colors"
+                className="flex items-center gap-3 px-5 py-3.5 hover:bg-white transition-colors"
               >
                 {tarefa.done ? (
                   <CheckCircle2 size={17} strokeWidth={1.5} className="text-lotus-brown shrink-0" />
@@ -421,7 +421,7 @@ export default function DashboardClient({
               href={DRIVE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 flex items-center gap-2 bg-lotus-brown hover:bg-lotus-brown/90 text-paper text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+              className="shrink-0 flex items-center gap-2 bg-lotus-brown hover:bg-lotus-brown/90 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
             >
               Abrir Drive <ExternalLink size={14} strokeWidth={1.5} />
             </a>

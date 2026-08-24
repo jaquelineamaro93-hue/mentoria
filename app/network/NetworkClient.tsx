@@ -329,7 +329,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
               <button
                 onClick={handleImportarCSV}
-                className="w-full bg-brown-deep text-paper px-6 py-3 rounded-lg font-medium hover:bg-brown transition mb-8 inline-flex items-center justify-center gap-2"
+                className="w-full bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown transition mb-8 inline-flex items-center justify-center gap-2"
               >
                 <Upload size={18} />
                 Selecionar arquivo CSV
@@ -459,7 +459,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                   <button
                     onClick={handleAdicionarContatoManual}
                     disabled={salvando}
-                    className="flex-1 bg-brown-deep text-paper px-4 py-2 rounded-lg hover:bg-brown transition-colors font-medium disabled:opacity-50"
+                    className="flex-1 bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors font-medium disabled:opacity-50"
                   >
                     {salvando ? 'Salvando...' : 'Adicionar Contato'}
                   </button>
@@ -510,7 +510,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded text-sm font-medium transition ${
                           copiado === (mensagens[circulo.id] || '')
                             ? 'bg-green-100 text-green-700 border border-green-300'
-                            : 'bg-brown-deep text-paper hover:bg-brown'
+                            : 'bg-brown-deep text-white hover:bg-brown'
                         }`}
                       >
                         {copiado === (mensagens[circulo.id] || '') ? (

@@ -49,21 +49,21 @@ export function ForgotPassword({ onBack }: ForgotPasswordProps) {
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
-        <h1 className="font-display text-3xl text-brown-deep mb-2">SOMA Mentoria</h1>
-        <p className="text-sm text-ink-faint">Portal do Mentorado</p>
+        <h1 className="font-display text-3xl text-black mb-2">SOMA Mentoria</h1>
+        <p className="text-sm text-gray-text">Portal do Mentorado</p>
       </div>
 
-      <div className="bg-white border-2 border-line rounded-2xl p-8">
+      <div className="bg-white border-2 border-gray-faint rounded-2xl p-8">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-sm text-brown-deep hover:text-brown mb-6 font-medium"
+          className="flex items-center gap-2 text-sm text-black hover:text-orange mb-6 font-medium"
         >
           <ArrowLeft size={16} />
           Voltar ao login
         </button>
 
-        <h2 className="font-display text-xl text-brown-deep mb-1">Esqueci a Senha</h2>
-        <p className="text-sm text-ink-faint mb-6">
+        <h2 className="font-display text-xl text-black mb-1">Esqueci a Senha</h2>
+        <p className="text-sm text-gray-text mb-6">
           Digite seu email e enviaremos um link para redefinir sua senha
         </p>
 
@@ -87,13 +87,13 @@ export function ForgotPassword({ onBack }: ForgotPasswordProps) {
             )}
 
             <div>
-              <label className="block text-xs font-medium text-brown-deep mb-2">E-mail</label>
+              <label className="block text-xs font-medium text-black mb-2">E-mail</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu.email@exemplo.com"
-                className="w-full px-4 py-3 border border-line rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
+                className="w-full px-4 py-3 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep transition-colors"
                 disabled={carregando}
               />
             </div>

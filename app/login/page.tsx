@@ -372,20 +372,20 @@ function LoginPageContent() {
       <style>{`
         .input {
           width: 100%;
-          background: var(--color-cream);
-          border: 1px solid var(--color-line);
+          background: var(--color-white);
+          border: 1px solid var(--color-gray-faint);
           border-radius: 8px;
           padding: 10px 14px;
           font-size: 14px;
-          color: var(--color-ink);
+          color: var(--color-black);
         }
         .input:focus {
-          border-color: var(--color-sky-deep);
+          border-color: var(--color-mint);
         }
         .btn-primary {
           width: 100%;
-          background: var(--color-brown);
-          color: var(--color-paper);
+          background: var(--color-mint);
+          color: var(--color-black);
           font-weight: 600;
           font-size: 14px;
           padding: 11px 16px;
