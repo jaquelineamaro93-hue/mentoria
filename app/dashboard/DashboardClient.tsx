@@ -57,8 +57,8 @@ type FaseStatus = 'pendente' | 'em_andamento' | 'concluida';
 
 function StatusBadge({ status }: { status: FaseStatus }) {
   const config = {
-    concluida: { label: 'Concluída', className: 'bg-lotus-mint/40 border-lotus-mint text-lotus-brown' },
-    em_andamento: { label: 'Em andamento', className: 'bg-lotus-coral/15 border-lotus-coral text-lotus-brown' },
+    concluida: { label: 'Concluída', className: 'bg-lotus-mint/40 border-lotus-mint text-black' },
+    em_andamento: { label: 'Em andamento', className: 'bg-lotus-coral/15 border-lotus-coral text-black' },
     pendente: { label: 'A iniciar', className: 'bg-white border-gray-faint text-gray-text' },
   }[status];
   return (
@@ -227,14 +227,14 @@ export default function DashboardClient({
               Bem-vinda, {primeiroNome}
             </h1>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-[11px] uppercase tracking-wide bg-lotus-brown/10 border border-lotus-brown/30 text-lotus-brown px-2.5 py-1 rounded-full">
+              <span className="text-[11px] uppercase tracking-wide bg-lotus-brown/10 border border-lotus-brown/30 text-black px-2.5 py-1 rounded-full">
                 Mentorada {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
               </span>
               <span
                 className={`flex items-center gap-1 text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full border ${
                   profile?.onboarding_concluido
-                    ? 'bg-lotus-mint/30 border-lotus-mint text-lotus-brown'
-                    : 'bg-lotus-coral/10 border-lotus-coral text-lotus-brown'
+                    ? 'bg-lotus-mint/30 border-lotus-mint text-black'
+                    : 'bg-lotus-coral/10 border-lotus-coral text-black'
                 }`}
               >
                 {profile?.onboarding_concluido ? (
