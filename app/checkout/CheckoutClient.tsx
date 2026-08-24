@@ -78,7 +78,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
                 <div className="space-y-2 text-sm mb-6">
                   <p className="text-black font-medium">Opções de pagamento:</p>
                   <p className="text-gray-text">
-                    R$ {Number(p.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} à vista
+                    R$ {Number(p.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (PIX)
                   </p>
                   <p className="text-gray-text">
                     R$ {Number(p.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no cartão
@@ -107,7 +107,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
                     : 'border-gray-faint hover:border-brown-deep'
                 }`}
               >
-                <p className="font-medium text-black mb-2">À Vista</p>
+                <p className="font-medium text-black mb-2">PIX</p>
                 <p className="text-lg font-display text-black">
                   R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
