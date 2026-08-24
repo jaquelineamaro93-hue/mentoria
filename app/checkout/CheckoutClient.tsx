@@ -23,6 +23,8 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
     );
   }
 
+  const planoSafe = plano as PlanoMentoria;
+
   async function irParaMercadoPago() {
     if (!formaEscolhida) {
       alert('Por favor, escolha uma forma de pagamento');
@@ -30,7 +32,7 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
     }
     setProcessando(true);
     try {
-      const planoCodigo = plano.codigo;
+      const planoCodigo = planoSafe.codigo;
       const res = await fetch('/api/mercadopago/criar-assinatura', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,8 +63,8 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
         </Link>
 
         <div className="text-center mb-12">
-          <h1 className="font-display text-4xl text-black mb-2">{plano.nome}</h1>
-          <p className="text-lg text-gray-text">{plano.descricao_encontros}</p>
+          <h1 className="font-display text-4xl text-black mb-2">{planoSafe.nome}</h1>
+          <p className="text-lg text-gray-text">{planoSafe.descricao_encontros}</p>
         </div>
 
         {planoAtualCodigo && (
@@ -72,22 +74,22 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
         )}
 
         <div className="bg-white border-2 border-gray-faint rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-2xl text-black mb-6">{plano.nome}</h2>
+          <h2 className="font-display text-2xl text-black mb-6">{planoSafe.nome}</h2>
 
           <div className="space-y-4 mb-8">
             <div>
-              <p className="text-xs font-medium text-primary mb-2">{plano.duracao_meses} MESES</p>
+              <p className="text-xs font-medium text-primary mb-2">{planoSafe.duracao_meses} MESES</p>
               <p className="text-sm mb-4">
-                {plano.codigo.includes('online') ? (
+                {planoSafe.codigo.includes('online') ? (
                   <span className="text-primary font-medium">100% Online</span>
                 ) : (
-                  <span className="text-gray-text">{plano.foco}</span>
+                  <span className="text-gray-text">{planoSafe.foco}</span>
                 )}
               </p>
             </div>
 
             <div className="space-y-2">
-              {(plano.itens_inclusos || []).map((item: string, i: number) => (
+              {(planoSafe.itens_inclusos || []).map((item: string, i: number) => (
                 <div key={i} className="flex gap-2 text-sm text-black">
                   <span>✓</span>
                   <span>{item}</span>
@@ -100,15 +102,15 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-text">PIX</span>
-                <span className="font-bold text-black">R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-black">R$ {Number(planoSafe.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-text">Cartão (1x)</span>
-                <span className="font-bold text-black">R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-black">R$ {Number(planoSafe.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-text">Parcelado</span>
-                <span className="font-bold text-black">{plano.parcelas_recorrente}x R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold text-black">{planoSafe.parcelas_recorrente}x R$ {(Number(planoSafe.preco_recorrente_total) / planoSafe.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>
@@ -127,7 +129,7 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
             >
               <p className="font-medium text-black mb-2">PIX</p>
               <p className="text-lg font-display text-black">
-                R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R$ {Number(planoSafe.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </button>
             <button
@@ -140,7 +142,7 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
             >
               <p className="font-medium text-black mb-2">Cartão</p>
               <p className="text-lg font-display text-black">
-                R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R$ {Number(planoSafe.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </button>
             <button
@@ -152,10 +154,10 @@ export default function CheckoutClient({ plano, logado, planoAtualCodigo }: { pl
               }`}
             >
               <p className="font-medium text-black mb-2">Parcelado</p>
-              <p className="text-sm text-gray-text mb-1">{plano.parcelas_recorrente}x de</p>
+              <p className="text-sm text-gray-text mb-1">{planoSafe.parcelas_recorrente}x de</p>
               <p className="text-lg font-display text-black">
                 R${' '}
-                {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', {
+                {(Number(planoSafe.preco_recorrente_total) / planoSafe.parcelas_recorrente).toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
                 })}
               </p>
