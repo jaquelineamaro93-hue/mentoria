@@ -24,7 +24,6 @@ import {
 import Sidebar from '@/components/Sidebar';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
-import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS } from '@/lib/soma-badges';
@@ -455,14 +454,6 @@ export default function DashboardClient({
               </Panel>
             </Link>
           </div>
-        </section>
-
-        {/* SEÇÃO 4: Mural de avisos e passaporte de conquistas */}
-        <section className="mb-10">
-          <Eyebrow>
-            <Calendar size={13} strokeWidth={1.5} /> Mural de avisos & próximos encontros
-          </Eyebrow>
-          <MuralAtualizado avisos={announcements} />
         </section>
 
 
