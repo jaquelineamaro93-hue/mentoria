@@ -10,7 +10,7 @@ const PLANOS = {
     title: 'SOMA 6 meses',
     subtitle: 'Movimento e Posicionamento',
     duracao: '6 MESES',
-    encontros: '13 encontros: 1 online individual, 6 online coletivos, 6 presenciais coletivos',
+    encontros: '6 Online Individuais + 6 Online Coletivos + 6 Presenciais Coletivos + Acesso ao Portal do Mentorado por 12 meses',
     features: [
       'Diagnóstico de Perfil e Carreira',
       'Mapeamento de Talentos',
@@ -19,16 +19,34 @@ const PLANOS = {
       'Bônus: Guia Dream Board',
     ],
     precos: {
-      vista: 650,
-      cartao: 700,
-      recorrente: { valor: 125, vezes: 6, periodo: 'mês' },
+      vista: 800,
+      cartao: 875,
+      recorrente: { valor: 240, vezes: 4, periodo: 'mês' },
+    },
+  },
+  'soma-6m-online': {
+    title: 'SOMA 6 meses - Online',
+    subtitle: 'Movimento e Posicionamento (Online)',
+    duracao: '6 MESES',
+    encontros: '6 Online Individuais + 6 Online Coletivos + Kit onboarding + Acesso ao Portal do Mentorado por 12 meses',
+    features: [
+      'Diagnóstico de Perfil e Carreira',
+      'Mapeamento de Talentos',
+      'Plano de Ação 90 dias',
+      'Presença Profissional (revisão de LinkedIn ou Currículo)',
+      'Bônus: Guia Dream Board',
+    ],
+    precos: {
+      vista: 730,
+      cartao: 805,
+      recorrente: { valor: 222.50, vezes: 4, periodo: 'mês' },
     },
   },
   'soma-12m': {
     title: 'SOMA 12 meses',
     subtitle: 'Consistência e Alta Performance',
     duracao: '12 MESES',
-    encontros: '14 encontros: 2 online individuais, 12 online coletivos, 12 presenciais coletivos',
+    encontros: '12 Online Individuais + 12 Online Coletivos + 12 Presenciais Coletivos + Acesso ao Portal do Mentorado por 12 meses',
     features: [
       'Diagnóstico de Perfil e Carreira',
       'Mapeamento de Talentos',
@@ -37,9 +55,27 @@ const PLANOS = {
       'Bônus: Guia Dream Board',
     ],
     precos: {
-      vista: 850,
-      cartao: 950,
-      recorrente: { valor: 100, vezes: 12, periodo: 'mês' },
+      vista: 870,
+      cartao: 978,
+      recorrente: { valor: 240, vezes: 5, periodo: 'mês' },
+    },
+  },
+  'soma-12m-online': {
+    title: 'SOMA 12 meses - Online',
+    subtitle: 'Consistência e Alta Performance (Online)',
+    duracao: '12 MESES',
+    encontros: '12 Online Individuais + 12 Online Coletivos + Kit onboarding + Acesso ao Portal do Mentorado por 12 meses',
+    features: [
+      'Diagnóstico de Perfil e Carreira',
+      'Mapeamento de Talentos',
+      'Plano de Ação 90 dias',
+      'Presença Profissional (revisão de LinkedIn ou Currículo)',
+      'Bônus: Guia Dream Board',
+    ],
+    precos: {
+      vista: 800,
+      cartao: 908,
+      recorrente: { valor: 226, vezes: 5, periodo: 'mês' },
     },
   },
   'teste': {
@@ -178,7 +214,7 @@ function CheckoutContent() {
                 }`}
               >
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">À vista</span>
+                  <span className="font-medium">PIX</span>
                   <span className="font-bold">R$ {plan.precos.vista.toFixed(2)}</span>
                 </div>
               </button>
