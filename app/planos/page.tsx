@@ -18,6 +18,7 @@ export default function PlanosPage() {
         .select('*')
         .eq('ativo', true)
         .not('codigo', 'ilike', '%teste%')
+        .not('duracao_meses', 'eq', 5)
         .order('duracao_meses', { ascending: true });
 
       if (data) {
