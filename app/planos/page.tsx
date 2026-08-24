@@ -19,13 +19,16 @@ export default function PlanosPage() {
         .from('planos_mentoria')
         .select('*')
         .eq('ativo', true)
-        .eq('visivel_checkout', true)
         .not('codigo', 'ilike', '%teste%')
-        .not('duracao_meses', 'eq', 5)
-        .order('duracao_meses', { ascending: true });
+        .neq('duracao_meses', 5)
+        .order('duracao_meses', { ascending: true })
+        .order('codigo', { ascending: true });
 
       if (data) {
-        setPlanos(data as PlanoMentoria[]);
+        const uniquePlanos = Array.from(
+          new Map((data as PlanoMentoria[]).map(p => [p.codigo, p])).values()
+        );
+        setPlanos(uniquePlanos as PlanoMentoria[]);
       }
     };
 
