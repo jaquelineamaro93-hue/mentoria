@@ -1,13 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Check, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import type { PlanoMentoria } from '@/lib/types';
 
 export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { planos: PlanoMentoria[]; logado: boolean; planoAtualCodigo: string | null }) {
+  const searchParams = useSearchParams();
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
+
+  useEffect(() => {
+    const planParam = searchParams.get('plan');
+    if (planParam) {
+      const plano = planos.find(p => p.codigo === planParam);
+      if (plano) {
+        setPlanoSelecionado(plano.id);
+      }
+    }
+  }, [searchParams, planos]);
 
   const plano = planos.find((p) => p.id === planoSelecionado);
 
@@ -39,6 +52,11 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   return (
     <main className="min-h-screen bg-gradient-to-br from-white to-white py-12 px-6">
       <div className="max-w-5xl mx-auto">
+        <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6">
+          <ArrowLeft size={20} />
+          <span>Voltar</span>
+        </Link>
+
         <div className="text-center mb-12">
           <h1 className="font-display text-4xl text-black mb-2">Soma — Mentoria de Carreira</h1>
           <p className="text-lg text-gray-text">Escolha seu plano e comece sua jornada de transformação profissional.</p>
@@ -70,7 +88,13 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h2 className="font-display text-2xl text-black">{p.nome}</h2>
-                    <p className="text-sm text-gray-text">{p.foco}</p>
+                    <p className="text-sm">
+                      {p.codigo.includes('online') ? (
+                        <span className="text-blue-600 font-medium">100% Online</span>
+                      ) : (
+                        <span className="text-gray-text">{p.foco}</span>
+                      )}
+                    </p>
                   </div>
                   {isSelected && <Check size={24} className="text-green-600" />}
                 </div>
