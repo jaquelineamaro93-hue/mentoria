@@ -8,10 +8,6 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
-  }
-
   const body = await request.json();
   const planoCodigo: string = body.planoCodigo;
   const formaPagamento: 'avista' | 'cartao' | 'recorrente' = body.formaPagamento;
@@ -20,12 +16,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Plano ou forma de pagamento não informados.' }, { status: 400 });
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('nome, email')
-    .eq('id', user.id)
-    .single();
-
   const { data: plano } = await supabase
     .from('planos_mentoria')
     .select('*')
@@ -33,33 +23,53 @@ export async function POST(request: Request) {
     .eq('ativo', true)
     .single();
 
-  if (!profile || !plano) {
-    return NextResponse.json({ error: 'Plano ou perfil não encontrado.' }, { status: 404 });
+  if (!plano) {
+    return NextResponse.json({ error: 'Plano não encontrado.' }, { status: 404 });
   }
 
-  try {
+  let userEmail = 'cliente@somamentoria.com';
+  let userId = user?.id;
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('nome, email')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile) {
+      return NextResponse.json({ error: 'Perfil não encontrado.' }, { status: 404 });
+    }
+
+    userEmail = profile.email;
+
     // Guarda a escolha do plano e forma de pagamento, pra sabermos o que
     // ativar quando o webhook confirmar o pagamento.
     await supabase
       .from('profiles')
       .update({ plano_id: plano.id, forma_pagamento_escolhida: formaPagamento })
       .eq('id', user.id);
+  }
+
+  try {
 
     if (formaPagamento === 'recorrente') {
       const valorParcela = Number(plano.preco_recorrente_total) / plano.parcelas_recorrente;
 
       const assinatura = await criarAssinaturaMercadoPago({
-        email: profile.email,
+        email: userEmail,
         valorParcela,
         parcelas: plano.parcelas_recorrente,
         motivo: `${plano.nome} — Mentoria SOMA (${plano.parcelas_recorrente}x)`,
-        externalReference: user.id,
+        externalReference: userId || 'guest',
       });
 
-      await supabase
-        .from('profiles')
-        .update({ mp_subscription_id: assinatura.id })
-        .eq('id', user.id);
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ mp_subscription_id: assinatura.id })
+          .eq('id', user.id);
+      }
 
       return NextResponse.json({ init_point: assinatura.init_point });
     }
@@ -69,7 +79,7 @@ export async function POST(request: Request) {
     const pagamento = await criarPagamentoUnicoMercadoPago({
       titulo: `${plano.nome} — Mentoria SOMA (${formaPagamento === 'avista' ? 'à vista' : 'cartão'})`,
       valor,
-      externalReference: user.id,
+      externalReference: userId || 'guest',
     });
 
     return NextResponse.json({ init_point: pagamento.init_point });
