@@ -19,6 +19,7 @@ export default function PlanosPage() {
         .from('planos_mentoria')
         .select('*')
         .eq('ativo', true)
+        .eq('visivel_checkout', true)
         .not('codigo', 'ilike', '%teste%')
         .neq('duracao_meses', 5)
         .order('duracao_meses', { ascending: true })
