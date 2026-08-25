@@ -15,7 +15,12 @@ export default async function PlanosPage() {
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
 
-  const planos = (planosRaw || []).filter((p) => p.codigo && !p.codigo.toLowerCase().includes('teste'));
+  const planos = (planosRaw || []).filter((p) => {
+    const hasTestInCodigo = p.codigo && p.codigo.toLowerCase().includes('teste');
+    const hasTestInName = p.nome && p.nome.toLowerCase().includes('teste');
+    const hasTestInDesc = p.descricao_encontros && p.descricao_encontros.toLowerCase().includes('teste');
+    return !hasTestInCodigo && !hasTestInName && !hasTestInDesc;
+  });
 
   const { data: avisos } = await supabase
     .from('announcements')
