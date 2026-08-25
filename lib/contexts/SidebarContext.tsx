@@ -24,6 +24,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   // Atalho de teclado (Cmd+B ou Ctrl+B)
   useEffect(() => {
+    if (!isHydrated) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
         e.preventDefault();
@@ -33,7 +35,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isHydrated]);
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {
@@ -43,11 +45,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Evitar hydration mismatch
-  if (!isHydrated) {
-    return <>{children}</>;
-  }
-
+  // Always render provider with default values during SSR
+  // Values will update on client hydration via useEffect
   return (
     <SidebarContext.Provider value={{ isCollapsed, toggleSidebar }}>
       {children}
