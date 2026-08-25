@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import Sidebar from './components/Sidebar';
 import StarsSelector from './components/StarsSelector';
 import DashboardAcompanhamento from './components/DashboardAcompanhamento';
 import TabNavigation from './components/TabNavigation';
@@ -23,6 +24,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
   const [respostas, setRespostas] = useState<Record<string, any>>(initialData?.respostas_json || {});
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const saveData = async () => {
     setIsSaving(true);
@@ -66,24 +68,29 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header with Back Button */}
-      <div className="bg-white border-b border-gray-faint px-8 py-6">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Voltar ao Início
-        </Link>
-        <h1 className="font-display text-5xl text-black mb-2">Primeiros 90 Dias</h1>
-        <p className="text-gray-text text-base leading-relaxed">
-          Guia de aceleração de carreira e transição executiva
-        </p>
-      </div>
+    <div className="min-h-screen bg-white flex">
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
 
-      {/* Content */}
-      <div className="px-8 py-8 max-w-6xl mx-auto">
+      {/* Main Content */}
+      <div className="flex-1">
+        {/* Header with Back Button */}
+        <div className="bg-white border-b border-gray-faint px-8 py-6">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Voltar ao Início
+          </Link>
+          <h1 className="font-display text-5xl text-black mb-2">Primeiros 90 Dias</h1>
+          <p className="text-gray-text text-base leading-relaxed">
+            Guia de aceleração de carreira e transição executiva
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="px-8 py-8 max-w-6xl mx-auto">
         {/* STARS Diagnosis */}
         <div className="mb-12">
           <h2 className="text-xl text-black font-medium mb-6">Contexto de Atuação</h2>
@@ -149,6 +156,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
