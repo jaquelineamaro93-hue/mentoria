@@ -56,7 +56,7 @@ export default async function HomePage() {
             <Link
               href="/planos"
               className="text-black px-6 py-2 rounded-lg font-medium transition-colors hover:opacity-90"
-              style={{ backgroundColor: '#3DD9C8' }}
+              style={{ backgroundColor: '#0D8071' }}
             >
               Começar
             </Link>
@@ -66,7 +66,7 @@ export default async function HomePage() {
 
       {/* Hero Preto Full */}
       <section style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }} className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#3DD9C8' }}>
+        <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#0D8071' }}>
           Mentoria de Carreira e Estratégia
         </p>
         <h2 className="font-display text-5xl mb-6">
@@ -79,7 +79,7 @@ export default async function HomePage() {
         <Link
           href="/planos"
           className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors"
-          style={{ backgroundColor: '#3DD9C8', color: '#1A1A1A' }}
+          style={{ backgroundColor: '#0D8071', color: '#1A1A1A' }}
         >
           Ver Planos
         </Link>
@@ -88,7 +88,7 @@ export default async function HomePage() {
       {/* Sobre — Branco */}
       <section className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
         <div className="max-w-4xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#3DD9C8' }}>Sobre a mentora</p>
+          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>Sobre a mentora</p>
           <h3 className="font-display text-3xl text-center mb-8" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
           <div className="leading-relaxed space-y-4 text-center max-w-2xl mx-auto" style={{ color: '#808080' }}>
             <p>Administradora e Head de CRM, com uma trajetória construída na intersecção entre dados, tecnologia e negócios. Passagens em empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
@@ -101,7 +101,7 @@ export default async function HomePage() {
       {/* SOMA Pilares */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#3DD9C8' }}>A metodologia</p>
+          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>A metodologia</p>
           <h3 className="font-display text-3xl text-center mb-4" style={{ color: '#1A1A1A' }}>SOMA: sua totalidade</h3>
           <p className="text-center max-w-2xl mx-auto mb-12" style={{ color: '#808080' }}>
             A palavra SOMA vem do grego e representa a totalidade do ser: a união entre mente, corpo e espírito. Um chamado para você integrar todas as suas potências e parar de fragmentar quem você é.
@@ -109,7 +109,7 @@ export default async function HomePage() {
 
           <div className="grid sm:grid-cols-2 gap-6">
             {PILARES_SOMA.map((pilar) => {
-              const cores: any = { S: '#3DD9C8', O: '#FF7A8A', M: '#FFB366', A: '#1A1A1A' };
+              const cores: any = { S: '#0D8071', O: '#FF7A8A', M: '#FFB366', A: '#1A1A1A' };
               return (
                 <div key={pilar.letra} className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
                   <div className="w-10 h-10 rounded-full text-white flex items-center justify-center font-display text-lg mb-4" style={{ backgroundColor: cores[pilar.letra] }}>
@@ -127,17 +127,17 @@ export default async function HomePage() {
       {/* Como funciona */}
       <section className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#3DD9C8' }}>Como funciona</p>
+          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>Como funciona</p>
           <h3 className="font-display text-3xl text-center mb-12" style={{ color: '#1A1A1A' }}>Um programa híbrido em dois tempos</h3>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="border rounded-2xl p-8 bg-white" style={{ borderColor: '#E8E8E8' }}>
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center" style={{ borderColor: '#3DD9C8', backgroundColor: 'rgba(61, 217, 200, 0.1)' }}>
-                  <Video size={18} style={{ color: '#3DD9C8' }} />
+                <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center" style={{ borderColor: '#0D8071', backgroundColor: 'rgba(61, 217, 200, 0.1)' }}>
+                  <Video size={18} style={{ color: '#0D8071' }} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-wide" style={{ color: '#3DD9C8' }}>Etapa 1 · Online</p>
+                  <p className="text-xs uppercase tracking-wide" style={{ color: '#0D8071' }}>Etapa 1 · Online</p>
                   <h4 className="font-display text-lg" style={{ color: '#1A1A1A' }}>Alinhamento e mapa individual</h4>
                 </div>
               </div>
@@ -178,52 +178,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* DEPOIMENTOS */}
-      <section className="px-6 py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs uppercase tracking-wider mb-4 text-center font-semibold" style={{ color: '#808080' }}>Histórias reais</p>
-          <h3 className="font-display text-4xl text-center mb-12" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(61, 217, 200, 0.08)', borderColor: '#3DD9C8' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#3DD9C8' }}>NM</div>
-                <div>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Natalia M.</p>
-                  <p className="text-xs font-medium" style={{ color: '#3DD9C8' }}>S — Sabedoria Interna</p>
-                </div>
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"A metodologia SOMA transformou minha carreira. Finalmente entendi meus diferenciais únicos."</p>
-              <div className="text-lg">⭐⭐⭐⭐⭐</div>
-            </div>
-
-            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(255, 122, 138, 0.08)', borderColor: '#FF7A8A' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FF7A8A' }}>CB</div>
-                <div>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Carlos B.</p>
-                  <p className="text-xs font-medium" style={{ color: '#FF7A8A' }}>O — Objetividade Magnética</p>
-                </div>
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Estrutura cristalina, impacto real. Saí com um plano executável e posicionamento definido."</p>
-              <div className="text-lg">⭐⭐⭐⭐⭐</div>
-            </div>
-
-            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(255, 179, 102, 0.08)', borderColor: '#FFB366' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FFB366' }}>SL</div>
-                <div>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Sofia L.</p>
-                  <p className="text-xs font-medium" style={{ color: '#FFB366' }}>M — Maestria em Ação</p>
-                </div>
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Encontrou os detalhes que ninguém vira. Agora tenho autoridade genuína em tudo que faço."</p>
-              <div className="text-lg">⭐⭐⭐⭐⭐</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Planos */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
@@ -242,7 +196,7 @@ export default async function HomePage() {
                     <p className="font-display text-3xl mb-1" style={{ color: '#1A1A1A' }}>R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     <p className="text-xs" style={{ color: '#808080' }}>à vista</p>
                   </div>
-                  <Link href="/planos" className="w-full block text-center px-6 py-3 rounded-lg font-medium transition-colors" style={{ backgroundColor: destaque ? '#3DD9C8' : 'rgba(61, 217, 200, 0.1)', color: destaque ? '#1A1A1A' : '#3DD9C8' }}>
+                  <Link href="/planos" className="w-full block text-center px-6 py-3 rounded-lg font-medium transition-colors" style={{ backgroundColor: destaque ? '#0D8071' : 'rgba(61, 217, 200, 0.1)', color: destaque ? '#1A1A1A' : '#0D8071' }}>
                     Escolher Plano
                   </Link>
                 </div>
@@ -263,7 +217,7 @@ export default async function HomePage() {
               <p className="text-sm" style={{ color: '#808080' }}>Análise de perfil feita por quem viveu o mercado, não um teste genérico.</p>
             </div>
             <div className="text-center">
-              <Users size={32} className="mx-auto mb-4" style={{ color: '#3DD9C8' }} />
+              <Users size={32} className="mx-auto mb-4" style={{ color: '#0D8071' }} />
               <h4 className="font-display text-lg mb-2" style={{ color: '#1A1A1A' }}>Comunidade</h4>
               <p className="text-sm" style={{ color: '#808080' }}>Encontros presenciais com quem busca o mesmo nível de excelência.</p>
             </div>
@@ -279,10 +233,10 @@ export default async function HomePage() {
       {/* CTA Final — Preto */}
       <section style={{ backgroundColor: '#1A1A1A' }} className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <Sparkles size={28} className="mx-auto mb-4 opacity-80" style={{ color: '#3DD9C8' }} />
+          <Sparkles size={28} className="mx-auto mb-4 opacity-80" style={{ color: '#0D8071' }} />
           <h3 className="font-display text-3xl mb-4 text-white">É o momento de somar suas forças</h3>
           <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto text-white">Para quem não aceita mais perder, busca integrar quem é com o que faz e quer ocupar o seu lugar no mundo.</p>
-          <Link href="/planos" className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors" style={{ backgroundColor: '#3DD9C8', color: '#1A1A1A' }}>
+          <Link href="/planos" className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors" style={{ backgroundColor: '#0D8071', color: '#1A1A1A' }}>
             Ver Planos e Começar
           </Link>
         </div>
