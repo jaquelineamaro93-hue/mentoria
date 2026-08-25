@@ -7,13 +7,20 @@ import type { PlanoMentoria } from '@/lib/types';
 export default async function CheckoutPage() {
   const supabase = await createClient();
 
-  const { data: planos } = await supabase
+  const { data: planosRaw } = await supabase
     .from('planos_mentoria')
     .select('*')
     .eq('ativo', true)
     .eq('visivel_checkout', true)
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
+
+  const planos = (planosRaw || []).filter((p) => {
+    const hasTestInCodigo = p.codigo && p.codigo.toLowerCase().includes('teste');
+    const hasTestInName = p.nome && p.nome.toLowerCase().includes('teste');
+    const hasTestInDesc = p.descricao_encontros && p.descricao_encontros.toLowerCase().includes('teste');
+    return !hasTestInCodigo && !hasTestInName && !hasTestInDesc;
+  });
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -43,12 +50,6 @@ export default async function CheckoutPage() {
         {planoAtualCodigo && (
           <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black">
             Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
-          </div>
-        )}
-
-        {!user && (
-          <div className="bg-white border border-gray-faint rounded-xl p-4 mb-8 text-center text-sm text-black">
-            Já é aluna? <Link href="/login" className="text-black font-medium underline">Faça login</Link> antes de contratar para vincular ao seu perfil.
           </div>
         )}
 

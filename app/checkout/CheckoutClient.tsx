@@ -18,6 +18,7 @@ export default function CheckoutClient({
   const [processando, setProcessando] = useState(false);
 
   const plano = planos.find((p) => p.id === planoSelecionado);
+  const planoSafe = plano as PlanoMentoria;
 
   async function irParaMercadoPago() {
     if (!plano || !formaEscolhida) {
@@ -37,24 +38,8 @@ export default function CheckoutClient({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'checkout@soma.com',
-          external_reference: `${plano.id}_${Date.now()}`,
-          plan_id: plano.id,
-          payment_type: formaEscolhida === 'avista' ? 'vista' : formaEscolhida,
-          items: [
-            {
-              id: plano.id,
-              title: plano.nome,
-              description: plano.foco || '100% Online',
-              quantity: 1,
-              currency_id: 'BRL',
-              unit_price: precoMap[formaEscolhida],
-            },
-          ],
-          payer: { email: 'checkout@soma.com' },
-          notification_url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/webhooks/mercadopago`,
-          binary_mode: true,
-          statement_descriptor: 'SOMA MENTORIA',
+          planoCodigo: planoSafe.codigo,
+          formaPagamento: formaEscolhida,
         }),
       });
 
@@ -72,46 +57,112 @@ export default function CheckoutClient({
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-8">
-      {planos.map((p) => {
-        const isSelected = planoSelecionado === p.id;
-        return (
-          <div
-            key={p.id}
-            onClick={() => setPlanoSelecionado(p.id)}
-            className={`border-2 rounded-2xl p-8 cursor-pointer transition-all ${
-              isSelected ? 'border-brown-deep bg-white shadow-lg' : 'border-gray-faint hover:border-brown-deep'
-            }`}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="font-display text-2xl text-black">{p.nome}</h2>
-                <p className="text-sm">
-                  {p.codigo.includes('online') ? (
-                    <span className="text-blue-600 font-medium">100% Online</span>
-                  ) : (
-                    <span className="text-gray-text">{p.foco}</span>
-                  )}
+    <main className="min-h-screen bg-gradient-to-br from-white to-white py-12 px-6">
+      <div className="max-w-5xl mx-auto">
+        <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6">
+          <ArrowLeft size={20} />
+          <span>Voltar</span>
+        </Link>
+
+        <div className="text-center mb-12">
+          <h1 className="font-display text-4xl text-black mb-2">Soma — Mentoria de Carreira</h1>
+          <p className="text-lg text-gray-text">Escolha seu plano e comece sua jornada de transformação profissional.</p>
+        </div>
+
+        {planoAtualCodigo && (
+          <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black">
+            Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {planos.map((p) => {
+            const isSelected = planoSelecionado === p.id;
+            return (
+              <div
+                key={p.id}
+                onClick={() => setPlanoSelecionado(p.id)}
+                className={`border-2 rounded-2xl p-8 cursor-pointer transition-all ${
+                  isSelected ? 'border-brown-deep bg-white shadow-lg' : 'border-gray-faint hover:border-brown-deep'
+                }`}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="font-display text-2xl text-black">{p.nome}</h2>
+                    <p className="text-sm">
+                      {p.codigo.includes('online') ? (
+                        <span className="text-blue-600 font-medium">100% Online</span>
+                      ) : (
+                        <span className="text-gray-text">{p.foco}</span>
+                      )}
+                    </p>
+                  </div>
+                  {isSelected && <Check size={24} className="text-green-600" />}
+                </div>
+                <p className="text-sm text-gray-text mb-6 leading-relaxed">{p.descricao_encontros}</p>
+                <div className="space-y-2 text-sm mb-6">
+                  <p className="text-black font-medium">Opções de pagamento:</p>
+                  <p className="text-gray-text">
+                    R$ {Number(p.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (PIX)
+                  </p>
+                  <p className="text-gray-text">
+                    R$ {Number(p.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no cartão
+                  </p>
+                  <p className="text-gray-text">
+                    R${' '}
+                    {(Number(p.preco_recorrente_total) / p.parcelas_recorrente).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })}{' '}
+                    x {p.parcelas_recorrente} recorrente
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {planoSelecionado && plano && (
+          <div className="bg-white border-2 border-brown-deep rounded-2xl p-8">
+            <h3 className="font-display text-xl text-black mb-6">Como você prefere pagar?</h3>
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              <button
+                onClick={() => setFormaEscolhida('avista')}
+                className={`border-2 rounded-xl p-4 transition-all text-center ${
+                  formaEscolhida === 'avista'
+                    ? 'border-brown-deep bg-brown-deep/5'
+                    : 'border-gray-faint hover:border-brown-deep'
+                }`}
+              >
+                <p className="font-medium text-black mb-2">PIX</p>
+                <p className="text-lg font-display text-black">
+                  R$ {Number(planoSafe.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
-              </div>
-              {isSelected && <Check size={24} className="text-green-600" />}
-            </div>
-            <p className="text-sm text-gray-text mb-6 leading-relaxed">{p.descricao_encontros}</p>
-            <div className="space-y-2 text-sm mb-6">
-              <p className="text-black font-medium">Opções de pagamento:</p>
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-text">PIX</span>
-                <span className="font-bold">R$ {Number(p.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-text">Cartão</span>
-                <span className="font-bold">R$ {Number(p.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-text">Recorrente</span>
-                <span className="font-bold">
-                  {p.parcelas_recorrente}x R${' '}
-                  {(Number(p.preco_recorrente_total) / p.parcelas_recorrente).toLocaleString('pt-BR', {
+              </button>
+              <button
+                onClick={() => setFormaEscolhida('cartao')}
+                className={`border-2 rounded-xl p-4 transition-all text-center ${
+                  formaEscolhida === 'cartao'
+                    ? 'border-brown-deep bg-brown-deep/5'
+                    : 'border-gray-faint hover:border-brown-deep'
+                }`}
+              >
+                <p className="font-medium text-black mb-2">Cartão</p>
+                <p className="text-lg font-display text-black">
+                  R$ {Number(planoSafe.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+              </button>
+              <button
+                onClick={() => setFormaEscolhida('recorrente')}
+                className={`border-2 rounded-xl p-4 transition-all text-center ${
+                  formaEscolhida === 'recorrente'
+                    ? 'border-brown-deep bg-brown-deep/5'
+                    : 'border-gray-faint hover:border-brown-deep'
+                }`}
+              >
+                <p className="font-medium text-black mb-2">Parcelado</p>
+                <p className="text-sm text-gray-text mb-1">{planoSafe.parcelas_recorrente}x de</p>
+                <p className="text-lg font-display text-black">
+                  R${' '}
+                  {(Number(planoSafe.preco_recorrente_total) / planoSafe.parcelas_recorrente).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                   })}
                 </span>
