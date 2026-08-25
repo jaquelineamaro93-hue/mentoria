@@ -80,7 +80,7 @@ export default function Month2Content({ respostas, onChange }: Month2ContentProp
                 <div className="flex gap-2">
                   <div
                     className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0"
-                    style={{ backgroundColor: '#3DD9C8' }}
+                    style={{ backgroundColor: '#0D8071' }}
                   >
                     {idx + 1}
                   </div>

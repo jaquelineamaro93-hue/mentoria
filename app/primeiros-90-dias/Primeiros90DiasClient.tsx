@@ -138,8 +138,8 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
                 disabled={isSaving}
                 className="px-6 py-3 rounded-lg font-medium transition-colors text-white border"
                 style={{
-                  backgroundColor: '#3DD9C8',
-                  borderColor: '#3DD9C8',
+                  backgroundColor: '#0D8071',
+                  borderColor: '#0D8071',
                   opacity: isSaving ? 0.7 : 1,
                 }}
               >

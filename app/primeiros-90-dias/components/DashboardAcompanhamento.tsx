@@ -151,7 +151,7 @@ ${stars ? `Diretriz Tática: ${stars.diretriz}` : ''}`;
               className="h-full transition-all duration-300"
               style={{
                 width: `${metrics.progressPercent}%`,
-                backgroundColor: '#3DD9C8',
+                backgroundColor: '#0D8071',
               }}
             />
           </div>
@@ -162,7 +162,7 @@ ${stars ? `Diretriz Tática: ${stars.diretriz}` : ''}`;
           {[
             { phase: 'Mês 1', data: metrics.month1, color: '#FFB366' },
             { phase: 'Mês 2', data: metrics.month2, color: '#FF7A8A' },
-            { phase: 'Mês 3', data: metrics.month3, color: '#3DD9C8' },
+            { phase: 'Mês 3', data: metrics.month3, color: '#0D8071' },
           ].map(({ phase, data, color }) => (
             <div key={phase} className="flex items-center justify-between text-xs">
               <span className="text-gray-text">{phase}</span>
@@ -226,8 +226,8 @@ ${stars ? `Diretriz Tática: ${stars.diretriz}` : ''}`;
           onClick={handleCopyToClipboard}
           className="w-full py-2 px-3 rounded text-sm font-medium text-white border transition-opacity"
           style={{
-            backgroundColor: '#3DD9C8',
-            borderColor: '#3DD9C8',
+            backgroundColor: '#0D8071',
+            borderColor: '#0D8071',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
