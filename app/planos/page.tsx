@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import type { PlanoMentoria } from '@/lib/types';
+import MuralAtualizado from '@/components/MuralAtualizado';
+import type { PlanoMentoria, Announcement } from '@/lib/types';
 
 export default async function PlanosPage() {
   const supabase = await createClient();
@@ -13,6 +14,11 @@ export default async function PlanosPage() {
     .eq('visivel_checkout', true)
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
+
+  const { data: avisos } = await supabase
+    .from('announcements')
+    .select('*')
+    .order('created_at', { ascending: false });
 
   return (
     <div className="min-h-screen bg-white p-6">
@@ -75,6 +81,12 @@ export default async function PlanosPage() {
             </div>
           ))}
         </div>
+
+        {(avisos || []).length > 0 && (
+          <div className="mt-16">
+            <MuralAtualizado avisos={avisos as Announcement[]} />
+          </div>
+        )}
       </div>
     </div>
   );
