@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Calendar,
   User as UserIcon,
   ExternalLink,
   Compass,
@@ -24,12 +23,10 @@ import {
 import Sidebar from '@/components/Sidebar';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
-import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS } from '@/lib/soma-badges';
 import type {
-  Announcement,
   Profile,
   Diagnostic,
   BussolaPosicionamento,
@@ -42,7 +39,6 @@ import TourPortal from '@/components/TourPortal';
 
 interface Props {
   profile: Profile | null;
-  announcements: Announcement[];
   diagnostic: Diagnostic | null;
   bussola: BussolaPosicionamento | null;
   viaResultado: ViaResultado | null;
@@ -73,7 +69,6 @@ function StatusBadge({ status }: { status: FaseStatus }) {
 
 export default function DashboardClient({
   profile,
-  announcements,
   diagnostic,
   bussola,
   viaResultado,
@@ -456,15 +451,6 @@ export default function DashboardClient({
             </Link>
           </div>
         </section>
-
-        {/* SEÇÃO 4: Mural de avisos e passaporte de conquistas */}
-        <section className="mb-10">
-          <Eyebrow>
-            <Calendar size={13} strokeWidth={1.5} /> Mural de avisos & próximos encontros
-          </Eyebrow>
-          <MuralAtualizado avisos={announcements} />
-        </section>
-
 
       </main>
     </div>

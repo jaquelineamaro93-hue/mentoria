@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DashboardClient from './DashboardClient';
 import type {
-  Announcement,
   Profile,
   Diagnostic,
   BussolaPosicionamento,
@@ -27,13 +26,6 @@ export default async function DashboardPage() {
     .select('*')
     .eq('id', user.id)
     .single<Profile>();
-
-  const { data: announcements } = await supabase
-    .from('announcements')
-    .select('*')
-    .order('data_evento', { ascending: true })
-    .limit(6)
-    .returns<Announcement[]>();
 
   let diagnostic: Diagnostic | null = null;
   try {
@@ -79,7 +71,6 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       profile={profile}
-      announcements={announcements ?? []}
       diagnostic={diagnostic}
       bussola={bussola}
       viaResultado={viaResultado}
