@@ -33,6 +33,7 @@ const NAV_ITEMS = [
   { href: '/onboarding', label: 'Onboarding', icon: ListChecks },
   { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
   { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
+  { href: '/primeiros-90-dias', label: 'Primeiros 90 Dias', icon: Compass },
   { href: '/meu-pdi', label: 'PDI & Trilha Estratégica', icon: Target },
   { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
   { href: '/feedback-pares', label: 'Feedback entre Colegas', icon: MessageCircle },
