@@ -8,9 +8,9 @@
   /* Paleta Vibrante SOMA */
   --color-black: #1A1A1A;
   --color-dark: #2D2D2D;
-  --color-mint: #3DD9C8;
-  --color-mint-light: rgba(61, 217, 200, 0.1);
-  --color-mint-border: rgba(61, 217, 200, 0.2);
+  --color-mint: #0D8071;
+  --color-mint-light: rgba(13, 128, 113, 0.1);
+  --color-mint-border: rgba(13, 128, 113, 0.2);
   --color-orange: #FFB366;
   --color-orange-light: rgba(255, 179, 102, 0.1);
   --color-rose: #FF7A8A;
@@ -28,9 +28,9 @@
   --color-ink-faint: #808080;
   --color-brown: #FFB366;
   --color-brown-deep: #1A1A1A;
-  --color-sky: #3DD9C8;
-  --color-sky-deep: #3DD9C8;
-  --color-sky-tint: rgba(61, 217, 200, 0.1);
+  --color-sky: #0D8071;
+  --color-sky-deep: #0D8071;
+  --color-sky-tint: rgba(13, 128, 113, 0.1);
   --color-line: #E8E8E8;
   --color-line-soft: #F9F9F9;
 }
@@ -52,7 +52,7 @@ body {
 }
 
 ::selection {
-  background: rgba(61, 217, 200, 0.3);
+  background: rgba(13, 128, 113, 0.3);
   color: var(--color-black);
 }
 
@@ -70,7 +70,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2FB5B0;
+  background: #0A5E54;
 }
 
 a:focus-visible,
