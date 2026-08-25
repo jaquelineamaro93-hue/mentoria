@@ -290,6 +290,64 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="font-display text-4xl text-center text-black mb-4">Dúvidas Frequentes</h2>
+          <p className="text-center text-gray-text mb-12 text-lg">Respostas para as perguntas mais comuns sobre a mentoria SOMA</p>
+
+          <div className="space-y-4">
+            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors" open>
+              <summary className="font-display text-lg text-black flex justify-between items-center">
+                <span>Qual é a estrutura da mentoria SOMA?</span>
+                <span className="text-0D8071">+</span>
+              </summary>
+              <p className="text-gray-text mt-4 leading-relaxed">A SOMA é uma mentoria híbrida em dois tempos: Etapa 1 Online (alinhamento e mapa individual) e Etapa 2 Presencial (fluxo, presença e ambiência). Você recebe sessões individuais para diagnóstico, mapeamento de talentos e plano de ação de 90 dias, além de encontros em grupo para networking e posicionamento.</p>
+            </details>
+
+            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+              <summary className="font-display text-lg text-black flex justify-between items-center">
+                <span>Quanto tempo leva a mentoria?</span>
+                <span className="text-0D8071">+</span>
+              </summary>
+              <p className="text-gray-text mt-4 leading-relaxed">Oferecemos planos de 6 meses e 12 meses. A duração depende da sua situação atual (Start-up, Turnaround, Realinhamento ou Sustentação) e dos seus objetivos de desenvolvimento profissional.</p>
+            </details>
+
+            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+              <summary className="font-display text-lg text-black flex justify-between items-center">
+                <span>Como funciona o pagamento?</span>
+                <span className="text-0D8071">+</span>
+              </summary>
+              <p className="text-gray-text mt-4 leading-relaxed">Você pode pagar à vista via PIX, no cartão (1x), ou parcelado (recorrente). Após o pagamento, você recebe um link para criar sua conta no portal do mentorado e já tem acesso a todos os materiais e cronograma de encontros.</p>
+            </details>
+
+            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+              <summary className="font-display text-lg text-black flex justify-between items-center">
+                <span>Posso fazer a mentoria 100% online?</span>
+                <span className="text-0D8071">+</span>
+              </summary>
+              <p className="text-gray-text mt-4 leading-relaxed">Sim! Temos planos presenciais e 100% online. O conteúdo é o mesmo, mas os encontros em grupo na Etapa 2 são adaptados para sessões virtuais no plano online.</p>
+            </details>
+
+            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+              <summary className="font-display text-lg text-black flex justify-between items-center">
+                <span>Como vejo os resultados de quem já fez?</span>
+                <span className="text-0D8071">+</span>
+              </summary>
+              <p className="text-gray-text mt-4 leading-relaxed">Conheça as histórias reais de nossos mentorados no LinkedIn:
+                <div className="mt-3 space-y-2">
+                  <a href="https://lnkd.in/p/esE9t5fr" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Maria Laura Soares</a>
+                  <a href="https://lnkd.in/p/ew3SKqt3" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Fernanda</a>
+                  <a href="https://lnkd.in/p/esUcyWA5" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Isabella</a>
+                  <a href="https://lnkd.in/p/eetWmSiv" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Giulia Gomes</a>
+                  <a href="https://lnkd.in/p/euSGD_V9" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Rita Alecrim</a>
+                </div>
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
       {/* Footer — Preto */}
       <footer style={{ backgroundColor: '#1A1A1A', borderTop: '1px solid #2D2D2D' }} className="py-8 text-center text-sm">
         <div className="max-w-6xl mx-auto px-6">
