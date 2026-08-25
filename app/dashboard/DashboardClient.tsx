@@ -409,22 +409,40 @@ export default function DashboardClient({
           <Eyebrow>
             <FolderOpen size={13} strokeWidth={1.5} /> Trilha de aprendizado
           </Eyebrow>
-          <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-gray-faint">
-            <div>
-              <p className="text-black mb-1">Materiais da Mentoria SOMA</p>
-              <p className="text-sm text-gray-text">
-                Todo o conteúdo, gravações e templates do programa, centralizados em um só lugar.
-              </p>
-            </div>
+          <div className="grid sm:grid-cols-2 gap-4">
             <a
               href={DRIVE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 flex items-center gap-2 bg-lotus-brown hover:bg-lotus-brown/90 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+              className="group"
             >
-              Abrir Drive <ExternalLink size={14} strokeWidth={1.5} />
+              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors border-gray-faint">
+                <FolderOpen className="text-lotus-brown mb-3" size={22} strokeWidth={1.5} />
+                <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
+                  Materiais da Mentoria SOMA
+                </p>
+                <p className="text-sm text-gray-text">
+                  Todo o conteúdo, gravações e templates do programa, centralizados em um só lugar.
+                </p>
+              </Panel>
             </a>
-          </Panel>
+            <a
+              href="https://calendar.app.google/T9DhtbrVVG9hKShN7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+            >
+              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors border-gray-faint">
+                <Calendar className="text-lotus-brown mb-3" size={22} strokeWidth={1.5} />
+                <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
+                  Agende sua sessão individual
+                </p>
+                <p className="text-sm text-gray-text">
+                  Um encontro rápido para alinhar seus objetivos no início da jornada.
+                </p>
+              </Panel>
+            </a>
+          </div>
         </section>
 
         {/* Atalhos */}
