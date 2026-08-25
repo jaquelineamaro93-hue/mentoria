@@ -178,6 +178,52 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* DEPOIMENTOS */}
+      <section className="px-6 py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs uppercase tracking-wider mb-4 text-center font-semibold" style={{ color: '#808080' }}>Histórias reais</p>
+          <h3 className="font-display text-4xl text-center mb-12" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(13, 128, 113, 0.08)', borderColor: '#0D8071' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#0D8071' }}>ML</div>
+                <div>
+                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Maria Laura Soares</p>
+                  <p className="text-xs font-medium" style={{ color: '#0D8071' }}>CRM & Lifecycle Marketing</p>
+                </div>
+              </div>
+              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Percebi que alguns dos meus pontos fortes eu nunca tinha parado para identificar de forma consciente. Os primeiros encontros já ampliaram tanto minha visão, estou imaginando tudo o que tem pela frente."</p>
+              <div className="text-lg">⭐⭐⭐⭐⭐</div>
+            </div>
+
+            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(255, 122, 138, 0.08)', borderColor: '#FF7A8A' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FF7A8A' }}>GG</div>
+                <div>
+                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Giulia Gomes</p>
+                  <p className="text-xs font-medium" style={{ color: '#FF7A8A' }}>CRM Analyst & Lifecycle Marketing</p>
+                </div>
+              </div>
+              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"É uma mentoria muito voltada para carreira mesmo. Tenho saído desses encontros com aquela sensação de que estou ajustando o caminho, não só fazendo mais, mas fazendo melhor."</p>
+              <div className="text-lg">⭐⭐⭐⭐⭐</div>
+            </div>
+
+            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(255, 179, 102, 0.08)', borderColor: '#FFB366' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FFB366' }}>RA</div>
+                <div>
+                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Rita Alecrim</p>
+                  <p className="text-xs font-medium" style={{ color: '#FFB366' }}>CRM Senior / Product Owner</p>
+                </div>
+              </div>
+              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Que mentoria incrível! Foram horas de muito conteúdo, trocas e aprendizado prático. Saio dessa mentoria com a bagagem cheia e com a expectativa de aplicar as novas estratégias."</p>
+              <div className="text-lg">⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Planos */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
