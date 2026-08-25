@@ -20,6 +20,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   }, [searchParams]);
 
   const plano = planos.find((p) => p.id === planoSelecionado);
+  const planoSafe = plano as PlanoMentoria;
 
   async function irParaMercadoPago() {
     if (!plano || !formaEscolhida) return;
@@ -29,7 +30,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          planoCodigo: plano.codigo,
+          planoCodigo: planoSafe.codigo,
           formaPagamento: formaEscolhida,
         }),
       });
@@ -130,7 +131,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
               >
                 <p className="font-medium text-black mb-2">PIX</p>
                 <p className="text-lg font-display text-black">
-                  R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R$ {Number(planoSafe.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </button>
               <button
@@ -143,7 +144,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
               >
                 <p className="font-medium text-black mb-2">Cartão</p>
                 <p className="text-lg font-display text-black">
-                  R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R$ {Number(planoSafe.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </button>
               <button
@@ -155,10 +156,10 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
                 }`}
               >
                 <p className="font-medium text-black mb-2">Parcelado</p>
-                <p className="text-sm text-gray-text mb-1">{plano.parcelas_recorrente}x de</p>
+                <p className="text-sm text-gray-text mb-1">{planoSafe.parcelas_recorrente}x de</p>
                 <p className="text-lg font-display text-black">
                   R${' '}
-                  {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', {
+                  {(Number(planoSafe.preco_recorrente_total) / planoSafe.parcelas_recorrente).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                   })}
                 </p>
