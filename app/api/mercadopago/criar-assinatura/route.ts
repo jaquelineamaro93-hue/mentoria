@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Plano ou forma de pagamento não informados.' }, { status: 400 });
   }
 
-  let email = emailLead;
+  let email = '';
   let userId = '';
   let profile = null;
 
@@ -33,10 +33,6 @@ export async function POST(request: Request) {
       email = userProfile.email;
       userId = user.id;
     }
-  }
-
-  if (!email) {
-    return NextResponse.json({ error: 'Email é obrigatório.' }, { status: 400 });
   }
 
   const { data: plano } = await supabase
