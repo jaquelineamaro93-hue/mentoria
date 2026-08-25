@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Compass, Sparkles, TrendingUp, Save, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import Sidebar from '@/components/Sidebar';
+import StandardLayout from '@/components/StandardLayout';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -175,10 +175,7 @@ export default function ExerciciosClient({
   const ultimo = diagnostics[diagnostics.length - 1];
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
-
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+    <StandardLayout profile={profile} onSignOut={handleSignOut}>
         <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
             Área de diagnóstico
@@ -493,7 +490,6 @@ export default function ExerciciosClient({
             </div>
           )}
         </section>
-      </main>
-    </div>
+    </StandardLayout>
   );
 }

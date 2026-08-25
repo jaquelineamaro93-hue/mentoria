@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
+import { useRouter } from 'next/navigation';
+import StandardLayout from '@/components/StandardLayout';
 import { BarChart3, Zap, TrendingUp, Briefcase } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import AnaliseFitTab from './tabs/AnaliseFitTab';
 import KanbanTab from './tabs/KanbanTab';
 import RankingTab from './tabs/RankingTab';
+import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types';
 
 type Tab = 'analise' | 'kanban' | 'ranking';
@@ -32,10 +34,18 @@ export default function VagasClient({
 }: {
   profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'> | null;
 }) {
+  const router = useRouter();
+  const supabase = createClient();
   const [tab, setTab] = useState<Tab>('kanban');
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState(0);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  }
 
   useEffect(() => {
     carregarVagas();
@@ -61,11 +71,7 @@ export default function VagasClient({
   };
 
   return (
-    <div className="flex h-screen bg-white">
-      <Sidebar profile={profile} />
-
-      <div className="flex-1 overflow-auto">
-        <div className="p-8 md:p-12 max-w-7xl mx-auto">
+    <StandardLayout profile={profile} onSignOut={handleSignOut}>
           {/* Header */}
           <div className="mb-8">
             <Eyebrow>
@@ -135,8 +141,6 @@ export default function VagasClient({
               </>
             )}
           </Panel>
-        </div>
-      </div>
-    </div>
+    </StandardLayout>
   );
 }

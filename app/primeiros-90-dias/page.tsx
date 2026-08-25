@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Primeiros90DiasClient from './Primeiros90DiasClient';
+import type { Profile } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Primeiros 90 Dias | SOMA Mentoria',
@@ -19,6 +20,13 @@ export default async function Primeiros90DiasPage() {
     redirect('/login');
   }
 
+  // Fetch profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single<Profile>();
+
   // Fetch existing data if available
   const { data: existingData, error } = await supabase
     .from('primeiros_90_dias_respostas')
@@ -35,5 +43,5 @@ export default async function Primeiros90DiasPage() {
     updated_at: new Date().toISOString(),
   };
 
-  return <Primeiros90DiasClient initialData={initialData} userId={user.id} />;
+  return <Primeiros90DiasClient initialData={initialData} userId={user.id} profile={profile} />;
 }

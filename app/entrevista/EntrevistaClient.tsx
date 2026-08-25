@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, BookOpen, Briefcase, AlertCircle, Copy, CheckCircle2, Download, ChevronDown, ChevronUp, Trash2, Target, MessageSquare, Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import Sidebar from '@/components/Sidebar';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types';
 
@@ -183,10 +183,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
   };
 
   return (
-    <div className="flex flex-row w-full h-screen">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
-
-      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
+    <StandardLayout profile={profile} onSignOut={handleSignOut}>
         <Eyebrow>
           <Sparkles size={14} />
           Preparação para Entrevistas
@@ -530,7 +527,6 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
             )}
           </div>
         )}
-      </main>
-    </div>
+    </StandardLayout>
   );
 }

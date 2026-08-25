@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle, Star } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
@@ -113,11 +115,19 @@ function CheckinMensal({ userId }: { userId: string }) {
 }
 
 export default function MeuPdiClient({ userId, profile, secoes, respostasIniciais }: MeuPdiClientProps) {
+  const router = useRouter();
+  const supabase = createClient();
   const [activeTab, setActiveTab] = useState<Tab>('perguntas');
   const [documentos, setDocumentos] = useState<any[]>([]);
   const [nomDoc, setNomDoc] = useState('');
   const [categoria, setCategoria] = useState('Currículo');
   const [urlDoc, setUrlDoc] = useState('');
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  }
 
   const handleAddDocumento = () => {
     if (!nomDoc.trim() || !urlDoc.trim()) return;
@@ -137,7 +147,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <StandardLayout profile={profile} onSignOut={handleSignOut}>
       <div className="border-b border-gray-faint bg-white px-6 md:px-12 py-4 sticky top-0 z-10">
         <div className="flex gap-8 max-w-5xl mx-auto">
           <button
@@ -272,6 +282,6 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
           <CheckinMensal userId={userId} />
         )}
       </main>
-    </div>
+    </StandardLayout>
   );
 }
