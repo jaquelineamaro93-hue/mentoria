@@ -85,7 +85,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
         <div className="mb-9">
           <p className="font-display text-3xl text-white">SOMA</p>
           <div className="h-px w-8 my-2.5" style={{ backgroundColor: '#3DD9C8' }} />
-          <p className="text-[10px] uppercase tracking-[0.2em]" style={{ color: '#999999' }}>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-white">
             Portal do Mentorado
           </p>
         </div>
@@ -100,10 +100,10 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors border ${
+                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors border text-white ${
                   isActive
-                    ? 'text-white border-mint'
-                    : 'text-gray-text border-transparent hover:text-white'
+                    ? 'border-mint'
+                    : 'border-transparent hover:text-white'
                 }`}
                 style={{ backgroundColor: isActive ? 'rgba(61, 217, 200, 0.4)' : 'transparent' }}
               >
@@ -120,10 +120,10 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
             <div className="h-px my-4" style={{ backgroundColor: '#3A3A3A' }} />
             <Link
               href="/admin"
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors border ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] transition-colors border text-white ${
                 pathname === '/admin'
-                  ? 'text-white border-mint'
-                  : 'text-gray-text border-transparent hover:text-white'
+                  ? 'border-mint'
+                  : 'border-transparent hover:text-white'
               }`}
               style={{ backgroundColor: pathname === '/admin' ? 'rgba(61, 217, 200, 0.4)' : 'transparent' }}
             >
@@ -146,7 +146,7 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
             )}
             <div>
               <p className="text-[13px] text-white leading-tight">{profile.nome}</p>
-              <p className="text-[10px] uppercase tracking-wide leading-tight mt-0.5" style={{ color: '#999999' }}>
+              <p className="text-[10px] uppercase tracking-wide leading-tight mt-0.5 text-white">
                 Mentorada {profile.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
               </p>
             </div>
@@ -154,29 +154,27 @@ export default function Sidebar({ profile, onSignOut }: SidebarProps) {
         )}
         <Link
           href="/perfil"
-          className="flex items-center gap-2 text-[13px] transition-colors mb-3"
-          style={{ color: '#999999' }}
+          className="flex items-center gap-2 text-[13px] transition-colors mb-3 text-white"
           onMouseEnter={(e) => e.currentTarget.style.color = '#3DD9C8'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#999999'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#FFFFFF'}
         >
           <UserCog size={15} strokeWidth={1.75} />
           Meu Perfil
         </Link>
         <Link
           href="/termos"
-          className="flex items-center gap-2 text-[13px] transition-colors mb-3"
-          style={{ color: '#999999' }}
+          className="flex items-center gap-2 text-[13px] transition-colors mb-3 text-white"
           onMouseEnter={(e) => e.currentTarget.style.color = '#3DD9C8'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#999999'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#FFFFFF'}
         >
           Termos da mentoria
         </Link>
         <button
           onClick={onSignOut}
-          className="flex items-center gap-2 text-[13px] transition-colors"
-          style={{ color: '#999999', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+          className="flex items-center gap-2 text-[13px] transition-colors text-white"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
           onMouseEnter={(e) => e.currentTarget.style.color = '#3DD9C8'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#999999'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#FFFFFF'}
         >
           <LogOut size={15} strokeWidth={1.75} />
           Sair
