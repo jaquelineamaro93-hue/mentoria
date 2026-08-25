@@ -1,32 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Check, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from 'react';
+import { Check } from 'lucide-react';
 import type { PlanoMentoria } from '@/lib/types';
 
-export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { planos: PlanoMentoria[]; logado: boolean; planoAtualCodigo: string | null }) {
-  const searchParams = useSearchParams();
+export default function CheckoutClient({
+  planos,
+  logado,
+  planoAtualCodigo,
+}: {
+  planos: PlanoMentoria[];
+  logado: boolean;
+  planoAtualCodigo: string | null;
+}) {
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
-
-  useEffect(() => {
-    const planParam = searchParams.get('plan');
-    if (planParam) {
-      setPlanoSelecionado(planParam);
-    }
-  }, [searchParams]);
 
   const plano = planos.find((p) => p.id === planoSelecionado);
   const planoSafe = plano as PlanoMentoria;
 
   async function irParaMercadoPago() {
-    if (!plano || !formaEscolhida) return;
+    if (!plano || !formaEscolhida) {
+      alert('Selecione um plano e forma de pagamento');
+      return;
+    }
+
     setProcessando(true);
     try {
-      const res = await fetch('/api/mercadopago/criar-assinatura', {
+      const precoMap: Record<string, number> = {
+        avista: Number(plano.preco_avista),
+        cartao: Number(plano.preco_cartao),
+        recorrente: Number(plano.preco_recorrente_total) / plano.parcelas_recorrente,
+      };
+
+      const res = await fetch('/api/mercadopago/create-preference', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,6 +42,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           formaPagamento: formaEscolhida,
         }),
       });
+
       const data = await res.json();
       if (data.init_point) {
         window.location.href = data.init_point;
@@ -156,21 +165,63 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
                   {(Number(planoSafe.preco_recorrente_total) / planoSafe.parcelas_recorrente).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                   })}
-                </p>
-              </button>
+                </span>
+              </div>
             </div>
-            {formaEscolhida && (
-              <button
-                onClick={irParaMercadoPago}
-                disabled={processando}
-                className="w-full bg-brown-deep text-white font-medium py-4 rounded-lg hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {processando ? 'Processando...' : planoAtualCodigo ? 'Renovar com Mercado Pago' : 'Continuar com Mercado Pago'}
-              </button>
-            )}
           </div>
-        )}
-      </div>
-    </main>
+        );
+      })}
+
+      {planoSelecionado && (
+        <div className="md:col-span-2 bg-white border-2 border-brown-deep rounded-2xl p-8">
+          <h3 className="text-xl font-medium text-black mb-6">Forma de Pagamento</h3>
+          <div className="space-y-3 mb-8">
+            <button
+              onClick={() => setFormaEscolhida('avista')}
+              className={`w-full p-4 rounded-lg border-2 text-left transition ${
+                formaEscolhida === 'avista'
+                  ? 'border-brown-deep bg-brown-deep text-white'
+                  : 'border-gray-faint hover:border-brown-deep'
+              }`}
+            >
+              PIX
+            </button>
+            <button
+              onClick={() => setFormaEscolhida('cartao')}
+              className={`w-full p-4 rounded-lg border-2 text-left transition ${
+                formaEscolhida === 'cartao'
+                  ? 'border-brown-deep bg-brown-deep text-white'
+                  : 'border-gray-faint hover:border-brown-deep'
+              }`}
+            >
+              Cartão (1x)
+            </button>
+            <button
+              onClick={() => setFormaEscolhida('recorrente')}
+              className={`w-full p-4 rounded-lg border-2 text-left transition ${
+                formaEscolhida === 'recorrente'
+                  ? 'border-brown-deep bg-brown-deep text-white'
+                  : 'border-gray-faint hover:border-brown-deep'
+              }`}
+            >
+              Recorrente ({plano?.parcelas_recorrente}x)
+            </button>
+          </div>
+
+          <button
+            onClick={irParaMercadoPago}
+            disabled={processando || !planoSelecionado || !formaEscolhida || !logado}
+            className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown disabled:opacity-50 transition"
+          >
+            {processando ? 'Processando...' : 'Ir para Pagamento'}
+          </button>
+          {!logado && (
+            <p className="text-xs text-gray-text text-center mt-4">
+              Faça login antes de prosseguir com o pagamento.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

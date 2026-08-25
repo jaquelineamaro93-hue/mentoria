@@ -1,11 +1,17 @@
 'use client';
 
 interface TabNavigationProps {
-  activeTab: 'month1' | 'month2' | 'month3';
-  onTabChange: (tab: 'month1' | 'month2' | 'month3') => void;
+  activeTab: 'overview' | 'month1' | 'month2' | 'month3';
+  onTabChange: (tab: 'overview' | 'month1' | 'month2' | 'month3') => void;
 }
 
 const TABS = [
+  {
+    id: 'overview',
+    label: 'Visão Geral',
+    subtitle: 'Dashboard & Insights',
+    title: 'Acompanhamento e Inteligência',
+  },
   {
     id: 'month1',
     label: 'Mês 1',
@@ -28,12 +34,12 @@ const TABS = [
 
 export default function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   return (
-    <div className="flex gap-4 border-b border-gray-faint pb-6">
+    <div className="flex gap-4 border-b border-gray-faint pb-6 overflow-x-auto">
       {TABS.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => onTabChange(tab.id as any)}
-          className={`py-3 px-6 rounded-t-lg border-b-2 transition-colors ${
+          onClick={() => onTabChange(tab.id as 'overview' | 'month1' | 'month2' | 'month3')}
+          className={`py-3 px-6 rounded-t-lg border-b-2 transition-colors shrink-0 ${
             activeTab === tab.id
               ? 'border-mint text-black font-medium'
               : 'border-transparent text-gray-text hover:text-black'
