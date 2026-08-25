@@ -78,18 +78,6 @@ const PLANOS = {
       recorrente: { valor: 226, vezes: 5, periodo: 'mês' },
     },
   },
-  'teste': {
-    title: 'SOMA Teste',
-    subtitle: 'Plano de teste (OCULTAR DEPOIS)',
-    duracao: 'TESTE',
-    encontros: 'Acesso completo para teste',
-    features: ['Teste de pagamento', 'Webhook', 'Criação de conta'],
-    precos: {
-      vista: 1,
-      cartao: 1,
-      recorrente: { valor: 0.01, vezes: 1, periodo: 'mês' },
-    },
-  },
 };
 
 function CheckoutContent() {
