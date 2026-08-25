@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import StarsSelector from './components/StarsSelector';
 import DashboardAcompanhamento from './components/DashboardAcompanhamento';
@@ -16,7 +18,7 @@ interface Primeiros90DiasClientProps {
 
 export default function Primeiros90DiasClient({ initialData, userId }: Primeiros90DiasClientProps) {
   const supabase = createClient();
-  const [activeTab, setActiveTab] = useState<'month1' | 'month2' | 'month3'>('month1');
+  const [activeTab, setActiveTab] = useState<'overview' | 'month1' | 'month2' | 'month3'>('overview');
   const [situacaoStars, setSituacaoStars] = useState<string | null>(initialData?.situacao_stars);
   const [respostas, setRespostas] = useState<Record<string, any>>(initialData?.respostas_json || {});
   const [isSaving, setIsSaving] = useState(false);
@@ -65,8 +67,15 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-faint px-8 py-12">
+      {/* Header with Back Button */}
+      <div className="bg-white border-b border-gray-faint px-8 py-6">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
+        >
+          <ArrowLeft size={14} />
+          Voltar ao Início
+        </Link>
         <h1 className="font-display text-5xl text-black mb-2">Primeiros 90 Dias</h1>
         <p className="text-gray-text text-base leading-relaxed">
           Guia de aceleração de carreira e transição executiva
@@ -81,19 +90,20 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
           <StarsSelector selected={situacaoStars} onSelect={handleStarsSelect} />
         </div>
 
-        {/* Dashboard de Acompanhamento */}
-        {situacaoStars && (
-          <div className="mb-12">
-            <DashboardAcompanhamento respostas={respostas} situacao={situacaoStars} />
-          </div>
-        )}
-
         {/* Main Tabs */}
         {situacaoStars && (
           <div className="mt-12">
             <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
             <div className="mt-8 border-t border-gray-faint pt-8">
+              {/* Aba 1: Visão Geral & Insights (Dashboard) */}
+              {activeTab === 'overview' && (
+                <div className="space-y-8">
+                  <DashboardAcompanhamento respostas={respostas} situacao={situacaoStars} />
+                </div>
+              )}
+
+              {/* Aba 2: Mês 1 */}
               {activeTab === 'month1' && (
                 <Month1Content
                   respostas={respostas}
@@ -101,6 +111,8 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
                   onChange={handleRespostasChange}
                 />
               )}
+
+              {/* Aba 3: Mês 2 */}
               {activeTab === 'month2' && (
                 <Month2Content
                   respostas={respostas}
@@ -108,6 +120,8 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
                   onChange={handleRespostasChange}
                 />
               )}
+
+              {/* Aba 4: Mês 3 */}
               {activeTab === 'month3' && (
                 <Month3Content
                   respostas={respostas}

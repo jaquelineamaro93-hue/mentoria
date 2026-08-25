@@ -88,7 +88,7 @@ export default function DashboardAcompanhamento({
     const totalEarlyWins = [earlyWins['win1'], earlyWins['win2']].filter(
       (win) => win && win.trim().length > 0
     ).length;
-    const totalContacts = contacts.filter((c) => c?.name && c.name.trim().length > 0).length;
+    const totalContacts = contacts.filter((c: any) => c?.name && c.name.trim().length > 0).length;
 
     return {
       progressPercent,
