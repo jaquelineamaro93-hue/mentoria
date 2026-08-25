@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import StarsSelector from './components/StarsSelector';
+import DashboardAcompanhamento from './components/DashboardAcompanhamento';
 import TabNavigation from './components/TabNavigation';
 import Month1Content from './components/Month1Content';
 import Month2Content from './components/Month2Content';
@@ -79,6 +80,13 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
           <h2 className="text-xl text-black font-medium mb-6">Contexto de Atuação</h2>
           <StarsSelector selected={situacaoStars} onSelect={handleStarsSelect} />
         </div>
+
+        {/* Dashboard de Acompanhamento */}
+        {situacaoStars && (
+          <div className="mb-12">
+            <DashboardAcompanhamento respostas={respostas} situacao={situacaoStars} />
+          </div>
+        )}
 
         {/* Main Tabs */}
         {situacaoStars && (
