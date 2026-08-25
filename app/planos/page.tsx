@@ -15,7 +15,7 @@ export default async function PlanosPage() {
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
 
-  const planos = (planosRaw || []).filter((p) => !p.codigo.toLowerCase().includes('teste'));
+  const planos = (planosRaw || []).filter((p) => p.codigo && !p.codigo.toLowerCase().includes('teste'));
 
   const { data: avisos } = await supabase
     .from('announcements')

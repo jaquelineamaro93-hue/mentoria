@@ -15,7 +15,7 @@ export default async function CheckoutPage() {
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
 
-  const planos = (planosRaw || []).filter((p) => !p.codigo.toLowerCase().includes('teste'));
+  const planos = (planosRaw || []).filter((p) => p.codigo && !p.codigo.toLowerCase().includes('teste'));
 
   const { data: { user } } = await supabase.auth.getUser();
 
