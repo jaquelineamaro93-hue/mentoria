@@ -11,6 +11,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
+  const [emailLead, setEmailLead] = useState('');
 
   useEffect(() => {
     const planParam = searchParams.get('plan');
@@ -24,6 +25,12 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
 
   async function irParaMercadoPago() {
     if (!plano || !formaEscolhida) return;
+
+    if (!logado && !emailLead) {
+      alert('Por favor, informe seu email para continuar');
+      return;
+    }
+
     setProcessando(true);
     try {
       const res = await fetch('/api/mercadopago/criar-assinatura', {
@@ -32,6 +39,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
         body: JSON.stringify({
           planoCodigo: planoSafe.codigo,
           formaPagamento: formaEscolhida,
+          email: emailLead || undefined,
         }),
       });
       const data = await res.json();
@@ -113,6 +121,18 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
         </div>
         {planoSelecionado && plano && (
           <div className="bg-white border-2 border-brown-deep rounded-2xl p-8">
+            {!logado && (
+              <div className="mb-8 pb-8 border-b border-gray-faint">
+                <label className="block text-sm font-medium text-black mb-2">Seu email</label>
+                <input
+                  type="email"
+                  value={emailLead}
+                  onChange={(e) => setEmailLead(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="w-full px-4 py-2 border border-gray-faint rounded-lg focus:outline-none focus:border-brown-deep"
+                />
+              </div>
+            )}
             <h3 className="font-display text-xl text-black mb-6">Como você prefere pagar?</h3>
             <div className="grid md:grid-cols-3 gap-4 mb-8">
               <button
