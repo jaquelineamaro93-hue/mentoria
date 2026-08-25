@@ -61,7 +61,7 @@ export default function DashboardAcompanhamento({
     let month2Completed = 0;
     if (earlyWins['win1'] && earlyWins['win1'].trim().length > 0) month2Completed++;
     if (earlyWins['win2'] && earlyWins['win2'].trim().length > 0) month2Completed++;
-    contacts.forEach((contact) => {
+    contacts.forEach((contact: any) => {
       if (contact?.name && contact.name.trim().length > 0) month2Completed++;
     });
 
