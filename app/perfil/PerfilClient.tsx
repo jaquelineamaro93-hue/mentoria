@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import Sidebar from '@/components/Sidebar';
+import StandardLayout from '@/components/StandardLayout';
 import { Eye, EyeOff, Upload, LogOut, Compass } from 'lucide-react';
 import type { Profile, PlanoMentoria } from '@/lib/types';
 import TourPortal from '@/components/TourPortal';
@@ -123,10 +123,7 @@ export default function PerfilClient({
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={perfil} onSignOut={handleSignOut} />
-
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
+    <StandardLayout profile={perfil} onSignOut={handleSignOut}>
         <div className="flex items-start justify-between gap-4 mb-8">
           <h1 className="font-display text-3xl text-black">Meu Perfil</h1>
           {perfil && (
@@ -288,7 +285,6 @@ export default function PerfilClient({
             Sair
           </button>
         </div>
-      </main>
-    </div>
+    </StandardLayout>
   );
 }
