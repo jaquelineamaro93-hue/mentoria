@@ -7,13 +7,15 @@ import type { PlanoMentoria, Announcement } from '@/lib/types';
 export default async function PlanosPage() {
   const supabase = await createClient();
 
-  const { data: planos } = await supabase
+  const { data: planosRaw } = await supabase
     .from('planos_mentoria')
     .select('*')
     .eq('ativo', true)
     .eq('visivel_checkout', true)
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
+
+  const planos = (planosRaw || []).filter((p) => !p.codigo.toLowerCase().includes('teste'));
 
   const { data: avisos } = await supabase
     .from('announcements')
