@@ -187,7 +187,7 @@ export default async function HomePage() {
           <h3 className="font-display text-4xl text-center mb-12" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(13, 128, 113, 0.08)', borderColor: '#0D8071' }}>
+            <a href="https://lnkd.in/p/esE9t5fr" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(13, 128, 113, 0.08)', borderColor: '#0D8071' }}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#0D8071' }}>ML</div>
                 <div>
@@ -196,10 +196,13 @@ export default async function HomePage() {
                 </div>
               </div>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Percebi que alguns dos meus pontos fortes eu nunca tinha parado para identificar de forma consciente. Os primeiros encontros já ampliaram tanto minha visão, estou imaginando tudo o que tem pela frente."</p>
-              <div className="text-lg">⭐⭐⭐⭐⭐</div>
-            </div>
+              <div className="flex justify-between items-center">
+                <div className="text-lg">⭐⭐⭐⭐⭐</div>
+                <p className="text-xs font-medium" style={{ color: '#0D8071' }}>Ver no LinkedIn →</p>
+              </div>
+            </a>
 
-            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(255, 122, 138, 0.08)', borderColor: '#FF7A8A' }}>
+            <a href="https://lnkd.in/p/eetWmSiv" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(255, 122, 138, 0.08)', borderColor: '#FF7A8A' }}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FF7A8A' }}>GG</div>
                 <div>
@@ -208,10 +211,13 @@ export default async function HomePage() {
                 </div>
               </div>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"É uma mentoria muito voltada para carreira mesmo. Tenho saído desses encontros com aquela sensação de que estou ajustando o caminho, não só fazendo mais, mas fazendo melhor."</p>
-              <div className="text-lg">⭐⭐⭐⭐⭐</div>
-            </div>
+              <div className="flex justify-between items-center">
+                <div className="text-lg">⭐⭐⭐⭐⭐</div>
+                <p className="text-xs font-medium" style={{ color: '#FF7A8A' }}>Ver no LinkedIn →</p>
+              </div>
+            </a>
 
-            <div className="rounded-lg p-6 border-2" style={{ backgroundColor: 'rgba(255, 179, 102, 0.08)', borderColor: '#FFB366' }}>
+            <a href="https://lnkd.in/p/euSGD_V9" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(255, 179, 102, 0.08)', borderColor: '#FFB366' }}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FFB366' }}>RA</div>
                 <div>
@@ -220,8 +226,11 @@ export default async function HomePage() {
                 </div>
               </div>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Que mentoria incrível! Foram horas de muito conteúdo, trocas e aprendizado prático. Saio dessa mentoria com a bagagem cheia e com a expectativa de aplicar as novas estratégias."</p>
-              <div className="text-lg">⭐⭐⭐⭐⭐</div>
-            </div>
+              <div className="flex justify-between items-center">
+                <div className="text-lg">⭐⭐⭐⭐⭐</div>
+                <p className="text-xs font-medium" style={{ color: '#FFB366' }}>Ver no LinkedIn →</p>
+              </div>
+            </a>
           </div>
         </div>
       </section>
@@ -293,56 +302,48 @@ export default async function HomePage() {
       {/* FAQ Section */}
       <section className="py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="font-display text-4xl text-center text-black mb-4">Dúvidas Frequentes</h2>
-          <p className="text-center text-gray-text mb-12 text-lg">Respostas para as perguntas mais comuns sobre a mentoria SOMA</p>
+          <h2 className="font-display text-4xl text-center text-black mb-2">Perguntas Frequentes</h2>
+          <p className="text-center text-gray-text mb-12 text-base">Tire suas dúvidas sobre como a mentoria SOMA funciona</p>
 
           <div className="space-y-4">
             <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors" open>
-              <summary className="font-display text-lg text-black flex justify-between items-center">
-                <span>Qual é a estrutura da mentoria SOMA?</span>
-                <span className="text-0D8071">+</span>
+              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+                <span>Como a mentoria SOMA funciona?</span>
+                <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">A SOMA é uma mentoria híbrida em dois tempos: Etapa 1 Online (alinhamento e mapa individual) e Etapa 2 Presencial (fluxo, presença e ambiência). Você recebe sessões individuais para diagnóstico, mapeamento de talentos e plano de ação de 90 dias, além de encontros em grupo para networking e posicionamento.</p>
+              <p className="text-gray-text mt-4 leading-relaxed">A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você.</p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center">
-                <span>Quanto tempo leva a mentoria?</span>
-                <span className="text-0D8071">+</span>
+              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+                <span>Quanto tempo preciso dedicar à mentoria?</span>
+                <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Oferecemos planos de 6 meses e 12 meses. A duração depende da sua situação atual (Start-up, Turnaround, Realinhamento ou Sustentação) e dos seus objetivos de desenvolvimento profissional.</p>
+              <p className="text-gray-text mt-4 leading-relaxed">Oferecemos planos de 6 meses ou 12 meses conforme sua necessidade. A mentoria se adapta ao seu contexto, seja você começando algo novo, enfrentando uma crise ou buscando fazer as coisas com mais excelência. O tempo depende do quanto você quer evoluir e do quanto está disposto a se dedicar.</p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center">
-                <span>Como funciona o pagamento?</span>
-                <span className="text-0D8071">+</span>
+              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+                <span>Qual é o investimento?</span>
+                <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Você pode pagar à vista via PIX, no cartão (1x), ou parcelado (recorrente). Após o pagamento, você recebe um link para criar sua conta no portal do mentorado e já tem acesso a todos os materiais e cronograma de encontros.</p>
+              <p className="text-gray-text mt-4 leading-relaxed">A gente oferece flexibilidade total. Você pode pagar à vista com PIX, em uma parcela no cartão ou parcelar ao longo dos meses. Depois que você confirma o pagamento, já ganha acesso ao portal com todos os materiais, agendamento dos encontros e começa a jornada. Tudo fica guardado lá pra você acompanhar seu progresso.</p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center">
-                <span>Posso fazer a mentoria 100% online?</span>
-                <span className="text-0D8071">+</span>
+              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+                <span>Preciso vir presencialmente?</span>
+                <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Sim! Temos planos presenciais e 100% online. O conteúdo é o mesmo, mas os encontros em grupo na Etapa 2 são adaptados para sessões virtuais no plano online.</p>
+              <p className="text-gray-text mt-4 leading-relaxed">Temos planos 100% online e planos presenciais. Se você não consegue vir pessoalmente, sem problema. Os encontros em grupo podem ser virtuais. O importante é que você realmente quer mudar de patamar na carreira e está aberto pra aprender com quem já passou pelo mesmo que você.</p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center">
-                <span>Como vejo os resultados de quem já fez?</span>
-                <span className="text-0D8071">+</span>
+              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+                <span>Posso ver quem já fez a mentoria?</span>
+                <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Conheça as histórias reais de nossos mentorados no LinkedIn:
-                <div className="mt-3 space-y-2">
-                  <a href="https://lnkd.in/p/esE9t5fr" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Maria Laura Soares</a>
-                  <a href="https://lnkd.in/p/ew3SKqt3" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Fernanda</a>
-                  <a href="https://lnkd.in/p/esUcyWA5" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Isabella</a>
-                  <a href="https://lnkd.in/p/eetWmSiv" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Giulia Gomes</a>
-                  <a href="https://lnkd.in/p/euSGD_V9" target="_blank" rel="noopener noreferrer" className="block" style={{ color: '#0D8071', textDecoration: 'underline' }}>→ Rita Alecrim</a>
-                </div>
-              </p>
+              <p className="text-gray-text mt-4 leading-relaxed">Com certeza. No topo da página você já viu uns depoimentos. Mas se quiser ver mais histórias e histórias completas, é só clicar nos nomes deles que leva para os posts deles no LinkedIn. Lá você vê com as próprias palavras deles como foi a experiência de trabalhar comigo.</p>
             </details>
           </div>
         </div>
