@@ -65,24 +65,26 @@ export default async function HomePage() {
       </header>
 
       {/* Hero Preto Full */}
-      <section style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }} className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#0D8071' }}>
-          Mentoria de Carreira e Estratégia
-        </p>
-        <h2 className="font-display text-5xl mb-6">
-          Se você sente que precisa destravar a sua carreira, essa mentoria é para você
-        </h2>
-        <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-          A Metodologia SOMA une autodescoberta, estratégia de carreira e execução de alto nível.
-          Para quem cansou de se sentir "em partes" e deseja a plenitude de uma vida profissional alinhada.
-        </p>
-        <Link
-          href="/planos"
-          className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors"
-          style={{ backgroundColor: '#0D8071', color: '#1A1A1A' }}
-        >
-          Ver Planos
-        </Link>
+      <section style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }} className="w-full px-6 py-20 text-center">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#0D8071' }}>
+            Mentoria de Carreira e Estratégia
+          </p>
+          <h2 className="font-display text-5xl mb-6">
+            Se você sente que precisa destravar a sua carreira, essa mentoria é para você
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+            A Metodologia SOMA une autodescoberta, estratégia de carreira e execução de alto nível.
+            Para quem cansou de se sentir "em partes" e deseja a plenitude de uma vida profissional alinhada.
+          </p>
+          <Link
+            href="/planos"
+            className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors"
+            style={{ backgroundColor: '#0D8071', color: '#1A1A1A' }}
+          >
+            Ver Planos
+          </Link>
+        </div>
       </section>
 
       {/* Sobre — Branco */}
@@ -277,8 +279,8 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Final — Preto */}
-      <section style={{ backgroundColor: '#1A1A1A' }} className="py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-6 py-16 text-center">
+        <div className="max-w-4xl mx-auto">
           <Sparkles size={28} className="mx-auto mb-4 opacity-80" style={{ color: '#0D8071' }} />
           <h3 className="font-display text-3xl mb-4 text-white">É o momento de somar suas forças</h3>
           <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto text-white">Para quem não aceita mais perder, busca integrar quem é com o que faz e quer ocupar o seu lugar no mundo.</p>
