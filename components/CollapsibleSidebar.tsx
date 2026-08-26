@@ -40,7 +40,6 @@ const navItems: NavItem[] = [
   { label: 'Indique um Amigo', href: '/indique-um-amigo', icon: <Gift size={20} /> },
   { label: 'Minha Trilha', href: '/minha-trilha', icon: <TrendingUp size={20} /> },
   { label: 'Perguntas Frequentes', href: '/faq', icon: <HelpCircle size={20} /> },
-  { label: 'Gestão de Vagas', href: '/vagas', icon: <Briefcase size={20} /> },
 ];
 
 export default function CollapsibleSidebar() {
