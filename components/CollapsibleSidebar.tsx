@@ -55,32 +55,19 @@ export default function CollapsibleSidebar() {
 
   async function carregarPerfil() {
     try {
-      console.log('🔍 Iniciando carregamento do perfil...');
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      console.log('👤 User ID:', user?.id);
-      if (!user) {
-        console.log('❌ Usuário não autenticado');
-        return;
-      }
+      if (!user) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
-        .select('*')
+        .select('nome, foto_url, genero, tipo_pacote, is_admin:is_admin')
         .eq('id', user.id)
         .single();
 
-      console.log('📊 Dados do Supabase:', data);
-      console.log('❌ Erro do Supabase:', error);
-
       if (data) {
-        console.log('✅ Perfil carregado:', {
-          nome: data.nome,
-          is_admin: data.is_admin,
-          tipo_de_is_admin: typeof data.is_admin
-        });
         setProfile(data);
         const partes = data.nome?.split(' ') || [];
         const iniciais = partes
@@ -89,11 +76,9 @@ export default function CollapsibleSidebar() {
           .join('')
           .toUpperCase() || '';
         setInitials(iniciais);
-      } else {
-        console.log('⚠️ Nenhum dado retornado do Supabase');
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar perfil:', error);
+      console.error('Erro ao carregar perfil:', error);
     }
   }
 
@@ -172,7 +157,7 @@ export default function CollapsibleSidebar() {
           );
         })}
 
-        {/* Admin Panel - Conditional */}
+        {/* Admin Panel - Only for admins */}
         {profile?.is_admin && (
           <Link
             href="/admin"
