@@ -212,6 +212,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
           )}
         </main>
       </div>
+    </div>
     </StandardLayout>
   );
 }
