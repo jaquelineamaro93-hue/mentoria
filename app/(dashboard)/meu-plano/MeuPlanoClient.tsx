@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { Calendar, Users, Video, FileText, Clock } from 'lucide-react';
-import StandardLayout from '@/components/StandardLayout';
 import type { Profile, PlanoMentoria } from '@/lib/types';
 
 export default function MeuPlanoClient({
@@ -26,11 +25,11 @@ export default function MeuPlanoClient({
 
   if (!plano) {
     return (
-      <StandardLayout>
+      <>
         <p className="text-sm text-gray-text">
           Seu plano será ativado em breve. Você receberá um aviso por email.
         </p>
-      </StandardLayout>
+      </>
     );
   }
 
@@ -40,7 +39,7 @@ export default function MeuPlanoClient({
   const encontrosPresenciais = plano.duracao_meses === 6 ? 6 : 12;
 
   return (
-    <StandardLayout>
+    <>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
         Seu investimento
       </p>
@@ -127,6 +126,6 @@ export default function MeuPlanoClient({
           Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho pra você.
         </p>
       </div>
-    </StandardLayout>
+    </>
   );
 }

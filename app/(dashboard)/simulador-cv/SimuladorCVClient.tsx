@@ -149,7 +149,7 @@ export default function SimuladorCVClient({
         : 'bg-red-500';
 
   return (
-    <StandardLayout>
+    <>
       <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
@@ -450,6 +450,6 @@ export default function SimuladorCVClient({
             )}
           </section>
         )}
-      </StandardLayout>
+      </>
   );
 }

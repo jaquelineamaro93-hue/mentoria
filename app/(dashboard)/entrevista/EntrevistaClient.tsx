@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, BookOpen, Briefcase, AlertCircle, Copy, CheckCircle2, Download, ChevronDown, ChevronUp, Trash2, Target, MessageSquare, Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types';
 
@@ -183,7 +182,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
   };
 
   return (
-    <StandardLayout>
+    <>
       <main className="w-full px-6 py-10 md:px-12">
         <Eyebrow>
           <Sparkles size={14} />
@@ -529,6 +528,6 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
           </div>
         )}
       </main>
-    </StandardLayout>
+    </>
   );
 }

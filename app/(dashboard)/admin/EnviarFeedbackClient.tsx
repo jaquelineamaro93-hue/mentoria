@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { Send, Loader2 } from 'lucide-react';
 
@@ -55,7 +54,7 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
   }
 
   return (
-    <StandardLayout>
+    <>
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-xl border border-gray-faint p-8">
           <h2 className="text-2xl font-medium text-black mb-6">Enviar Feedback ao Mentorado</h2>
@@ -138,6 +137,6 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
       </div>
         </div>
       </div>
-    </StandardLayout>
+    </>
   );
 }

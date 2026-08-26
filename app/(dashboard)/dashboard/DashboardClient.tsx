@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS } from '@/lib/soma-badges';
@@ -206,11 +205,11 @@ export default function DashboardClient({
   const pontosTotais = profile?.pontos_total ?? 0;
 
   return (
-    <StandardLayout>
+    <>
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
-        {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
+      {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (
             <img src={profile.foto_url} alt={profile.nome} className="w-16 h-16 rounded-full object-cover border border-lotus-brown/30 shrink-0" />
@@ -525,6 +524,6 @@ export default function DashboardClient({
             </Link>
           </div>
         </section>
-    </StandardLayout>
+    </>
   );
 }

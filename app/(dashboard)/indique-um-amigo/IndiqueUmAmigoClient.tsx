@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { Copy, Check, Gift, Users } from 'lucide-react';
 import type { Indicacao, Profile } from '@/lib/types';
-import StandardLayout from '@/components/StandardLayout';
 
 const AMIGOS_POR_SESSAO = 2;
 
@@ -49,7 +48,7 @@ export default function IndiqueUmAmigoClient({
   }
 
   return (
-    <StandardLayout>
+    <>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
           Comunidade SOMA
         </p>
@@ -146,6 +145,6 @@ export default function IndiqueUmAmigoClient({
             ))}
           </div>
         )}
-      </StandardLayout>
+      </>
   );
 }

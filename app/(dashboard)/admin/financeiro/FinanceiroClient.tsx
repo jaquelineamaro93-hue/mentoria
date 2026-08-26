@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Wallet, TrendingUp, Users, AlertTriangle, Gift, Target, Loader2, ArrowLeft } from 'lucide-react';
-import StandardLayout from '@/components/StandardLayout';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -116,7 +115,7 @@ export default function FinanceiroClient({
   const meses = [3, 6, 12];
 
   return (
-    <StandardLayout>
+    <>
       <div className="max-w-6xl mx-auto">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
@@ -363,6 +362,6 @@ export default function FinanceiroClient({
           </div>
         </section>
       </div>
-    </StandardLayout>
+    </>
   );
 }

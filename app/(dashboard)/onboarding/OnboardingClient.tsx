@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Circle, ArrowRight } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Profile } from '@/lib/types';
@@ -88,7 +87,7 @@ export default function OnboardingClient({
   const concluidas = etapas.filter((e) => e.feita).length;
 
   return (
-    <StandardLayout>
+    <>
       <div className="flex flex-col md:flex-row w-full">
 
         <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
@@ -160,6 +159,6 @@ export default function OnboardingClient({
         )}
       </main>
     </div>
-    </StandardLayout>
+    </>
   );
 }

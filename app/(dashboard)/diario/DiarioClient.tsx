@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NotebookPen, Sparkles, Loader2, Users, User as UserIcon } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { JournalNote, Profile, TipoEncontro } from '@/lib/types';
@@ -87,7 +86,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
   }
 
   return (
-    <StandardLayout>
+    <>
       <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-brown-deep mb-2 bg-orange-100 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-orange-200">
             Registro pessoal
@@ -238,6 +237,6 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
             </div>
           )}
         </section>
-    </StandardLayout>
+    </>
   );
 }
