@@ -252,17 +252,7 @@ export default function VotarEncontroClient({
 
   return (
     <>
-      <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Participação</p>
-        <h1 className="font-display text-3xl text-black mb-1">
-          {aba === 'encontros' ? 'Qual é o melhor dia?' : 'Enquetes e Votações'}
-        </h1>
-        <p className="text-sm text-gray-text mb-8">
-          {aba === 'encontros'
-            ? abaDados === 'presencial'
-              ? `Vote na data que funciona melhor para você. Encontro em ${LOCAL}, das ${HORARIO}.`
-              : 'Vote na data que funciona melhor para você no próximo encontro online.'
-            : `Participar das enquetes ${abaEnquete === 'presencial' ? 'presenciais' : 'online'} que importam para nossa comunidade.`}
-        </p>
+      
 
         <div className="flex gap-4 mb-8 border-b border-gray-faint">
           <button

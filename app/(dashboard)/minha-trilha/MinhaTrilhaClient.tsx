@@ -95,13 +95,7 @@ export default function MinhaTrilhaClient({
 
   return (
     <>
-      <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-        Sua jornada
-      </p>
-      <h1 className="font-display text-3xl text-black mb-1">Minha Trilha</h1>
-        <p className="text-sm text-gray-text mb-10">
-          Uma vez por mês, deixa para seu mentor uma nota de 0 a 5 e um comentário. Isso ajuda a ajustar a mentoria conforme necessário.
-        </p>
+      
 
         <div className="relative pl-8 space-y-8">
           <div className="absolute left-[11px] top-2 bottom-2 w-px bg-line" />

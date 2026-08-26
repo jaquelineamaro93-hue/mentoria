@@ -126,13 +126,7 @@ export default function FinanceiroClient({
           <ArrowLeft size={16} />
           Voltar
         </button>
-        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Área administrativa</p>
-        <h1 className="font-display text-3xl text-black mb-1">Financeiro</h1>
-        <p className="text-sm text-gray-text mb-8">
-          Como os pagamentos atuais são controlados manualmente (sem um extrato de transações no
-          portal), os valores de receita aqui são uma estimativa baseada no plano e status de cada
-          mentorado, não um extrato bancário. Para conferência exata, use o Mercado Pago.
-        </p>
+        
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Panel className="p-5">

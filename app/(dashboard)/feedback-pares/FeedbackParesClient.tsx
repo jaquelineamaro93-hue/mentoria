@@ -73,16 +73,7 @@ export default function FeedbackParesClient({
       <div className="flex flex-col md:flex-row w-full">
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-          Comunidade
-        </p>
-        <h1 className="font-display text-3xl text-black mb-1">
-          Feedback entre Colegas
-        </h1>
-        <p className="text-sm text-gray-text mb-8">
-          A mentoria fica mais rica quando vocês trocam entre si. Deixe um feedback pra
-          alguém da turma, sobre o que você percebeu, admirou ou aprendeu com essa pessoa.
-        </p>
+        
 
         <section className="mb-10">
           <Eyebrow>

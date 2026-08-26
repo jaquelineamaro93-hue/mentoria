@@ -31,13 +31,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
 
   return (
     <>
-      <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-          Biblioteca de encontros
-        </p>
-        <h1 className="font-display text-3xl text-black mb-1">Gravações</h1>
-        <p className="text-sm text-gray-text mb-8">
-          Reveja as sessões sempre que precisar. Tudo fica salvo no Drive do programa.
-        </p>
+      
 
         <div className="flex gap-2 mb-6">
           {(['todas', 'individual', 'grupo'] as Filtro[]).map((f) => (

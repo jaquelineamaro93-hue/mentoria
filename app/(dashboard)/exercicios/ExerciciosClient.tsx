@@ -177,13 +177,7 @@ export default function ExerciciosClient({
     <>
       <main className="px-6 py-8 md:px-12 md:py-12 w-full">
         <div className="mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-brown-deep mb-2 bg-orange-100 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-orange-200">
-            Área de diagnóstico
-          </p>
-          <h1 className="font-display text-3xl sm:text-4xl text-black">Diagnóstico & Perfil</h1>
-          <p className="text-sm text-gray-text mt-2">
-            Entenda onde você está agora e acompanhe como isso muda ao longo da mentoria.
-          </p>
+          
         </div>
 
         {/* Mapa Quem Sou */}

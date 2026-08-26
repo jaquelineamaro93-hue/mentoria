@@ -88,14 +88,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
   return (
     <>
       <div className="mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-brown-deep mb-2 bg-orange-100 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-orange-200">
-            Registro pessoal
-          </p>
-          <h1 className="font-display text-3xl sm:text-4xl text-black">Diário de Bordo</h1>
-          <p className="text-sm text-gray-text mt-2">
-            Registre aprendizados, dúvidas e sacadas dos seus encontros individuais e em
-            grupo.
-          </p>
+          
         </div>
 
         {/* Campo de nova anotação */}
