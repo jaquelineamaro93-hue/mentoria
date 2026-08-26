@@ -93,7 +93,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
                     )}
                   </div>
                 </div>
-                <span className="text-xs text-orange shrink-0">Abrir no Drive</span>
+                <span className="text-xs text-brown-deep shrink-0">Abrir no Drive</span>
               </a>
             ))}
           </div>
