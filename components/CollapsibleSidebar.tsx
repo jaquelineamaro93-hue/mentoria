@@ -110,7 +110,7 @@ export default function CollapsibleSidebar() {
       className={`
         fixed left-0 top-0 h-screen bg-gradient-to-b from-[#1A1A1A] to-[#2D2D2D] border-r border-white/5
         flex flex-col transition-all duration-300 z-50
-        ${isCollapsed ? 'w-20' : 'w-[280px]'}
+        ${isCollapsed ? 'w-16' : 'w-[280px]'}
       `}
     >
       {/* Logo Section - Estilo padrão */}
