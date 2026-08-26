@@ -19,6 +19,7 @@ import {
   Gem,
   Award,
   TrendingUp,
+  Calendar,
 } from 'lucide-react';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
@@ -422,6 +423,33 @@ export default function DashboardClient({
         </section>
 
         {/* Atalhos */}
+        {/* Sessão Individual */}
+        <section className="mb-10">
+          <Eyebrow>Sessão Individual com Mentora</Eyebrow>
+          <a
+            href="https://calendar.app.google/T9DhtbrVVG9hKShN7"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Panel className="p-6 hover:border-lotus-brown/40 transition-colors group border-gray-faint">
+              <div className="flex items-start gap-4">
+                <Calendar className="text-lotus-brown mb-2 shrink-0" size={24} strokeWidth={1.5} />
+                <div>
+                  <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
+                    Agendar Sessão Individual
+                  </p>
+                  <p className="text-sm text-gray-text">
+                    Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
+                  </p>
+                  <div className="flex items-center gap-1 mt-2 text-xs text-lotus-brown group-hover:gap-2 transition-all">
+                    Agendar agora <ExternalLink size={14} />
+                  </div>
+                </div>
+              </div>
+            </Panel>
+          </a>
+        </section>
+
         <section className="mb-10">
           <Eyebrow>Continue sua jornada</Eyebrow>
           <div className="grid sm:grid-cols-2 gap-4">
