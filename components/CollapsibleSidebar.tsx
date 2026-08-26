@@ -61,14 +61,24 @@ export default function CollapsibleSidebar() {
 
       if (!user) return;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('nome, foto_url, genero, tipo_pacote, is_admin')
         .eq('id', user.id)
         .single();
 
+      if (error) {
+        console.error('Erro ao buscar perfil:', error);
+        return;
+      }
+
       if (data) {
-        console.log('✅ Perfil carregado:', { nome: data.nome, is_admin: data.is_admin, tipo: typeof data.is_admin });
+        console.log('✅ Perfil carregado:', {
+          nome: data.nome,
+          is_admin: data.is_admin,
+          tipo_admin: typeof data.is_admin,
+          user_id: user.id
+        });
         setProfile(data);
         const partes = data.nome?.split(' ') || [];
         const iniciais = partes
@@ -159,7 +169,7 @@ export default function CollapsibleSidebar() {
         })}
 
         {/* Admin Panel - Only for admins */}
-        {profile?.is_admin && (
+        {profile?.is_admin === true && (
           <Link
             href="/admin"
             className={`
