@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
-import Sidebar from '@/components/Sidebar';
 import { Calendar, Users, Video, FileText, Clock } from 'lucide-react';
 import type { Profile, PlanoMentoria } from '@/lib/types';
 
@@ -27,7 +26,6 @@ export default function MeuPlanoClient({
   if (!plano) {
     return (
       <div className="flex flex-col md:flex-row w-full">
-        <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
           <p className="text-sm text-gray-text">
             Seu plano será ativado em breve. Você receberá um aviso por email.
@@ -44,7 +42,6 @@ export default function MeuPlanoClient({
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">

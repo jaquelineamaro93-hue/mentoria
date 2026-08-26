@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
 import KanbanTab from '@/app/vagas/tabs/KanbanTab';
 import { createClient } from '@/lib/supabase/client';
@@ -149,7 +148,6 @@ export default function SimuladorCVClient({
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">

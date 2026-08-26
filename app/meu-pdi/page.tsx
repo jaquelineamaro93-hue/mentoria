@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Sidebar from '@/components/Sidebar';
 import MeuPdiClient from './MeuPdiClient';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
@@ -30,7 +29,7 @@ export default async function MeuPdiPage() {
 
   return (
     <div className="flex">
-      <Sidebar profile={profile} />
+      
       <main className="flex-1 overflow-auto">
         <MeuPdiClient
           userId={user.id}

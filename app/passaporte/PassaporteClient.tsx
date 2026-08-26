@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, Lock, Loader2, Award, ShoppingBag, Zap } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -58,7 +57,6 @@ export default function PassaporteClient({
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 overflow-auto">
         <div className="px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">

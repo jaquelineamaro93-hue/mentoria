@@ -51,7 +51,7 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar profile={adminProfile as Profile} />
+      
       <UsuarioPermissoesClient
         usuario={usuarioProfile as Profile}
         permissoesIniciais={permissoes || []}

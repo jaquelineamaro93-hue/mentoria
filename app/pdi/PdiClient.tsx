@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -93,7 +92,6 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
   if (!secao) {
     return (
       <div className="flex flex-col md:flex-row w-full">
-        <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 px-6 py-10 md:px-12">
           <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
         </main>
@@ -103,7 +101,6 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <div className="flex-1 flex">
         <div className="hidden lg:block w-[260px] shrink-0 border-r border-gray-faint p-8 overflow-y-auto">

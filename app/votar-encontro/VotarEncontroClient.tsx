@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
-import Sidebar from '@/components/Sidebar';
 import { AlertCircle, CheckCircle2, Users, TrendingUp } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 
@@ -223,7 +222,6 @@ export default function VotarEncontroClient({
   if (enviado && (jaSeuVoto || aba === 'enquetes')) {
     return (
       <div className="flex flex-row w-full h-screen">
-        <Sidebar profile={profile} onSignOut={handleSignOut} />
         <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
           <div className="text-center py-12">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
@@ -256,7 +254,6 @@ export default function VotarEncontroClient({
 
   return (
     <div className="flex flex-row w-full h-screen">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Participação</p>
