@@ -88,7 +88,7 @@ export default function OnboardingClient({
 
   return (
     <>
-      <div className="">
+      <div>
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Sua jornada</p>
         <h1 className="font-display text-3xl text-black mb-2">Onboarding</h1>
         <p className="text-sm text-gray-text mb-8">

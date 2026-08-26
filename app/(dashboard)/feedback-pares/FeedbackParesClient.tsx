@@ -70,7 +70,7 @@ export default function FeedbackParesClient({
 
   return (
     <>
-      <div className="">
+      <div>
         <section className="mb-10">
           <Eyebrow>
             <MessageCircle size={13} /> Novo feedback

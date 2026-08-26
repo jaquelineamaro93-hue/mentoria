@@ -192,7 +192,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
   return (
     <>
-      <div className="">
+      <div>
         <Eyebrow>
           <Network size={14} />
           Círculos de Influência
