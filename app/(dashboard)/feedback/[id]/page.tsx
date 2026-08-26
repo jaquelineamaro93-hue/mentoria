@@ -55,7 +55,7 @@ export default async function FeedbackPage({ params }: { params: Promise<{ id: s
             </p>
           </div>
 
-          <div className="prose prose-sm
+          <div className="prose prose-sm">
             <p className="text-base text-black leading-relaxed whitespace-pre-wrap">
               {feedback.conteudo}
             </p>
