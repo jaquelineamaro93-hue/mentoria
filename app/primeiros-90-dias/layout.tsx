@@ -1,9 +1,15 @@
-import AppShell from '@/components/AppShell';
+'use client';
+
+import { SidebarProvider } from '@/lib/contexts/SidebarContext';
 
 export default function Primeiros90DiasLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AppShell>{children}</AppShell>;
+  return (
+    <SidebarProvider>
+      {children}
+    </SidebarProvider>
+  );
 }

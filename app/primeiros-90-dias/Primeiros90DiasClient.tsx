@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import Sidebar from './components/Sidebar';
+import { useSidebar } from '@/lib/contexts/SidebarContext';
+import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import StarsSelector from './components/StarsSelector';
 import DashboardAcompanhamento from './components/DashboardAcompanhamento';
 import TabNavigation from './components/TabNavigation';
@@ -19,12 +20,12 @@ interface Primeiros90DiasClientProps {
 
 export default function Primeiros90DiasClient({ initialData, userId }: Primeiros90DiasClientProps) {
   const supabase = createClient();
+  const { isCollapsed } = useSidebar();
   const [activeTab, setActiveTab] = useState<'overview' | 'month1' | 'month2' | 'month3'>('overview');
   const [situacaoStars, setSituacaoStars] = useState<string | null>(initialData?.situacao_stars);
   const [respostas, setRespostas] = useState<Record<string, any>>(initialData?.respostas_json || {});
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const saveData = async () => {
     setIsSaving(true);
@@ -68,12 +69,16 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen bg-white">
+      {/* New Collapsible Sidebar */}
+      <CollapsibleSidebar />
 
       {/* Main Content */}
-      <div className="flex-1">
+      <div
+        className={`transition-all duration-300 min-h-screen overflow-y-auto ${
+          isCollapsed ? 'ml-20' : 'ml-64'
+        }`}
+      >
         {/* Header with Back Button */}
         <div className="bg-white border-b border-gray-faint px-8 py-6">
           <Link
