@@ -1,24 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
+import { useUser } from '@/lib/contexts/UserContext';
 import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, LogOut, Target, MessageCircle, PlayCircle, Award, FileSearch, Users, CreditCard, MapPin, Gift, HelpCircle, TrendingUp, Briefcase, Compass, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
-}
-
-interface UserProfile {
-  nome: string;
-  foto_url?: string;
-  genero?: string;
-  tipo_pacote?: string;
-  is_admin?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -44,58 +37,14 @@ const navItems: NavItem[] = [
 
 export default function CollapsibleSidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
+  const { profile, initials } = useUser();
   const pathname = usePathname();
+  const router = useRouter();
   const supabase = createClient();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [initials, setInitials] = useState('');
-
-  useEffect(() => {
-    carregarPerfil();
-  }, []);
-
-  async function carregarPerfil() {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('nome, foto_url, tipo_pacote, is_admin')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Erro ao buscar perfil:', error);
-        return;
-      }
-
-      if (data) {
-        console.log('✅ Perfil carregado:', {
-          nome: data.nome,
-          is_admin: data.is_admin,
-          tipo_admin: typeof data.is_admin,
-          user_id: user.id
-        });
-        setProfile(data);
-        const partes = data.nome?.split(' ') || [];
-        const iniciais = partes
-          .slice(0, 2)
-          .map((p: string) => p[0])
-          .join('')
-          .toUpperCase() || '';
-        setInitials(iniciais);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar perfil:', error);
-    }
-  }
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    window.location.href = '/login';
+    router.push('/login');
   }
 
   const isActiveRoute = (href: string) => {
