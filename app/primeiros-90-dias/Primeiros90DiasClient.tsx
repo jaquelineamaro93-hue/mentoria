@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { useSidebar } from '@/lib/contexts/SidebarContext';
-import CollapsibleSidebar from '@/components/CollapsibleSidebar';
+import StandardLayout from '@/components/StandardLayout';
 import StarsSelector from './components/StarsSelector';
 import DashboardAcompanhamento from './components/DashboardAcompanhamento';
 import TabNavigation from './components/TabNavigation';
@@ -20,7 +19,6 @@ interface Primeiros90DiasClientProps {
 
 export default function Primeiros90DiasClient({ initialData, userId }: Primeiros90DiasClientProps) {
   const supabase = createClient();
-  const { isCollapsed } = useSidebar();
   const [activeTab, setActiveTab] = useState<'overview' | 'month1' | 'month2' | 'month3'>('overview');
   const [situacaoStars, setSituacaoStars] = useState<string | null>(initialData?.situacao_stars);
   const [respostas, setRespostas] = useState<Record<string, any>>(initialData?.respostas_json || {});
@@ -69,18 +67,10 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* New Collapsible Sidebar */}
-      <CollapsibleSidebar />
-
-      {/* Main Content */}
-      <div
-        className={`transition-all duration-300 min-h-screen overflow-y-auto ${
-          isCollapsed ? 'ml-20' : 'ml-64'
-        }`}
-      >
-        {/* Header with Back Button */}
-        <div className="bg-white border-b border-gray-faint px-8 py-6">
+    <StandardLayout>
+      {/* Header with Back Button */}
+      <div className="bg-white border-b border-gray-faint px-0 -mx-6 md:-mx-12 mb-8">
+        <div className="px-6 md:px-12 py-6">
           <Link
             href="/dashboard"
             className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
@@ -88,14 +78,15 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
             <ArrowLeft size={14} />
             Voltar ao Início
           </Link>
-          <h1 className="font-display text-5xl text-black mb-2">Primeiros 90 Dias</h1>
+          <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Primeiros 90 Dias</h1>
           <p className="text-gray-text text-base leading-relaxed">
             Guia de aceleração de carreira e transição executiva
           </p>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="px-8 py-8 max-w-6xl mx-auto">
+      {/* Content */}
+      <div>
         {/* STARS Diagnosis */}
         <div className="mb-12">
           <h2 className="text-xl text-black font-medium mb-6">Contexto de Atuação</h2>
@@ -161,8 +152,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
             </div>
           </div>
         )}
-        </div>
       </div>
-    </div>
+    </StandardLayout>
   );
 }

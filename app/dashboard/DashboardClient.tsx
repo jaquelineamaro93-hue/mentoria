@@ -294,27 +294,33 @@ export default function DashboardClient({
             </div>
             <div className="space-y-3">
               {feedbacks.map((feedback) => (
-                <Panel key={feedback.id} className="p-4 border-gray-faint hover:border-lotus-brown/40 transition-colors">
-                  <div className="flex gap-3">
-                    <MessageSquare className="text-lotus-brown shrink-0 mt-1" size={18} strokeWidth={1.5} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <p className="text-sm font-medium text-lotus-brown truncate">{feedback.titulo}</p>
-                        <span className="text-[10px] uppercase tracking-wide text-gray-text shrink-0 whitespace-nowrap">
-                          {feedback.tipo === 'feedback' ? 'Feedback' : feedback.tipo === 'nota' ? 'Nota' : 'Arquivo'}
-                        </span>
+                <Link
+                  key={feedback.id}
+                  href={`/feedback/${feedback.id}`}
+                  className="block group"
+                >
+                  <Panel className="p-4 border-gray-faint hover:border-lotus-brown/40 transition-colors cursor-pointer">
+                    <div className="flex gap-3">
+                      <MessageSquare className="text-lotus-brown shrink-0 mt-1" size={18} strokeWidth={1.5} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="text-sm font-medium text-lotus-brown truncate group-hover:underline">{feedback.titulo}</p>
+                          <span className="text-[10px] uppercase tracking-wide text-gray-text shrink-0 whitespace-nowrap">
+                            {feedback.tipo === 'feedback' ? 'Feedback' : feedback.tipo === 'nota' ? 'Nota' : 'Arquivo'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-black line-clamp-2 mb-2">{feedback.conteudo}</p>
+                        <p className="text-xs text-gray-text">
+                          {new Date(feedback.data).toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </p>
                       </div>
-                      <p className="text-sm text-black line-clamp-2 mb-2">{feedback.conteudo}</p>
-                      <p className="text-xs text-gray-text">
-                        {new Date(feedback.data).toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </p>
                     </div>
-                  </div>
-                </Panel>
+                  </Panel>
+                </Link>
               ))}
             </div>
           </section>
