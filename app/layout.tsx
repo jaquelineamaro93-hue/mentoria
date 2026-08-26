@@ -3,6 +3,7 @@ import './globals.css';
 import PostHogInit from '@/components/PostHogInit';
 import TermosGate from '@/components/TermosGate';
 import AcessoGate from '@/components/AcessoGate';
+import AppShell from '@/components/AppShell';
 
 export const metadata: Metadata = {
   title: 'Portal do Mentorado | Mentoria SOMA',
@@ -26,11 +27,13 @@ export default function RootLayout({
         />
         <script async defer src="https://accounts.google.com/gsi/client"></script>
       </head>
-      <body className="min-h-full flex flex-col bg-white text-black">
+      <body className="min-h-full bg-white text-black">
         <PostHogInit />
         <AcessoGate />
         <TermosGate />
-        {children}
+        <AppShell>
+          {children}
+        </AppShell>
       </body>
     </html>
   );
