@@ -68,6 +68,7 @@ export default function CollapsibleSidebar() {
         .single();
 
       if (data) {
+        console.log('Perfil carregado:', { nome: data.nome, is_admin: data.is_admin });
         setProfile(data);
         const partes = data.nome?.split(' ') || [];
         const iniciais = partes
