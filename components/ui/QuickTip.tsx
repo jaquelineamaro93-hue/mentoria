@@ -8,8 +8,8 @@ export function QuickTip() {
   const pathname = usePathname();
   const tip = getQuickTipForPath(pathname);
 
-  // Se a página não tiver dica cadastrada, não renderiza nada
-  if (!tip) return null;
+  // Se a página não tiver dica cadastrada ou for dashboard, não renderiza nada
+  if (!tip || pathname === '/dashboard') return null;
 
   return (
     <div className="bg-gray-light border border-gray-faint rounded-lg p-4 text-sm transition-all">
