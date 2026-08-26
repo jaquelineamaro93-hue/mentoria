@@ -148,7 +148,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
   };
 
   return (
-    <StandardLayout profile={profile} onSignOut={handleSignOut}>
+    <StandardLayout>
       <div className="border-b border-gray-faint bg-white px-6 md:px-12 py-4 sticky top-0 z-10">
         <div className="flex gap-8 max-w-5xl mx-auto">
           <button
