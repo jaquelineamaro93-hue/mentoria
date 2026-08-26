@@ -17,7 +17,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           isCollapsed ? 'ml-20' : 'ml-64'
         }`}
       >
-        <div className="p-8 md:p-12 max-w-7xl mx-auto w-full">
+        <div className="p-8 md:p-12 w-full">
           {children}
 
           {/* Quick Tip positioned at bottom of main content */}
