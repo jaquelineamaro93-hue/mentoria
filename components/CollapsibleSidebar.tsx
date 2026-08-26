@@ -72,7 +72,7 @@ export default function CollapsibleSidebar() {
         const partes = data.nome?.split(' ') || [];
         const iniciais = partes
           .slice(0, 2)
-          .map((p) => p[0])
+          .map((p: string) => p[0])
           .join('')
           .toUpperCase() || '';
         setInitials(iniciais);

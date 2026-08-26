@@ -174,10 +174,7 @@ export default function ExerciciosClient({
   const ultimo = diagnostics[diagnostics.length - 1];
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
-
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+    <main className="px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
             Área de diagnóstico
@@ -493,6 +490,5 @@ export default function ExerciciosClient({
           )}
         </section>
       </main>
-    </div>
   );
 }
