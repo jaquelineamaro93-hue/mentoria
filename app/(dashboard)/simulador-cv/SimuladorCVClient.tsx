@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { Panel } from '@/components/Panel'
 import StandardLayout from '@/components/StandardLayout';;
-import KanbanTab from '@/app/vagas/tabs/KanbanTab';
-import RankingTab from '@/app/vagas/tabs/RankingTab';
+import KanbanTab from '@/app/(dashboard)/vagas/tabs/KanbanTab';
+import RankingTab from '@/app/(dashboard)/vagas/tabs/RankingTab';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { formatarTituloInsight } from '@/lib/string-utils';
