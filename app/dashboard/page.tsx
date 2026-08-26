@@ -68,6 +68,17 @@ export default async function DashboardPage() {
     votacaoAtiva = !!data && data.length > 0;
   } catch { votacaoAtiva = false; }
 
+  let feedbacks: any[] = [];
+  try {
+    const { data } = await supabase
+      .from('feedback_sessoes')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('data', { ascending: false })
+      .limit(5);
+    feedbacks = data ?? [];
+  } catch { feedbacks = []; }
+
   return (
     <DashboardClient
       profile={profile}
@@ -78,6 +89,7 @@ export default async function DashboardPage() {
       pdiRespostas={pdiRespostas}
       journalNotes={journalNotes}
       votacaoAtiva={votacaoAtiva}
+      feedbacks={feedbacks}
     />
   );
 }
