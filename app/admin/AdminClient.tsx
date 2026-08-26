@@ -243,7 +243,7 @@ export default function AdminClient({
     <div className="w-full">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
+            <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
               Área administrativa
             </p>
             <h1 className="font-display text-3xl text-black mb-1">

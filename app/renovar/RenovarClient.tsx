@@ -82,7 +82,7 @@ export default function RenovarClient({ profile, planos }: Props) {
                 key={plano.id}
                 className="bg-white border border-gray-faint rounded-2xl p-6 flex flex-col"
               >
-                <p className="text-xs uppercase tracking-wide text-mint mb-1">
+                <p className="text-xs uppercase tracking-wide text-mint mb-1 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
                   {plano.duracao_meses} meses
                 </p>
                 <p className="font-display text-2xl text-black mb-1">{plano.nome}</p>

@@ -256,7 +256,7 @@ export default function VotarEncontroClient({
     <div className="flex flex-row w-full h-screen">
 
       <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
-        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Participação</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Participação</p>
         <h1 className="font-display text-3xl text-black mb-1">
           {aba === 'encontros' ? 'Qual é o melhor dia?' : 'Enquetes e Votações'}
         </h1>

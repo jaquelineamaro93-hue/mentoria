@@ -42,7 +42,7 @@ export default function CrescimentoClient({
     <div className="px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
-        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Área administrativa</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Área administrativa</p>
         <h1 className="font-display text-3xl text-black mb-1">Boas práticas de crescimento</h1>
         <p className="text-sm text-gray-text mb-8">
           Um retrato de como as mentoradas atuais chegaram até você, e o que costuma funcionar pra
