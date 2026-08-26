@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-import { Panel } from '@/components/Panel';
+import { Panel } from '@/components/Panel'
+import StandardLayout from '@/components/StandardLayout';;
 import KanbanTab from '@/app/vagas/tabs/KanbanTab';
 import RankingTab from '@/app/vagas/tabs/RankingTab';
 import { createClient } from '@/lib/supabase/client';
@@ -148,9 +149,7 @@ export default function SimuladorCVClient({
         : 'bg-red-500';
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+    <StandardLayout> className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
@@ -451,7 +450,6 @@ export default function SimuladorCVClient({
             )}
           </section>
         )}
-      </main>
-    </div>
+      </StandardLayout>
   );
 }

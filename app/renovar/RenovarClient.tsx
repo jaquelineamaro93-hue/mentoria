@@ -6,6 +6,7 @@ import { Lock, Loader2, ExternalLink, Check } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { PlanoMentoria, Profile } from '@/lib/types';
+import StandardLayout from '@/components/StandardLayout';
 
 interface Props {
   profile: Profile | null;

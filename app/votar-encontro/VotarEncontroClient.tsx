@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { AlertCircle, CheckCircle2, Users, TrendingUp } from 'lucide-react';
 import type { Profile } from '@/lib/types';
+import StandardLayout from '@/components/StandardLayout';
 
 const DATAS_ENCONTROS = [
   { id: '22-08', label: 'Sábado, 22 de agosto', data: '2026-08-22' },
@@ -221,8 +222,7 @@ export default function VotarEncontroClient({
 
   if (enviado && (jaSeuVoto || aba === 'enquetes')) {
     return (
-      <div className="flex flex-row w-full h-screen">
-        <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
+    <StandardLayout> className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
           <div className="text-center py-12">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
             <h1 className="font-display text-2xl text-black mb-2">Seu voto foi registrado!</h1>
@@ -242,9 +242,8 @@ export default function VotarEncontroClient({
               </p>
             )}
           </div>
-        </main>
-      </div>
-    );
+        </StandardLayout>
+  );
   }
 
   const contagemVotos = datasDaAba.map((data) => ({
@@ -253,9 +252,7 @@ export default function VotarEncontroClient({
   }));
 
   return (
-    <div className="flex flex-row w-full h-screen">
-
-      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
+    <StandardLayout> className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Participação</p>
         <h1 className="font-display text-3xl text-black mb-1">
           {aba === 'encontros' ? 'Qual é o melhor dia?' : 'Enquetes e Votações'}
@@ -619,7 +616,6 @@ export default function VotarEncontroClient({
             )}
           </>
         )}
-      </main>
-    </div>
+      </StandardLayout>
   );
 }
