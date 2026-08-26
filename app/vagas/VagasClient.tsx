@@ -61,7 +61,7 @@ export default function VagasClient({
   };
 
   return (
-    <div className="w-full">
+    <StandardLayout>
       <div className="p-8 md:p-12 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -133,6 +133,6 @@ export default function VagasClient({
             )}
           </Panel>
         </div>
-    </div>
+    </StandardLayout>
   );
 }

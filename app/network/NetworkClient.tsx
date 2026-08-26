@@ -192,8 +192,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   };
 
   return (
-    <div className="flex flex-row w-full h-screen">
-
+    <StandardLayout>
       <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Network size={14} />
@@ -541,6 +540,6 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
           </div>
         )}
       </main>
-    </div>
+    </StandardLayout>
   );
 }

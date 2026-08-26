@@ -89,7 +89,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
   return (
     <StandardLayout>
       <div className="mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-brown-deep mb-2 bg-orange-100 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-orange-200">
             Registro pessoal
           </p>
           <h1 className="font-display text-3xl sm:text-4xl text-black">Diário de Bordo</h1>

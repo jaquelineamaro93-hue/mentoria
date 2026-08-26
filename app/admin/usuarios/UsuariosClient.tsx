@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Users, Shield, CheckCircle2, Circle } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 
 interface User {
   id: string;
@@ -76,9 +77,9 @@ export function UsuariosClient() {
   const totalOnboarding = mentoradas.filter(u => u.onboarding_concluido).length;
 
   return (
-    
-<div className="space-y-6">
-      <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
+    <StandardLayout>
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-display text-black flex items-center gap-2">
@@ -154,6 +155,7 @@ export function UsuariosClient() {
           </table>
         </div>
       )}
-    </div>
+      </div>
+    </StandardLayout>
   );
 }

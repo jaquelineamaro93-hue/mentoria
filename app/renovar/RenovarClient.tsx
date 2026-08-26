@@ -54,8 +54,9 @@ export default function RenovarClient({ profile, planos }: Props) {
   }
 
   return (
-    <div className="min-h-screen w-full px-6 py-12 bg-white">
-      <div className="max-w-4xl mx-auto">
+    <StandardLayout>
+      <div className="min-h-screen w-full px-6 py-12 bg-white">
+        <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <div className="w-14 h-14 rounded-full bg-mint-light border border-mint flex items-center justify-center mx-auto mb-6">
             <Lock size={22} className="text-mint" />
@@ -164,6 +165,7 @@ export default function RenovarClient({ profile, planos }: Props) {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </StandardLayout>
   );
 }
