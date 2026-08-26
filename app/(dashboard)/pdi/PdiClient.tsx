@@ -92,7 +92,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
   if (!secao) {
     return (
       <>
-        <div className="px-6 py-10 md:px-12">
+        <div className="">
           <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
         </div>
       </>

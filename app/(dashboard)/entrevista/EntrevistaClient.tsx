@@ -183,7 +183,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
 
   return (
     <>
-      <div className="px-6 py-10 md:px-12">
+      <div className="">
         <Eyebrow>
           <Sparkles size={14} />
           Preparação para Entrevistas

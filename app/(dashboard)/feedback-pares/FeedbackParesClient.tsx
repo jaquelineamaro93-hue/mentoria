@@ -70,7 +70,7 @@ export default function FeedbackParesClient({
 
   return (
     <>
-      <div className="px-6 py-8 md:px-12 md:py-12">
+      <div className="">
         <section className="mb-10">
           <Eyebrow>
             <MessageCircle size={13} /> Novo feedback

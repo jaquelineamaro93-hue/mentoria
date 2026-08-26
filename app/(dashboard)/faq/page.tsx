@@ -102,7 +102,7 @@ export default async function FaqPage() {
 
   return (
     <>
-      <div className="px-6 py-10 md:px-12">
+      <div className="">
         <h1 className="font-display text-3xl text-black mb-2">Perguntas Frequentes</h1>
         <p className="text-gray-text mb-10">Tudo o que voce precisa saber para aproveitar ao maximo a mentoria.</p>
 
