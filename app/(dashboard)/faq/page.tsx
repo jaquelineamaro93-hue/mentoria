@@ -127,10 +127,6 @@ export default async function FaqPage() {
             ))}
         </div>
       </div>
-<<<<<<< Updated upstream
-=======
-      </div>
->>>>>>> Stashed changes
     </>
   );
 }

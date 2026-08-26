@@ -12,11 +12,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-<<<<<<< Updated upstream
-import { Panel } from '@/components/Panel'
-=======
 import { Panel } from '@/components/Panel';
->>>>>>> Stashed changes
 import KanbanTab from '@/app/(dashboard)/vagas/tabs/KanbanTab';
 import RankingTab from '@/app/(dashboard)/vagas/tabs/RankingTab';
 import { createClient } from '@/lib/supabase/client';

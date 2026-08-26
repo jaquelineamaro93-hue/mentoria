@@ -196,11 +196,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         </div>
       </div>
 
-<<<<<<< Updated upstream
-      <div>
-=======
       <div className="flex-1 px-6 py-10 md:px-12 w-full">
->>>>>>> Stashed changes
         {activeTab === 'perguntas' && (
           <PdiClientContent
             profile={profile}
