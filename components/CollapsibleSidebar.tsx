@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
-import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, LogOut, Target, MessageCircle, PlayCircle, Award, FileSearch, Users, CreditCard, MapPin, Gift, HelpCircle, TrendingUp, Briefcase, Compass } from 'lucide-react';
+import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, LogOut, Target, MessageCircle, PlayCircle, Award, FileSearch, Users, CreditCard, MapPin, Gift, HelpCircle, TrendingUp, Briefcase, Compass, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -18,6 +18,7 @@ interface UserProfile {
   foto_url?: string;
   genero?: string;
   tipo_pacote?: string;
+  is_admin?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -63,7 +64,7 @@ export default function CollapsibleSidebar() {
 
       const { data } = await supabase
         .from('profiles')
-        .select('nome, foto_url, genero, tipo_pacote')
+        .select('nome, foto_url, genero, tipo_pacote, is_admin')
         .eq('id', user.id)
         .single();
 
@@ -156,6 +157,36 @@ export default function CollapsibleSidebar() {
             </Link>
           );
         })}
+
+        {/* Admin Panel - Conditional */}
+        {profile?.is_admin && (
+          <Link
+            href="/admin"
+            className={`
+              flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
+              group relative text-sm
+              ${
+                pathname.startsWith('/admin')
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/70 hover:bg-white/5 hover:text-white'
+              }
+            `}
+          >
+            <div className="flex-shrink-0">
+              <ShieldCheck size={20} />
+            </div>
+
+            {!isCollapsed && (
+              <span className="truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>Painel dos mentorados</span>
+            )}
+
+            {isCollapsed && (
+              <div className="absolute left-full ml-2 px-2 py-1 bg-white/20 backdrop-blur text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                Painel dos mentorados
+              </div>
+            )}
+          </Link>
+        )}
       </nav>
 
       {/* Footer - User Card */}
