@@ -14,7 +14,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       {/* Main content area - accounts for fixed sidebar */}
       <main
         className={`transition-all duration-300 min-h-screen overflow-x-hidden overflow-y-auto w-full ${
-          isCollapsed ? 'ml-20' : 'ml-64'
+          isCollapsed ? 'ml-20' : 'ml-[280px]'
         }`}
       >
         <div className="p-8 md:p-12 w-full">
