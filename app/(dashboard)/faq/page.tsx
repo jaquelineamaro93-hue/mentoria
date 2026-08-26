@@ -103,7 +103,7 @@ export default async function FaqPage() {
 
   return (
     <StandardLayout>
-      <div className="max-w-3xl mx-auto">
+      <div>
         <h1 className="font-display text-3xl text-black mb-2">Perguntas Frequentes</h1>
           <p className="text-gray-text mb-10">Tudo o que voce precisa saber para aproveitar ao maximo a mentoria.</p>
 

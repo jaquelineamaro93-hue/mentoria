@@ -29,7 +29,7 @@ export default async function FeedbackPage({ params }: { params: Promise<{ id: s
 
   return (
     <StandardLayout>
-      <div className="max-w-3xl mx-auto">
+      <div>
         <Link
           href="/dashboard"
           className="inline-flex items-center gap-2 text-sm font-medium text-gray-text hover:text-black mb-8 transition-colors"
@@ -55,7 +55,7 @@ export default async function FeedbackPage({ params }: { params: Promise<{ id: s
             </p>
           </div>
 
-          <div className="prose prose-sm max-w-none">
+          <div className="prose prose-sm
             <p className="text-base text-black leading-relaxed whitespace-pre-wrap">
               {feedback.conteudo}
             </p>

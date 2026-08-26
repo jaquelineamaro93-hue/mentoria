@@ -251,7 +251,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
   };
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <Eyebrow>
         <Sparkles size={14} />
         Análise de Compatibilidade com IA
@@ -343,7 +343,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
 
           <Panel className="p-8 bg-mint-light border border-mint text-center">
             <div className="mb-4">
-              <div className="w-32 h-32 rounded-full border-4 border-mint-deep flex items-center justify-center mx-auto mb-4">
+              <div className="w-32 h-32 rounded-full border-4 border-mint-deep flex items-center justify-center mb-4">
                 <div className="font-display text-5xl text-mint">
                   {analise.fit_score}%
                 </div>

@@ -358,7 +358,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       {/* Modal de Importação com Template */}
       {mostraImportacao && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Panel className="max-w-2xl w-full border border-gray-faint">
+          <Panel className="w-full border border-gray-faint">
             <div className="sticky top-0 bg-white border-b border-gray-faint p-6 flex items-start justify-between">
               <h2 className="font-display text-2xl text-black">Template de Vagas</h2>
               <button
@@ -547,7 +547,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
       {mostraModalNova && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Panel className="max-w-2xl w-full border border-gray-faint">
+          <Panel className="w-full border border-gray-faint">
             <div className="bg-white border-b border-gray-faint p-6 flex items-start justify-between">
               <h2 className="font-display text-2xl text-black">Adicionar Nova Vaga</h2>
               <button
@@ -636,7 +636,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
 
       {modalVaga && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Panel className="max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-faint">
+          <Panel className="w-full max-h-[90vh] overflow-y-auto border border-gray-faint">
             <div className="sticky top-0 bg-white border-b border-gray-faint p-6 flex items-start justify-between">
               <div>
                 {editandoVaga ? (
