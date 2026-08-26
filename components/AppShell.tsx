@@ -8,12 +8,12 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="relative min-h-screen w-full bg-white">
+    <div className="relative h-screen w-screen bg-white overflow-hidden">
       <CollapsibleSidebar />
 
       {/* Main content area - margin-left accounts for fixed sidebar */}
       <main
-        className={`min-h-screen overflow-x-hidden overflow-y-auto transition-all duration-300 ${
+        className={`h-full w-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
           isCollapsed ? 'ml-20' : 'ml-[280px]'
         }`}
       >
