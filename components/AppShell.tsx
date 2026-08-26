@@ -13,9 +13,12 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
       {/* Main content area - margin-left accounts for fixed sidebar */}
       <main
-        className={`h-full w-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
+        className={`h-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
           isCollapsed ? 'ml-20' : 'ml-[280px]'
         }`}
+        style={{
+          width: isCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 280px)'
+        }}
       >
         <div className="p-8 md:p-12">
           {/* Quick Tip positioned at top of main content */}
