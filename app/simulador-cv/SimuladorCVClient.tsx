@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Panel } from '@/components/Panel';
 import KanbanTab from '@/app/vagas/tabs/KanbanTab';
+import RankingTab from '@/app/vagas/tabs/RankingTab';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { formatarTituloInsight } from '@/lib/string-utils';
@@ -29,7 +30,7 @@ interface Props {
 
 const LIMITE_GRATIS_MES = 3;
 
-type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista' | 'minhas-vagas';
+type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista' | 'minhas-vagas' | 'ranking';
 
 export default function SimuladorCVClient({
   profile,
@@ -294,6 +295,7 @@ export default function SimuladorCVClient({
                   ['palavras', 'Palavras-chave'],
                   ['entrevista', 'Entrevista'],
                   ['minhas-vagas', 'Minhas Vagas'],
+                  ['ranking', 'Ranking'],
                 ] as [Aba, string][]
               ).map(([valor, label]) => (
                 <button
@@ -442,6 +444,10 @@ export default function SimuladorCVClient({
 
             {aba === 'minhas-vagas' && (
               <KanbanTab vagas={vagas} onVagaAtualizada={handleVagaAtualizada} />
+            )}
+
+            {aba === 'ranking' && (
+              <RankingTab vagas={vagas} />
             )}
           </section>
         )}
