@@ -19,7 +19,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         }`}
       >
         <div className="w-full h-full overflow-y-auto">
-          <div className="pl-2 pr-4 py-6 md:pr-6 w-full">
+          <div className="pl-0 pr-4 py-6 md:pr-6 w-full">
             {/* Quick Tip positioned at top of main content */}
             <div className="mb-4">
               <QuickTip />
