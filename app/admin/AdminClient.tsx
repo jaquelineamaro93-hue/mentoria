@@ -240,9 +240,7 @@ export default function AdminClient({
 
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-7xl mx-auto w-full">
+    <div className="w-full">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
@@ -666,7 +664,6 @@ export default function AdminClient({
 
           </div>
         </section>
-      </main>
     </div>
   );
 }
