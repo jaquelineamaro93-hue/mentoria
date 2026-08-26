@@ -220,11 +220,11 @@ export default function DashboardClient({
           )}
           <div>
             <h1 className="font-display text-3xl sm:text-4xl text-lotus-brown">
-              Bem-vinda, {primeiroNome}
+              {profile?.genero === 'masculino' ? 'Bem-vindo' : 'Bem-vinda'}, {primeiroNome}
             </h1>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[11px] uppercase tracking-wide bg-lotus-brown/10 border border-lotus-brown/30 text-lotus-brown px-2.5 py-1 rounded-full">
-                Mentorada {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
+                {profile?.genero === 'masculino' ? 'Mentorando' : 'Mentorada'} {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
               </span>
               <span
                 className={`flex items-center gap-1 text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full border ${

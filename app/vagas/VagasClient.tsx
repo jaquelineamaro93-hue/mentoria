@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
 import { BarChart3, Zap, TrendingUp, Briefcase } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import AnaliseFitTab from './tabs/AnaliseFitTab';
@@ -61,11 +60,8 @@ export default function VagasClient({
   };
 
   return (
-    <div className="flex h-screen bg-white">
-      <Sidebar profile={profile} />
-
-      <div className="flex-1 overflow-auto">
-        <div className="p-8 md:p-12 max-w-7xl mx-auto">
+    <div className="w-full">
+      <div className="p-8 md:p-12 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <Eyebrow>
@@ -136,7 +132,6 @@ export default function VagasClient({
             )}
           </Panel>
         </div>
-      </div>
     </div>
   );
 }

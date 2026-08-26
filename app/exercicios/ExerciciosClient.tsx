@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Compass, Sparkles, TrendingUp, Save, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';

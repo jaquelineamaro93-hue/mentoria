@@ -270,14 +270,10 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         )}
 
         {activeTab === 'feedbacks' && (
-          <div className="space-y-12">
-            <CheckinMensal userId={userId} />
-
-            <section>
-              <h2 className="text-2xl font-medium text-black mb-6">Feedbacks dos Mentores</h2>
-              <FeedbackTimeline userId={userId} />
-            </section>
-          </div>
+          <section>
+            <h2 className="text-2xl font-medium text-black mb-6">Feedbacks dos Mentores</h2>
+            <FeedbackTimeline userId={userId} />
+          </section>
         )}
       </main>
     </div>

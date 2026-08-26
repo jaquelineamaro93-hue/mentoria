@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NotebookPen, Sparkles, Loader2, Users, User as UserIcon } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -87,10 +86,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
-
-      <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+    <main className="px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
             Registro pessoal
@@ -242,6 +238,5 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
           )}
         </section>
       </main>
-    </div>
   );
 }

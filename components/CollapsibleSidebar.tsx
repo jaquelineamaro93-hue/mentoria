@@ -1,14 +1,22 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
 import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+}
+
+interface UserProfile {
+  nome: string;
+  foto_url?: string;
+  genero?: string;
 }
 
 const navItems: NavItem[] = [
@@ -22,6 +30,42 @@ const navItems: NavItem[] = [
 export default function CollapsibleSidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const supabase = createClient();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [initials, setInitials] = useState('');
+
+  useEffect(() => {
+    carregarPerfil();
+  }, []);
+
+  async function carregarPerfil() {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('nome, foto_url, genero')
+        .eq('id', user.id)
+        .single();
+
+      if (data) {
+        setProfile(data);
+        const partes = data.nome?.split(' ') || [];
+        const iniciais = partes
+          .slice(0, 2)
+          .map((p) => p[0])
+          .join('')
+          .toUpperCase() || '';
+        setInitials(iniciais);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar perfil:', error);
+    }
+  }
 
   const isActiveRoute = (href: string) => {
     if (href === '/dashboard') {
@@ -34,9 +78,10 @@ export default function CollapsibleSidebar() {
     <aside
       className={`
         fixed left-0 top-0 h-screen bg-[#1E292B] border-r border-white/10
-        flex flex-col transition-all duration-300 z-50
+        flex flex-col transition-all duration-300 z-50 font-body
         ${isCollapsed ? 'w-20' : 'w-64'}
       `}
+      style={{ fontFamily: "'Poppins', sans-serif" }}
     >
       {/* Logo Section */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
@@ -103,13 +148,21 @@ export default function CollapsibleSidebar() {
       {/* Footer - User Card */}
       <div className="border-t border-white/10 p-3">
         <div className="flex items-center gap-3 px-2 py-2 hover:bg-black/20 rounded-lg transition-colors cursor-pointer group relative">
-          <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
-            JA
-          </div>
+          {profile?.foto_url ? (
+            <img
+              src={profile.foto_url}
+              alt={profile.nome}
+              className="w-9 h-9 rounded-full object-cover shrink-0"
+            />
+          ) : (
+            <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
+              {initials}
+            </div>
+          )}
 
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-medium truncate">Jacqueline</p>
+              <p className="text-white text-xs font-medium truncate">{profile?.nome || 'Usuário'}</p>
               <p className="text-white/50 text-xs truncate">Meu Perfil</p>
             </div>
           )}
