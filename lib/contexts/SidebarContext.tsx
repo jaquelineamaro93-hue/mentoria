@@ -16,8 +16,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   // Recupera estado salvo ao carregar (apenas no cliente)
   useEffect(() => {
     const saved = localStorage.getItem('soma_sidebar_collapsed');
+    const isMobile = window.innerWidth < 768;
+
     if (saved !== null) {
       setIsCollapsed(JSON.parse(saved));
+    } else if (isMobile) {
+      // Auto-colapsa em mobile se não houver preferência salva
+      setIsCollapsed(true);
+      localStorage.setItem('soma_sidebar_collapsed', JSON.stringify(true));
     }
     setIsHydrated(true);
   }, []);
@@ -35,6 +41,24 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isHydrated]);
+
+  // Recolhe sidebar ao redimensionar para mobile
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      const saved = localStorage.getItem('soma_sidebar_collapsed');
+
+      // Se não há preferência salva e é mobile, colapsa
+      if (!saved && isMobile) {
+        setIsCollapsed(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [isHydrated]);
 
   const toggleSidebar = () => {
