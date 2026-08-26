@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Zap, TrendingUp, Briefcase } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import StandardLayout from '@/components/StandardLayout';
 import AnaliseFitTab from './tabs/AnaliseFitTab';
 import KanbanTab from './tabs/KanbanTab';
 import RankingTab from './tabs/RankingTab';
