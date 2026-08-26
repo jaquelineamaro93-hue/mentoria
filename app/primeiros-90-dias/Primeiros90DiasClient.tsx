@@ -1,39 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
+import { useSidebar } from '@/lib/contexts/SidebarContext';
+import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import StarsSelector from './components/StarsSelector';
 import DashboardAcompanhamento from './components/DashboardAcompanhamento';
 import TabNavigation from './components/TabNavigation';
 import Month1Content from './components/Month1Content';
 import Month2Content from './components/Month2Content';
 import Month3Content from './components/Month3Content';
-import type { Profile } from '@/lib/types';
 
 interface Primeiros90DiasClientProps {
   initialData: any;
   userId: string;
-  profile: Profile | null;
 }
 
-export default function Primeiros90DiasClient({ initialData, userId, profile }: Primeiros90DiasClientProps) {
-  const router = useRouter();
+export default function Primeiros90DiasClient({ initialData, userId }: Primeiros90DiasClientProps) {
   const supabase = createClient();
+  const { isCollapsed } = useSidebar();
   const [activeTab, setActiveTab] = useState<'overview' | 'month1' | 'month2' | 'month3'>('overview');
   const [situacaoStars, setSituacaoStars] = useState<string | null>(initialData?.situacao_stars);
   const [respostas, setRespostas] = useState<Record<string, any>>(initialData?.respostas_json || {});
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.push('/login');
-    router.refresh();
-  }
 
   const saveData = async () => {
     setIsSaving(true);
@@ -77,19 +69,33 @@ export default function Primeiros90DiasClient({ initialData, userId, profile }: 
   };
 
   return (
-    <StandardLayout profile={profile} onSignOut={handleSignOut}>
+    <div className="min-h-screen bg-white">
+      {/* New Collapsible Sidebar */}
+      <CollapsibleSidebar />
+
+      {/* Main Content */}
+      <div
+        className={`transition-all duration-300 min-h-screen overflow-y-auto ${
+          isCollapsed ? 'ml-20' : 'ml-64'
+        }`}
+      >
         {/* Header with Back Button */}
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Voltar ao Início
-        </Link>
-        <h1 className="font-display text-4xl text-black mb-2">Primeiros 90 Dias</h1>
-        <p className="text-gray-text text-base leading-relaxed mb-8">
-          Guia de aceleração de carreira e transição executiva
-        </p>
+        <div className="bg-white border-b border-gray-faint px-8 py-6">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Voltar ao Início
+          </Link>
+          <h1 className="font-display text-5xl text-black mb-2">Primeiros 90 Dias</h1>
+          <p className="text-gray-text text-base leading-relaxed">
+            Guia de aceleração de carreira e transição executiva
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="px-8 py-8 max-w-6xl mx-auto">
         {/* STARS Diagnosis */}
         <div className="mb-12">
           <h2 className="text-xl text-black font-medium mb-6">Contexto de Atuação</h2>
@@ -153,7 +159,10 @@ export default function Primeiros90DiasClient({ initialData, userId, profile }: 
               </button>
               {saved && <p className="text-mint font-medium">Salvo com sucesso</p>}
             </div>
+          </div>
         )}
-    </StandardLayout>
+        </div>
+      </div>
+    </div>
   );
 }

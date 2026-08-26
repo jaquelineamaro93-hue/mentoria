@@ -70,7 +70,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
   }
 
   return (
-    <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
+    <div className="px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
       <Link href="/admin" className="text-mint hover:text-black text-sm mb-6 inline-flex items-center gap-1">
         <ArrowLeft size={14} /> Voltar
       </Link>
@@ -121,6 +121,6 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
           Cancelar
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
-import StandardLayout from '@/components/StandardLayout';
 import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -92,15 +91,18 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
 
   if (!secao) {
     return (
-      <StandardLayout profile={profile} onSignOut={handleSignOut}>
-        <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
-      </StandardLayout>
+      <div className="flex flex-col md:flex-row w-full">
+        <main className="flex-1 px-6 py-10 md:px-12">
+          <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
+        </main>
+      </div>
     );
   }
 
   return (
-    <StandardLayout profile={profile} onSignOut={handleSignOut}>
-      <div className="flex">
+    <div className="flex flex-col md:flex-row w-full">
+
+      <div className="flex-1 flex">
         <div className="hidden lg:block w-[260px] shrink-0 border-r border-gray-faint p-8 overflow-y-auto">
           <p className="text-[11px] uppercase tracking-wide text-gray-text mb-4">
             {concluidos} de {total} seções concluídas
@@ -204,7 +206,8 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
               </Panel>
             </div>
           )}
+        </main>
       </div>
-    </StandardLayout>
+    </div>
   );
 }

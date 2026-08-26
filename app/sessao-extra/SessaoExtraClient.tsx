@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/Sidebar';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { AlertCircle, Clock } from 'lucide-react';
@@ -52,7 +51,6 @@ export default function SessaoExtraClient({
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={perfil as Profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Sessão Individual</p>

@@ -7,6 +7,7 @@ import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
+import FeedbackTimeline from './FeedbackTimeline';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
 interface MeuPdiClientProps {
@@ -279,7 +280,10 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         )}
 
         {activeTab === 'feedbacks' && (
-          <CheckinMensal userId={userId} />
+          <section>
+            <h2 className="text-2xl font-medium text-black mb-6">Feedbacks dos Mentores</h2>
+            <FeedbackTimeline userId={userId} />
+          </section>
         )}
       </main>
     </StandardLayout>

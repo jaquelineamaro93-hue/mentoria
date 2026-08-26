@@ -8,6 +8,7 @@ export interface Profile {
   email: string;
   tipo_pacote: TipoPacote;
   foto_url: string | null;
+  genero?: 'masculino' | 'feminino' | null;
   onboarding_concluido: boolean;
   tour_concluido: boolean;
   pontos_total: number;

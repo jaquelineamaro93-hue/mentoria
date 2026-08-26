@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Sidebar from '@/components/Sidebar';
 import UsuarioPermissoesClient from './UsuarioPermissoesClient';
 import type { Profile } from '@/lib/types';
 
@@ -50,12 +49,9 @@ export default async function UsuarioPermissoesPage({ params }: Props) {
     .eq('user_id', userId);
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar profile={adminProfile as Profile} />
-      <UsuarioPermissoesClient
-        usuario={usuarioProfile as Profile}
-        permissoesIniciais={permissoes || []}
-      />
-    </div>
+    <UsuarioPermissoesClient
+      usuario={usuarioProfile as Profile}
+      permissoesIniciais={permissoes || []}
+    />
   );
 }

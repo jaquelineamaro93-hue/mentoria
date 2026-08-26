@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
-import Sidebar from '@/components/Sidebar';
 import { Copy, Check, Gift, Users } from 'lucide-react';
 import type { Indicacao, Profile } from '@/lib/types';
 
@@ -50,7 +49,6 @@ export default function IndiqueUmAmigoClient({
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">

@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import Sidebar from '@/components/Sidebar';
 import { ChevronDown } from 'lucide-react';
 
 const FAQS = [
@@ -103,7 +102,6 @@ export default async function FaqPage() {
 
   return (
     <div className="flex h-screen bg-white overflow-hidden">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
       <main className="flex-1 overflow-auto px-6 py-8 md:px-12 md:py-12">
         <div className="max-w-3xl mx-auto">
           <h1 className="font-display text-3xl text-black mb-2">Perguntas Frequentes</h1>

@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DashboardClient from './DashboardClient';
 import type {
-  Announcement,
   Profile,
   Diagnostic,
   BussolaPosicionamento,
@@ -27,13 +26,6 @@ export default async function DashboardPage() {
     .select('*')
     .eq('id', user.id)
     .single<Profile>();
-
-  const { data: announcements } = await supabase
-    .from('announcements')
-    .select('*')
-    .order('data_evento', { ascending: true })
-    .limit(6)
-    .returns<Announcement[]>();
 
   let diagnostic: Diagnostic | null = null;
   try {
@@ -76,10 +68,20 @@ export default async function DashboardPage() {
     votacaoAtiva = !!data && data.length > 0;
   } catch { votacaoAtiva = false; }
 
+  let feedbacks: any[] = [];
+  try {
+    const { data } = await supabase
+      .from('feedback_sessoes')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('data', { ascending: false })
+      .limit(5);
+    feedbacks = data ?? [];
+  } catch { feedbacks = []; }
+
   return (
     <DashboardClient
       profile={profile}
-      announcements={announcements ?? []}
       diagnostic={diagnostic}
       bussola={bussola}
       viaResultado={viaResultado}
@@ -87,6 +89,7 @@ export default async function DashboardPage() {
       pdiRespostas={pdiRespostas}
       journalNotes={journalNotes}
       votacaoAtiva={votacaoAtiva}
+      feedbacks={feedbacks}
     />
   );
 }

@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Calendar,
   User as UserIcon,
   ExternalLink,
   Compass,
@@ -20,16 +19,15 @@ import {
   Gem,
   Award,
   TrendingUp,
+  Calendar,
+  MessageSquare,
 } from 'lucide-react';
-import StandardLayout from '@/components/StandardLayout';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
-import MuralAtualizado from '@/components/MuralAtualizado';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS } from '@/lib/soma-badges';
 import type {
-  Announcement,
   Profile,
   Diagnostic,
   BussolaPosicionamento,
@@ -42,7 +40,6 @@ import TourPortal from '@/components/TourPortal';
 
 interface Props {
   profile: Profile | null;
-  announcements: Announcement[];
   diagnostic: Diagnostic | null;
   bussola: BussolaPosicionamento | null;
   viaResultado: ViaResultado | null;
@@ -50,6 +47,7 @@ interface Props {
   pdiRespostas: PdiResposta[];
   journalNotes: JournalNote[];
   votacaoAtiva: boolean;
+  feedbacks?: any[];
 }
 
 const DRIVE_URL = 'https://drive.google.com/';
@@ -73,7 +71,6 @@ function StatusBadge({ status }: { status: FaseStatus }) {
 
 export default function DashboardClient({
   profile,
-  announcements,
   diagnostic,
   bussola,
   viaResultado,
@@ -81,6 +78,7 @@ export default function DashboardClient({
   pdiRespostas,
   journalNotes,
   votacaoAtiva,
+  feedbacks = [],
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -211,7 +209,8 @@ export default function DashboardClient({
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
-      <StandardLayout profile={profile} onSignOut={handleSignOut}>
+
+      <main className="overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full bg-white">
         {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (
@@ -223,11 +222,11 @@ export default function DashboardClient({
           )}
           <div>
             <h1 className="font-display text-3xl sm:text-4xl text-lotus-brown">
-              Bem-vinda, {primeiroNome}
+              {profile?.genero === 'masculino' ? 'Bem-vindo' : 'Bem-vinda'}, {primeiroNome}
             </h1>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[11px] uppercase tracking-wide bg-lotus-brown/10 border border-lotus-brown/30 text-lotus-brown px-2.5 py-1 rounded-full">
-                Mentorada {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
+                {profile?.genero === 'masculino' ? 'Mentorando' : 'Mentorada'} {profile?.tipo_pacote === 'presencial' ? 'Presencial' : 'Online'}
               </span>
               <span
                 className={`flex items-center gap-1 text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full border ${
@@ -427,6 +426,72 @@ export default function DashboardClient({
         </section>
 
         {/* Atalhos */}
+        {/* Sessão Individual */}
+        <section className="mb-10">
+          <Eyebrow>Sessão Individual com Mentora</Eyebrow>
+          <a
+            href="https://calendar.app.google/T9DhtbrVVG9hKShN7"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Panel className="p-6 hover:border-lotus-brown/40 transition-colors group border-gray-faint">
+              <div className="flex items-start gap-4">
+                <Calendar className="text-lotus-brown mb-2 shrink-0" size={24} strokeWidth={1.5} />
+                <div>
+                  <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
+                    Agendar Sessão Individual
+                  </p>
+                  <p className="text-sm text-gray-text">
+                    Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
+                  </p>
+                  <div className="flex items-center gap-1 mt-2 text-xs text-lotus-brown group-hover:gap-2 transition-all">
+                    Agendar agora <ExternalLink size={14} />
+                  </div>
+                </div>
+              </div>
+            </Panel>
+          </a>
+        </section>
+
+        {/* Feedbacks da Mentora */}
+        {feedbacks.length > 0 && (
+          <section className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
+              {feedbacks.length > 0 && (
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-mint text-white text-xs font-bold rounded-full">
+                  {feedbacks.length}
+                </span>
+              )}
+            </div>
+            <div className="space-y-3">
+              {feedbacks.map((feedback) => (
+                <Panel key={feedback.id} className="p-4 border-gray-faint hover:border-lotus-brown/40 transition-colors">
+                  <div className="flex gap-3">
+                    <MessageSquare className="text-lotus-brown shrink-0 mt-1" size={18} strokeWidth={1.5} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="text-sm font-medium text-lotus-brown truncate">{feedback.titulo}</p>
+                        <span className="text-[10px] uppercase tracking-wide text-gray-text shrink-0 whitespace-nowrap">
+                          {feedback.tipo === 'feedback' ? 'Feedback' : feedback.tipo === 'nota' ? 'Nota' : 'Arquivo'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-black line-clamp-2 mb-2">{feedback.conteudo}</p>
+                      <p className="text-xs text-gray-text">
+                        {new Date(feedback.data).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </Panel>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="mb-10">
           <Eyebrow>Continue sua jornada</Eyebrow>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -455,14 +520,7 @@ export default function DashboardClient({
           </div>
         </section>
 
-        {/* SEÇÃO 4: Mural de avisos e passaporte de conquistas */}
-        <section className="mb-10">
-          <Eyebrow>
-            <Calendar size={13} strokeWidth={1.5} /> Mural de avisos & próximos encontros
-          </Eyebrow>
-          <MuralAtualizado avisos={announcements} />
-        </section>
-      </StandardLayout>
+      </main>
     </>
   );
 }

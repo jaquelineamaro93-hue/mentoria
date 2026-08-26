@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckCircle2 } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
 import { Panel } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -30,7 +29,6 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Sidebar profile={profile} onSignOut={handleSignOut} />
 
       <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
