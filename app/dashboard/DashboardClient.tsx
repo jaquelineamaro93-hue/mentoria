@@ -281,6 +281,45 @@ export default function DashboardClient({
           </Panel>
         </section>
 
+        {/* Feedbacks da Mentora */}
+        {feedbacks.length > 0 && (
+          <section className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
+              {feedbacks.length > 0 && (
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-mint text-white text-xs font-bold rounded-full">
+                  {feedbacks.length}
+                </span>
+              )}
+            </div>
+            <div className="space-y-3">
+              {feedbacks.map((feedback) => (
+                <Panel key={feedback.id} className="p-4 border-gray-faint hover:border-lotus-brown/40 transition-colors">
+                  <div className="flex gap-3">
+                    <MessageSquare className="text-lotus-brown shrink-0 mt-1" size={18} strokeWidth={1.5} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="text-sm font-medium text-lotus-brown truncate">{feedback.titulo}</p>
+                        <span className="text-[10px] uppercase tracking-wide text-gray-text shrink-0 whitespace-nowrap">
+                          {feedback.tipo === 'feedback' ? 'Feedback' : feedback.tipo === 'nota' ? 'Nota' : 'Arquivo'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-black line-clamp-2 mb-2">{feedback.conteudo}</p>
+                      <p className="text-xs text-gray-text">
+                        {new Date(feedback.data).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </Panel>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Resumo Estratégico */}
         <section className="mb-8">
           <Eyebrow>
@@ -453,44 +492,6 @@ export default function DashboardClient({
           </a>
         </section>
 
-        {/* Feedbacks da Mentora */}
-        {feedbacks.length > 0 && (
-          <section className="mb-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
-              {feedbacks.length > 0 && (
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-mint text-white text-xs font-bold rounded-full">
-                  {feedbacks.length}
-                </span>
-              )}
-            </div>
-            <div className="space-y-3">
-              {feedbacks.map((feedback) => (
-                <Panel key={feedback.id} className="p-4 border-gray-faint hover:border-lotus-brown/40 transition-colors">
-                  <div className="flex gap-3">
-                    <MessageSquare className="text-lotus-brown shrink-0 mt-1" size={18} strokeWidth={1.5} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <p className="text-sm font-medium text-lotus-brown truncate">{feedback.titulo}</p>
-                        <span className="text-[10px] uppercase tracking-wide text-gray-text shrink-0 whitespace-nowrap">
-                          {feedback.tipo === 'feedback' ? 'Feedback' : feedback.tipo === 'nota' ? 'Nota' : 'Arquivo'}
-                        </span>
-                      </div>
-                      <p className="text-sm text-black line-clamp-2 mb-2">{feedback.conteudo}</p>
-                      <p className="text-xs text-gray-text">
-                        {new Date(feedback.data).toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </Panel>
-              ))}
-            </div>
-          </section>
-        )}
 
         <section className="mb-10">
           <Eyebrow>Continue sua jornada</Eyebrow>
