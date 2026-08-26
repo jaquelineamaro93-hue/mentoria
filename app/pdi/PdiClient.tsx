@@ -92,16 +92,19 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
 
   if (!secao) {
     return (
-      <div className="flex flex-col md:flex-row w-full">
-        <main className="flex-1 px-6 py-10 md:px-12">
-          <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
-        </main>
-      </div>
+      <StandardLayout>
+        <div className="flex flex-col md:flex-row w-full">
+          <main className="flex-1 px-6 py-10 md:px-12">
+            <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
+          </main>
+        </div>
+      </StandardLayout>
     );
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
+    <StandardLayout>
+      <div className="flex flex-col md:flex-row w-full">
 
       <div className="flex-1 flex">
         <div className="hidden lg:block w-[260px] shrink-0 border-r border-gray-faint p-8 overflow-y-auto">
@@ -209,6 +212,6 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
           )}
         </main>
       </div>
-    </div>
+    </StandardLayout>
   );
 }
