@@ -63,7 +63,7 @@ export default function CollapsibleSidebar() {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('nome, foto_url, genero, tipo_pacote, is_admin')
+        .select('nome, foto_url, tipo_pacote, is_admin')
         .eq('id', user.id)
         .single();
 
