@@ -43,5 +43,5 @@ export default async function Primeiros90DiasPage() {
     updated_at: new Date().toISOString(),
   };
 
-  return <Primeiros90DiasClient initialData={initialData} userId={user.id} profile={profile} />;
+  return <Primeiros90DiasClient initialData={initialData} userId={user.id} />;
 }
