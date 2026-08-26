@@ -29,9 +29,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full">
-
-      <main className="flex-1 px-6 py-10 md:px-12 w-full">
+      <div className="px-6 py-10 md:px-12">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
           Consulta
         </p>
@@ -75,8 +73,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
         ) : (
           <p className="text-sm text-gray-text">Nenhum termo publicado ainda.</p>
         )}
-      </main>
-    </div>
+      </div>
     </>
   );
 }

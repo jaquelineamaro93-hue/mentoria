@@ -143,9 +143,7 @@ export default function QuemSouEuClient({
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full">
-
-        <div className="flex-1 flex">
+      <div className="flex flex-col lg:flex-row">
         <div className="hidden lg:block w-[240px] shrink-0 border-r border-gray-faint p-8">
           <p className="text-[11px] uppercase tracking-wide text-gray-text mb-4">
             {concluidos} de {totalBlocos} blocos
@@ -349,7 +347,6 @@ export default function QuemSouEuClient({
           )}
         </main>
       </div>
-    </div>
     </>
   );
 }

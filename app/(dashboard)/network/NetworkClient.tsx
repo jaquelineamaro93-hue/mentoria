@@ -192,7 +192,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
   return (
     <>
-      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
+      <div className="px-6 py-10 md:px-12">
         <Eyebrow>
           <Network size={14} />
           Círculos de Influência
@@ -538,7 +538,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             </Panel>
           </div>
         )}
-      </main>
+      </div>
     </>
   );
 }

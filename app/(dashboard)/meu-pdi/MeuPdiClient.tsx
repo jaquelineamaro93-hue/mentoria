@@ -196,7 +196,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         </div>
       </div>
 
-      <main className="flex-1 px-6 py-10 md:px-12 w-full">
+      <div>
         {activeTab === 'perguntas' && (
           <PdiClientContent
             profile={profile}
@@ -284,7 +284,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
             <FeedbackTimeline userId={userId} />
           </section>
         )}
-      </main>
+      </div>
     </>
   );
 }
