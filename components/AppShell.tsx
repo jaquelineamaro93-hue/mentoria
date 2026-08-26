@@ -15,11 +15,13 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       {/* Main content area - margin adjusts with sidebar state */}
       <main
         className={`absolute top-0 right-0 h-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
-          isCollapsed ? 'left-16' : 'left-[280px]'
+          isCollapsed ? 'left-16' : 'left-[300px]'
         }`}
       >
         <div className="w-full h-full overflow-y-auto">
-          <div className="px-12 py-8 w-full">
+          {/* Standard padding: 24px horizontal (px-6), 24px vertical (py-6) */}
+          {/* Applied to ALL 38 pages in (dashboard) */}
+          <div className="px-6 py-6 w-full">
             {/* Quick Tip positioned at top of main content */}
             <div className="mb-6">
               <QuickTip />

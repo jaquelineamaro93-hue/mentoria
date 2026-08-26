@@ -175,11 +175,7 @@ export default function ExerciciosClient({
 
   return (
     <>
-      <div className="mb-10">
-
-      </div>
-
-        {/* Mapa Quem Sou */}
+      {/* Mapa Quem Sou */}
         <section className="mb-10">
           <Eyebrow>
             <Compass size={13} /> Mapa &quot;Quem Sou&quot;
