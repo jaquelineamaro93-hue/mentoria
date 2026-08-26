@@ -68,7 +68,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
                 <p className="text-xs text-gray-text">{profile?.email}</p>
               </div>
             </div>
-            <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-relaxed prose-p:my-4 prose-strong:text-black prose-li:text-black prose-li:my-1">
+            <div className="prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-relaxed prose-p:my-4 prose-strong:text-black prose-li:text-black prose-li:my-1">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{termo.conteudo_markdown}</ReactMarkdown>
             </div>
           </Panel>

@@ -55,7 +55,7 @@ export default function RenovarClient({ profile, planos }: Props) {
   return (
     <>
       <div className="min-h-screen w-full px-6 py-12 bg-white">
-        <div className="mx-auto">
+        <div className="">
         <div className="text-center mb-10">
           <div className="w-14 h-14 rounded-full bg-mint-light border border-mint flex items-center justify-center mb-6">
             <Lock size={22} className="text-mint" />
@@ -63,14 +63,14 @@ export default function RenovarClient({ profile, planos }: Props) {
           <p className="font-display text-4xl text-black mb-2">
             Escolha seu plano na Mentoria SOMA
           </p>
-          <p className="text-sm text-gray-text max-w-lg">
+          <p className="text-sm text-gray-text ">
             Olá, {profile?.nome?.split(' ')[0] ?? 'futura mentorada'}. Escolha o plano e a
             forma de pagamento que fazem mais sentido para você.
           </p>
         </div>
 
         {erro && (
-          <p className="text-sm text-red-700 bg-red-50 border border-red-300 rounded-md px-4 py-3 mb-6 max-w-lg text-center">
+          <p className="text-sm text-red-700 bg-red-50 border border-red-300 rounded-md px-4 py-3 mb-6  text-center">
             {erro}
           </p>
         )}

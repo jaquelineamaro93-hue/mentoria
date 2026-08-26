@@ -394,7 +394,7 @@ export default function SimuladorCVClient({
             )}
 
             {aba === 'curriculo' && (
-              <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-relaxed prose-p:my-3 prose-strong:text-black prose-li:text-black">
+              <Panel className="p-6 prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-relaxed prose-p:my-3 prose-strong:text-black prose-li:text-black">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {r.curriculo_final_markdown}
                 </ReactMarkdown>

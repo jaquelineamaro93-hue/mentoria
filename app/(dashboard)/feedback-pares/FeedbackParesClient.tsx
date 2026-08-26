@@ -96,7 +96,7 @@ export default function FeedbackParesClient({
               </p>
             ) : (
               <>
-                <label className="flex flex-col gap-1.5 mb-4 max-w-xs">
+                <label className="flex flex-col gap-1.5 mb-4 ">
                   <span className="text-xs uppercase tracking-wide text-gray-text">
                     Para quem
                   </span>

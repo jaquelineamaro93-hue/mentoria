@@ -291,7 +291,7 @@ export default function ExerciciosClient({
                 ))}
               </div>
               {viaResultado.analise_ia && (
-                <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
+                <div className="prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{viaResultado.analise_ia}</ReactMarkdown>
                 </div>
               )}
@@ -335,7 +335,7 @@ export default function ExerciciosClient({
                 <span className="text-xs text-gray-text">ou preencha manualmente abaixo</span>
               </div>
 
-              <label className="flex flex-col gap-1.5 mb-4 max-w-[220px]">
+              <label className="flex flex-col gap-1.5 mb-4 ">
                 <span className="text-xs uppercase tracking-wide text-gray-text">
                   Data em que fez o teste
                 </span>
@@ -430,7 +430,7 @@ export default function ExerciciosClient({
               </button>
             </Panel>
           ) : (
-            <Panel className="p-6 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black prose-strong:text-black">
+            <Panel className="p-6 prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black prose-strong:text-black">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{resumoPerfil.conteudo_markdown}</ReactMarkdown>
             </Panel>
           )}
