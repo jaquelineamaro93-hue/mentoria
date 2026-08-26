@@ -87,8 +87,8 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
   }
 
   return (
-    <main className="px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
-        <div className="mb-10">
+    <StandardLayout>
+      <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-orange mb-2">
             Registro pessoal
           </p>
@@ -238,6 +238,6 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
             </div>
           )}
         </section>
-      </main>
+    </StandardLayout>
   );
 }

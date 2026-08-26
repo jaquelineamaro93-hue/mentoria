@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
+import StandardLayout from '@/components/StandardLayout';
 import { X, Plus, Edit2, Trash2, Check } from 'lucide-react';
 
 interface Enquete {
@@ -183,8 +184,8 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
   }
 
   return (
-    <main className="px-6 py-8 md:px-12 md:py-12 w-full">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
+    <StandardLayout>
+      <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
         <div className="mb-8">
           <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Área administrativa</p>
@@ -339,6 +340,6 @@ export default function AdminEnquetesClient({ enquetes: enquetesIniciais }: { en
             )}
           </div>
         </section>
-      </main>
+      </StandardLayout>
   );
 }
