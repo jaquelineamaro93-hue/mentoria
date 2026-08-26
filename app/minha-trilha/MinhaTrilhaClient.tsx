@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { Tooltip } from '@/components/Tooltip';
+import StandardLayout from '@/components/StandardLayout';
 import { Check, Circle, Lock, Star } from 'lucide-react';
 import type { CheckinMensal, Profile } from '@/lib/types';
 
@@ -94,7 +95,7 @@ export default function MinhaTrilhaClient({
   }
 
   return (
-    <div>
+    <StandardLayout>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
         Sua jornada
       </p>
@@ -205,6 +206,6 @@ export default function MinhaTrilhaClient({
             );
           })}
         </div>
-    </div>
+    </StandardLayout>
   );
 }

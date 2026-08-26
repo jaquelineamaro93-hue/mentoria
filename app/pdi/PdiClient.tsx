@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
@@ -91,18 +92,18 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
 
   if (!secao) {
     return (
-      <div>
+      <StandardLayout>
         <div className="flex flex-col md:flex-row w-full">
           <main className="flex-1 px-6 py-10 md:px-12">
             <p className="text-sm text-gray-text">Nenhuma seção configurada ainda.</p>
           </main>
         </div>
-      </div>
+      </StandardLayout>
     );
   }
 
   return (
-    <div>
+    <StandardLayout>
       <div className="flex flex-col md:flex-row w-full">
 
       <div className="flex-1 flex">
@@ -212,6 +213,6 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
         </main>
       </div>
     </div>
-    </div>
+    </StandardLayout>
   );
 }

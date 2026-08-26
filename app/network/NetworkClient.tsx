@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Upload, Target, Network, Copy, CheckCircle2, Plus, X, Trash2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types';
 
@@ -191,8 +192,8 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   };
 
   return (
-    <div>
-      <div className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
+    <StandardLayout>
+      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Network size={14} />
           Círculos de Influência
@@ -538,7 +539,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             </Panel>
           </div>
         )}
-      </div>
-    </div>
+      </main>
+    </StandardLayout>
   );
 }

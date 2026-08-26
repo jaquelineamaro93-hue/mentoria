@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, Lock, Loader2, Award, ShoppingBag, Zap } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
@@ -56,7 +57,7 @@ export default function PassaporteClient({
   }
 
   return (
-    <div>
+    <StandardLayout>
       <div className="flex flex-col md:flex-row w-full">
 
         <main className="flex-1 overflow-auto">
@@ -246,6 +247,6 @@ export default function PassaporteClient({
         </div>
       </main>
     </div>
-    </div>
+    </StandardLayout>
   );
 }

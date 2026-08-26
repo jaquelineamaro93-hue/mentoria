@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, Send, Loader2, Inbox, Users } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { MentoradoPublico, PeerFeedback, Profile } from '@/lib/types';
@@ -69,7 +70,7 @@ export default function FeedbackParesClient({
   }
 
   return (
-    <div>
+    <StandardLayout>
       <div className="flex flex-col md:flex-row w-full">
 
       <main className="flex-1 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
@@ -216,6 +217,6 @@ export default function FeedbackParesClient({
         </section>
       </main>
     </div>
-    </div>
+    </StandardLayout>
   );
 }

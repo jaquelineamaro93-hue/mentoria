@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Eye, EyeOff, Upload, LogOut, Compass } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 import type { Profile, PlanoMentoria } from '@/lib/types';
 import TourPortal from '@/components/TourPortal';
 
@@ -122,7 +123,7 @@ export default function PerfilClient({
   }
 
   return (
-    <div>
+    <StandardLayout>
       <div className="flex items-start justify-between gap-4 mb-8">
           <h1 className="font-display text-3xl text-black">Meu Perfil</h1>
           {perfil && (
@@ -284,6 +285,6 @@ export default function PerfilClient({
             Sair
           </button>
         </div>
-    </div>
+    </StandardLayout>
   );
 }

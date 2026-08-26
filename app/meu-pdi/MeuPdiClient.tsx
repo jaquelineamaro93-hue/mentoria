@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle, Star } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
@@ -147,7 +148,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
   };
 
   return (
-    <div>
+    <StandardLayout>
       <div className="border-b border-gray-faint bg-white px-6 md:px-12 py-4 sticky top-0 z-10">
         <div className="flex gap-8 max-w-5xl mx-auto">
           <button
@@ -285,6 +286,6 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
           </section>
         )}
       </main>
-    </div>
+    </StandardLayout>
   );
 }

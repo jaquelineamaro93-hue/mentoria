@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Plus, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import StandardLayout from '@/components/StandardLayout';
 import { posthog } from '@/lib/posthog';
 import type { Profile, PlanoMentoria, TipoPacote } from '@/lib/types';
 
@@ -163,7 +164,7 @@ export default function GerenciarPlanosClient({
   }
 
   return (
-    <div>
+    <StandardLayout>
       <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
       <Link
@@ -375,6 +376,6 @@ export default function GerenciarPlanosClient({
       {mentorados.length === 0 && (
         <p className="text-sm text-gray-text text-center py-8">Nenhum mentorado cadastrado ainda.</p>
       )}
-    </div>
+    </StandardLayout>
   );
 }

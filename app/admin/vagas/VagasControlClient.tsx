@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Users, TrendingUp, Edit2, Save, X } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 
 interface Vaga {
   id: string;
@@ -81,7 +82,7 @@ export default function VagasControlClient() {
   }
 
   return (
-    <div>
+    <StandardLayout>
       <div className="max-w-6xl mx-auto">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
       <h1 className="text-3xl font-bold mb-8">Controle de Vagas</h1>
@@ -250,6 +251,6 @@ export default function VagasControlClient() {
         </div>
       </div>
       </div>
-    </div>
+    </StandardLayout>
   );
 }
