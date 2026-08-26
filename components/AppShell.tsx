@@ -8,11 +8,15 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="flex min-h-screen w-screen bg-white overflow-hidden">
+    <div className="relative min-h-screen w-full bg-white">
       <CollapsibleSidebar />
 
-      {/* Main content area - flex-1 ensures it takes remaining space */}
-      <main className="flex-1 overflow-x-hidden overflow-y-auto">
+      {/* Main content area - margin-left accounts for fixed sidebar */}
+      <main
+        className={`min-h-screen overflow-x-hidden overflow-y-auto transition-all duration-300 ${
+          isCollapsed ? 'ml-20' : 'ml-[280px]'
+        }`}
+      >
         <div className="p-8 md:p-12">
           {/* Quick Tip positioned at top of main content */}
           <div className="mb-8">
