@@ -63,11 +63,12 @@ export default function CollapsibleSidebar() {
 
       const { data } = await supabase
         .from('profiles')
-        .select('nome, foto_url, genero, tipo_pacote, is_admin:is_admin')
+        .select('nome, foto_url, genero, tipo_pacote, is_admin')
         .eq('id', user.id)
         .single();
 
       if (data) {
+        console.log('✅ Perfil carregado:', { nome: data.nome, is_admin: data.is_admin, tipo: typeof data.is_admin });
         setProfile(data);
         const partes = data.nome?.split(' ') || [];
         const iniciais = partes
