@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { Check, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import type { PlanoMentoria } from '@/lib/types';
-import StandardLayout from '@/components/StandardLayout';
 
 export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { planos: PlanoMentoria[]; logado: boolean; planoAtualCodigo: string | null }) {
   const searchParams = useSearchParams();
@@ -49,7 +48,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   }
 
   return (
-    <StandardLayout>
+    <div>
       <div className="max-w-5xl mx-auto">
         <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6">
           <ArrowLeft size={20} />
@@ -172,6 +171,6 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           </div>
         )}
       </div>
-    </StandardLayout>
+    </div>
   );
 }

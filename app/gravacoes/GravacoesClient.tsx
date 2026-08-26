@@ -6,7 +6,6 @@ import { PlayCircle, Users, User as UserIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Profile, Recording } from '@/lib/types';
-import StandardLayout from '@/components/StandardLayout';
 
 interface Props {
   profile: Profile | null;
@@ -31,7 +30,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
   const filtradas = gravacoes.filter((g) => filtro === 'todas' || g.tipo === filtro);
 
   return (
-    <StandardLayout>
+    <div>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
           Biblioteca de encontros
         </p>
@@ -98,6 +97,6 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
             ))}
           </div>
         )}
-      </StandardLayout>
+      </div>
   );
 }

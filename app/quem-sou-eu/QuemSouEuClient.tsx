@@ -6,7 +6,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ArrowLeft, ArrowRight, Compass, Sparkles, Loader2, Check } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
@@ -143,7 +142,7 @@ export default function QuemSouEuClient({
   }
 
   return (
-    <StandardLayout>
+    <div>
       <div className="flex flex-col md:flex-row w-full">
 
         <div className="flex-1 flex">
@@ -351,7 +350,7 @@ export default function QuemSouEuClient({
         </main>
       </div>
     </div>
-    </StandardLayout>
+    </div>
   );
 }
 

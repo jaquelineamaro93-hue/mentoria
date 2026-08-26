@@ -6,7 +6,6 @@ import { Compass, Sparkles, TrendingUp, Save, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { VIA_FORCAS } from '@/lib/prompts';
@@ -175,8 +174,7 @@ export default function ExerciciosClient({
   const ultimo = diagnostics[diagnostics.length - 1];
 
   return (
-    <StandardLayout>
-      <main className="px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+    <div className="px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
         <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-brown-deep mb-2 bg-orange-100 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-orange-200">
             Área de diagnóstico
@@ -491,7 +489,6 @@ export default function ExerciciosClient({
             </div>
           )}
         </section>
-      </main>
-    </StandardLayout>
+      </div>
   );
 }

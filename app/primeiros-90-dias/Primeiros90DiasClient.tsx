@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import StandardLayout from '@/components/StandardLayout';
 import StarsSelector from './components/StarsSelector';
 import DashboardAcompanhamento from './components/DashboardAcompanhamento';
 import TabNavigation from './components/TabNavigation';
@@ -67,7 +66,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
   };
 
   return (
-    <StandardLayout>
+    <div>
       {/* Header with Back Button */}
       <div className="bg-white border-b border-gray-faint px-0 -mx-6 md:-mx-12 mb-8">
         <div className="px-6 md:px-12 py-6">
@@ -153,6 +152,6 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
           </div>
         )}
       </div>
-    </StandardLayout>
+    </div>
   );
 }

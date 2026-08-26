@@ -5,7 +5,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckCircle2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { Profile, TermoVersao } from '@/lib/types';
@@ -29,7 +28,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
   }
 
   return (
-    <StandardLayout>
+    <div>
       <div className="flex flex-col md:flex-row w-full">
 
       <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
@@ -78,6 +77,6 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
         )}
       </main>
     </div>
-    </StandardLayout>
+    </div>
   );
 }

@@ -6,7 +6,6 @@ import { Lock, Loader2, ExternalLink, Check } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { PlanoMentoria, Profile } from '@/lib/types';
-import StandardLayout from '@/components/StandardLayout';
 
 interface Props {
   profile: Profile | null;
@@ -54,7 +53,7 @@ export default function RenovarClient({ profile, planos }: Props) {
   }
 
   return (
-    <StandardLayout>
+    <div>
       <div className="min-h-screen w-full px-6 py-12 bg-white">
         <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
@@ -166,6 +165,6 @@ export default function RenovarClient({ profile, planos }: Props) {
         </div>
       </div>
       </div>
-    </StandardLayout>
+    </div>
   );
 }

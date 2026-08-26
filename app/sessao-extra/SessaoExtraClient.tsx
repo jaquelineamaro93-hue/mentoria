@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { AlertCircle, Clock } from 'lucide-react';
 import type { Profile } from '@/lib/types';
-import StandardLayout from '@/components/StandardLayout';
 
 export default function SessaoExtraClient({
   perfil,
@@ -51,7 +50,7 @@ export default function SessaoExtraClient({
   }
 
   return (
-    <StandardLayout>
+    <div>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Sessão Individual</p>
         <h1 className="font-display text-3xl text-black mb-1">Compre sua sessão extra</h1>
         <p className="text-sm text-gray-text max-w-xl mb-8">
@@ -99,6 +98,6 @@ export default function SessaoExtraClient({
         <p className="text-xs text-gray-text text-center">
           Dúvidas? Fale com seu mentor/mentora por email ou WhatsApp.
         </p>
-      </StandardLayout>
+      </div>
   );
 }

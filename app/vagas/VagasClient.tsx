@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Zap, TrendingUp, Briefcase } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import AnaliseFitTab from './tabs/AnaliseFitTab';
 import KanbanTab from './tabs/KanbanTab';
 import RankingTab from './tabs/RankingTab';
@@ -61,7 +60,7 @@ export default function VagasClient({
   };
 
   return (
-    <StandardLayout>
+    <div>
       <div className="p-8 md:p-12 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -133,6 +132,6 @@ export default function VagasClient({
             )}
           </Panel>
         </div>
-    </StandardLayout>
+    </div>
   );
 }

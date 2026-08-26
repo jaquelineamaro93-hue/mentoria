@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
-import StandardLayout from '@/components/StandardLayout';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS } from '@/lib/soma-badges';
@@ -206,7 +205,7 @@ export default function DashboardClient({
   const pontosTotais = profile?.pontos_total ?? 0;
 
   return (
-    <StandardLayout>
+    <div>
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
@@ -525,6 +524,6 @@ export default function DashboardClient({
             </Link>
           </div>
         </section>
-    </StandardLayout>
+    </div>
   );
 }
