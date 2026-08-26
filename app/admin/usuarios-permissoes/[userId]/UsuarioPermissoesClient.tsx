@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { Tooltip } from '@/components/Tooltip';
@@ -70,8 +71,9 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
   }
 
   return (
-    <div className="px-6 py-8 md:px-12 md:py-12 max-w-3xl mx-auto w-full">
-      <Link href="/admin" className="text-mint hover:text-black text-sm mb-6 inline-flex items-center gap-1">
+    <StandardLayout>
+      <div className="max-w-3xl mx-auto">
+        <Link href="/admin" className="text-mint hover:text-black text-sm mb-6 inline-flex items-center gap-1">
         <ArrowLeft size={14} /> Voltar
       </Link>
 
@@ -121,6 +123,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
           Cancelar
         </Link>
       </div>
-    </div>
+      </div>
+    </StandardLayout>
   );
 }

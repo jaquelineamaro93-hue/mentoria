@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Gift, Star, RotateCcw, Megaphone, Users2 } from 'lucide-react';
+import StandardLayout from '@/components/StandardLayout';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -39,7 +40,8 @@ export default function CrescimentoClient({
     insights.total > 0 ? Math.round((insights.jaIndicaramAlguem / insights.total) * 100) : 0;
 
   return (
-    <div className="px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-auto w-full">
+    <StandardLayout>
+      <div className="max-w-4xl mx-auto">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Área administrativa</p>
@@ -131,6 +133,7 @@ export default function CrescimentoClient({
             </p>
           </Panel>
         </div>
-    </div>
+      </div>
+    </StandardLayout>
   );
 }
