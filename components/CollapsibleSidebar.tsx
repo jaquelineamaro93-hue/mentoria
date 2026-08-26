@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
-import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, Settings, LogOut } from 'lucide-react';
+import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, Settings, LogOut, Target, MessageCircle, PlayCircle, Award, FileSearch, Users, CreditCard, MapPin, Gift, HelpCircle, TrendingUp, Briefcase, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -21,9 +21,24 @@ interface UserProfile {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={20} /> },
-  { label: 'Exercícios', href: '/exercicios', icon: <Zap size={20} /> },
-  { label: '90 Dias', href: '/primeiros-90-dias', icon: <Calendar size={20} /> },
-  { label: 'Diário', href: '/diario', icon: <BookOpen size={20} /> },
+  { label: 'Onboarding', href: '/onboarding', icon: <Zap size={20} /> },
+  { label: 'Mapa Quem Sou Eu', href: '/quem-sou-eu', icon: <Compass size={20} /> },
+  { label: 'Diagnóstico & Perfil', href: '/exercicios', icon: <Zap size={20} /> },
+  { label: 'Primeiros 90 Dias', href: '/primeiros-90-dias', icon: <Calendar size={20} /> },
+  { label: 'PDI & Trilha', href: '/meu-pdi', icon: <Target size={20} /> },
+  { label: 'Diário de Bordo', href: '/diario', icon: <BookOpen size={20} /> },
+  { label: 'Feedback Pares', href: '/feedback-pares', icon: <MessageCircle size={20} /> },
+  { label: 'Gravações', href: '/gravacoes', icon: <PlayCircle size={20} /> },
+  { label: 'Passaporte', href: '/passaporte', icon: <Award size={20} /> },
+  { label: 'Simulador CV', href: '/simulador-cv', icon: <FileSearch size={20} /> },
+  { label: 'SOAR Builder', href: '/entrevista', icon: <Zap size={20} /> },
+  { label: 'Círculos', href: '/network', icon: <Users size={20} /> },
+  { label: 'Meu Plano', href: '/meu-plano', icon: <CreditCard size={20} /> },
+  { label: 'Votar Encontro', href: '/votar-encontro', icon: <MapPin size={20} /> },
+  { label: 'Indique Amigo', href: '/indique-um-amigo', icon: <Gift size={20} /> },
+  { label: 'Minha Trilha', href: '/minha-trilha', icon: <TrendingUp size={20} /> },
+  { label: 'FAQ', href: '/faq', icon: <HelpCircle size={20} /> },
+  { label: 'Gestão Vagas', href: '/vagas', icon: <Briefcase size={20} /> },
   { label: 'Perfil', href: '/perfil', icon: <User size={20} /> },
 ];
 
