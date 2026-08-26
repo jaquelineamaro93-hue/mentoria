@@ -70,8 +70,12 @@ export default function FeedbackParesClient({
 
   return (
     <>
+<<<<<<< Updated upstream
       <>
 
+=======
+      <div className="px-6 py-8 md:px-12 md:py-12">
+>>>>>>> Stashed changes
         <section className="mb-10">
           <Eyebrow>
             <MessageCircle size={13} /> Novo feedback
@@ -202,7 +206,11 @@ export default function FeedbackParesClient({
             </div>
           )}
         </section>
+<<<<<<< Updated upstream
       </>
+=======
+      </div>
+>>>>>>> Stashed changes
     </>
   );
 }

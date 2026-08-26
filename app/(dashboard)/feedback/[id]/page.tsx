@@ -37,6 +37,7 @@ export default async function FeedbackPage({ params }: { params: Promise<{ id: s
       </Link>
 
       <div className="bg-white rounded-xl border border-gray-faint p-8">
+<<<<<<< Updated upstream
           <div className="mb-6">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h1 className="font-display text-3xl text-black">{feedback.titulo}</h1>
@@ -51,12 +52,35 @@ export default async function FeedbackPage({ params }: { params: Promise<{ id: s
                 year: 'numeric',
               })}
             </p>
+=======
+        <div className="mb-6">
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <h1 className="font-display text-3xl text-black">{feedback.titulo}</h1>
+            <span className="text-[11px] uppercase tracking-wide text-gray-text px-3 py-1.5 bg-gray-100 rounded-md shrink-0">
+              {feedback.tipo === 'feedback' ? 'Feedback' : feedback.tipo === 'nota' ? 'Nota' : 'Arquivo'}
+            </span>
+>>>>>>> Stashed changes
           </div>
+          <p className="text-sm text-gray-text">
+            {new Date(feedback.data).toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </p>
+        </div>
 
+<<<<<<< Updated upstream
           <div className="prose prose-sm">
             <p className="text-base text-black leading-relaxed whitespace-pre-wrap">
               {feedback.conteudo}
             </p>
+=======
+        <div className="prose prose-sm">
+          <p className="text-base text-black leading-relaxed whitespace-pre-wrap">
+            {feedback.conteudo}
+          </p>
+>>>>>>> Stashed changes
         </div>
       </div>
     </div>
