@@ -223,7 +223,7 @@ export default function VotarEncontroClient({
     return (
     <>
       <div className="text-center py-12">
-            <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
+            <CheckCircle2 size={48} className="text-green-600 mb-4" />
             <h1 className="font-display text-2xl text-black mb-2">Seu voto foi registrado!</h1>
             {aba === 'encontros' && (
               <>
@@ -256,7 +256,7 @@ export default function VotarEncontroClient({
         <h1 className="font-display text-3xl text-black mb-1">
           {aba === 'encontros' ? 'Qual é o melhor dia?' : 'Enquetes e Votações'}
         </h1>
-        <p className="text-sm text-gray-text max-w-xl mb-8">
+        <p className="text-sm text-gray-text mb-8">
           {aba === 'encontros'
             ? abaDados === 'presencial'
               ? `Vote na data que funciona melhor para você. Encontro em ${LOCAL}, das ${HORARIO}.`

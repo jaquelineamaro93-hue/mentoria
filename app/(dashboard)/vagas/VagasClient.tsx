@@ -61,7 +61,7 @@ export default function VagasClient({
 
   return (
     <>
-      <div className="p-8 md:p-12 max-w-7xl mx-auto">
+      <div className="p-8 md:p-12">
           {/* Header */}
           <div className="mb-8">
             <Eyebrow>

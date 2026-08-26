@@ -53,7 +53,7 @@ export default function IndiqueUmAmigoClient({
           Comunidade SOMA
         </p>
         <h1 className="font-display text-3xl text-black mb-1">Indique um Amigo</h1>
-        <p className="text-sm text-gray-text max-w-xl mb-8">
+        <p className="text-sm text-gray-text mb-8">
           A cada 2 amigos que assinarem a Mentoria SOMA através do seu link, você
           ganha 1 sessão individual extra comigo.
         </p>

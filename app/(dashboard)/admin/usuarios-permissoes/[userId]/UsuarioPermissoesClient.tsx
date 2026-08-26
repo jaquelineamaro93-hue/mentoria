@@ -71,7 +71,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
 
   return (
     <>
-      <div className="max-w-3xl mx-auto">
+      <div className="mx-auto">
         <Link href="/admin" className="text-mint hover:text-black text-sm mb-6 inline-flex items-center gap-1">
         <ArrowLeft size={14} /> Voltar
       </Link>

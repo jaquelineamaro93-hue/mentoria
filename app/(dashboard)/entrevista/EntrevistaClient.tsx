@@ -189,7 +189,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
           Preparação para Entrevistas
         </Eyebrow>
         <h1 className="font-display text-3xl text-black mb-1">SOAR Builder</h1>
-        <p className="text-sm text-gray-text max-w-xl mb-8">
+        <p className="text-sm text-gray-text mb-8">
           Mapeie suas experiências com o framework SOAR e receba respostas prontas para entrevistas.
         </p>
 
@@ -325,7 +325,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
 
             {!analise ? (
               <Panel className="text-center py-12 p-6">
-                <BookOpen size={48} className="mx-auto text-black mb-4" />
+                <BookOpen size={48} className="text-black mb-4" />
                 <p className="text-gray-text mb-4">Nenhuma análise SOAR gerada ainda</p>
                 <button
                   onClick={() => setAba('novo')}

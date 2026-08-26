@@ -198,7 +198,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
           Círculos de Influência
         </Eyebrow>
         <h1 className="font-display text-3xl text-black mb-1">Sua Rede Estratégica</h1>
-        <p className="text-sm text-gray-text max-w-xl mb-8">
+        <p className="text-sm text-gray-text mb-8">
           Mapeie seus contatos em círculos de influência e receba um plano de ação personalizado para 72 horas.
         </p>
 
@@ -315,7 +315,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
         {aba === 'importar' && (
           <div className="space-y-6">
-            <Panel className="p-8 border-2 border-mint max-w-2xl mx-auto">
+            <Panel className="p-8 border-2 border-mint">
               <h3 className="font-display text-2xl text-black mb-2 flex items-center gap-2">
                 <Upload size={24} />
                 Importar do LinkedIn
@@ -372,7 +372,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
 
         {mostraFormulario && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Panel className="max-w-2xl w-full border border-gray-faint">
+            <Panel className="w-full border border-gray-faint">
               <div className="bg-white border-b border-gray-faint p-6 flex items-start justify-between">
                 <div>
                   <h2 className="font-display text-2xl text-black">Adicionar Contato</h2>

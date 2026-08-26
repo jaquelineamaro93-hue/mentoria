@@ -77,7 +77,7 @@ export function UsuariosClient() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="space-y-6">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>

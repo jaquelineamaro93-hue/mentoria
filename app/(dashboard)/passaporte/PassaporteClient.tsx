@@ -60,7 +60,7 @@ export default function PassaporteClient({
       <div className="flex flex-col md:flex-row w-full">
 
         <main className="flex-1 overflow-auto">
-        <div className="px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">
+        <div className="px-6 py-10 md:px-12 w-full">
           <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
             Sua jornada em pontos
           </p>

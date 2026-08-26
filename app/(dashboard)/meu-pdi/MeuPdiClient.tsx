@@ -149,7 +149,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
   return (
     <>
       <div className="border-b border-gray-faint bg-white px-6 md:px-12 py-4 sticky top-0 z-10">
-        <div className="flex gap-8 max-w-5xl mx-auto">
+        <div className="flex gap-8">
           <button
             onClick={() => setActiveTab('perguntas')}
             className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
@@ -196,7 +196,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         </div>
       </div>
 
-      <main className="flex-1 px-6 py-10 md:px-12 max-w-5xl mx-auto w-full">
+      <main className="flex-1 px-6 py-10 md:px-12 w-full">
         {activeTab === 'perguntas' && (
           <PdiClientContent
             profile={profile}
@@ -243,7 +243,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
 
             {documentos.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-xl border border-gray-faint border-dashed">
-                <FileText size={32} className="mx-auto mb-3 text-gray-text" />
+                <FileText size={32} className="mb-3 text-gray-text" />
                 <p className="text-gray-text">Nenhum documento ou anexo adicionado ainda</p>
               </div>
             ) : (

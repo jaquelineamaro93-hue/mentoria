@@ -53,7 +53,7 @@ export default function SessaoExtraClient({
     <>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Sessão Individual</p>
         <h1 className="font-display text-3xl text-black mb-1">Compre sua sessão extra</h1>
-        <p className="text-sm text-gray-text max-w-xl mb-8">
+        <p className="text-sm text-gray-text mb-8">
           Você é mentorado(a) SOMA. Aqui você consegue comprar sessões individuais extras com seu mentor/mentora.
         </p>
 

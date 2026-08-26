@@ -99,7 +99,7 @@ export default function MinhaTrilhaClient({
         Sua jornada
       </p>
       <h1 className="font-display text-3xl text-black mb-1">Minha Trilha</h1>
-        <p className="text-sm text-gray-text max-w-xl mb-10">
+        <p className="text-sm text-gray-text mb-10">
           Uma vez por mês, deixa para seu mentor uma nota de 0 a 5 e um comentário. Isso ajuda a ajustar a mentoria conforme necessário.
         </p>
 

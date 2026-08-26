@@ -116,7 +116,7 @@ export default function FinanceiroClient({
 
   return (
     <>
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
         <button

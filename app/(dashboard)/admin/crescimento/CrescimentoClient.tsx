@@ -40,7 +40,7 @@ export default function CrescimentoClient({
 
   return (
     <>
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Área administrativa</p>

@@ -175,7 +175,7 @@ export default function ExerciciosClient({
 
   return (
     <>
-      <main className="px-6 py-8 md:px-12 md:py-12 max-w-6xl mx-auto w-full">
+      <main className="px-6 py-8 md:px-12 md:py-12 w-full">
         <div className="mb-10">
           <p className="text-xs uppercase tracking-[0.2em] text-brown-deep mb-2 bg-orange-100 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-orange-200">
             Área de diagnóstico

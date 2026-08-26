@@ -156,7 +156,7 @@ export default function SimuladorCVClient({
               Ferramenta de carreira
             </p>
             <h1 className="font-display text-3xl text-black mb-1">Simulador de CV</h1>
-            <p className="text-sm text-gray-text max-w-xl">
+            <p className="text-sm text-gray-text">
               Cole seu currículo e a vaga desejada. A IA analisa como um recrutador
               exigente, otimiza para ATS e entrega um currículo e uma carta prontos.
             </p>
