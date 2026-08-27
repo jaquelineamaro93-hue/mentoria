@@ -156,11 +156,6 @@ export default function VotarEncontroClient({
   );
   }
 
-  const contagemVotos = datasDaAba.map((data) => ({
-    ...data,
-    count: votosDaAba.filter((v) => v.data_escolhida === data.id).length,
-  }));
-
   return (
     <>
       <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">Participação</p>
@@ -169,10 +164,7 @@ export default function VotarEncontroClient({
           Participar das enquetes {abaEnquete === 'presencial' ? 'presenciais' : 'online'} que importam para nossa comunidade.
         </p>
 
-
-        {aba === 'enquetes' && (
-          <>
-            <div className="flex gap-4 mb-8 border-b border-gray-faint">
+        <div className="flex gap-4 mb-8 border-b border-gray-faint">
               <button
                 onClick={() => setAbaEnquete('online')}
                 className={`pb-3 px-4 font-medium transition ${
@@ -364,8 +356,6 @@ export default function VotarEncontroClient({
                 )}
               </>
             )}
-          </>
-        )}
-      </>
+    </>
   );
 }
