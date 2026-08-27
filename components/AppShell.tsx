@@ -1,5 +1,6 @@
 'use client';
 
+import { SidebarProvider } from '@/lib/contexts/SidebarContext';
 import { UserProvider } from '@/lib/contexts/UserContext';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import { QuickTip } from '@/components/ui/QuickTip';
@@ -30,7 +31,9 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <UserProvider>
-      <AppShellContent>{children}</AppShellContent>
+      <SidebarProvider>
+        <AppShellContent>{children}</AppShellContent>
+      </SidebarProvider>
     </UserProvider>
   );
 }
