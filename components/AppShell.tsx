@@ -14,7 +14,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
       {/* Main content area - margin adjusts with sidebar state */}
       <main
-        className={`absolute top-0 right-0 h-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
+        className={`absolute top-0 right-0 h-full overflow-hidden transition-all duration-300 ${
           isCollapsed ? 'left-16' : 'left-[300px]'
         }`}
       >
