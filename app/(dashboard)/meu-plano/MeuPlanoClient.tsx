@@ -40,11 +40,6 @@ export default function MeuPlanoClient({
 
   return (
     <>
-      <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-        Seu investimento
-      </p>
-      <h1 className="font-display text-3xl text-black mb-1">{plano.nome}</h1>
-      <p className="text-sm text-gray-text mb-8">{plano.foco}</p>
 
       <div className="bg-white border border-gray-faint rounded-2xl p-6 mb-8">
         <div className="grid grid-cols-2 gap-4 mb-6">

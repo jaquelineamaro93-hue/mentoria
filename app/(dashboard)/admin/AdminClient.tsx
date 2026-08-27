@@ -241,20 +241,7 @@ export default function AdminClient({
 
   return (
     <>
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-              Área administrativa
-            </p>
-            <h1 className="font-display text-3xl text-black mb-1">
-              Painel dos mentorados
-            </h1>
-            <p className="text-sm text-gray-text">
-              Visão geral de quem está usando o quê. Para dados de sessão, tempo médio de
-              acesso e localização, consulte o PostHog.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 shrink-0">
+        <div className="flex flex-col gap-2 shrink-0 mb-8">
             <Link
               href="/admin/financeiro"
               className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
@@ -299,7 +286,6 @@ export default function AdminClient({
               {enviandoLembretes ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
               Enviar lembretes agora
             </button>
-          </div>
         </div>
 
         {resultadoLembretes && (

@@ -150,16 +150,6 @@ export default function SimuladorCVClient({
   return (
     <>
       <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-              Ferramenta de carreira
-            </p>
-            <h1 className="font-display text-3xl text-black mb-1">Simulador de CV</h1>
-            <p className="text-sm text-gray-text">
-              Cole seu currículo e a vaga desejada. A IA analisa como um recrutador
-              exigente, otimiza para ATS e entrega um currículo e uma carta prontos.
-            </p>
-          </div>
           {historico.length > 0 && (
             <button
               onClick={() => setMostrarHistorico((v) => !v)}

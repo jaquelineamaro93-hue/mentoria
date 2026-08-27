@@ -58,10 +58,6 @@ export default function PassaporteClient({
   return (
     <>
       <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-          Sua jornada em pontos
-        </p>
-        <h1 className="font-display text-3xl text-black mb-8">Meu Passaporte</h1>
 
         <div className="rounded-2xl bg-brown-deep px-8 py-7 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>

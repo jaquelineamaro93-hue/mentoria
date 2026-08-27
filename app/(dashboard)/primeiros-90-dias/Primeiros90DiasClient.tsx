@@ -69,7 +69,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
     <>
       {/* Header with Back Button */}
       <div className="bg-white border-b border-gray-faint px-0 -mx-6 md:-mx-12 mb-8">
-        <div className="px-6 md:px-12 py-6">
+        <div className="px-0 py-6">
           <Link
             href="/dashboard"
             className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"

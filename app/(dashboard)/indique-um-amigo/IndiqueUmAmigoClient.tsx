@@ -49,15 +49,6 @@ export default function IndiqueUmAmigoClient({
 
   return (
     <>
-      <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-          Comunidade SOMA
-        </p>
-        <h1 className="font-display text-3xl text-black mb-1">Indique um Amigo</h1>
-        <p className="text-sm text-gray-text mb-8">
-          A cada 2 amigos que assinarem a Mentoria SOMA através do seu link, você
-          ganha 1 sessão individual extra comigo.
-        </p>
-
         <div className="bg-white border border-gray-faint rounded-2xl p-6 mb-8">
           <p className="text-xs uppercase tracking-wide text-gray-text mb-2">
             Seu link de indicação
