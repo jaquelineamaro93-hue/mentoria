@@ -129,9 +129,6 @@ export async function POST(req: NextRequest) {
       .join("\n")
       .trim();
 
-    const jsonMatch = textoResposta.match(/\{[\s\S]*\}/);
-    const textoJson = jsonMatch ? jsonMatch[0] : textoResposta.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
-
     let planoGerado: {
       diagnostico: { sintese: string; conflito_central: string | null; alertas_sobrecarga: string[] };
       equacao: string | null;
@@ -145,12 +142,30 @@ export async function POST(req: NextRequest) {
     };
 
     try {
-      planoGerado = JSON.parse(textoJson);
+      planoGerado = JSON.parse(textoResposta);
     } catch {
-      return NextResponse.json(
-        { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
-        { status: 502 }
-      );
+      try {
+        const jsonMatch = textoResposta.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch && jsonMatch[1]) {
+          planoGerado = JSON.parse(jsonMatch[1]);
+        } else {
+          const jsonStart = textoResposta.indexOf('{');
+          const jsonEnd = textoResposta.lastIndexOf('}');
+          if (jsonStart >= 0 && jsonEnd > jsonStart) {
+            const textoJson = textoResposta.substring(jsonStart, jsonEnd + 1);
+            planoGerado = JSON.parse(textoJson);
+          } else {
+            throw new Error("Nenhum JSON encontrado na resposta");
+          }
+        }
+      } catch (erroInnerJson) {
+        console.error("Resposta da IA:", textoResposta);
+        console.error("Erro ao parsear JSON:", erroInnerJson);
+        return NextResponse.json(
+          { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
+          { status: 502 }
+        );
+      }
     }
 
     // Arquiva plano anterior (se existir) para manter histórico de versões
