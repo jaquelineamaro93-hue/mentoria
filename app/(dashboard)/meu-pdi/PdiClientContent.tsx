@@ -109,7 +109,7 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
         </div>
       </div>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full">
+      <div className="flex-1 max-w-5xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
           Meu PDI · seção {passo + 1} de {total}
         </p>
@@ -163,7 +163,7 @@ export default function PdiClientContent({ profile, userId, secoes, respostasIni
             </button>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

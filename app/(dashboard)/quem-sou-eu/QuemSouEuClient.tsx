@@ -178,7 +178,7 @@ export default function QuemSouEuClient({
           </div>
         </div>
 
-        <main className="flex-1 px-0 py-0 xl:">
+        <div className="flex-1 px-0 py-0">
           <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
             Mapa Quem Sou Eu · bloco {passo + 1} de {totalBlocos}
           </p>
@@ -345,7 +345,7 @@ export default function QuemSouEuClient({
               )}
             </section>
           )}
-        </main>
+        </div>
       </div>
     </>
   );
