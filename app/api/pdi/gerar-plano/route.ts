@@ -141,31 +141,57 @@ export async function POST(req: NextRequest) {
       alertas: Array<{ tipo: string; cor: string; descricao: string }>;
     };
 
-    try {
-      planoGerado = JSON.parse(textoResposta);
-    } catch {
+    function extrairEParseJSON(texto: string) {
+      // Remove caracteres de controle e espaços extras
+      let textoLimpo = texto.replace(/[\x00-\x1F\x7F]/g, ' ').trim();
+
+      // Tenta parsar direto
       try {
-        const jsonMatch = textoResposta.match(/```json\s*([\s\S]*?)\s*```/);
-        if (jsonMatch && jsonMatch[1]) {
-          planoGerado = JSON.parse(jsonMatch[1]);
-        } else {
-          const jsonStart = textoResposta.indexOf('{');
-          const jsonEnd = textoResposta.lastIndexOf('}');
-          if (jsonStart >= 0 && jsonEnd > jsonStart) {
-            const textoJson = textoResposta.substring(jsonStart, jsonEnd + 1);
-            planoGerado = JSON.parse(textoJson);
-          } else {
-            throw new Error("Nenhum JSON encontrado na resposta");
+        return JSON.parse(textoLimpo);
+      } catch {
+        // Tenta com code blocks markdown
+        const codeBlockMatch = textoLimpo.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (codeBlockMatch?.[1]) {
+          return JSON.parse(codeBlockMatch[1].trim());
+        }
+
+        // Tenta extrair JSON entre primeiras chaves balanceadas
+        const primeiraBraceAberta = textoLimpo.indexOf('{');
+        if (primeiraBraceAberta < 0) throw new Error("Sem { encontrado");
+
+        let depth = 0;
+        let ultimaBrace = -1;
+
+        for (let i = primeiraBraceAberta; i < textoLimpo.length; i++) {
+          if (textoLimpo[i] === '{') depth++;
+          if (textoLimpo[i] === '}') {
+            depth--;
+            if (depth === 0) {
+              ultimaBrace = i;
+              break;
+            }
           }
         }
-      } catch (erroInnerJson) {
-        console.error("Resposta da IA:", textoResposta);
-        console.error("Erro ao parsear JSON:", erroInnerJson);
-        return NextResponse.json(
-          { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
-          { status: 502 }
-        );
+
+        if (ultimaBrace <= primeiraBraceAberta) {
+          throw new Error("Braces não balanceadas");
+        }
+
+        const jsonExtraido = textoLimpo.substring(primeiraBraceAberta, ultimaBrace + 1);
+        return JSON.parse(jsonExtraido);
       }
+    }
+
+    try {
+      planoGerado = extrairEParseJSON(textoResposta);
+    } catch (erroJson) {
+      console.error("❌ Erro ao gerar PDI - resposta inválida");
+      console.error("Primeira 500 chars:", textoResposta.substring(0, 500));
+      console.error("Erro específico:", erroJson);
+      return NextResponse.json(
+        { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
+        { status: 502 }
+      );
     }
 
     // Arquiva plano anterior (se existir) para manter histórico de versões
