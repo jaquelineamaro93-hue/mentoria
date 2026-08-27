@@ -14,8 +14,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content area - flex-1 min-w-0 prevents overflow */}
-      <main className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden">
-        <div className="w-full px-6 md:px-12 py-6 md:py-8">
+      <main className="flex-1 min-w-0 h-full overflow-y-auto">
+        <div className="w-full px-6 md:px-12 py-6 md:py-8 max-w-full">
           {/* Quick Tip positioned at top of main content */}
           <div className="mb-6">
             <QuickTip />
