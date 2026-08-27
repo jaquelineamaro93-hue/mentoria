@@ -19,6 +19,7 @@ export function initPostHog() {
       defaults: '2026-05-30',
       capture_pageview: true,
       capture_pageleave: true,
+      capture_performance: true,
     });
     initialized = true;
   } catch (error) {
