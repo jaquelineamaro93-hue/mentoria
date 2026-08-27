@@ -196,7 +196,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
         </div>
       </div>
 
-      <div className="flex-1 px-6 py-10 md:px-12 w-full">
+      <div className="flex-1 w-full">
         {activeTab === 'perguntas' && (
           <PdiClientContent
             profile={profile}

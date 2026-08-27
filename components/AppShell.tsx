@@ -13,9 +13,9 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         <CollapsibleSidebar />
       </aside>
 
-      {/* Main content area - Flexbox with scroll */}
-      <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
-        <div className="w-full px-6 py-6">
+      {/* Main content area - flex-1 min-w-0 prevents overflow */}
+      <main className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden">
+        <div className="w-full px-6 md:px-12 py-6 md:py-8">
           {/* Quick Tip positioned at top of main content */}
           <div className="mb-6">
             <QuickTip />

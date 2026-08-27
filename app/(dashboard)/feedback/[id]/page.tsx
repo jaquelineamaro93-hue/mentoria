@@ -27,7 +27,7 @@ export default async function FeedbackPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="px-6 py-10 md:px-12">
+    <div>
       <Link
         href="/dashboard"
         className="inline-flex items-center gap-2 text-sm font-medium text-gray-text hover:text-black mb-8 transition-colors"
