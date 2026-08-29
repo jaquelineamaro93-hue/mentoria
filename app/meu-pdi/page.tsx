@@ -31,7 +31,7 @@ export default async function MeuPdiPage() {
   return (
     <div className="flex">
       <Sidebar profile={profile} />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overflow-x-hidden">
         <MeuPdiClient
           userId={user.id}
           profile={profile}

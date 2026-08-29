@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="h-full antialiased">
+    <html lang="pt-BR" className="h-full antialiased overflow-hidden">
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,7 +26,7 @@ export default function RootLayout({
         />
         <script async defer src="https://accounts.google.com/gsi/client"></script>
       </head>
-      <body className="min-h-full flex flex-col bg-white text-black">
+      <body className="min-h-full flex flex-col bg-white text-black overflow-hidden">
         <PostHogInit />
         <AcessoGate />
         <TermosGate />

@@ -186,7 +186,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
     <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Sparkles size={14} />
           Preparação para Entrevistas

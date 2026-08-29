@@ -224,7 +224,7 @@ export default function VotarEncontroClient({
     return (
       <div className="flex flex-row w-full h-screen">
         <Sidebar profile={profile} onSignOut={handleSignOut} />
-        <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-8 md:px-12 md:py-12 w-full">
           <div className="text-center py-12">
             <CheckCircle2 size={48} className="text-green-600 mx-auto mb-4" />
             <h1 className="font-display text-2xl text-black mb-2">Seu voto foi registrado!</h1>
@@ -258,7 +258,7 @@ export default function VotarEncontroClient({
     <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-8 md:px-12 md:py-12 w-full">
         <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">Participação</p>
         <h1 className="font-display text-3xl text-black mb-1">
           {aba === 'encontros' ? 'Qual é o melhor dia?' : 'Enquetes e Votações'}

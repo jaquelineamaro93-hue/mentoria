@@ -213,7 +213,7 @@ export default function DashboardClient({
       )}
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 overflow-y-auto px-6 py-8 md:px-12 md:py-12 w-full bg-white">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-8 md:px-12 md:py-12 w-full bg-white">
         {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (

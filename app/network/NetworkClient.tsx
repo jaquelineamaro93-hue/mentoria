@@ -195,7 +195,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
     <div className="flex flex-row w-full h-screen">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Network size={14} />
           Círculos de Influência

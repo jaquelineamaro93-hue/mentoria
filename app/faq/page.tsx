@@ -104,7 +104,7 @@ export default async function FaqPage() {
   return (
     <div className="flex h-screen bg-white overflow-hidden">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
-      <main className="flex-1 overflow-auto px-6 py-8 md:px-12 md:py-12">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overflow-x-hidden px-6 py-8 md:px-12 md:py-12">
         <div className="max-w-3xl mx-auto">
           <h1 className="font-display text-3xl text-black mb-2">Perguntas Frequentes</h1>
           <p className="text-gray-text mb-10">Tudo o que voce precisa saber para aproveitar ao maximo a mentoria.</p>

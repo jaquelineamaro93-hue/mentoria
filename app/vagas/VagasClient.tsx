@@ -64,7 +64,7 @@ export default function VagasClient({
     <div className="flex h-screen bg-white">
       <Sidebar profile={profile} />
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="p-8 md:p-12 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">

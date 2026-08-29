@@ -60,7 +60,7 @@ export default function PassaporteClient({
     <div className="flex flex-col md:flex-row w-full">
       <Sidebar profile={profile} onSignOut={handleSignOut} />
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overflow-x-hidden">
         <div className="px-6 py-10 md:px-12 max-w-6xl mx-auto w-full">
           <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2">
             Sua jornada em pontos
