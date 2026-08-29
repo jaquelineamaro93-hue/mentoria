@@ -6,6 +6,9 @@ import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
 export async function POST(req: NextRequest) {
   try {
+    const t0 = Date.now();
+    console.log("[PDI] Iniciando geração de plano");
+
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -18,6 +21,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ erro: "mentoradoId é obrigatório" }, { status: 400 });
     }
 
+    const t1 = Date.now();
+    console.log(`[PDI] Iniciando queries (${t1 - t0}ms)`);
+
     const { data: perfil, error: erroPerfil } = await supabaseAdmin
       .from("profiles")
       .select("*")
@@ -27,6 +33,9 @@ export async function POST(req: NextRequest) {
     if (erroPerfil || !perfil) {
       return NextResponse.json({ erro: "mentorado não encontrado" }, { status: 404 });
     }
+
+    const t2 = Date.now();
+    console.log(`[PDI] Profile carregado (${t2 - t1}ms)`);
 
     // Busca as 20 respostas do PDI pelo schema real do projeto
     const { data: respostasRaw, error: erroRespostas } = await supabaseAdmin
@@ -43,11 +52,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const t3 = Date.now();
+    console.log(`[PDI] Respostas PDI carregadas (${t3 - t2}ms)`);
+
     const respostas: RespostaSecaoPDI[] = respostasRaw.map((r) => ({
       codigo: r.secao,
       titulo: r.secao.replace(/_/g, " ").toUpperCase(),
       resposta: r.dados?.texto ?? "",
     }));
+
+    const t4 = Date.now();
+    console.log(`[PDI] Respostas formatadas (${t4 - t3}ms)`);
 
     // Contexto extra de outras etapas já feitas na mentoria (Mapa Quem Sou Eu,
     // Diagnóstico VIA, Bússola de Posicionamento), pra deixar o plano gerado
@@ -74,6 +89,9 @@ export async function POST(req: NextRequest) {
           .limit(1)
           .maybeSingle(),
       ]);
+
+    const t5 = Date.now();
+    console.log(`[PDI] Context queries carregadas (${t5 - t4}ms)`);
 
     const partesContexto: string[] = [];
 
@@ -110,6 +128,9 @@ export async function POST(req: NextRequest) {
 
     const contextoAdicional = partesContexto.length > 0 ? partesContexto.join("\n\n") : null;
 
+    const t6 = Date.now();
+    console.log(`[PDI] Contexto preparado (${t6 - t5}ms)`);
+
     const prompt = montarPromptGeracaoPDI({
       nomeMentorado: perfil.nome ?? "Mentorada",
       cargoAtual: perfil.cargo_atual ?? "Não informado",
@@ -117,11 +138,17 @@ export async function POST(req: NextRequest) {
       contextoAdicional,
     });
 
+    const t7 = Date.now();
+    console.log(`[PDI] Prompt gerado (${t7 - t6}ms)`);
+
     const resposta = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
+      max_tokens: 3000,
       messages: [{ role: "user", content: prompt }],
     });
+
+    const t8 = Date.now();
+    console.log(`[PDI] Claude API respondeu (${t8 - t7}ms)`);
 
     const textoResposta = resposta.content
       .filter((b): b is Anthropic.TextBlock => b.type === "text")
@@ -129,29 +156,108 @@ export async function POST(req: NextRequest) {
       .join("\n")
       .trim();
 
-    const jsonMatch = textoResposta.match(/\{[\s\S]*\}/);
-    const textoJson = jsonMatch ? jsonMatch[0] : textoResposta.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+    console.log("[PDI] Texto da IA (primeiros 500 chars):", textoResposta.substring(0, 500));
 
-    let planoGerado: {
-      diagnostico: { sintese: string; conflito_central: string | null; alertas_sobrecarga: string[] };
-      equacao: string | null;
-      pilares: Array<{
-        titulo: string;
-        meta_smart: Record<string, string>;
-        acoes: Array<{ titulo: string; descricao: string; prazo: string | null }>;
-      }>;
-      roadmap: Array<{ periodo: string; foco: string; marcos: string }>;
-      alertas: Array<{ tipo: string; cor: string; descricao: string }>;
+    // Função auxiliar
+    const extrairUltimaLinha = (linhas: string[], prefixo: string): string | null => {
+      for (let i = linhas.length - 1; i >= 0; i--) {
+        if (linhas[i].includes(prefixo)) {
+          return linhas[i].replace(prefixo + ":", "").trim() || null;
+        }
+      }
+      return null;
     };
 
-    try {
-      planoGerado = JSON.parse(textoJson);
-    } catch {
-      return NextResponse.json(
-        { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
-        { status: 502 }
-      );
-    }
+    // Parse super simples e robusto do formato estruturado
+    const linhas = textoResposta.split("\n");
+
+    const diagnostico = {
+      sintese: extrairUltimaLinha(linhas, "SÍNTESE") || "Plano gerado",
+      conflito_central: extrairUltimaLinha(linhas, "CONFLITO") || null,
+      alertas_sobrecarga: [],
+    };
+
+    const equacao = extrairUltimaLinha(linhas, "EQUAÇÃO") || null;
+
+    const pilares: Array<{ titulo: string; meta_smart: Record<string, string>; acoes: Array<{ titulo: string; descricao: string; prazo: string | null }> }> = [];
+    let pilarAtual: any = null;
+
+    linhas.forEach((linha) => {
+      const nomePilar = linha.match(/=== PILAR \d+ ===/);
+      if (nomePilar) {
+        if (pilarAtual) pilares.push(pilarAtual);
+        pilarAtual = {
+          titulo: "Pilar",
+          meta_smart: { especifico: "", mensuravel: "", alcancavel: "", relevante: "", temporal: null },
+          acoes: [],
+        };
+      }
+
+      if (pilarAtual) {
+        if (linha.includes("NOME:")) pilarAtual.titulo = linha.replace("NOME:", "").trim();
+        if (linha.includes("ESPECÍFICO:")) pilarAtual.meta_smart.especifico = linha.replace("ESPECÍFICO:", "").trim();
+        if (linha.includes("MENSURÁVEL:")) pilarAtual.meta_smart.mensuravel = linha.replace("MENSURÁVEL:", "").trim();
+        if (linha.includes("ALCANÇÁVEL:")) pilarAtual.meta_smart.alcancavel = linha.replace("ALCANÇÁVEL:", "").trim();
+        if (linha.includes("RELEVANTE:")) pilarAtual.meta_smart.relevante = linha.replace("RELEVANTE:", "").trim();
+        if (linha.includes("TEMPORAL:")) pilarAtual.meta_smart.temporal = linha.replace("TEMPORAL:", "").trim() || null;
+
+        if (linha.includes("AÇÃO")) {
+          const partes = linha.split("|");
+          if (partes.length >= 2) {
+            const titulo = partes[0].replace(/AÇÃO \d+:/i, "").trim();
+            const descricao = partes[1].trim();
+            pilarAtual.acoes.push({ titulo, descricao, prazo: null });
+          }
+        }
+      }
+    });
+    if (pilarAtual) pilares.push(pilarAtual);
+
+    // Roadmap simples
+    const roadmap: Array<{ periodo: string; foco: string; marcos: string }> = [];
+    let emRoadmap = false;
+    linhas.forEach((linha) => {
+      if (linha.includes("=== ROADMAP ===")) emRoadmap = true;
+      if (emRoadmap && linha.includes(":") && !linha.startsWith("===")) {
+        const partes = linha.split("Marcos:");
+        if (partes.length === 2) {
+          const [periodo, foco] = partes[0].split(":");
+          roadmap.push({
+            periodo: periodo.replace("[", "").replace("]", "").trim(),
+            foco: foco?.trim() || "",
+            marcos: partes[1].trim(),
+          });
+        }
+      }
+    });
+
+    const alertas: Array<{ tipo: string; cor: string; descricao: string }> = [];
+    let emAlertas = false;
+    linhas.forEach((linha) => {
+      if (linha.includes("=== ALERTAS ===")) emAlertas = true;
+      if (emAlertas && linha.includes("|") && !linha.startsWith("===")) {
+        const partes = linha.split("|");
+        if (partes.length >= 3) {
+          const tipo = partes[0].replace("[", "").replace("]", "").trim();
+          const cor = partes[1].toLowerCase().includes("vermelho") ? "vermelho" :
+                     partes[1].toLowerCase().includes("amarelo") ? "amarelo" : "azul";
+          alertas.push({ tipo, cor, descricao: partes[2].trim() });
+        }
+      }
+    });
+
+    const t9 = Date.now();
+    console.log(`[PDI] Parsing concluído (${t9 - t8}ms)`);
+
+    const planoGerado = {
+      diagnostico,
+      equacao,
+      pilares: pilares.filter((p) => p.titulo && p.titulo !== "Pilar"),
+      roadmap,
+      alertas,
+    };
+
+    console.log(`[PDI] Plano objeto criado: ${planoGerado.pilares.length} pilares, ${planoGerado.roadmap.length} roadmap, ${planoGerado.alertas.length} alertas`);
 
     // Arquiva plano anterior (se existir) para manter histórico de versões
     await supabaseAdmin
@@ -159,6 +265,9 @@ export async function POST(req: NextRequest) {
       .update({ status: "arquivado" })
       .eq("mentorado_id", mentoradoId)
       .eq("status", "ativo");
+
+    const t10 = Date.now();
+    console.log(`[PDI] Plano anterior arquivado (${t10 - t9}ms)`);
 
     const { data: planoSalvo, error: erroSalvar } = await supabaseAdmin
       .from("pdi_planos")
@@ -173,7 +282,11 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
+    const t11 = Date.now();
+    console.log(`[PDI] Plano inserido (${t11 - t10}ms)`);
+
     if (erroSalvar || !planoSalvo) {
+      console.error("[PDI] Erro ao salvar plano:", erroSalvar);
       return NextResponse.json({ erro: "não consegui salvar o plano" }, { status: 500 });
     }
 
@@ -194,9 +307,17 @@ export async function POST(req: NextRequest) {
       await supabaseAdmin.from("pdi_acoes").insert(acoesParaInserir);
     }
 
+    const t12 = Date.now();
+    console.log(`[PDI] Ações inseridas (${t12 - t11}ms)`);
+    console.log(`[PDI] Tempo total: ${t12 - t0}ms`);
+
     return NextResponse.json({ plano: planoSalvo });
   } catch (erro) {
-    console.error("erro ao gerar plano de PDI", erro);
-    return NextResponse.json({ erro: "erro interno ao gerar o plano" }, { status: 500 });
+    console.error("[PDI] Erro ao gerar plano:", erro instanceof Error ? erro.message : String(erro));
+    if (erro instanceof Error) console.error("[PDI] Stack:", erro.stack);
+    return NextResponse.json({
+      erro: "erro interno ao gerar o plano",
+      detalhes: erro instanceof Error ? erro.message : String(erro)
+    }, { status: 500 });
   }
 }

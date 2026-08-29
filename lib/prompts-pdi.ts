@@ -56,46 +56,43 @@ Respostas do mentorado, seção por seção:
 
 ${blocoRespostas}
 
-Devolva SOMENTE um JSON válido (sem markdown, sem texto antes ou depois), no formato exato abaixo.
-Escreva tudo em português, na segunda pessoa, direto para ${nomeMentorado}. Nada de jargão de
-mentoria genérico: cada frase precisa vir de algo que a pessoa efetivamente escreveu nas respostas.
+Devolva o plano em FORMATO ESTRUTURADO (não JSON), seguindo exatamente este padrão:
 
-{
-  "diagnostico": {
-    "sintese": "2 a 4 frases sobre quem é essa pessoa a partir do que ela escreveu",
-    "conflito_central": "1 a 2 frases sobre o principal nó a destravar neste ciclo, ou null se não houver um claro",
-    "alertas_sobrecarga": ["frase curta de risco 1", "frase curta de risco 2"]
-  },
-  "equacao": "uma frase curta tipo fórmula que resuma o eixo do plano, ou null",
-  "pilares": [
-    {
-      "titulo": "nome curto do pilar (ex: Inglês executivo)",
-      "meta_smart": {
-        "especifico": "...",
-        "mensuravel": "...",
-        "alcancavel": "...",
-        "relevante": "...",
-        "temporal": "data ou prazo"
-      },
-      "acoes": [
-        { "titulo": "ação concreta e curta", "descricao": "1 frase de contexto", "prazo": "AAAA-MM-DD ou null" }
-      ]
-    }
-  ],
-  "roadmap": [
-    { "periodo": "ex: ${hoje.toLocaleDateString("pt-BR", { month: "short" })}-${anoAtual}", "foco": "foco principal do período", "marcos": "marcos de entrega, separados por ponto" }
-  ],
-  "alertas": [
-    { "tipo": "curto, ex: Travamento autoral", "cor": "vermelho | amarelo | azul", "descricao": "o que observar e o que fazer quando aparecer" }
-  ]
-}
+=== DIAGNÓSTICO ===
+SÍNTESE: [2 a 4 frases sobre quem é essa pessoa]
+CONFLITO: [1 a 2 frases sobre o principal nó a destravar, ou VAZIO se não houver]
+ALERTAS: [lista de frases curtas separadas por |]
 
-Regras de conteúdo:
-- Gere entre 3 e 6 pilares. Cada pilar precisa ter entre 2 e 5 ações concretas, verificáveis (a pessoa
-  precisa conseguir marcar como feita ou não feita sem ambiguidade).
-- O roadmap cobre o ciclo inteiro em blocos de 1 a 3 meses.
-- Não invente certificações, cursos ou números que a pessoa não mencionou. Se faltar dado para um
-  campo, escreva null em vez de inventar.
-- Nunca use travessão (—). Nunca use jargão tipo "sinergia", "empoderar", "destravar potencial",
-  "jornada de transformação".`;
+=== EQUAÇÃO ===
+[uma frase curta que resuma o eixo do plano, ou VAZIO]
+
+=== PILAR 1 ===
+NOME: [nome curto, ex: Inglês executivo]
+ESPECÍFICO: [meta específica]
+MENSURÁVEL: [como medir]
+ALCANÇÁVEL: [é possível?]
+RELEVANTE: [por que importa?]
+TEMPORAL: [prazo, ex: 31-12-2024 ou VAZIO]
+AÇÃO 1: [título] | [descrição]
+AÇÃO 2: [título] | [descrição]
+[... mais ações se houver ...]
+
+[REPITA PARA CADA PILAR]
+
+=== ROADMAP ===
+[período, ex: jan-2024]: [foco principal]. Marcos: [marcos separados por ponto]
+[próximo período]: [foco]. Marcos: [marcos]
+[... mais períodos ...]
+
+=== ALERTAS ===
+[tipo, ex: Travamento]: [cor: vermelho/amarelo/azul] | [descrição]
+[... mais alertas ...]
+
+REGRAS:
+- Escreva tudo em português, na segunda pessoa, direto para ${nomeMentorado}
+- Gere entre 3 e 6 pilares. Cada pilar com 2 a 5 ações concretas e verificáveis
+- O roadmap cobre ${anoAtual} a ${anoSeguinte}
+- Não invente dados que não foram mencionados
+- Nada de jargão tipo "sinergia", "empoderar", "destravar potencial"
+- Nunca use travessão (—)`;
 }
