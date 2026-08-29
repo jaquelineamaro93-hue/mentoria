@@ -30,6 +30,12 @@ export default async function AdminFeedbacksPage() {
     .select('*, profiles(nome, email)')
     .order('created_at', { ascending: false });
 
+  const { data: feedbacksEnviados } = await supabase
+    .from('feedback_sessoes')
+    .select('*, profiles(nome)')
+    .eq('admin_id', user.id)
+    .order('data', { ascending: false });
+
   const mediaGeral =
     checkins && checkins.length > 0
       ? (checkins.reduce((soma, c) => soma + c.nota, 0) / checkins.length).toFixed(1)
@@ -54,6 +60,34 @@ export default async function AdminFeedbacksPage() {
       <div className="mb-10">
         <EnviarFeedbackClient mentorados={mentorados ?? []} />
       </div>
+
+      <h2 className="font-display text-xl text-black mb-4">Feedbacks que você enviou</h2>
+      {!feedbacksEnviados || feedbacksEnviados.length === 0 ? (
+        <p className="text-sm text-gray-text mb-8">Você ainda não enviou nenhum feedback.</p>
+      ) : (
+        <div className="space-y-3 mb-8">
+          {feedbacksEnviados.map((f: any) => (
+            <div key={f.id} className="bg-white border border-gray-faint rounded-xl p-4">
+              <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
+                <div>
+                  <p className="text-sm font-medium text-black">{f.titulo}</p>
+                  <p className="text-xs text-gray-text">
+                    Para: {f.profiles?.nome ?? 'Mentorado'}
+                  </p>
+                </div>
+                <span className="text-xs bg-mint-light text-mint px-2.5 py-1 rounded-full">
+                  {f.tipo}
+                </span>
+              </div>
+              <p className="text-sm text-black mb-2">{f.conteudo}</p>
+              <p className="text-xs text-gray-text">
+                {new Date(f.data).toLocaleDateString('pt-BR')} às{' '}
+                {new Date(f.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <h2 className="font-display text-xl text-black mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
