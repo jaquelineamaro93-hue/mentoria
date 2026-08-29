@@ -36,26 +36,28 @@ interface StarsSelectorProps {
 
 export default function StarsSelector({ selected, onSelect }: StarsSelectorProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {STARS_OPTIONS.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => onSelect(option.id)}
-          className={`p-6 rounded-lg border-2 transition-all text-left ${
-            selected === option.id
-              ? 'border-mint bg-mint-light'
-              : 'border-gray-faint hover:border-mint bg-white'
-          }`}
-        >
-          <h3 className="font-medium text-black text-lg mb-2">{option.label}</h3>
-          <p className="text-gray-text text-sm mb-4">{option.description}</p>
-          <div className="p-3 rounded bg-white border border-mint-border">
-            <p className="text-xs text-gray-text leading-relaxed">
-              <span className="font-medium text-black">Foco:</span> {option.focus}
-            </p>
-          </div>
-        </button>
-      ))}
+    <div className="overflow-y-auto max-h-[600px] pr-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {STARS_OPTIONS.map((option) => (
+          <button
+            key={option.id}
+            onClick={() => onSelect(option.id)}
+            className={`p-6 rounded-lg border-2 transition-all text-left ${
+              selected === option.id
+                ? 'border-mint bg-mint-light'
+                : 'border-gray-faint hover:border-mint bg-white'
+            }`}
+          >
+            <h3 className="font-medium text-black text-lg mb-2">{option.label}</h3>
+            <p className="text-gray-text text-sm mb-4">{option.description}</p>
+            <div className="p-3 rounded bg-white border border-mint-border">
+              <p className="text-xs text-gray-text leading-relaxed">
+                <span className="font-medium text-black">Foco:</span> {option.focus}
+              </p>
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
