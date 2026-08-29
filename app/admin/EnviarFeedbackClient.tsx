@@ -30,17 +30,8 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
     setErro('');
     setSucesso('');
 
-    const { data: userData } = await supabase.auth.getUser();
-    const adminId = userData?.user?.id;
-
-    if (!adminId) {
-      setErro('Erro: não consegui identificar o admin');
-      return;
-    }
-
     const { error } = await supabase.from('feedback_sessoes').insert({
       user_id: mentoradoId,
-      admin_id: adminId,
       titulo: titulo.trim(),
       conteudo: conteudo.trim(),
       tipo,
