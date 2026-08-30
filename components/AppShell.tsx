@@ -3,7 +3,6 @@
 import { SidebarProvider, useSidebar } from '@/lib/contexts/SidebarContext';
 import { UserProvider } from '@/lib/contexts/UserContext';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
-import { QuickTip } from '@/components/ui/QuickTip';
 
 function AppShellContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar();
@@ -22,11 +21,6 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
           {/* Applied to ALL 38 pages in (dashboard) */}
           <div className="px-12 py-8 w-full">
-            {/* Quick Tip positioned at top of main content */}
-            <div className="mb-6">
-              <QuickTip />
-            </div>
-
             {children}
           </div>
         </div>
