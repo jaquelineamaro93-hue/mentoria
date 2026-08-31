@@ -11,7 +11,15 @@ interface FeedbackEnviado {
   conteudo: string;
   tipo: 'feedback' | 'nota' | 'arquivo';
   data: string;
-  profiles?: { nome: string };
+  profiles?: { nome: string } | { nome: string }[];
+}
+
+function getNomeProfile(profiles?: { nome: string } | { nome: string }[]): string {
+  if (!profiles) return 'Desconhecido';
+  if (Array.isArray(profiles)) {
+    return profiles[0]?.nome || 'Desconhecido';
+  }
+  return profiles.nome || 'Desconhecido';
 }
 
 export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedbacks }: { feedbacks: FeedbackEnviado[] }) {
@@ -61,7 +69,7 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
               <div className="flex-1">
                 <p className="text-sm font-medium text-black">{feedback.titulo}</p>
                 <p className="text-xs text-gray-text">
-                  Para: {feedback.profiles?.nome || 'Desconhecido'} •{' '}
+                  Para: {getNomeProfile(feedback.profiles)} •{' '}
                   {new Date(feedback.data).toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: 'short',
