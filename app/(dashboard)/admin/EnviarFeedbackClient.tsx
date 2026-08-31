@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Send, Loader2 } from 'lucide-react';
 
@@ -11,6 +11,7 @@ interface Profile {
 
 export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profile[] }) {
   const supabase = createClient();
+  const [adminId, setAdminId] = useState<string>('');
   const [mentoradoId, setMentoradoId] = useState('');
   const [titulo, setTitulo] = useState('');
   const [conteudo, setConteudo] = useState('');
@@ -19,6 +20,16 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
+
+  useEffect(() => {
+    async function getUser() {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setAdminId(data.user.id);
+      }
+    }
+    getUser();
+  }, [supabase]);
 
   async function handleEnviar() {
     if (!mentoradoId || !titulo.trim() || !conteudo.trim()) {
@@ -32,6 +43,7 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
 
     const { error } = await supabase.from('feedback_sessoes').insert({
       user_id: mentoradoId,
+      admin_id: adminId,
       titulo: titulo.trim(),
       conteudo: conteudo.trim(),
       tipo,

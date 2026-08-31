@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { Star } from 'lucide-react';
 import EnviarFeedbackClient from '../EnviarFeedbackClient';
+import ListarFeedbacksEnviadosClient from '../ListarFeedbacksEnviadosClient';
 
 export default async function AdminFeedbacksPage() {
   const supabase = await createClient();
@@ -54,6 +55,8 @@ export default async function AdminFeedbacksPage() {
       <div className="mb-10">
         <EnviarFeedbackClient mentorados={mentorados ?? []} />
       </div>
+
+      <ListarFeedbacksEnviadosClient />
 
       <h2 className="font-display text-xl text-black mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
