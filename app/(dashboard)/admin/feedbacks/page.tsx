@@ -26,6 +26,12 @@ export default async function AdminFeedbacksPage() {
     .eq('is_admin', false)
     .order('nome');
 
+  const { data: feedbacksEnviados } = await supabase
+    .from('feedback_sessoes')
+    .select('id, user_id, titulo, conteudo, tipo, data, profiles(nome)')
+    .eq('admin_id', user.id)
+    .order('data', { ascending: false });
+
   const { data: checkins } = await supabase
     .from('checkins_mensais')
     .select('*, profiles(nome, email)')
@@ -56,7 +62,7 @@ export default async function AdminFeedbacksPage() {
         <EnviarFeedbackClient mentorados={mentorados ?? []} />
       </div>
 
-      <ListarFeedbacksEnviadosClient />
+      <ListarFeedbacksEnviadosClient feedbacks={feedbacksEnviados ?? []} />
 
       <h2 className="font-display text-xl text-black mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
