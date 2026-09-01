@@ -56,11 +56,12 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
   }
 
   return (
-    <>
-      {feedbacks.length > 0 && (
-        <div className="mb-8">
-          <h2 className="font-display text-xl text-black mb-4">Feedbacks que Você Enviou</h2>
-          <div className="space-y-3">
+    <div className="mb-8">
+      <h2 className="font-display text-xl text-black mb-4">Feedbacks que Você Enviou</h2>
+      {feedbacks.length === 0 ? (
+        <p className="text-sm text-gray-text">Você ainda não enviou nenhum feedback.</p>
+      ) : (
+        <div className="space-y-3">
             {feedbacks.map((feedback) => (
               <div key={feedback.id} className="bg-white border border-gray-faint rounded-xl p-4">
                 <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
@@ -135,9 +136,8 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
                 )}
               </div>
             ))}
-          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

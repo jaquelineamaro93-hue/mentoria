@@ -50,7 +50,6 @@ export default async function AdminFeedbacksPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
         <div>
           <h1 className="font-display text-3xl text-black mb-1">Feedbacks da Trilha</h1>
-          <p className="text-sm text-gray-text">Check-ins mensais enviados pelos mentorados.</p>
         </div>
         <div className="bg-white border border-gray-faint rounded-2xl px-5 py-3 text-center">
           <p className="text-2xl font-display text-black">{mediaGeral}</p>
