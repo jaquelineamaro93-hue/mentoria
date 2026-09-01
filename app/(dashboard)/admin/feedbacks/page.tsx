@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { Star } from 'lucide-react';
 import EnviarFeedbackClient from '../EnviarFeedbackClient';
+import ListarFeedbacksEnviadosClient from '../ListarFeedbacksEnviadosClient';
 
 export default async function AdminFeedbacksPage() {
   const supabase = await createClient();
@@ -25,6 +26,12 @@ export default async function AdminFeedbacksPage() {
     .eq('is_admin', false)
     .order('nome');
 
+  const { data: feedbacksEnviados } = await supabase
+    .from('feedback_sessoes')
+    .select('id, user_id, titulo, conteudo, tipo, data, profiles(nome)')
+    .eq('admin_id', user.id)
+    .order('data', { ascending: false });
+
   const { data: checkins } = await supabase
     .from('checkins_mensais')
     .select('*, profiles(nome, email)')
@@ -43,7 +50,6 @@ export default async function AdminFeedbacksPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
         <div>
           <h1 className="font-display text-3xl text-black mb-1">Feedbacks da Trilha</h1>
-          <p className="text-sm text-gray-text">Check-ins mensais enviados pelos mentorados.</p>
         </div>
         <div className="bg-white border border-gray-faint rounded-2xl px-5 py-3 text-center">
           <p className="text-2xl font-display text-black">{mediaGeral}</p>
@@ -54,6 +60,8 @@ export default async function AdminFeedbacksPage() {
       <div className="mb-10">
         <EnviarFeedbackClient mentorados={mentorados ?? []} />
       </div>
+
+      <ListarFeedbacksEnviadosClient feedbacks={feedbacksEnviados ?? []} />
 
       <h2 className="font-display text-xl text-black mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
