@@ -17,7 +17,9 @@ export function QuickTip() {
         <Lightbulb size={16} className="text-gray-text mt-0.5 shrink-0" />
         <div className="flex-1">
           <p className="font-medium text-black mb-1">{tip.title}</p>
-          <p className="text-gray-text text-xs leading-relaxed">{tip.description}</p>
+          {tip.description && (
+            <p className="text-gray-text text-xs leading-relaxed">{tip.description}</p>
+          )}
         </div>
       </div>
     </div>
