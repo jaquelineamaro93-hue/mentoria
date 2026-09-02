@@ -9,26 +9,24 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="relative h-screen w-screen bg-white overflow-hidden">
+    <div className="h-screen w-full overflow-hidden bg-white">
       <CollapsibleSidebar />
 
-      {/* Main content area - margin adjusts with sidebar state */}
+      {/* Main content area - single scroll container with margin for fixed sidebar */}
       <main
-        className={`absolute top-0 right-0 h-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
-          isCollapsed ? 'left-16' : 'left-[280px]'
+        className={`h-full overflow-y-auto overflow-x-hidden transition-all duration-300 ${
+          isCollapsed ? 'ml-16' : 'ml-[280px]'
         }`}
       >
-        <div className="w-full h-full overflow-y-auto">
-          {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
-          {/* Applied to ALL 38 pages in (dashboard) */}
-          <div className="px-12 py-8 w-full">
-            {/* Quick Tip positioned at top of main content */}
-            <div className="mb-6">
-              <QuickTip />
-            </div>
-
-            {children}
+        {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
+        {/* Applied to ALL pages in (dashboard) */}
+        <div className="px-12 py-8 w-full">
+          {/* Quick Tip positioned at top of main content */}
+          <div className="mb-6">
+            <QuickTip />
           </div>
+
+          {children}
         </div>
       </main>
     </div>
