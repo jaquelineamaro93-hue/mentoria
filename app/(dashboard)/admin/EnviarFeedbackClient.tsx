@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Send, Loader2 } from 'lucide-react';
 
@@ -11,6 +12,7 @@ interface Profile {
 
 export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profile[] }) {
   const supabase = createClient();
+  const router = useRouter();
   const [adminId, setAdminId] = useState<string>('');
   const [mentoradoId, setMentoradoId] = useState('');
   const [titulo, setTitulo] = useState('');
@@ -63,6 +65,9 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
     setConteudo('');
     setTipo('feedback');
     setArquivoUrl('');
+    setMentoradoId('');
+
+    router.refresh();
   }
 
   return (
