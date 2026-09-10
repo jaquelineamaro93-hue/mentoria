@@ -28,9 +28,8 @@ export default async function AdminFeedbacksPage() {
 
   const { data: feedbacksEnviados } = await supabase
     .from('feedback_sessoes')
-    .select('id, user_id, titulo, conteudo, tipo, data, profiles(nome)')
-    .eq('admin_id', user.id)
-    .order('data', { ascending: false });
+    .select('*')
+    .order('created_at', { ascending: false });
 
   const { data: checkins } = await supabase
     .from('checkins_mensais')
