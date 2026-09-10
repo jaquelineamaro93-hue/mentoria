@@ -18,17 +18,15 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           isCollapsed ? 'left-16' : 'left-[280px]'
         }`}
       >
-        <div className="w-full h-full overflow-y-auto">
-          {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
-          {/* Applied to ALL 38 pages in (dashboard) */}
-          <div className="px-12 py-8 w-full">
-            {/* Quick Tip positioned at top of main content */}
-            <div className="mb-6">
-              <QuickTip />
-            </div>
-
-            {children}
+        {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
+        {/* Applied to ALL pages in (dashboard) */}
+        <div className="px-12 py-8 w-full">
+          {/* Quick Tip positioned at top of main content */}
+          <div className="mb-6">
+            <QuickTip />
           </div>
+
+          {children}
         </div>
       </main>
     </div>

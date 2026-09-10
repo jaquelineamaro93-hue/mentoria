@@ -54,7 +54,7 @@ export default function RenovarClient({ profile, planos }: Props) {
 
   return (
     <>
-      <div className="min-h-screen w-full px-6 py-12 bg-white">
+      <div className="w-full">
         <div className="">
         <div className="text-center mb-10">
           <div className="w-14 h-14 rounded-full bg-mint-light border border-mint flex items-center justify-center mb-6">
