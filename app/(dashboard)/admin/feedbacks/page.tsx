@@ -43,9 +43,8 @@ export default async function AdminFeedbacksPage() {
       : '—';
 
   return (
-    
-<main className="px-6 py-8 md:px-12 md:py-12 w-full">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
+    <>
+      <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
       <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
         <div>
@@ -104,6 +103,6 @@ export default async function AdminFeedbacksPage() {
           ))}
         </div>
       )}
-    </main>
+    </>
   );
 }
