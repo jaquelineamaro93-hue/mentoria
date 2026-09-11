@@ -10,7 +10,8 @@ interface FeedbackEnviado {
   titulo: string;
   conteudo: string;
   tipo: 'feedback' | 'nota' | 'arquivo';
-  data: string;
+  data?: string;
+  created_at?: string;
   profiles?: { nome: string } | { nome: string }[];
 }
 
@@ -69,7 +70,7 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
                     <p className="text-sm font-medium text-black">{feedback.titulo}</p>
                     <p className="text-xs text-gray-text">
                       Para: {getNomeProfile(feedback.profiles)} •{' '}
-                      {new Date(feedback.data).toLocaleDateString('pt-BR', {
+                      {new Date(feedback.data || feedback.created_at || '').toLocaleDateString('pt-BR', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',

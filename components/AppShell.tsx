@@ -9,15 +9,11 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="relative h-screen w-screen bg-white overflow-hidden">
+    <div className="flex h-screen w-full bg-white overflow-x-hidden">
       <CollapsibleSidebar />
 
-      {/* Main content area - margin adjusts with sidebar state */}
-      <main
-        className={`absolute top-0 right-0 h-full overflow-x-hidden overflow-y-auto transition-all duration-300 ${
-          isCollapsed ? 'left-16' : 'left-[280px]'
-        }`}
-      >
+      {/* Main content area - flex-1 with min-w-0 to prevent overflow */}
+      <main className="flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto transition-all duration-300">
         {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
         {/* Applied to ALL pages in (dashboard) */}
         <div className="px-12 py-8 w-full">
