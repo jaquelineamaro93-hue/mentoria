@@ -28,16 +28,11 @@ export default async function MeuPdiPage() {
     .returns<PdiResposta[]>();
 
   return (
-    <div className="flex">
-      
-      <main className="flex-1 overflow-auto">
-        <MeuPdiClient
-          userId={user.id}
-          profile={profile}
-          secoes={secoes ?? []}
-          respostasIniciais={respostas ?? []}
-        />
-      </main>
-    </div>
+    <MeuPdiClient
+      userId={user.id}
+      profile={profile}
+      secoes={secoes ?? []}
+      respostasIniciais={respostas ?? []}
+    />
   );
 }
