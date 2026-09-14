@@ -26,12 +26,21 @@ export default async function AdminFeedbacksPage() {
     .eq('is_admin', false)
     .order('nome');
 
+  // Buscar TODOS os perfis para debug
+  const { data: todosOsPerfis } = await supabase
+    .from('profiles')
+    .select('id, nome, is_admin, email')
+    .order('nome');
+
   if (errorMentorados) {
     console.error('[ADMIN FEEDBACKS] Erro ao buscar mentorados:', errorMentorados);
   } else {
-    console.log('[ADMIN FEEDBACKS] Mentorados encontrados:', mentorados?.length || 0);
-    mentorados?.forEach((m: any) => {
-      console.log(`  - ${m.nome} (${m.email})`);
+    console.log('[ADMIN FEEDBACKS] Mentorados com is_admin=false:', mentorados?.length || 0);
+    console.log('[ADMIN FEEDBACKS] TODOS os perfis (com is_admin):', todosOsPerfis?.length || 0);
+    todosOsPerfis?.forEach((m: any) => {
+      if (m.nome?.includes('Leonardo') || m.nome?.includes('Laura')) {
+        console.log(`  [ENCONTRADO] ${m.nome} (${m.email}) - is_admin: ${m.is_admin}`);
+      }
     });
   }
 
