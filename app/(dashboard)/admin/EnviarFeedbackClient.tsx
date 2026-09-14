@@ -41,6 +41,8 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
     setErro('');
     setSucesso('');
 
+    console.log('[SEND FEEDBACK] Enviando com admin_id:', adminId, 'user_id (mentorado):', mentoradoId);
+
     const { error } = await supabase.from('feedback_sessoes').insert({
       user_id: mentoradoId,
       admin_id: adminId,
@@ -54,10 +56,12 @@ export default function EnviarFeedbackClient({ mentorados }: { mentorados: Profi
     setEnviando(false);
 
     if (error) {
+      console.error('[SEND FEEDBACK] Erro:', error);
       setErro('Erro ao enviar feedback: ' + error.message);
       return;
     }
 
+    console.log('[SEND FEEDBACK] Sucesso! Atualizando lista...');
     setSucesso('Feedback enviado com sucesso!');
     setTitulo('');
     setConteudo('');

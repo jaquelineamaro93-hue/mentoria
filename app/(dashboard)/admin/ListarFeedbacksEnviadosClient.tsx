@@ -42,9 +42,12 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
     setSalvando(false);
 
     if (error) {
+      console.error('[FEEDBACK EDIT] Erro ao salvar:', error);
       setErro('Erro ao salvar edição: ' + error.message);
       return;
     }
+
+    console.log('[FEEDBACK EDIT] Feedback atualizado com sucesso:', feedbackId);
 
     setFeedbacks(
       feedbacks.map((f) =>

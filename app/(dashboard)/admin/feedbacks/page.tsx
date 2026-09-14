@@ -26,11 +26,18 @@ export default async function AdminFeedbacksPage() {
     .eq('is_admin', false)
     .order('nome');
 
-  const { data: feedbacksEnviados } = await supabase
+  const { data: feedbacksEnviados, error: errorFeedbacks } = await supabase
     .from('feedback_sessoes')
-    .select('id, user_id, titulo, conteudo, tipo, data, profiles(nome)')
+    .select('id, user_id, titulo, conteudo, tipo, data, profiles:user_id(nome)')
     .eq('admin_id', user.id)
     .order('data', { ascending: false });
+
+  // Diagnóstico para debug
+  if (errorFeedbacks) {
+    console.error('[ADMIN FEEDBACKS] Erro ao buscar feedbacks:', errorFeedbacks, 'user.id:', user.id);
+  } else {
+    console.log('[ADMIN FEEDBACKS] Feedbacks encontrados:', feedbacksEnviados?.length || 0, 'user.id:', user.id);
+  }
 
   const { data: checkins } = await supabase
     .from('checkins_mensais')
