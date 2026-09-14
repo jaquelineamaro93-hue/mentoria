@@ -21,6 +21,7 @@ import {
   TrendingUp,
   Calendar,
   MessageSquare,
+  Bell,
 } from 'lucide-react';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
@@ -282,6 +283,13 @@ export default function DashboardClient({
         {/* Feedbacks da Mentora */}
         {feedbacks.length > 0 && (
           <section className="mb-10">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4 flex items-start gap-3">
+              <Bell size={18} className="text-blue-600 shrink-0 mt-0.5" strokeWidth={1.5} />
+              <div>
+                <p className="text-sm font-medium text-blue-900">Você tem {feedbacks.length} {feedbacks.length === 1 ? 'feedback' : 'feedbacks'} novo{feedbacks.length === 1 ? '' : 's'}</p>
+                <p className="text-xs text-blue-700 mt-0.5">Verifique os feedbacks que você recebeu de sua mentora</p>
+              </div>
+            </div>
             <div className="flex items-center gap-2 mb-4">
               <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
               {feedbacks.length > 0 && (

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Edit2, X, Check, Loader2 } from 'lucide-react';
+import { Edit2, X, Check, Loader2, Trash2 } from 'lucide-react';
 
 interface FeedbackEnviado {
   id: string;
@@ -28,6 +28,7 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [conteudoEditado, setConteudoEditado] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const [deletando, setDeletando] = useState<string | null>(null);
   const [erro, setErro] = useState('');
 
   async function handleSalvarEdicao(feedbackId: string) {
@@ -53,6 +54,29 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
     );
     setEditandoId(null);
     setConteudoEditado('');
+  }
+
+  async function handleDeletar(feedbackId: string) {
+    if (!window.confirm('Tem certeza que deseja deletar este feedback?')) {
+      return;
+    }
+
+    setDeletando(feedbackId);
+    setErro('');
+
+    const { error } = await supabase
+      .from('feedback_sessoes')
+      .delete()
+      .eq('id', feedbackId);
+
+    setDeletando(null);
+
+    if (error) {
+      setErro('Erro ao deletar feedback: ' + error.message);
+      return;
+    }
+
+    setFeedbacks(feedbacks.filter((f) => f.id !== feedbackId));
   }
 
   return (
@@ -122,16 +146,30 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
                 ) : (
                   <>
                     <p className="text-sm text-black mb-3 whitespace-pre-wrap">{feedback.conteudo}</p>
-                    <button
-                      onClick={() => {
-                        setEditandoId(feedback.id);
-                        setConteudoEditado(feedback.conteudo);
-                      }}
-                      className="inline-flex items-center gap-1 text-sm text-brown-deep hover:text-brown-deep/80 transition-colors"
-                    >
-                      <Edit2 size={14} />
-                      Editar
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setEditandoId(feedback.id);
+                          setConteudoEditado(feedback.conteudo);
+                        }}
+                        className="inline-flex items-center gap-1 text-sm text-brown-deep hover:text-brown-deep/80 transition-colors"
+                      >
+                        <Edit2 size={14} />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDeletar(feedback.id)}
+                        disabled={deletando === feedback.id}
+                        className="inline-flex items-center gap-1 text-sm text-red-600 hover:text-red-700 transition-colors disabled:opacity-50"
+                      >
+                        {deletando === feedback.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
+                        Deletar
+                      </button>
+                    </div>
                   </>
                 )}
               </div>
