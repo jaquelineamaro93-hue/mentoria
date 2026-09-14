@@ -26,22 +26,42 @@ export default async function AdminFeedbacksPage() {
     .eq('is_admin', false)
     .order('nome');
 
-  // Buscar TODOS os perfis para debug
-  const { data: todosOsPerfis } = await supabase
+  // Buscar IDs específicos de Leonardo e Laura
+  const { data: leonardoData } = await supabase
     .from('profiles')
-    .select('id, nome, is_admin, email')
-    .order('nome');
+    .select('id, nome, email')
+    .ilike('nome', '%Leonardo%Beserra%')
+    .single()
+    .catch(() => ({ data: null }));
+
+  const { data: lauraData } = await supabase
+    .from('profiles')
+    .select('id, nome, email')
+    .ilike('nome', '%Laura%Souza%')
+    .single()
+    .catch(() => ({ data: null }));
+
+  // Buscar feedbacks desses mentorados
+  const feedbacksLeonardo = leonardoData ?
+    await supabase
+      .from('feedback_sessoes')
+      .select('id, admin_id, titulo, data')
+      .eq('user_id', leonardoData.id)
+    : { data: [] };
+
+  const feedbacksLaura = lauraData ?
+    await supabase
+      .from('feedback_sessoes')
+      .select('id, admin_id, titulo, data')
+      .eq('user_id', lauraData.id)
+    : { data: [] };
 
   if (errorMentorados) {
     console.error('[ADMIN FEEDBACKS] Erro ao buscar mentorados:', errorMentorados);
   } else {
-    console.log('[ADMIN FEEDBACKS] Mentorados com is_admin=false:', mentorados?.length || 0);
-    console.log('[ADMIN FEEDBACKS] TODOS os perfis (com is_admin):', todosOsPerfis?.length || 0);
-    todosOsPerfis?.forEach((m: any) => {
-      if (m.nome?.includes('Leonardo') || m.nome?.includes('Laura')) {
-        console.log(`  [ENCONTRADO] ${m.nome} (${m.email}) - is_admin: ${m.is_admin}`);
-      }
-    });
+    console.log('[ADMIN FEEDBACKS] Leonardo Beserra - ID:', leonardoData?.id, 'Feedbacks:', feedbacksLeonardo.data?.length || 0);
+    console.log('[ADMIN FEEDBACKS] Laura de Souza - ID:', lauraData?.id, 'Feedbacks:', feedbacksLaura.data?.length || 0);
+    console.log('[ADMIN FEEDBACKS] Admin logado ID:', user.id);
   }
 
   const { data: feedbacksEnviados, error: errorFeedbacks } = await supabase
