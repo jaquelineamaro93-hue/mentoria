@@ -20,49 +20,11 @@ export default async function AdminFeedbacksPage() {
 
   if (!perfilAdmin?.is_admin) redirect('/dashboard');
 
-  const { data: mentorados, error: errorMentorados } = await supabase
+  const { data: mentorados } = await supabase
     .from('profiles')
-    .select('id, nome, is_admin, email')
+    .select('id, nome')
     .eq('is_admin', false)
     .order('nome');
-
-  // Buscar IDs específicos de Leonardo e Laura
-  const { data: leonardoData } = await supabase
-    .from('profiles')
-    .select('id, nome, email')
-    .ilike('nome', '%Leonardo%Beserra%')
-    .single()
-    .catch(() => ({ data: null }));
-
-  const { data: lauraData } = await supabase
-    .from('profiles')
-    .select('id, nome, email')
-    .ilike('nome', '%Laura%Souza%')
-    .single()
-    .catch(() => ({ data: null }));
-
-  // Buscar feedbacks desses mentorados
-  const feedbacksLeonardo = leonardoData ?
-    await supabase
-      .from('feedback_sessoes')
-      .select('id, admin_id, titulo, data')
-      .eq('user_id', leonardoData.id)
-    : { data: [] };
-
-  const feedbacksLaura = lauraData ?
-    await supabase
-      .from('feedback_sessoes')
-      .select('id, admin_id, titulo, data')
-      .eq('user_id', lauraData.id)
-    : { data: [] };
-
-  if (errorMentorados) {
-    console.error('[ADMIN FEEDBACKS] Erro ao buscar mentorados:', errorMentorados);
-  } else {
-    console.log('[ADMIN FEEDBACKS] Leonardo Beserra - ID:', leonardoData?.id, 'Feedbacks:', feedbacksLeonardo.data?.length || 0);
-    console.log('[ADMIN FEEDBACKS] Laura de Souza - ID:', lauraData?.id, 'Feedbacks:', feedbacksLaura.data?.length || 0);
-    console.log('[ADMIN FEEDBACKS] Admin logado ID:', user.id);
-  }
 
   const { data: feedbacksEnviados, error: errorFeedbacks } = await supabase
     .from('feedback_sessoes')
@@ -98,7 +60,7 @@ export default async function AdminFeedbacksPage() {
   if (errorFeedbacks) {
     console.error('[ADMIN FEEDBACKS] Erro ao buscar feedbacks:', errorFeedbacks, 'user.id:', user.id);
   } else {
-    console.log('[ADMIN FEEDBACKS] Feedbacks encontrados:', feedbacksComNome?.length || 0, 'user.id:', user.id);
+    console.log('[ADMIN FEEDBACKS] Feedbacks encontrados:', feedbacksComNome?.length || 0, 'para admin:', user.id);
   }
 
   const { data: checkins } = await supabase
@@ -112,7 +74,7 @@ export default async function AdminFeedbacksPage() {
       : '—';
 
   return (
-    
+
 <main className="px-6 py-8 md:px-12 md:py-12 w-full">
         <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
 
