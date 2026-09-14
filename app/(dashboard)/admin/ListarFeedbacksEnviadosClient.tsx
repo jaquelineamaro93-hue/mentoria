@@ -14,7 +14,7 @@ interface FeedbackEnviado {
   profiles?: { nome: string } | { nome: string }[] | null;
 }
 
-function getNomeProfile(profiles?: { nome: string } | { nome: string }[]): string {
+function getNomeProfile(profiles?: { nome: string } | { nome: string }[] | null): string {
   if (!profiles) return 'Desconhecido';
   if (Array.isArray(profiles)) {
     return profiles[0]?.nome || 'Desconhecido';
