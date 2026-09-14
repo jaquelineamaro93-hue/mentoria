@@ -46,6 +46,9 @@ export default async function AdminFeedbacksPage() {
     console.error('[ADMIN FEEDBACKS] Erro ao buscar feedbacks:', errorFeedbacks, 'user.id:', user.id);
   } else {
     console.log('[ADMIN FEEDBACKS] Feedbacks encontrados:', feedbacksEnviados?.length || 0, 'user.id:', user.id);
+    feedbacksEnviados?.forEach((f: any) => {
+      console.log(`  - ID: ${f.id}, user_id: ${f.user_id}, titulo: ${f.titulo}, profile_nome: ${f.profiles?.nome || 'SEM PERFIL'}`);
+    });
   }
 
   const { data: checkins } = await supabase
