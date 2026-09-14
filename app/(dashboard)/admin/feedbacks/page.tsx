@@ -20,11 +20,20 @@ export default async function AdminFeedbacksPage() {
 
   if (!perfilAdmin?.is_admin) redirect('/dashboard');
 
-  const { data: mentorados } = await supabase
+  const { data: mentorados, error: errorMentorados } = await supabase
     .from('profiles')
-    .select('id, nome')
+    .select('id, nome, is_admin, email')
     .eq('is_admin', false)
     .order('nome');
+
+  if (errorMentorados) {
+    console.error('[ADMIN FEEDBACKS] Erro ao buscar mentorados:', errorMentorados);
+  } else {
+    console.log('[ADMIN FEEDBACKS] Mentorados encontrados:', mentorados?.length || 0);
+    mentorados?.forEach((m: any) => {
+      console.log(`  - ${m.nome} (${m.email})`);
+    });
+  }
 
   const { data: feedbacksEnviados, error: errorFeedbacks } = await supabase
     .from('feedback_sessoes')
