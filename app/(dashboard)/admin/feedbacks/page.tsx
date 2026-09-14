@@ -37,18 +37,39 @@ export default async function AdminFeedbacksPage() {
 
   const { data: feedbacksEnviados, error: errorFeedbacks } = await supabase
     .from('feedback_sessoes')
-    .select('id, user_id, titulo, conteudo, tipo, data, profiles:user_id(nome)')
+    .select('id, user_id, titulo, conteudo, tipo, data, profiles(nome)')
     .eq('admin_id', user.id)
     .order('data', { ascending: false });
+
+  // Se houver feedback sem nome (perfil deletado), buscar nome da tabela profiles separadamente
+  const feedbacksComNome = feedbacksEnviados ? await Promise.all(
+    feedbacksEnviados.map(async (feedback: any) => {
+      if (feedback.profiles && Array.isArray(feedback.profiles) && feedback.profiles[0]?.nome) {
+        return feedback;
+      }
+      if (feedback.profiles && !Array.isArray(feedback.profiles) && feedback.profiles.nome) {
+        return feedback;
+      }
+
+      // Se não tem nome, buscar direto por user_id
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('nome')
+        .eq('id', feedback.user_id)
+        .single();
+
+      return {
+        ...feedback,
+        profiles: profile ? { nome: profile.nome } : { nome: 'Mentorado Deletado' },
+      };
+    })
+  ) : [];
 
   // Diagnóstico para debug
   if (errorFeedbacks) {
     console.error('[ADMIN FEEDBACKS] Erro ao buscar feedbacks:', errorFeedbacks, 'user.id:', user.id);
   } else {
-    console.log('[ADMIN FEEDBACKS] Feedbacks encontrados:', feedbacksEnviados?.length || 0, 'user.id:', user.id);
-    feedbacksEnviados?.forEach((f: any) => {
-      console.log(`  - ID: ${f.id}, user_id: ${f.user_id}, titulo: ${f.titulo}, profile_nome: ${f.profiles?.nome || 'SEM PERFIL'}`);
-    });
+    console.log('[ADMIN FEEDBACKS] Feedbacks encontrados:', feedbacksComNome?.length || 0, 'user.id:', user.id);
   }
 
   const { data: checkins } = await supabase
@@ -80,7 +101,7 @@ export default async function AdminFeedbacksPage() {
         <EnviarFeedbackClient mentorados={mentorados ?? []} />
       </div>
 
-      <ListarFeedbacksEnviadosClient feedbacks={feedbacksEnviados ?? []} />
+      <ListarFeedbacksEnviadosClient feedbacks={feedbacksComNome ?? []} />
 
       <h2 className="font-display text-xl text-black mb-4">Check-ins dos mentorados</h2>
       {!checkins || checkins.length === 0 ? (
