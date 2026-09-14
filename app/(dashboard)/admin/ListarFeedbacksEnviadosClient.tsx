@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Edit2, X, Check, Loader2 } from 'lucide-react';
 
@@ -11,10 +11,10 @@ interface FeedbackEnviado {
   conteudo: string;
   tipo: 'feedback' | 'nota' | 'arquivo';
   data: string;
-  profiles?: { nome: string } | { nome: string }[] | null;
+  profiles?: { nome: string } | { nome: string }[];
 }
 
-function getNomeProfile(profiles?: { nome: string } | { nome: string }[] | null): string {
+function getNomeProfile(profiles?: { nome: string } | { nome: string }[]): string {
   if (!profiles) return 'Desconhecido';
   if (Array.isArray(profiles)) {
     return profiles[0]?.nome || 'Desconhecido';
@@ -29,35 +29,6 @@ export default function ListarFeedbacksEnviadosClient({ feedbacks: initialFeedba
   const [conteudoEditado, setConteudoEditado] = useState('');
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
-
-  // Buscar nomes dos mentorados que estão faltando
-  useEffect(() => {
-    async function buscarNomesFaltantes() {
-      const feedbacksSemNome = feedbacks.filter(f => !f.profiles);
-      if (feedbacksSemNome.length === 0) return;
-
-      const feedbacksComNomes = await Promise.all(
-        feedbacks.map(async (feedback) => {
-          if (feedback.profiles) return feedback;
-
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('nome')
-            .eq('id', feedback.user_id)
-            .single();
-
-          return {
-            ...feedback,
-            profiles: profile ? { nome: profile.nome } : { nome: 'Mentorado Deletado' },
-          };
-        })
-      );
-
-      setFeedbacks(feedbacksComNomes);
-    }
-
-    buscarNomesFaltantes();
-  }, [initialFeedbacks, supabase]);
 
   async function handleSalvarEdicao(feedbackId: string) {
     setSalvando(true);
