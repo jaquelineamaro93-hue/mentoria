@@ -199,7 +199,7 @@ Analise o currículo e a vaga desejada abaixo. Faça o raciocínio completo inte
     "motivo": por que isso faz um recrutador rejeitar o currículo em segundos,
     "correcao": a versão corrigida ou o que fazer,
   "palavras_chave_ausentes": array com as palavras-chave da vaga que faltam no currículo e deveriam ser incluídas,
-  "curriculo_final_markdown": string em markdown com o currículo reescrito, completo, pronto pra uso, com bullets de resultado e o melhor resumo profissional adaptado ao cargo, limite de 2 páginas,
+  "curriculo_final_markdown": string em markdown com o currículo final pronto para uso. Deve ser ATS-safe, em uma única coluna, sem tabelas, sem ícones, sem foto, sem caixas, sem barras laterais e sem elementos gráficos. Estruture em ordem: nome; linha de contato; resumo profissional; competências-chave somente quando agregarem valor; experiência profissional da mais recente para a mais antiga; formação; certificações ou idiomas quando relevantes. Use títulos simples, bullets curtos e evidências reais. Priorize as experiências mais recentes e mais aderentes à vaga, resumindo experiências antigas para manter o documento em NO MÁXIMO 2 páginas A4. Não ultrapasse aproximadamente 950 palavras. Não invente resultados, métricas, ferramentas, cargos ou datas. O texto deve ficar legível em fonte de corpo equivalente a 10,5 ou 11 pt,
   "carta_apresentacao_markdown": string em markdown com a carta de apresentação estratégica, no máximo 200 palavras, conectando a experiência da pessoa aos problemas que a vaga revela,
   "perguntas_entrevista": array com 5 perguntas prováveis de entrevista com base na vaga e no perfil da pessoa
 }
