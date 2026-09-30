@@ -8,11 +8,15 @@
   /* Paleta Vibrante SOMA */
   --color-black: #1A1A1A;
   --color-dark: #2D2D2D;
+  --color-dark-gray: #2D2D2D;
   --color-mint: #0D8071;
+  --color-mint-deep: #0D8071;
   --color-mint-light: rgba(13, 128, 113, 0.1);
   --color-mint-border: rgba(13, 128, 113, 0.2);
   --color-orange: #FFB366;
   --color-orange-light: rgba(255, 179, 102, 0.1);
+  --color-emerald-light: #ECFDF5;
+  --color-mustard-light: #FFFBEB;
   --color-rose: #FF7A8A;
   --color-rose-light: rgba(255, 122, 138, 0.1);
   --color-gray-light: #F9F9F9;
@@ -33,6 +37,22 @@
   --color-sky-tint: rgba(13, 128, 113, 0.1);
   --color-line: #E8E8E8;
   --color-line-soft: #F9F9F9;
+}
+
+
+/* Fallback crítico para CTAs da jornada.
+   Tailwind v4 lê tokens de @theme; estas regras garantem contraste mesmo
+   se uma utility customizada não for emitida ou houver CSS antigo em cache. */
+.bg-mint-deep {
+  background-color: #0D8071 !important;
+}
+
+.text-mint-deep {
+  color: #0D8071 !important;
+}
+
+.border-mint-deep {
+  border-color: #0D8071 !important;
 }
 
 html {
