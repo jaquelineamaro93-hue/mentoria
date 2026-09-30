@@ -33,7 +33,7 @@ export default function VagasClient({
   profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'> | null;
   embedded?: boolean;
 }) {
-  const [tab, setTab] = useState<Tab>('kanban');
+  const [tab, setTab] = useState<Tab>(embedded ? 'analise' : 'kanban');
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState(0);
