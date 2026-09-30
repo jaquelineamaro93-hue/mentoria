@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
         gaps: body.gaps ?? null,
         recomendacoes_curriculo: body.recomendacoes_curriculo ?? null,
         resumo: body.resumo ?? null,
+        cv_simulacao_id: body.cv_simulacao_id ?? null,
       })
       .select()
       .single();
