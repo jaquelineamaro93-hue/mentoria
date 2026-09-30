@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, ArrowLeft } from 'lucide-react';
+import { Plus, ArrowLeft, Search } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
@@ -32,6 +32,7 @@ export default function GerenciarPlanosClient({
   const [salvando, setSalvando] = useState<string | null>(null);
   const [mostrarFormPlano, setMostrarFormPlano] = useState(false);
   const [criandoPlano, setCriandoPlano] = useState(false);
+  const [buscaMentorado, setBuscaMentorado] = useState('');
   const [novoPlano, setNovoPlano] = useState({
     nome: '',
     duracaoMeses: '',
@@ -42,6 +43,14 @@ export default function GerenciarPlanosClient({
   });
 
   const planoMap = new Map(planos.map((p) => [p.id, p]));
+  const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
+  const mentoradosFiltrados = mentorados.filter((m) => {
+    if (!termoMentorado) return true;
+    return (
+      m.nome?.toLocaleLowerCase('pt-BR').includes(termoMentorado) ||
+      m.email?.toLocaleLowerCase('pt-BR').includes(termoMentorado)
+    );
+  });
 
   function formatarMoeda(valor: number | null | undefined) {
     if (valor === null || valor === undefined) return '—';
@@ -241,6 +250,22 @@ export default function GerenciarPlanosClient({
         </div>
       )}
 
+      <div className="mb-3">
+        <label className="relative block max-w-xl">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
+          <input
+            type="search"
+            value={buscaMentorado}
+            onChange={(e) => setBuscaMentorado(e.target.value)}
+            placeholder="Buscar mentorado por nome ou e-mail..."
+            className="w-full rounded-lg border border-gray-faint bg-white py-2.5 pl-9 pr-3 text-sm text-black focus:outline-none focus:border-mint-deep"
+          />
+        </label>
+        <p className="mt-1.5 text-xs text-gray-text">
+          {mentoradosFiltrados.length} de {mentorados.length} mentorados
+        </p>
+      </div>
+
       <div className="overflow-x-auto border border-gray-faint rounded-2xl">
         <table className="w-full text-sm">
           <thead>
@@ -259,7 +284,7 @@ export default function GerenciarPlanosClient({
             </tr>
           </thead>
           <tbody>
-            {mentorados.map((mentorado) => {
+            {mentoradosFiltrados.map((mentorado) => {
               const emEdicao = edicao[mentorado.id];
               const planoAtualId = emEdicao?.plano_id || mentorado.plano_id;
               const planoAtual = planoAtualId ? planoMap.get(planoAtualId) : null;
