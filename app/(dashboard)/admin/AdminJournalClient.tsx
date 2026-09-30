@@ -26,7 +26,13 @@ function labelTipo(tipo: DiarioAdminItem['tipo_encontro']) {
   return 'Registro';
 }
 
-export default function AdminJournalClient({ entries }: { entries: DiarioAdminItem[] }) {
+export default function AdminJournalClient({
+  entries,
+  showHeader = true,
+}: {
+  entries: DiarioAdminItem[];
+  showHeader?: boolean;
+}) {
   const [mentoradoId, setMentoradoId] = useState('todos');
   const [tipo, setTipo] = useState('todos');
   const [busca, setBusca] = useState('');
@@ -52,19 +58,21 @@ export default function AdminJournalClient({ entries }: { entries: DiarioAdminIt
   }, [entries, mentoradoId, tipo, busca]);
 
   return (
-    <section className="mb-10">
-      <div className="flex flex-col gap-1 mb-4">
-        <div className="flex items-center gap-2">
-          <NotebookPen size={18} className="text-mint-deep" />
-          <h2 className="font-display text-xl text-black">Diário de Bordo dos mentorados</h2>
-          <span className="text-xs px-2 py-1 rounded-full bg-mint-light border border-mint text-black">
-            {entries.length}
-          </span>
+    <section className={showHeader ? 'mb-10' : ''}>
+      {showHeader && (
+        <div className="flex flex-col gap-1 mb-4">
+          <div className="flex items-center gap-2">
+            <NotebookPen size={18} className="text-mint-deep" />
+            <h2 className="font-display text-xl text-black">Diário de Bordo dos mentorados</h2>
+            <span className="text-xs px-2 py-1 rounded-full bg-mint-light border border-mint text-black">
+              {entries.length}
+            </span>
+          </div>
+          <p className="text-sm text-gray-text">
+            Leia os registros antes de preparar o feedback e acompanhe mudanças de percepção, dúvidas e aprendizados ao longo da jornada.
+          </p>
         </div>
-        <p className="text-sm text-gray-text">
-          Leia os registros antes de preparar o feedback e acompanhe mudanças de percepção, dúvidas e aprendizados ao longo da jornada.
-        </p>
-      </div>
+      )}
 
       <div className="grid md:grid-cols-[1fr_220px_180px] gap-3 mb-4">
         <label className="relative">
