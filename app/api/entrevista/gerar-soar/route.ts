@@ -29,15 +29,71 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const [
+      { data: via },
+      { data: bussola },
+      { data: resumoPerfil },
+      { data: pdi },
+    ] = await Promise.all([
+      supabase
+        .from('via_resultados')
+        .select('forcas, analise_ia, data_teste')
+        .eq('user_id', user.id)
+        .order('data_teste', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('bussola_posicionamento')
+        .select('norte, sul, leste, oeste, centro, gerado_em')
+        .eq('user_id', user.id)
+        .order('gerado_em', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('resumo_perfil')
+        .select('conteudo_markdown, gerado_em')
+        .eq('user_id', user.id)
+        .order('gerado_em', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('pdi_respostas')
+        .select('secao, dados, concluido, updated_at')
+        .eq('user_id', user.id)
+        .eq('concluido', true)
+        .order('updated_at', { ascending: false })
+        .limit(8),
+    ]);
+
+    const contextoSoma = {
+      resumo_perfil: resumoPerfil?.conteudo_markdown ?? null,
+      forcas_via: via?.forcas ?? [],
+      analise_via: via?.analise_ia ?? null,
+      bussola: bussola ?? null,
+      pdi: (pdi ?? []).map((item) => ({
+        secao: item.secao,
+        texto: item.dados?.texto ?? null,
+      })),
+    };
+
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-    const prompt = `Você é um especialista em entrevistas corporativas. Analise o currículo e a descrição da vaga usando o framework SOAR (Situation, Obstacle, Action, Result).
+    const prompt = `Você é um especialista em entrevistas corporativas da Mentoria SOMA. Analise o currículo e a descrição da vaga usando o framework SOAR (Situation, Obstacle, Action, Result).
+
+REGRA DE EVIDÊNCIA:
+- Toda experiência, projeto, métrica, ferramenta, responsabilidade e resultado narrado deve existir explicitamente no CURRÍCULO.
+- O contexto SOMA (VIA, Bússola, PDI e resumo de perfil) serve para escolher ênfases, linguagem, motivadores e reflexões; ele NÃO prova experiência profissional.
+- Se faltar evidência para uma resposta, reconheça a lacuna e formule uma resposta segura, sem inventar.
+- Não transforme força de caráter em competência técnica nem aumente senioridade por inferência.
 
 CURRÍCULO:
 ${curriculo}
 
 DESCRIÇÃO DA VAGA:
 ${descricaoVaga}
+
+CONTEXTO SOMA DE AUTOCONHECIMENTO E DESENVOLVIMENTO:
+${JSON.stringify(contextoSoma, null, 2)}
 
 Responda SOMENTE com JSON válido, sem crases, sem markdown e sem texto antes ou depois, exatamente neste formato:
 {
@@ -74,7 +130,7 @@ Use tom natural e falado, como numa conversa profissional — nada de linguagem 
 
 DESTAQUES: dentro desses textos, marque com **asteriscos duplos** as métricas, números e decisões estratégicas mais importantes (ex.: "reduzi o churn em **32%**"). Use no máximo 3 destaques por texto, só no que realmente importa.
 
-Regras: no máximo 4 experiências (as mais relevantes para a vaga), exatamente 3 histórias âncora, "forca" é um número de 1 a 5. Seja específico, use números e métricas quando existirem no currículo, e conecte cada experiência com a vaga alvo. Escreva em português do Brasil.`;
+Regras: no máximo 4 experiências (as mais relevantes para a vaga), exatamente 3 histórias âncora, "forca" é um número de 1 a 5. Seja específico, use números e métricas SOMENTE quando existirem no currículo, e conecte cada experiência com a vaga alvo. O contexto SOMA pode ajudar a explicar motivadores e coerência de carreira, mas nunca pode criar fatos. Escreva em português do Brasil.`;
 
     const resposta = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
