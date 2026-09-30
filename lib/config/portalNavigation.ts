@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ListChecks, Compass, Sparkles, CalendarDays, Target,
   NotebookPen, TrendingUp, PlayCircle, Award, BriefcaseBusiness,
   Users, MessageCircle, MapPin, Gift, CreditCard, HelpCircle, FileText, ShieldCheck,
-  FileSearch, MessagesSquare,
+  FileSearch, MessageSquare,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -37,7 +37,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     label: 'Crescimento na empresa',
     items: [
       { href: '/primeiros-90-dias', label: 'Primeiros 90 dias', icon: CalendarDays },
-      { href: '/meu-pdi', label: 'PDI & plano de ação', icon: Target },
+      { href: '/meu-pdi', label: 'Plano de desenvolvimento', icon: Target },
       { href: '/minha-trilha', label: 'Minha evolução', icon: TrendingUp },
     ],
   },
@@ -47,7 +47,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     items: [
       { href: '/carreira?etapa=cv', label: 'Analisar currículo', icon: FileSearch },
       { href: '/carreira?etapa=vagas', label: 'Vagas & candidaturas', icon: BriefcaseBusiness },
-      { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessagesSquare },
+      { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessageSquare },
     ],
   },
   {
