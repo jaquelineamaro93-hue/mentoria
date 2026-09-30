@@ -28,13 +28,17 @@ const CORES_ALERTA: Record<string, string> = {
   azul: "#3DD9C8",
 };
 
+const KARINY_MORE_ID = "477ff931-0338-4e10-a307-98e8ead54111";
+
 export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
   const supabase = createClient();
+  const permitePdiParcial = mentoradoId === KARINY_MORE_ID;
   const [carregando, setCarregando] = useState(true);
   const [gerando, setGerando] = useState(false);
   const [plano, setPlano] = useState<Plano | null>(null);
   const [acoesPorPilar, setAcoesPorPilar] = useState<Record<string, Acao[]>>({});
   const [erro, setErro] = useState<string | null>(null);
+  const [progressoPdi, setProgressoPdi] = useState<{ respondidas: number; total: number } | null>(null);
 
   useEffect(() => {
     carregarPlano();
@@ -43,6 +47,20 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
 
   async function carregarPlano() {
     setCarregando(true);
+
+    if (permitePdiParcial) {
+      const [{ count: respondidas }, { count: total }] = await Promise.all([
+        supabase
+          .from("pdi_respostas")
+          .select("secao", { count: "exact", head: true })
+          .eq("user_id", mentoradoId)
+          .eq("concluido", true),
+        supabase
+          .from("pdi_guia_secoes")
+          .select("id", { count: "exact", head: true }),
+      ]);
+      setProgressoPdi({ respondidas: respondidas ?? 0, total: total ?? 20 });
+    }
 
     const { data: planoAtivo } = await supabase
       .from("pdi_planos")
@@ -114,9 +132,10 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
           <p className="display" style={{ fontSize: 24, color: "#1A1A1A", marginBottom: 12 }}>
             Seu plano ainda não foi gerado
           </p>
-          <p style={{ color: "#808080", maxWidth: 460, margin: "0 auto 28px" }}>
-            Você já preencheu as 20 seções do Meu PDI. Agora é só transformar isso em um plano com
-            caminho, prazos e ações que você consegue acompanhar mês a mês.
+          <p style={{ color: "#808080", maxWidth: 520, margin: "0 auto 28px" }}>
+            {permitePdiParcial
+              ? `Você já tem material suficiente para um plano inicial, mesmo com ${progressoPdi?.respondidas ?? 0} de ${progressoPdi?.total ?? 20} perguntas respondidas. O que ainda não foi preenchido fica em aberto para ser refinado depois.`
+              : "Você já preencheu as 20 seções do Meu PDI. Agora é só transformar isso em um plano com caminho, prazos e ações que você consegue acompanhar mês a mês."}
           </p>
           {erro && <p style={{ color: "#c85a4a", marginBottom: 16 }}>{erro}</p>}
           <button
@@ -132,13 +151,23 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
               cursor: "pointer",
             }}
           >
-            {gerando ? "Gerando seu plano..." : "Gerar meu plano"}
+            {gerando ? "Gerando seu plano..." : permitePdiParcial ? "Gerar plano inicial" : "Gerar meu plano"}
           </button>
         </div>
       )}
 
       {plano && (
         <>
+          {permitePdiParcial && (
+            <div className="mb-6 rounded-xl border border-mint bg-mint-light px-5 py-4">
+              <p className="text-sm font-medium text-black">Plano inicial com os dados já disponíveis</p>
+              <p className="text-xs text-gray-text mt-1 leading-relaxed">
+                Este plano foi construído sem exigir o preenchimento artificial das perguntas restantes.
+                Hoje ele considera {progressoPdi?.respondidas ?? 0} de {progressoPdi?.total ?? 20} respostas do PDI,
+                além dos materiais já registrados na SOMA. As próximas respostas podem refinar uma versão futura.
+              </p>
+            </div>
+          )}
           <header style={{ marginBottom: 40 }}>
             <p className="display" style={{ fontSize: 28, color: "#1A1A1A", margin: "0 0 6px" }}>
               Meu plano
