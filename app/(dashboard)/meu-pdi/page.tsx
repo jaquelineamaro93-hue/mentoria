@@ -3,11 +3,21 @@ import { createClient } from '@/lib/supabase/server';
 import MeuPdiClient from './MeuPdiClient';
 import type { PdiGuiaSecao, PdiResposta, Profile } from '@/lib/types';
 
-export default async function MeuPdiPage() {
+export default async function MeuPdiPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ aba?: string }>;
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect('/login');
+
+  const params = await searchParams;
+  const initialTab =
+    params.aba === 'plano' || params.aba === 'documentos' || params.aba === 'feedbacks'
+      ? params.aba
+      : 'perguntas';
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -36,6 +46,7 @@ export default async function MeuPdiPage() {
           profile={profile}
           secoes={secoes ?? []}
           respostasIniciais={respostas ?? []}
+          initialTab={initialTab}
         />
       </main>
     </div>
