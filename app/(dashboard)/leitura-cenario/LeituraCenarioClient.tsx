@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Compass, Loader2, Sparkles } from 'lucide-react';
+import { Compass, Loader2 } from 'lucide-react';
 import SomaAnalysisOutput, { type SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
 
 export default function LeituraCenarioClient({
