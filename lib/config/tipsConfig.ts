@@ -64,7 +64,7 @@ export const tipsConfig: Record<string, QuickTipData> = {
     title: 'Escolha o Tema do Encontro',
   },
   '/minha-trilha': {
-    title: 'Sua Trilha de Aprendizado',
+    title: 'Avalie sua experiência com a SOMA',
   },
   '/termos': {
     title: 'Termos da Mentoria',
