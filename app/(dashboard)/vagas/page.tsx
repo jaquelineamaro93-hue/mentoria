@@ -1,20 +1,5 @@
-import VagasClient from './VagasClient';
-import { createClient } from '@/lib/supabase/server';
-import type { Profile } from '@/lib/types';
+import { redirect } from 'next/navigation';
 
-export default async function VagasPage() {
-  const supabase = await createClient();
-  const { data: user } = await supabase.auth.getUser();
-
-  if (!user.user) {
-    return <div className="p-8">Não autenticado</div>;
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('nome, tipo_pacote, is_admin, foto_url')
-    .eq('id', user.user.id)
-    .single<Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'>>();
-
-  return <VagasClient profile={profile} />;
+export default function LegacyCareerRoute() {
+  redirect('/carreira?etapa=vagas');
 }
