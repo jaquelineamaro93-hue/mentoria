@@ -11,6 +11,7 @@ type Props = {
     o_que_travou: string | null;
     ajuste_para_o_proximo_mes: string | null;
   } | null;
+  onSaved?: () => void | Promise<void>;
 };
 
 const NOMES_MES = [
@@ -18,7 +19,7 @@ const NOMES_MES = [
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
 ];
 
-export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Props) {
+export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente, onSaved }: Props) {
   const [energia, setEnergia] = useState(reflexaoExistente?.energia ?? "");
   const [oQueAvancou, setOQueAvancou] = useState(reflexaoExistente?.o_que_avancou ?? "");
   const [oQueTravou, setOQueTravou] = useState(reflexaoExistente?.o_que_travou ?? "");
@@ -32,7 +33,7 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
   async function salvar() {
     setSalvando(true);
     try {
-      await fetch("/api/pdi/reflexao", {
+      const response = await fetch("/api/pdi/reflexao", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -44,7 +45,9 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
           ajusteParaProximoMes: ajuste,
         }),
       });
+      if (!response.ok) return;
       setSalvo(true);
+      await onSaved?.();
       setTimeout(() => setSalvo(false), 2500);
     } finally {
       setSalvando(false);
@@ -83,9 +86,9 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
             style={{
               padding: "6px 16px",
               borderRadius: 20,
-              border: "1px solid #FFB366",
-              background: energia === nivel ? "#FFB366" : "transparent",
-              color: energia === nivel ? "#FFFFFF" : "#FFB366",
+              border: "1px solid #0D8071",
+              background: energia === nivel ? "#0D8071" : "transparent",
+              color: energia === nivel ? "#FFFFFF" : "#0D8071",
               fontSize: 13,
               cursor: "pointer",
               textTransform: "capitalize",
@@ -133,7 +136,7 @@ export function ReflexaoMensal({ planoId, mesReferencia, reflexaoExistente }: Pr
           padding: "10px 24px",
           borderRadius: 8,
           border: "none",
-          background: "#3DD9C8",
+          background: "#0D8071",
           color: "#FFFFFF",
           fontSize: 14,
           cursor: "pointer",
