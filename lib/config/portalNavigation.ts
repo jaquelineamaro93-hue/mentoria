@@ -46,6 +46,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     items: [
       { href: '/carreira?etapa=cv', label: 'Analisar currículo', icon: FileSearch },
       { href: '/carreira?etapa=vagas', label: 'Vagas & candidaturas', icon: BriefcaseBusiness },
+      { href: '/network', label: 'Rede & oportunidades', icon: Users },
       { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessageSquare },
     ],
   },
@@ -60,7 +61,6 @@ export const portalNavGroups: PortalNavGroup[] = [
     id: 'comunidade',
     label: 'Comunidade',
     items: [
-      { href: '/network', label: 'Círculos de Influência', icon: Users },
       { href: '/feedback-pares', label: 'Feedback entre Colegas', icon: MessageCircle },
       { href: '/votar-encontro', label: 'Votar Encontro', icon: MapPin },
       { href: '/indique-um-amigo', label: 'Indique um Amigo', icon: Gift },
