@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, Shield, CheckCircle2, Circle } from 'lucide-react';
+import { Users, Shield, CheckCircle2, Circle, Search } from 'lucide-react';
 
 interface User {
   id: string;
@@ -15,6 +15,7 @@ interface User {
 export function UsuariosClient() {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busca, setBusca] = useState('');
 
   useEffect(() => {
     carregarUsuarios();
@@ -74,6 +75,14 @@ export function UsuariosClient() {
 
   const mentoradas = usuarios.filter(u => !u.is_admin);
   const totalOnboarding = mentoradas.filter(u => u.onboarding_concluido).length;
+  const termo = busca.trim().toLocaleLowerCase('pt-BR');
+  const usuariosFiltrados = usuarios.filter((u) => {
+    if (!termo) return true;
+    return (
+      u.nome?.toLocaleLowerCase('pt-BR').includes(termo) ||
+      u.email?.toLocaleLowerCase('pt-BR').includes(termo)
+    );
+  });
 
   return (
     <>
@@ -99,6 +108,20 @@ export function UsuariosClient() {
         )}
       </div>
 
+      <div>
+        <label className="relative block max-w-xl">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
+          <input
+            type="search"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por nome ou e-mail..."
+            className="w-full rounded-lg border border-gray-faint bg-white py-2.5 pl-9 pr-3 text-sm text-black focus:outline-none focus:border-mint-deep"
+          />
+        </label>
+        <p className="mt-1.5 text-xs text-gray-text">{usuariosFiltrados.length} de {usuarios.length} usuários</p>
+      </div>
+
       {loading ? (
         <div className="text-center py-8 text-gray-text">Carregando...</div>
       ) : (
@@ -113,7 +136,7 @@ export function UsuariosClient() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {usuarios.map((user) => (
+              {usuariosFiltrados.map((user) => (
                 <tr key={user.id} className="hover:bg-white/50">
                   <td className="px-6 py-4 text-sm text-black">{user.nome}</td>
                   <td className="px-6 py-4 text-sm text-gray-text">{user.email}</td>
@@ -150,6 +173,13 @@ export function UsuariosClient() {
                   </td>
                 </tr>
               ))}
+              {usuariosFiltrados.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-text">
+                    Nenhum usuário encontrado para “{busca}”.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

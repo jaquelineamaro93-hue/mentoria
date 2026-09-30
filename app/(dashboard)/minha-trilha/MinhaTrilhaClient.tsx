@@ -95,9 +95,16 @@ export default function MinhaTrilhaClient({
 
   return (
     <>
-      
+      <header className="mb-8">
+        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2">Sua experiência na SOMA</p>
+        <h1 className="font-display text-3xl text-black mb-2">Como está sendo a mentoria para você?</h1>
+        <p className="text-sm text-gray-text max-w-2xl leading-relaxed">
+          Uma vez por mês, conte como está sendo sua experiência, o que está funcionando e o que podemos melhorar.
+          Esse check-in é sobre a mentoria — não é uma avaliação do seu desempenho profissional.
+        </p>
+      </header>
 
-        <div className="relative pl-8 space-y-8">
+      <div className="relative pl-8 space-y-8">
           <div className="absolute left-[11px] top-2 bottom-2 w-px bg-line" />
 
           {meses.map(({ referencia, indice }) => {
@@ -172,13 +179,13 @@ export default function MinhaTrilhaClient({
                     <textarea
                       value={feedbackTexto}
                       onChange={(e) => setFeedbackTexto(e.target.value)}
-                      placeholder="Como está sendo a mentoria para você esse mês? *"
+                      placeholder="O que funcionou bem para você na mentoria este mês? O que poderia ser diferente? *"
                       className="w-full text-sm border border-gray-faint rounded-lg px-3 py-2 min-h-[70px] focus:outline-none focus:border-brown-deep"
                     />
                     <textarea
                       value={sugestaoMelhoria}
                       onChange={(e) => setSugestaoMelhoria(e.target.value)}
-                      placeholder="Alguma sugestão de melhoria? (opcional)"
+                      placeholder="O que podemos melhorar na experiência da SOMA? (opcional)"
                       className="w-full text-sm border border-gray-faint rounded-lg px-3 py-2 min-h-[60px] focus:outline-none focus:border-brown-deep"
                     />
                     {erro && <p className="text-xs text-red-600">{erro}</p>}
@@ -198,7 +205,7 @@ export default function MinhaTrilhaClient({
               </div>
             );
           })}
-        </div>
+      </div>
     </>
   );
 }
