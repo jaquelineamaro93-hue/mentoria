@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X } from 'lucide-react';
 import { useSidebar } from '@/lib/contexts/SidebarContext';
 import { useUser } from '@/lib/contexts/UserContext';
@@ -15,6 +15,8 @@ export default function CollapsibleSidebar() {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
   const { profile, initials, isLoading } = useUser();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentSearch = searchParams.toString();
   const router = useRouter();
   const compact = isCollapsed && !isMobile;
   const sidebar = useRef<HTMLElement>(null);
@@ -73,7 +75,7 @@ export default function CollapsibleSidebar() {
   }
 
   function navLink(item: PortalNavItem) {
-    const active = isPortalRouteActive(pathname, item.href);
+    const active = isPortalRouteActive(pathname, item.href, currentSearch);
     const Icon = item.icon;
     return <Link key={item.href} href={item.href} prefetch={false} onClick={closeMobileSidebar}
       className={`${styles.navLink} ${active ? styles.active : ''}`}
@@ -111,7 +113,7 @@ export default function CollapsibleSidebar() {
         </div>
         {portalNavGroups.map((group) => {
           // A group containing the current page stays discoverable, even after a saved collapse.
-          const containsActive = group.items.some((item) => isPortalRouteActive(pathname, item.href));
+          const containsActive = group.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch));
           const open = compact || containsActive || !closedGroups[group.id];
           return <section key={group.id} className={styles.navGroup} aria-label={group.label}>
             {!compact && <button type="button" className={styles.groupToggle}
