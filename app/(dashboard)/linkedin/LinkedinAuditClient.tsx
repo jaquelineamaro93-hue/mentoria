@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, Linkedin, Loader2, Search, Sparkles, Upload } from 'lucide-react';
+import { Loader2, Sparkles, Upload } from 'lucide-react';
 import { extrairTextoPdf } from '@/lib/pdf';
 import SomaAnalysisOutput, { type SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
 
