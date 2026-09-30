@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FileText, MessageSquare, Plus, Trash2, ExternalLink, HelpCircle, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { PlanoGerado } from '@/components/pdi/PlanoGerado';
 import PdiClientContent from './PdiClientContent';
@@ -14,136 +13,85 @@ interface MeuPdiClientProps {
   profile: Profile | null;
   secoes: PdiGuiaSecao[];
   respostasIniciais: PdiResposta[];
+  initialTab?: Tab;
 }
 
 type Tab = 'perguntas' | 'plano' | 'documentos' | 'feedbacks';
 
 
-function CheckinMensal({ userId }: { userId: string }) {
+export default function MeuPdiClient({
+  userId,
+  profile,
+  secoes,
+  respostasIniciais,
+  initialTab = 'perguntas',
+}: MeuPdiClientProps) {
   const supabase = createClient();
-  const [nota, setNota] = useState(0);
-  const [hoverNota, setHoverNota] = useState(0);
-  const [feedbackTexto, setFeedbackTexto] = useState('');
-  const [sugestao, setSugestao] = useState('');
-  const [salvando, setSalvando] = useState(false);
-  const [sucesso, setSucesso] = useState(false);
-  const [erro, setErro] = useState('');
-  const [historico, setHistorico] = useState<any[]>([]);
-  const [carregando, setCarregando] = useState(true);
-  const mesAtual = new Date().toISOString().slice(0, 7);
-
-  useState(() => { carregarHistorico(); });
-
-  async function carregarHistorico() {
-    const { data } = await supabase.from('checkins_mensais').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-    setHistorico(data ?? []);
-    setCarregando(false);
-  }
-
-  const jaEnviouEsteMes = historico.some(c => c.mes_referencia === mesAtual);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (nota === 0) { setErro('Selecione uma nota de 1 a 5'); return; }
-    if (!feedbackTexto.trim()) { setErro('Por favor, escreva sobre sua experiencia este mes'); return; }
-    setSalvando(true); setErro('');
-    const res = await fetch('/api/checkin-mensal', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mes_referencia: mesAtual, nota, feedback_texto: feedbackTexto || null, sugestao_melhoria: sugestao || null }),
-    });
-    if (res.ok) { setSucesso(true); setNota(0); setFeedbackTexto(''); setSugestao(''); carregarHistorico(); }
-    else { const d = await res.json(); setErro(d.error || 'Erro ao enviar'); }
-    setSalvando(false);
-  }
-
-  return (
-    <div>
-      <h2 className="text-2xl font-medium text-black mb-6">Diário de Feedbacks</h2>
-      {!jaEnviouEsteMes ? (
-        <div className="bg-white border border-gray-faint rounded-xl p-6 mb-8">
-          <h3 className="font-medium text-black mb-1">Check-in deste mês</h3>
-          <p className="text-xs text-gray-text mb-4">{new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
-          {sucesso && <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-sm text-green-700">Feedback enviado!</div>}
-          {erro && <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-600">{erro}</div>}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-text mb-2">Como voce avalia sua evolucao este mes?</label>
-              <div className="flex gap-2">
-                {[1,2,3,4,5].map((n) => (
-                  <button key={n} type="button" onClick={() => setNota(n)} onMouseEnter={() => setHoverNota(n)} onMouseLeave={() => setHoverNota(0)} className="p-1">
-                    <Star size={28} className={(hoverNota || nota) >= n ? 'fill-amber-400 text-amber-400' : 'text-line'} />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-text mb-2">Como esta sendo sua experiencia na mentoria?</label>
-              <textarea value={feedbackTexto} onChange={(e) => setFeedbackTexto(e.target.value)} className="w-full border border-gray-faint rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-brown-deep resize-none" rows={3} placeholder="Compartilhe como esta sendo sua jornada..." />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-text mb-2">Alguma sugestao de melhoria?</label>
-              <textarea value={sugestao} onChange={(e) => setSugestao(e.target.value)} className="w-full border border-gray-faint rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-brown-deep resize-none" rows={2} placeholder="O que poderia ser diferente?" />
-            </div>
-            <button type="submit" disabled={salvando} className="bg-brown-deep text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-brown transition-colors disabled:opacity-50">
-              {salvando ? 'Enviando...' : 'Enviar feedback'}
-            </button>
-          </form>
-        </div>
-      ) : (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-8 text-sm text-green-700">Voce ja enviou seu check-in deste mes!</div>
-      )}
-      {!carregando && historico.length > 0 && (
-        <div>
-          <h3 className="font-medium text-black mb-4">Historico de check-ins</h3>
-          <div className="space-y-3">
-            {historico.map((c) => (
-              <div key={c.id} className="bg-white border border-gray-faint rounded-xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-gray-text">{new Date(c.mes_referencia + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
-                  <div className="flex gap-0.5">{[1,2,3,4,5].map((n) => (<Star key={n} size={12} className={n <= c.nota ? 'fill-amber-400 text-amber-400' : 'text-line'} />))}</div>
-                </div>
-                {c.feedback_texto && <p className="text-sm text-black mb-1">{c.feedback_texto}</p>}
-                {c.sugestao_melhoria && <p className="text-xs text-gray-text">Sugestao: {c.sugestao_melhoria}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function MeuPdiClient({ userId, profile, secoes, respostasIniciais }: MeuPdiClientProps) {
-  const router = useRouter();
-  const supabase = createClient();
-  const [activeTab, setActiveTab] = useState<Tab>('perguntas');
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [documentos, setDocumentos] = useState<any[]>([]);
+  const [carregandoDocumentos, setCarregandoDocumentos] = useState(true);
+  const [erroDocumento, setErroDocumento] = useState('');
   const [nomDoc, setNomDoc] = useState('');
   const [categoria, setCategoria] = useState('Currículo');
   const [urlDoc, setUrlDoc] = useState('');
 
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.push('/login');
-    router.refresh();
-  }
+  useEffect(() => {
+    let ativo = true;
+    async function carregarDocumentos() {
+      setCarregandoDocumentos(true);
+      const { data, error } = await supabase
+        .from('documentos_mentorado')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
 
-  const handleAddDocumento = () => {
+      if (!ativo) return;
+      if (error) setErroDocumento('Não foi possível carregar seus documentos.');
+      else setDocumentos(data ?? []);
+      setCarregandoDocumentos(false);
+    }
+    carregarDocumentos();
+    return () => { ativo = false; };
+  }, [userId, supabase]);
+
+  const handleAddDocumento = async () => {
     if (!nomDoc.trim() || !urlDoc.trim()) return;
-    setDocumentos([...documentos, {
-      id: Date.now(),
-      nome: nomDoc,
-      categoria,
-      url: urlDoc,
-      data: new Date().toLocaleDateString('pt-BR'),
-    }]);
+    setErroDocumento('');
+
+    const { data, error } = await supabase
+      .from('documentos_mentorado')
+      .insert({
+        user_id: userId,
+        nome: nomDoc.trim(),
+        categoria,
+        url: urlDoc.trim(),
+      })
+      .select()
+      .single();
+
+    if (error || !data) {
+      setErroDocumento('Não foi possível salvar o documento. Confira o link e tente novamente.');
+      return;
+    }
+
+    setDocumentos((prev) => [data, ...prev]);
     setNomDoc('');
     setUrlDoc('');
   };
 
-  const handleDeleteDocumento = (id: number) => {
-    setDocumentos(documentos.filter(d => d.id !== id));
+  const handleDeleteDocumento = async (id: string) => {
+    setErroDocumento('');
+    const { error } = await supabase
+      .from('documentos_mentorado')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) {
+      setErroDocumento('Não foi possível remover o documento.');
+      return;
+    }
+    setDocumentos((prev) => prev.filter((d) => d.id !== id));
   };
 
   return (
@@ -154,7 +102,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
             onClick={() => setActiveTab('perguntas')}
             className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
               activeTab === 'perguntas'
-                ? 'border-b-2 border-brown-deep text-black'
+                ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
@@ -165,7 +113,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
             onClick={() => setActiveTab('plano')}
             className={`pb-4 text-sm font-medium transition-colors ${
               activeTab === 'plano'
-                ? 'border-b-2 border-brown-deep text-black'
+                ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
@@ -175,7 +123,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
             onClick={() => setActiveTab('documentos')}
             className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
               activeTab === 'documentos'
-                ? 'border-b-2 border-brown-deep text-black'
+                ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
@@ -186,7 +134,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
             onClick={() => setActiveTab('feedbacks')}
             className={`flex items-center gap-2 pb-4 text-sm font-medium transition-colors ${
               activeTab === 'feedbacks'
-                ? 'border-b-2 border-brown-deep text-black'
+                ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
@@ -216,12 +164,12 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">Nome do Documento</label>
-                  <input type="text" value={nomDoc} onChange={(e) => setNomDoc(e.target.value)} placeholder="Ex: CV Atualizado" className="w-full border border-gray-faint rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brown-deep" />
+                  <input type="text" value={nomDoc} onChange={(e) => setNomDoc(e.target.value)} placeholder="Ex: CV Atualizado" className="w-full border border-gray-faint rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mint-deep/30" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">Categoria</label>
-                    <select value={categoria} onChange={(e) => setCategoria(e.target.value)} className="w-full border border-gray-faint rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brown-deep">
+                    <select value={categoria} onChange={(e) => setCategoria(e.target.value)} className="w-full border border-gray-faint rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mint-deep/30">
                       <option>Currículo</option>
                       <option>Assessment</option>
                       <option>Processos</option>
@@ -231,17 +179,28 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">URL / Link</label>
-                    <input type="url" value={urlDoc} onChange={(e) => setUrlDoc(e.target.value)} placeholder="https://drive.google.com/..." className="w-full border border-gray-faint rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brown-deep" />
+                    <input type="url" value={urlDoc} onChange={(e) => setUrlDoc(e.target.value)} placeholder="https://drive.google.com/..." className="w-full border border-gray-faint rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mint-deep/30" />
                   </div>
                 </div>
-                <button onClick={handleAddDocumento} className="flex items-center gap-2 bg-brown-deep hover:bg-brown text-white px-6 py-2 rounded-lg transition-colors">
+                <button onClick={handleAddDocumento} className="flex items-center gap-2 bg-mint-deep hover:opacity-90 text-white px-6 py-2 rounded-lg transition-colors">
                   <Plus size={16} />
                   Adicionar Documento
                 </button>
               </div>
             </div>
 
-            {documentos.length === 0 ? (
+            {erroDocumento && (
+              <p className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                {erroDocumento}
+              </p>
+            )}
+
+            {carregandoDocumentos ? (
+              <div className="flex items-center justify-center gap-2 py-12 text-sm text-gray-text">
+                <Loader2 size={16} className="animate-spin" />
+                Carregando documentos...
+              </div>
+            ) : documentos.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-xl border border-gray-faint border-dashed">
                 <FileText size={32} className="mb-3 text-gray-text" />
                 <p className="text-gray-text">Nenhum documento ou anexo adicionado ainda</p>
@@ -262,7 +221,7 @@ export default function MeuPdiClient({ userId, profile, secoes, respostasIniciai
                       <tr key={doc.id} className="border-b border-gray-faint hover:bg-white">
                         <td className="px-6 py-4 text-black">{doc.nome}</td>
                         <td className="px-6 py-4"><span className="inline-block px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700">{doc.categoria}</span></td>
-                        <td className="px-6 py-4 text-gray-text">{doc.data}</td>
+                        <td className="px-6 py-4 text-gray-text">{new Date(doc.created_at).toLocaleDateString('pt-BR')}</td>
                         <td className="px-6 py-4">
                           <div className="flex gap-3">
                             <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-white rounded"><ExternalLink size={16} className="text-black" /></a>
