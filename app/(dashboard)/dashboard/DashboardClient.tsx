@@ -21,6 +21,8 @@ import {
   TrendingUp,
   Calendar,
   MessageSquare,
+  BriefcaseBusiness,
+  FileSearch,
 } from 'lucide-react';
 import { Tooltip } from '@/components/Tooltip';
 import { Panel, Eyebrow } from '@/components/Panel';
@@ -48,6 +50,11 @@ interface Props {
   journalNotes: JournalNote[];
   votacaoAtiva: boolean;
   feedbacks?: any[];
+  careerJourney?: {
+    cvAnalyses: Array<{ id: string; resultado_json: any; created_at: string }>;
+    applications: Array<{ id: string; empresa: string; cargo: string; etapa: string; fit_score: number | null; updated_at: string }>;
+    soarAnalyses: Array<{ id: string; titulo: string | null; created_at: string }>;
+  };
 }
 
 const DRIVE_URL = 'https://drive.google.com/';
@@ -79,6 +86,7 @@ export default function DashboardClient({
   journalNotes,
   votacaoAtiva,
   feedbacks = [],
+  careerJourney = { cvAnalyses: [], applications: [], soarAnalyses: [] },
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -203,6 +211,25 @@ export default function DashboardClient({
 
   const etapasConcluidas = [quemSouCompleto, viaCompleto, bussolaCompleto, pdiCompleto].filter(Boolean).length;
   const pontosTotais = profile?.pontos_total ?? 0;
+
+  const fitAtual =
+    typeof careerJourney.cvAnalyses[0]?.resultado_json?.fit_percentual === 'number'
+      ? careerJourney.cvAnalyses[0].resultado_json.fit_percentual
+      : null;
+  const fitAnterior =
+    typeof careerJourney.cvAnalyses[1]?.resultado_json?.fit_percentual === 'number'
+      ? careerJourney.cvAnalyses[1].resultado_json.fit_percentual
+      : null;
+  const fitDelta = fitAtual !== null && fitAnterior !== null ? fitAtual - fitAnterior : null;
+  const ultimoInsightDiario = journalNotes.find((note) => note.ai_summary)?.ai_summary ?? null;
+
+  const insightEvolucao = fitAtual === null
+    ? viaCompleto || bussolaCompleto
+      ? 'Seu autoconhecimento já começou a ganhar forma. O próximo passo é testar essa direção em uma vaga real para transformar percepção em evidência de mercado.'
+      : 'Comece pelos mapeamentos de autoconhecimento. Conforme você avança, a SOMA passa a conectar esses sinais com vagas, CV e entrevistas.'
+    : fitDelta !== null
+      ? `Na análise de vaga mais recente, seu fit foi de ${fitAtual}% (${fitDelta >= 0 ? '+' : ''}${fitDelta} p.p. versus a análise anterior). Essa variação mede aderência às vagas analisadas — não seu valor profissional — e ajuda a entender onde sua narrativa está ficando mais alinhada.`
+      : `Seu primeiro ponto de referência de carreira já existe: ${fitAtual}% de aderência na análise mais recente. Nas próximas vagas, a SOMA vai comparar a evolução desse sinal com seu posicionamento e sua preparação.`;
 
   return (
     <>
@@ -354,6 +381,80 @@ export default function DashboardClient({
                 <Award size={12} strokeWidth={1.5} />
                 {conquistasObtidas.length} selo{conquistasObtidas.length !== 1 ? 's' : ''} conquistado{conquistasObtidas.length !== 1 ? 's' : ''}
               </span>
+            </div>
+          </Panel>
+        </section>
+
+        {/* Evolução integrada: autoconhecimento + carreira */}
+        <section className="mb-8">
+          <Eyebrow>
+            <TrendingUp size={13} strokeWidth={1.5} /> Evolução da sua jornada
+          </Eyebrow>
+          <Panel className="overflow-hidden border-gray-faint">
+            <div className="grid lg:grid-cols-2">
+              <div className="p-5 md:p-6 border-b lg:border-b-0 lg:border-r border-gray-faint">
+                <div className="flex items-center gap-2 mb-4">
+                  <Compass size={18} className="text-mint-deep" />
+                  <p className="text-sm font-semibold text-black">Autoconhecimento</p>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-gray-text">Forças VIA</span>
+                    <strong className="text-black">{viaResultado?.forcas?.length ? viaResultado.forcas.slice(0, 3).join(' · ') : 'A mapear'}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-gray-text">Bússola</span>
+                    <strong className="text-black">{bussolaCompleto ? 'Definida' : 'Pendente'}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-gray-text">PDI</span>
+                    <strong className="text-black">{pdiConcluidas}/{pdiTotal || '—'} seções</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-gray-text">Reflexões</span>
+                    <strong className="text-black">{journalNotes.length} registros recentes</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 md:p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <BriefcaseBusiness size={18} className="text-mint-deep" />
+                  <p className="text-sm font-semibold text-black">Aplicação na carreira</p>
+                </div>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div>
+                    <p className="text-2xl font-display text-black">{fitAtual ?? '—'}</p>
+                    <p className="text-xs text-gray-text">{fitAtual !== null ? '% fit recente' : 'fit a gerar'}</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-display text-black">{careerJourney.applications.length}</p>
+                    <p className="text-xs text-gray-text">candidaturas</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-display text-black">{careerJourney.soarAnalyses.length}</p>
+                    <p className="text-xs text-gray-text">SOARs</p>
+                  </div>
+                </div>
+                <Link
+                  href="/carreira"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-black hover:text-mint-deep transition"
+                >
+                  <FileSearch size={15} />
+                  Abrir jornada de carreira
+                </Link>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-faint bg-mint-light/35 p-5 md:px-6">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1">Insight de evolução</p>
+              <p className="text-sm text-black leading-relaxed">{insightEvolucao}</p>
+              {ultimoInsightDiario && (
+                <p className="mt-3 pt-3 border-t border-mint/50 text-sm text-gray-text whitespace-pre-wrap line-clamp-4">
+                  <span className="font-medium text-black">Último insight do Diário: </span>
+                  {ultimoInsightDiario}
+                </p>
+              )}
             </div>
           </Panel>
         </section>
