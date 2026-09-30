@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import MinhaTrilhaClient from './MinhaTrilhaClient';
 import type { CheckinMensal, PlanoMentoria, Profile } from '@/lib/types';
+
+export const metadata: Metadata = {
+  title: 'Avaliar a mentoria | SOMA',
+  description: 'Check-in mensal sobre sua experiência com a Mentoria SOMA.',
+};
 
 export default async function MinhaTrilhaPage() {
   const supabase = await createClient();
