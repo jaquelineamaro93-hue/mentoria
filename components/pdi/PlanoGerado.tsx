@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AcaoItem, type Acao } from "@/components/pdi/AcaoItem";
 import { RoadmapTimeline } from "@/components/pdi/RoadmapTimeline";
-import { ReflexaoMensal } from "@/components/pdi/ReflexaoMensal";
 
 type Pilar = {
   titulo: string;
@@ -112,10 +111,6 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
       setGerando(false);
     }
   }
-
-  const primeiroDiaDoMes = new Date();
-  primeiroDiaDoMes.setDate(1);
-  const mesReferencia = primeiroDiaDoMes.toISOString().slice(0, 10);
 
   if (carregando) {
     return (
@@ -236,15 +231,6 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
             </div>
           </section>
 
-          <section>
-            <p style={{ fontSize: 12, letterSpacing: "0.1em", color: "#999999", marginBottom: 16 }}>
-              CHECK-IN MENSAL
-            </p>
-            <ReflexaoMensal
-              planoId={plano.id}
-              mesReferencia={mesReferencia}
-            />
-          </section>
         </>
       )}
     </div>
