@@ -17,6 +17,10 @@ export const tipsConfig: Record<string, QuickTipData> = {
   '/diario': {
     title: 'Reflita sua Jornada',
   },
+  '/carreira': {
+    title: 'Sua Jornada de Carreira',
+    description: 'CV, vagas e preparação para entrevistas conectados em um único fluxo.',
+  },
   '/vagas': {
     title: 'Gerencie suas Candidaturas',
   },

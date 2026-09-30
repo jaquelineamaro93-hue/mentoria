@@ -29,6 +29,13 @@ interface AnaliseSalva {
   analise: AnaliseSoar;
 }
 
+interface CandidaturaOption {
+  id: string;
+  empresa: string;
+  cargo: string;
+  descricao_vaga: string | null;
+}
+
 interface AnaliseSoar {
   experiencias: SOARExperiencia[];
   mapaCompetencias: Record<string, string>;
@@ -60,12 +67,27 @@ function Texto({ children, className }: { children: string; className?: string }
   );
 }
 
-export default function EntrevistaClient({ userId, profile }: { userId: string; profile: Profile | null }) {
+export default function EntrevistaClient({
+  userId,
+  profile,
+  embedded = false,
+  initialCurriculo = '',
+  initialDescricaoVaga = '',
+  applications = [],
+}: {
+  userId: string;
+  profile: Profile | null;
+  embedded?: boolean;
+  initialCurriculo?: string;
+  initialDescricaoVaga?: string;
+  applications?: CandidaturaOption[];
+}) {
   const router = useRouter();
   const supabase = createClient();
   const [aba, setAba] = useState<'novo' | 'minhas'>('novo');
-  const [curriculo, setCurriculo] = useState('');
-  const [descricaoVaga, setDescricaoVaga] = useState('');
+  const [curriculo, setCurriculo] = useState(initialCurriculo);
+  const [descricaoVaga, setDescricaoVaga] = useState(initialDescricaoVaga);
+  const [candidaturaId, setCandidaturaId] = useState('');
   const [analise, setAnalise] = useState<AnaliseSoar | null>(null);
   const [gerando, setGerando] = useState(false);
   const [copiado, setCopiado] = useState<string | null>(null);
@@ -118,6 +140,13 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
     router.refresh();
   }
 
+  const handleSelecionarCandidatura = (id: string) => {
+    setCandidaturaId(id);
+    if (!id) return;
+    const candidatura = applications.find((item) => item.id === id);
+    if (candidatura?.descricao_vaga) setDescricaoVaga(candidatura.descricao_vaga);
+  };
+
   const handleGerarSOAR = async () => {
     if (!curriculo.trim() || !descricaoVaga.trim()) {
       alert('Preencha seu currículo e a descrição da vaga');
@@ -152,6 +181,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
           curriculo,
           descricao_vaga: descricaoVaga,
           analise: data.analise,
+          candidatura_id: candidaturaId || null,
         })
         .select('id, titulo, created_at, analise')
         .single();
@@ -183,22 +213,35 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
 
   return (
     <>
-      <main className="w-full px-6 py-10 md:px-12">
-        <Eyebrow>
-          <Sparkles size={14} />
-          Preparação para Entrevistas
-        </Eyebrow>
-        <h1 className="font-display text-3xl text-black mb-1">SOAR Builder</h1>
-        <p className="text-sm text-gray-text mb-8">
-          Mapeie suas experiências com o framework SOAR e receba respostas prontas para entrevistas.
-        </p>
+      <main className={embedded ? 'w-full' : 'w-full px-6 py-10 md:px-12'}>
+        {!embedded && (
+          <>
+            <Eyebrow>
+              <Sparkles size={14} />
+              Preparação para entrevistas
+            </Eyebrow>
+            <h1 className="font-display text-3xl text-black mb-1">SOAR Builder</h1>
+            <p className="text-sm text-gray-text mb-8">
+              Mapeie suas experiências com o framework SOAR e prepare respostas para entrevistas.
+            </p>
+          </>
+        )}
+
+        {embedded && (initialCurriculo || initialDescricaoVaga) && (
+          <Panel className="p-4 mb-6 border-mint bg-mint-light/40">
+            <p className="text-sm font-medium text-black">A SOMA trouxe o contexto da etapa anterior</p>
+            <p className="text-sm text-gray-text mt-1">
+              Seu currículo e a vaga da análise mais recente já estão preenchidos abaixo. Revise se quiser e gere sua preparação SOAR.
+            </p>
+          </Panel>
+        )}
 
         <div className="flex gap-4 mb-8 border-b border-gray-faint">
           <button
             onClick={() => setAba('novo')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'novo'
-                ? 'border-b-2 border-brown text-black'
+                ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
@@ -209,7 +252,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
             onClick={() => setAba('minhas')}
             className={`pb-3 px-4 font-medium transition ${
               aba === 'minhas'
-                ? 'border-b-2 border-brown text-black'
+                ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
@@ -234,6 +277,29 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
               </div>
             </Panel>
 
+            {applications.length > 0 && (
+              <Panel className="p-5">
+                <label className="block">
+                  <span className="block text-sm font-medium text-black mb-2">Preparar para uma candidatura salva</span>
+                  <select
+                    value={candidaturaId}
+                    onChange={(event) => handleSelecionarCandidatura(event.target.value)}
+                    className="w-full bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
+                  >
+                    <option value="">Usar apenas a vaga preenchida abaixo</option>
+                    {applications.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.cargo} · {item.empresa}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="block text-xs text-gray-text mt-2">
+                    Ao escolher uma candidatura, a descrição da vaga é reaproveitada e o SOAR fica ligado a esse processo.
+                  </span>
+                </label>
+              </Panel>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Panel className="p-6">
                 <h3 className="font-medium text-black mb-3 flex items-center gap-2">
@@ -244,7 +310,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                   value={curriculo}
                   onChange={(e) => setCurriculo(e.target.value)}
                   placeholder="Cole suas experiências profissionais aqui:&#10;- Período, Empresa, Cargo&#10;- O que você fez&#10;- Resultados quantificáveis&#10;- Projetos relevantes&#10;&#10;Quanto mais detalhado, melhor a análise!"
-                  className="w-full h-72 p-4 border border-gray-faint rounded-lg font-mono text-sm focus:outline-none focus:border-brown resize-none bg-white"
+                  className="w-full h-72 p-4 border border-gray-faint rounded-lg font-mono text-sm focus:outline-none focus:border-mint-deep resize-none bg-white"
                 />
               </Panel>
 
@@ -257,7 +323,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                   value={descricaoVaga}
                   onChange={(e) => setDescricaoVaga(e.target.value)}
                   placeholder="Cole a descrição completa da vaga aqui:&#10;- Responsabilidades&#10;- Requisitos&#10;- Diferenciais&#10;- Valores da empresa&#10;- Benefícios"
-                  className="w-full h-72 p-4 border border-gray-faint rounded-lg font-mono text-sm focus:outline-none focus:border-brown resize-none bg-white"
+                  className="w-full h-72 p-4 border border-gray-faint rounded-lg font-mono text-sm focus:outline-none focus:border-mint-deep resize-none bg-white"
                 />
               </Panel>
             </div>
@@ -266,7 +332,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
               <button
                 onClick={handleGerarSOAR}
                 disabled={gerando || !curriculo.trim() || !descricaoVaga.trim()}
-                className="bg-brown-deep text-white px-8 py-3 rounded-lg font-medium hover:bg-brown transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-mint-deep text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {gerando ? (
                   <>
@@ -298,7 +364,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                       className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
                         selecionada === item.id
                           ? 'bg-mint-light border-mint text-black'
-                          : 'bg-white border-gray-faint text-gray-text hover:border-brown-deep'
+                          : 'bg-white border-gray-faint text-gray-text hover:border-mint'
                       }`}
                     >
                       <button
@@ -329,7 +395,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                 <p className="text-gray-text mb-4">Nenhuma análise SOAR gerada ainda</p>
                 <button
                   onClick={() => setAba('novo')}
-                  className="text-black hover:text-orange transition underline font-medium"
+                  className="text-black hover:text-mint-deep transition underline font-medium"
                 >
                   Gerar sua primeira análise
                 </button>
@@ -355,7 +421,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                           className={`text-xs font-medium flex items-center gap-1 transition ${
                             copiado === historia
                               ? 'text-green-700'
-                              : 'text-black hover:text-brown'
+                              : 'text-black hover:text-mint-deep'
                           }`}
                         >
                           {copiado === historia ? (
@@ -386,7 +452,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                         className={`text-xs font-medium flex items-center gap-1 transition ${
                           copiado === analise.resposta_por_que_sair
                             ? 'text-green-700'
-                            : 'text-black hover:text-brown'
+                            : 'text-black hover:text-mint-deep'
                         }`}
                       >
                         {copiado === analise.resposta_por_que_sair ? (
@@ -411,7 +477,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                         className={`text-xs font-medium flex items-center gap-1 transition ${
                           copiado === analise.resposta_por_que_vaga
                             ? 'text-green-700'
-                            : 'text-black hover:text-brown'
+                            : 'text-black hover:text-mint-deep'
                         }`}
                       >
                         {copiado === analise.resposta_por_que_vaga ? (
@@ -436,7 +502,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                         className={`text-xs font-medium flex items-center gap-1 transition ${
                           copiado === analise.tratamento_gaps
                             ? 'text-green-700'
-                            : 'text-black hover:text-brown'
+                            : 'text-black hover:text-mint-deep'
                         }`}
                       >
                         {copiado === analise.tratamento_gaps ? (
@@ -476,7 +542,7 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                           type="button"
                           onClick={() => setExpandida(expandida === idx ? null : idx)}
                           aria-expanded={expandida === idx}
-                          className="flex items-center gap-1.5 text-sm font-medium text-black hover:text-orange transition"
+                          className="flex items-center gap-1.5 text-sm font-medium text-black hover:text-mint-deep transition"
                         >
                           {expandida === idx ? (
                             <ChevronUp size={16} />
@@ -512,13 +578,13 @@ export default function EntrevistaClient({ userId, profile }: { userId: string; 
                 </Panel>
 
                 <div className="flex justify-center gap-3">
-                  <button className="flex items-center gap-2 bg-brown-deep text-white px-6 py-2 rounded-lg font-medium hover:bg-brown transition">
+                  <button className="flex items-center gap-2 bg-mint-deep text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
                     <Download size={18} />
                     Baixar em PDF
                   </button>
                   <button
                     onClick={() => setAba('novo')}
-                    className="border border-brown-deep text-black px-6 py-2 rounded-lg font-medium hover:bg-white transition"
+                    className="border border-mint-deep text-black px-6 py-2 rounded-lg font-medium hover:bg-white transition"
                   >
                     + Gerar novo SOAR
                   </button>

@@ -57,9 +57,16 @@ export async function POST(request: NextRequest) {
         cargo: body.cargo,
         descricao_vaga: body.descricao_vaga,
         link_vaga: body.link_vaga,
-        proximo_passo: null,
-        observacoes: null,
+        proximo_passo: body.proximo_passo ?? null,
+        observacoes: body.observacoes ?? null,
         etapa: body.etapa || 'para_aplicar',
+        fit_score: typeof body.fit_score === 'number' ? body.fit_score : null,
+        sub_scores: body.sub_scores ?? null,
+        pontos_fortes: body.pontos_fortes ?? null,
+        gaps: body.gaps ?? null,
+        recomendacoes_curriculo: body.recomendacoes_curriculo ?? null,
+        resumo: body.resumo ?? null,
+        cv_simulacao_id: body.cv_simulacao_id ?? null,
       })
       .select()
       .single();

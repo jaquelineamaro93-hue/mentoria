@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -13,11 +12,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Panel } from '@/components/Panel'
-import StandardLayout from '@/components/StandardLayout';;
-import KanbanTab from '@/app/(dashboard)/vagas/tabs/KanbanTab';
-import RankingTab from '@/app/(dashboard)/vagas/tabs/RankingTab';
-import { createClient } from '@/lib/supabase/client';
-import { posthog, limparIdentidade } from '@/lib/posthog';
+import { posthog } from '@/lib/posthog';
 import { formatarTituloInsight } from '@/lib/string-utils';
 import type { CvSimulacao, Profile } from '@/lib/types';
 
@@ -26,21 +21,21 @@ interface Props {
   userId: string;
   simulacoesIniciais: CvSimulacao[];
   usadasEsteMes: number;
-  vagasIniciais?: any[];
+  onOpenSoar?: () => void;
+  onOpenVagas?: () => void;
 }
 
 const LIMITE_GRATIS_MES = 3;
 
-type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista' | 'minhas-vagas' | 'ranking';
+type Aba = 'compatibilidade' | 'curriculo' | 'palavras' | 'entrevista';
 
 export default function SimuladorCVClient({
   profile,
   simulacoesIniciais,
   usadasEsteMes,
-  vagasIniciais = [],
+  onOpenSoar,
+  onOpenVagas,
 }: Props) {
-  const router = useRouter();
-  const supabase = createClient();
 
   const [curriculo, setCurriculo] = useState('');
   const [vaga, setVaga] = useState('');
@@ -56,27 +51,8 @@ export default function SimuladorCVClient({
   const [historico, setHistorico] = useState(simulacoesIniciais);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
   const [aba, setAba] = useState<Aba>('compatibilidade');
-  const [vagas, setVagas] = useState(vagasIniciais ?? []);
-
-  async function handleVagaAtualizada() {
-    try {
-      const res = await fetch('/api/vagas');
-      const data = await res.json();
-      setVagas(data.vagas);
-    } catch (erro) {
-      console.error('Erro ao recarregar vagas:', erro);
-    }
-  }
 
   const restantesGratis = Math.max(0, LIMITE_GRATIS_MES - usadas);
-
-  async function handleSignOut() {
-    posthog.capture('logout_realizado');
-    await supabase.auth.signOut();
-    limparIdentidade();
-    router.push('/login');
-    router.refresh();
-  }
 
   async function analisar() {
     if (!curriculo.trim() || !vaga.trim()) return;
@@ -180,7 +156,7 @@ export default function SimuladorCVClient({
             <button
               onClick={comprarSimulacaoExtra}
               disabled={comprando}
-              className="text-xs px-3 py-1.5 rounded-full bg-brown text-white hover:bg-brown-deep transition-colors disabled:opacity-60"
+              className="text-xs px-3 py-1.5 rounded-full bg-brown text-white hover:bg-mint-deep transition-colors disabled:opacity-60"
             >
               {comprando ? 'Abrindo...' : 'Comprar crédito extra (R$ 5)'}
             </button>
@@ -256,7 +232,7 @@ export default function SimuladorCVClient({
             <button
               onClick={comprarSimulacaoExtra}
               disabled={comprando}
-              className="shrink-0 flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+              className="shrink-0 flex items-center gap-2 bg-mint-deep hover:opacity-90 disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
             >
               {comprando ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
               {comprando ? 'Abrindo pagamento...' : 'Comprar simulação extra (R$ 5)'}
@@ -267,7 +243,7 @@ export default function SimuladorCVClient({
         <button
           onClick={analisar}
           disabled={gerando || !curriculo.trim() || !vaga.trim() || (limiteAtingido && creditos === 0)}
-          className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-6 py-3 rounded-full transition-colors mb-10"
+          className="flex items-center gap-2 bg-mint-deep hover:opacity-90 disabled:opacity-50 text-white text-sm font-medium px-6 py-3 rounded-full transition-colors mb-10"
         >
           {gerando ? (
             <Loader2 size={16} className="animate-spin" />
@@ -285,9 +261,7 @@ export default function SimuladorCVClient({
                   ['compatibilidade', 'Compatibilidade'],
                   ['curriculo', 'Currículo'],
                   ['palavras', 'Palavras-chave'],
-                  ['entrevista', 'Entrevista'],
-                  ['minhas-vagas', 'Minhas Vagas'],
-                  ['ranking', 'Ranking'],
+                  ['entrevista', 'Perguntas de entrevista'],
                 ] as [Aba, string][]
               ).map(([valor, label]) => (
                 <button
@@ -295,7 +269,7 @@ export default function SimuladorCVClient({
                   onClick={() => setAba(valor)}
                   className={`px-4 py-2.5 text-sm border-b-2 -mb-px transition-colors ${
                     aba === valor
-                      ? 'border-brown text-black'
+                      ? 'border-mint-deep text-black'
                       : 'border-transparent text-gray-text hover:text-gray-text'
                   }`}
                 >
@@ -366,22 +340,22 @@ export default function SimuladorCVClient({
                   <p className="text-xs uppercase tracking-wide text-red-700 mb-3 flex items-center gap-1.5">
                     <XCircle size={13} /> Os 6 sabotadores do seu currículo
                   </p>
-                  <div className="flex flex-col gap-3">
+                  <Panel className="divide-y divide-gray-faint overflow-hidden">
                     {r.sabotadores.map((s, i) => (
-                      <Panel key={i} className="p-5">
-                        <div className="flex items-start gap-3">
-                          <span className="w-6 h-6 rounded-full bg-red-50 border border-red-300 text-red-700 text-xs flex items-center justify-center shrink-0 mt-0.5">
-                            {i + 1}
-                          </span>
-                          <div>
-                            <p className="text-black font-medium mb-1">{formatarTituloInsight(s.titulo)}</p>
-                            <p className="text-sm text-gray-text mb-2">{s.motivo}</p>
-                            <p className="text-sm text-mint">{s.correcao}</p>
-                          </div>
+                      <div key={i} className="flex items-start gap-4 p-5">
+                        <span className="w-7 h-7 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
+                          {i + 1}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-black font-medium mb-1">{formatarTituloInsight(s.titulo)}</p>
+                          <p className="text-sm text-gray-text mb-2 leading-relaxed">{s.motivo}</p>
+                          <p className="text-sm text-black">
+                            <span className="font-medium text-mint-deep">Como ajustar: </span>{s.correcao}
+                          </p>
                         </div>
-                      </Panel>
+                      </div>
                     ))}
-                  </div>
+                  </Panel>
                 </div>
               </div>
             )}
@@ -424,22 +398,37 @@ export default function SimuladorCVClient({
                 <div className="flex flex-col gap-3">
                   {r.perguntas_entrevista.map((p, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-mint-light border border-mint text-mint text-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-6 h-6 rounded-full bg-mint-light border border-mint text-black text-xs flex items-center justify-center shrink-0 mt-0.5">
                         {i + 1}
                       </span>
                       <p className="text-sm text-black leading-relaxed">{p}</p>
                     </div>
                   ))}
                 </div>
+                {(onOpenSoar || onOpenVagas) && (
+                  <div className="mt-6 pt-5 border-t border-gray-faint flex flex-wrap gap-3">
+                    {onOpenSoar && (
+                      <button
+                        type="button"
+                        onClick={onOpenSoar}
+                        className="inline-flex items-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 transition"
+                      >
+                        <Sparkles size={15} />
+                        Preparar respostas completas com SOAR
+                      </button>
+                    )}
+                    {onOpenVagas && (
+                      <button
+                        type="button"
+                        onClick={onOpenVagas}
+                        className="rounded-lg border border-gray-faint bg-white px-4 py-2.5 text-sm font-medium text-black hover:border-mint transition"
+                      >
+                        Acompanhar esta candidatura
+                      </button>
+                    )}
+                  </div>
+                )}
               </Panel>
-            )}
-
-            {aba === 'minhas-vagas' && (
-              <KanbanTab vagas={vagas} onVagaAtualizada={handleVagaAtualizada} />
-            )}
-
-            {aba === 'ranking' && (
-              <RankingTab vagas={vagas} />
             )}
           </section>
         )}

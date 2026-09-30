@@ -64,25 +64,32 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
     router.refresh();
   }
 
-  // Espaço reservado para o resumo automático via IA.
-  // Basta plugar aqui uma chamada real (ex: Anthropic API) que recebe
-  // `anotacoes` e grava o resultado em `ai_summary` na tabela journal_notes.
   async function handleAnalisar(note: JournalNote) {
     setAnalisandoId(note.id);
+    setErro(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 900));
+    try {
+      const response = await fetch('/api/diario/analisar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ noteId: note.id }),
+      });
 
-    const resumoSimulado = `Resumo gerado automaticamente a partir da anotação de ${new Date(
-      note.encontro_data
-    ).toLocaleDateString('pt-BR')}. Conecte este botão à sua chamada de IA preferida para gerar um resumo real.`;
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Não foi possível analisar este registro.');
+      }
 
-    await supabase
-      .from('journal_notes')
-      .update({ ai_summary: resumoSimulado })
-      .eq('id', note.id);
+      posthog.capture('diario_insight_jornada_gerado', {
+        tipo_encontro: note.tipo_encontro,
+      });
 
-    setAnalisandoId(null);
-    router.refresh();
+      router.refresh();
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : 'Não foi possível analisar este registro.');
+    } finally {
+      setAnalisandoId(null);
+    }
   }
 
   return (
@@ -205,7 +212,7 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                   {note.ai_summary ? (
                     <div className="mt-4 flex gap-2 rounded-lg bg-mint-light border border-mint px-4 py-3">
                       <Sparkles size={15} className="text-orange shrink-0 mt-0.5" />
-                      <p className="text-sm text-black/90 leading-relaxed">
+                      <p className="text-sm text-black/90 leading-relaxed whitespace-pre-wrap">
                         {note.ai_summary}
                       </p>
                     </div>
@@ -221,8 +228,8 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                         <Sparkles size={13} />
                       )}
                       {analisandoId === note.id
-                        ? 'Analisando...'
-                        : 'Gerar resumo com IA'}
+                        ? 'Cruzando sua jornada...'
+                        : 'Gerar insight da jornada'}
                     </button>
                   )}
                 </Panel>

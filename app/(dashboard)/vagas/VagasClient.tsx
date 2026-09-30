@@ -28,10 +28,12 @@ interface Vaga {
 
 export default function VagasClient({
   profile,
+  embedded = false,
 }: {
   profile: Pick<Profile, 'nome' | 'tipo_pacote' | 'is_admin' | 'foto_url'> | null;
+  embedded?: boolean;
 }) {
-  const [tab, setTab] = useState<Tab>('kanban');
+  const [tab, setTab] = useState<Tab>(embedded ? 'analise' : 'kanban');
   const [vagas, setVagas] = useState<Vaga[]>([]);
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState(0);
@@ -61,18 +63,19 @@ export default function VagasClient({
 
   return (
     <>
-      <div className="p-8 md:p-12">
-          {/* Header */}
-          <div className="mb-8">
-            <Eyebrow>
-              <Briefcase size={14} />
-              Gestão de Candidaturas
-            </Eyebrow>
-            <h1 className="font-display text-4xl text-black mb-2">Controle de Vagas</h1>
-            <p className="text-gray-text text-sm">
-              Acompanhe suas candidaturas a vagas de emprego durante sua jornada de transição de carreira
-            </p>
-          </div>
+      <div className={embedded ? '' : 'p-8 md:p-12'}>
+          {!embedded && (
+            <div className="mb-8">
+              <Eyebrow>
+                <Briefcase size={14} />
+                Gestão de candidaturas
+              </Eyebrow>
+              <h1 className="font-display text-4xl text-black mb-2">Controle de vagas</h1>
+              <p className="text-gray-text text-sm">
+                Acompanhe suas candidaturas durante sua jornada de carreira.
+              </p>
+            </div>
+          )}
 
           {/* Tabs */}
           <div className="flex gap-1 mb-6 border-b border-gray-faint">
@@ -80,7 +83,7 @@ export default function VagasClient({
               onClick={() => setTab('analise')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'analise'
-                  ? 'border-mint-deep text-mint'
+                  ? 'border-mint-deep text-black'
                   : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
@@ -92,7 +95,7 @@ export default function VagasClient({
               onClick={() => setTab('kanban')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'kanban'
-                  ? 'border-mint-deep text-mint'
+                  ? 'border-mint-deep text-black'
                   : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
@@ -104,7 +107,7 @@ export default function VagasClient({
               onClick={() => setTab('ranking')}
               className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
                 tab === 'ranking'
-                  ? 'border-mint-deep text-mint'
+                  ? 'border-mint-deep text-black'
                   : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
