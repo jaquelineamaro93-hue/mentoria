@@ -66,6 +66,18 @@ export const tipsConfig: Record<string, QuickTipData> = {
   '/minha-trilha': {
     title: 'Avalie sua experiência com a SOMA',
   },
+  '/feedbacks': {
+    title: 'Seu histórico de feedbacks',
+  },
+  '/linkedin': {
+    title: 'Posicione seu LinkedIn para o mercado',
+  },
+  '/gupy': {
+    title: 'Audite seu currículo para ATS',
+  },
+  '/leitura-cenario': {
+    title: 'Leia o cenário antes de agir',
+  },
   '/termos': {
     title: 'Termos da Mentoria',
   },

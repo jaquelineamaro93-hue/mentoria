@@ -309,16 +309,19 @@ export default function DashboardClient({
         {/* Feedbacks da Mentora */}
         {feedbacks.length > 0 && (
           <section className="mb-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
-              {feedbacks.length > 0 && (
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
                 <span className="inline-flex items-center justify-center w-6 h-6 bg-mint text-white text-xs font-bold rounded-full">
                   {feedbacks.length}
                 </span>
-              )}
+              </div>
+              <Link href="/feedbacks" className="text-xs font-medium text-mint-deep hover:underline">
+                Ver todos
+              </Link>
             </div>
             <div className="space-y-3">
-              {feedbacks.map((feedback) => (
+              {feedbacks.slice(0, 3).map((feedback) => (
                 <Link
                   key={feedback.id}
                   href={`/feedback/${feedback.id}`}

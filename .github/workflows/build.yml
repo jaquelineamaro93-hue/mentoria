@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+      SUPABASE_SERVICE_ROLE_KEY: placeholder
+      ANTHROPIC_API_KEY: placeholder
+      SENDGRID_API_KEY: placeholder
+      SENDGRID_FROM_EMAIL: contato@example.com
+      NEXT_PUBLIC_POSTHOG_KEY: placeholder
+      NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
