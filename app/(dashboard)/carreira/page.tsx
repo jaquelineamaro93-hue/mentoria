@@ -30,6 +30,7 @@ export default async function CarreiraPage({
     { data: simulacoes },
     { data: vagas },
     { count: soarCount },
+    { count: interviewSimulationCount },
   ] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single<Profile>(),
     supabase
@@ -47,6 +48,11 @@ export default async function CarreiraPage({
       .from('soar_analises')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id),
+    supabase
+      .from('entrevista_simulacoes')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('status', 'concluida'),
   ]);
 
   const simulacoesSeguras = simulacoes ?? [];
@@ -65,6 +71,7 @@ export default async function CarreiraPage({
       usadasEsteMes={usadasEsteMes}
       vagas={vagasSeguras}
       soarCount={soarCount ?? 0}
+      interviewSimulationCount={interviewSimulationCount ?? 0}
       latestCurriculo={ultimaSimulacao?.curriculo_texto ?? ''}
       latestVaga={ultimaSimulacao?.vaga_texto ?? ''}
     />
