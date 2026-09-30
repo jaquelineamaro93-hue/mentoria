@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ListChecks, Compass, Sparkles, CalendarDays, Target,
-  NotebookPen, TrendingUp, PlayCircle, Award, BriefcaseBusiness,
+  NotebookPen, PlayCircle, Award, BriefcaseBusiness, Star,
   Users, MessageCircle, MapPin, Gift, CreditCard, HelpCircle, FileText, ShieldCheck,
   FileSearch, MessageSquare,
   type LucideIcon,
@@ -38,7 +38,6 @@ export const portalNavGroups: PortalNavGroup[] = [
     items: [
       { href: '/primeiros-90-dias', label: 'Primeiros 90 dias', icon: CalendarDays },
       { href: '/meu-pdi', label: 'Plano de desenvolvimento', icon: Target },
-      { href: '/minha-trilha', label: 'Minha evolução', icon: TrendingUp },
     ],
   },
   {
@@ -48,6 +47,13 @@ export const portalNavGroups: PortalNavGroup[] = [
       { href: '/carreira?etapa=cv', label: 'Analisar currículo', icon: FileSearch },
       { href: '/carreira?etapa=vagas', label: 'Vagas & candidaturas', icon: BriefcaseBusiness },
       { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessageSquare },
+    ],
+  },
+  {
+    id: 'experiencia',
+    label: 'Sua experiência na SOMA',
+    items: [
+      { href: '/minha-trilha', label: 'Avaliar a mentoria', icon: Star },
     ],
   },
   {
