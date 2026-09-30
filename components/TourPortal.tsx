@@ -31,16 +31,10 @@ const PASSOS: Passo[] = [
       'Cada entrega da mentoria vira ponto no seu passaporte. Os pontos abrem recompensas e mostram sua constância junto com a comunidade.',
   },
   {
-    titulo: 'Simulador de CV',
-    href: '/simulador-cv',
+    titulo: 'Jornada de Carreira',
+    href: '/carreira',
     descricao:
-      'Cole seu currículo e a vaga que você quer. O simulador mostra o quanto vocês combinam e o que ajustar no currículo antes de se candidatar.',
-  },
-  {
-    titulo: 'SOAR Builder',
-    href: '/entrevista',
-    descricao:
-      'Transforma sua experiência em respostas prontas de entrevista, escritas em primeira pessoa, para você chegar preparada na conversa.',
+      'CV, análise de vagas, candidaturas e preparação SOAR vivem no mesmo fluxo. O que você constrói em uma etapa vira contexto para a próxima.',
   },
   {
     titulo: 'Círculos de Influência',
@@ -98,7 +92,7 @@ export default function TourPortal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] bg-brown-deep/40 backdrop-blur-[2px] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] bg-[#101827]/40 backdrop-blur-[2px] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="tour-titulo"
@@ -138,7 +132,7 @@ export default function TourPortal({
             <span
               key={i}
               className={`h-1 flex-1 rounded-full transition-colors ${
-                i <= passo ? 'bg-brown-deep' : 'bg-line'
+                i <= passo ? 'bg-[#101827]' : 'bg-line'
               }`}
             />
           ))}
@@ -163,7 +157,7 @@ export default function TourPortal({
             </button>
             <button
               onClick={() => (ultimo ? encerrar() : setPasso((p) => p + 1))}
-              className="flex items-center gap-1.5 text-sm font-medium bg-brown-deep text-white rounded-lg px-4 py-2 hover:bg-brown transition"
+              className="flex items-center gap-1.5 text-sm font-medium bg-[#101827] text-white rounded-lg px-4 py-2 hover:opacity-90 transition"
             >
               {ultimo ? (
                 <>
