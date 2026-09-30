@@ -29,6 +29,13 @@ interface AnaliseSalva {
   analise: AnaliseSoar;
 }
 
+interface CandidaturaOption {
+  id: string;
+  empresa: string;
+  cargo: string;
+  descricao_vaga: string | null;
+}
+
 interface AnaliseSoar {
   experiencias: SOARExperiencia[];
   mapaCompetencias: Record<string, string>;
@@ -66,18 +73,21 @@ export default function EntrevistaClient({
   embedded = false,
   initialCurriculo = '',
   initialDescricaoVaga = '',
+  applications = [],
 }: {
   userId: string;
   profile: Profile | null;
   embedded?: boolean;
   initialCurriculo?: string;
   initialDescricaoVaga?: string;
+  applications?: CandidaturaOption[];
 }) {
   const router = useRouter();
   const supabase = createClient();
   const [aba, setAba] = useState<'novo' | 'minhas'>('novo');
   const [curriculo, setCurriculo] = useState(initialCurriculo);
   const [descricaoVaga, setDescricaoVaga] = useState(initialDescricaoVaga);
+  const [candidaturaId, setCandidaturaId] = useState('');
   const [analise, setAnalise] = useState<AnaliseSoar | null>(null);
   const [gerando, setGerando] = useState(false);
   const [copiado, setCopiado] = useState<string | null>(null);
@@ -130,6 +140,13 @@ export default function EntrevistaClient({
     router.refresh();
   }
 
+  const handleSelecionarCandidatura = (id: string) => {
+    setCandidaturaId(id);
+    if (!id) return;
+    const candidatura = applications.find((item) => item.id === id);
+    if (candidatura?.descricao_vaga) setDescricaoVaga(candidatura.descricao_vaga);
+  };
+
   const handleGerarSOAR = async () => {
     if (!curriculo.trim() || !descricaoVaga.trim()) {
       alert('Preencha seu currículo e a descrição da vaga');
@@ -164,6 +181,7 @@ export default function EntrevistaClient({
           curriculo,
           descricao_vaga: descricaoVaga,
           analise: data.analise,
+          candidatura_id: candidaturaId || null,
         })
         .select('id, titulo, created_at, analise')
         .single();
@@ -258,6 +276,29 @@ export default function EntrevistaClient({
                 </div>
               </div>
             </Panel>
+
+            {applications.length > 0 && (
+              <Panel className="p-5">
+                <label className="block">
+                  <span className="block text-sm font-medium text-black mb-2">Preparar para uma candidatura salva</span>
+                  <select
+                    value={candidaturaId}
+                    onChange={(event) => handleSelecionarCandidatura(event.target.value)}
+                    className="w-full bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
+                  >
+                    <option value="">Usar apenas a vaga preenchida abaixo</option>
+                    {applications.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.cargo} · {item.empresa}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="block text-xs text-gray-text mt-2">
+                    Ao escolher uma candidatura, a descrição da vaga é reaproveitada e o SOAR fica ligado a esse processo.
+                  </span>
+                </label>
+              </Panel>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Panel className="p-6">
