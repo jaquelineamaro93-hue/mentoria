@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical } from 'lucide-react';
+import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical, Search } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -28,6 +28,7 @@ export default function AdminClient({
   const router = useRouter();
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
+  const [buscaMentorado, setBuscaMentorado] = useState('');
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
@@ -228,6 +229,14 @@ export default function AdminClient({
   }).length;
   const semAcessoNunca = linhas.filter((l) => !l.profile.last_login_at).length;
   const emailsNaoConfirmados = linhas.filter((l) => !l.emailConfirmado);
+  const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
+  const linhasFiltradas = linhas.filter((l) => {
+    if (!termoMentorado) return true;
+    return (
+      l.profile.nome?.toLocaleLowerCase('pt-BR').includes(termoMentorado) ||
+      l.profile.email?.toLocaleLowerCase('pt-BR').includes(termoMentorado)
+    );
+  });
   const usuariosFiltrados = usuarios.filter((u) => {
     if (filtroUsuarios === "admin" && !u.is_admin) return false;
     if (filtroUsuarios === "geral" && u.is_admin) return false;
@@ -344,6 +353,22 @@ export default function AdminClient({
             </a>
           </div>
 
+          <div className="mb-3">
+            <label className="relative block max-w-xl">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
+              <input
+                type="search"
+                value={buscaMentorado}
+                onChange={(e) => setBuscaMentorado(e.target.value)}
+                placeholder="Buscar mentorado por nome ou e-mail..."
+                className="w-full rounded-lg border border-gray-faint bg-white py-2.5 pl-9 pr-3 text-sm text-black focus:outline-none focus:border-mint-deep"
+              />
+            </label>
+            <p className="mt-1.5 text-xs text-gray-text">
+              {linhasFiltradas.length} de {linhas.length} mentorados
+            </p>
+          </div>
+
           <div className="overflow-x-auto rounded-xl border border-gray-faint">
             <table className="w-full text-sm">
               <thead>
@@ -382,7 +407,7 @@ export default function AdminClient({
                 </tr>
               </thead>
               <tbody>
-                {linhas.map((l) => (
+                {linhasFiltradas.map((l) => (
                   <tr key={l.profile.id} className="border-b border-gray-faint last:border-0 bg-white">
                     <td className="px-4 py-3">
                       <p className="text-black">{l.profile.nome}</p>
@@ -457,6 +482,13 @@ export default function AdminClient({
                     </td>
                   </tr>
                 ))}
+                {linhasFiltradas.length === 0 && (
+                  <tr>
+                    <td colSpan={11} className="px-4 py-8 text-center text-sm text-gray-text bg-white">
+                      Nenhum mentorado encontrado para “{buscaMentorado}”.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
