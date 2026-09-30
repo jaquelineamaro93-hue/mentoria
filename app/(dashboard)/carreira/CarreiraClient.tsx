@@ -153,6 +153,7 @@ export default function CarreiraClient({
             embedded
             initialCurriculo={latestCurriculo}
             initialDescricaoVaga={latestVaga}
+            applications={vagas}
           />
         </div>
       </div>
