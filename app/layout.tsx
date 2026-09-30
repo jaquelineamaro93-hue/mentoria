@@ -7,6 +7,10 @@ import AcessoGate from '@/components/AcessoGate';
 export const metadata: Metadata = {
   title: 'Portal do Mentorado | Mentoria SOMA',
   description: 'Sua jornada de desenvolvimento de carreira na Mentoria SOMA.',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
