@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ListChecks, Compass, Sparkles, CalendarDays, Target,
   NotebookPen, PlayCircle, Award, BriefcaseBusiness, Star,
   Users, MessageCircle, MapPin, Gift, CreditCard, HelpCircle, FileText, ShieldCheck,
-  FileSearch, MessageSquare,
+  FileSearch, MessageSquare, Linkedin,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -29,6 +29,7 @@ export const portalNavGroups: PortalNavGroup[] = [
       { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
       { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
       { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
+      { href: '/feedbacks', label: 'Feedbacks recebidos', icon: MessageCircle },
       { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
     ],
   },
@@ -37,6 +38,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     label: 'Crescimento na empresa',
     items: [
       { href: '/primeiros-90-dias', label: 'Primeiros 90 dias', icon: CalendarDays },
+      { href: '/leitura-cenario', label: 'Leitura de cenário', icon: Compass },
       { href: '/meu-pdi', label: 'Plano de desenvolvimento', icon: Target },
     ],
   },
@@ -45,6 +47,8 @@ export const portalNavGroups: PortalNavGroup[] = [
     label: 'Mercado de trabalho',
     items: [
       { href: '/carreira?etapa=cv', label: 'Analisar currículo', icon: FileSearch },
+      { href: '/gupy', label: 'Gupy & ATS', icon: FileSearch },
+      { href: '/linkedin', label: 'LinkedIn estratégico', icon: Linkedin },
       { href: '/carreira?etapa=vagas', label: 'Vagas & candidaturas', icon: BriefcaseBusiness },
       { href: '/network', label: 'Rede & oportunidades', icon: Users },
       { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessageSquare },
