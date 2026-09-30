@@ -19,7 +19,7 @@ const MODULOS = [
   { id: 'onboarding', nome: 'Onboarding', descricao: 'Gerenciar onboarding' },
   { id: 'pdi', nome: 'PDI & Trilha', descricao: 'Editar PDI' },
   { id: 'diario', nome: 'Diário de Bordo', descricao: 'Visualizar anotações' },
-  { id: 'minha-trilha', nome: 'Minha Trilha', descricao: 'Checkins mensais' },
+  { id: 'minha-trilha', nome: 'Avaliar a mentoria', descricao: 'Check-ins mensais sobre a experiência com a SOMA' },
   { id: 'passos', nome: 'Passos', descricao: 'Acesso a passos e milhas' },
   { id: 'admin', nome: 'Painel Admin', descricao: 'Acesso completo a admin' },
 ];
