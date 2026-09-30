@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, Circle, Loader2, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Loader2, TrendingUp } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Panel } from '@/components/Panel';
 import { ReflexaoMensal } from '@/components/pdi/ReflexaoMensal';
