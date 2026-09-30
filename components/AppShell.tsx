@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Menu, ChevronRight } from 'lucide-react';
@@ -44,5 +44,13 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  return <UserProvider><SidebarProvider><AppShellContent>{children}</AppShellContent></SidebarProvider></UserProvider>;
+  return (
+    <UserProvider>
+      <SidebarProvider>
+        <Suspense fallback={<div className="min-h-screen bg-white" />}>
+          <AppShellContent>{children}</AppShellContent>
+        </Suspense>
+      </SidebarProvider>
+    </UserProvider>
+  );
 }
