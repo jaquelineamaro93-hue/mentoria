@@ -1,44 +1,46 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, ChevronRight } from 'lucide-react';
 import { SidebarProvider, useSidebar } from '@/lib/contexts/SidebarContext';
 import { UserProvider } from '@/lib/contexts/UserContext';
+import { getPortalLocation } from '@/lib/config/portalNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import { QuickTip } from '@/components/ui/QuickTip';
+import styles from './PortalShell.module.css';
 
 function AppShellContent({ children }: { children: React.ReactNode }) {
-  const { isCollapsed } = useSidebar();
+  const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
+  const pathname = usePathname();
+  const location = getPortalLocation(pathname);
+  const main = useRef<HTMLElement>(null);
+  useEffect(() => { main.current?.scrollTo({ top: 0 }); }, [pathname]);
 
-  return (
-    <div className="h-screen w-full overflow-hidden bg-white">
-      <CollapsibleSidebar />
-
-      {/* Main content area - single scroll container with margin for fixed sidebar */}
-      <main
-        className={`h-full overflow-y-auto overflow-x-hidden transition-all duration-300 ${
-          isCollapsed ? 'ml-16' : 'ml-[280px]'
-        }`}
-      >
-        {/* Standard padding: 48px horizontal (px-12), 32px vertical (py-8) */}
-        {/* Applied to ALL pages in (dashboard) */}
-        <div className="px-12 py-8 w-full">
-          {/* Quick Tip positioned at top of main content */}
-          <div className="mb-6">
-            <QuickTip />
-          </div>
-
+  return <div className={`${styles.shell} ${isCollapsed ? styles.shellCompact : ''}`}>
+    <a href="#portal-content" className={styles.skipLink}>Pular para o conteúdo</a>
+    <CollapsibleSidebar />
+    <div className={styles.workspace} inert={isMobile && isMobileOpen ? true : undefined}>
+      <header className={styles.topbar}>
+        <button type="button" onClick={toggleSidebar} className={styles.mobileToggle} aria-label="Abrir menu" aria-expanded={isMobileOpen} aria-controls="soma-navigation"><Menu size={22} /></button>
+        <nav aria-label="Localização atual" className={styles.breadcrumb}>
+          <Link href="/dashboard">SOMA</Link><ChevronRight size={14} aria-hidden="true" />
+          <span className={styles.breadcrumbGroup}>{location.group}</span><ChevronRight className={styles.breadcrumbGroup} size={14} aria-hidden="true" />
+          <span aria-current="page" className={styles.currentPage}>{location.label}</span>
+        </nav>
+        <span className={styles.portalCaption}>Seu espaço de desenvolvimento</span>
+      </header>
+      <main ref={main} id="portal-content" tabIndex={-1} className={styles.main}>
+        <div className={styles.pageContent}>
+          <div className={styles.quickTip}><QuickTip /></div>
           {children}
         </div>
       </main>
     </div>
-  );
+  </div>;
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  return (
-    <UserProvider>
-      <SidebarProvider>
-        <AppShellContent>{children}</AppShellContent>
-      </SidebarProvider>
-    </UserProvider>
-  );
+  return <UserProvider><SidebarProvider><AppShellContent>{children}</AppShellContent></SidebarProvider></UserProvider>;
 }

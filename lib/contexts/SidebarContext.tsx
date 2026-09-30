@@ -1,87 +1,57 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 interface SidebarContextType {
   isCollapsed: boolean;
+  isMobile: boolean;
+  isMobileOpen: boolean;
   toggleSidebar: () => void;
+  closeMobileSidebar: () => void;
 }
-
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  // Recupera estado salvo ao carregar (apenas no cliente)
   useEffect(() => {
-    const saved = localStorage.getItem('soma_sidebar_collapsed');
-    const isMobile = window.innerWidth < 768;
-
-    if (saved !== null) {
-      setIsCollapsed(JSON.parse(saved));
-    } else if (isMobile) {
-      // Auto-colapsa em mobile se não houver preferência salva
-      setIsCollapsed(true);
-      localStorage.setItem('soma_sidebar_collapsed', JSON.stringify(true));
-    }
-    setIsHydrated(true);
+    try { setIsCollapsed(localStorage.getItem('soma_sidebar_collapsed') === 'true'); } catch { /* Storage can be unavailable. */ }
+    const media = window.matchMedia('(max-width: 767px)');
+    const sync = () => { setIsMobile(media.matches); setIsMobileOpen(false); };
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
   }, []);
 
-  // Atalho de teclado (Cmd+B ou Ctrl+B)
-  useEffect(() => {
-    if (!isHydrated) return;
+  const closeMobileSidebar = useCallback(() => setIsMobileOpen(false), []);
+  const toggleSidebar = useCallback(() => {
+    if (isMobile) { setIsMobileOpen((open) => !open); return; }
+    setIsCollapsed((current) => {
+      const next = !current;
+      try { localStorage.setItem('soma_sidebar_collapsed', String(next)); } catch { /* Keep the in-memory preference. */ }
+      return next;
+    });
+  }, [isMobile]);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault();
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || target.closest('input, textarea, select'))) return;
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'b') {
+        event.preventDefault();
         toggleSidebar();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isHydrated]);
+  }, [toggleSidebar]);
 
-  // Recolhe sidebar ao redimensionar para mobile
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 768;
-      const saved = localStorage.getItem('soma_sidebar_collapsed');
-
-      // Se não há preferência salva e é mobile, colapsa
-      if (!saved && isMobile) {
-        setIsCollapsed(true);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isHydrated]);
-
-  const toggleSidebar = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev;
-      localStorage.setItem('soma_sidebar_collapsed', JSON.stringify(next));
-      return next;
-    });
-  };
-
-  // Always render provider with default values during SSR
-  // Values will update on client hydration via useEffect
-  return (
-    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar }}>
-      {children}
-    </SidebarContext.Provider>
-  );
+  return <SidebarContext.Provider value={{ isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar }}>{children}</SidebarContext.Provider>;
 }
-
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar deve ser usado dentro de um SidebarProvider');
-  }
+  if (!context) throw new Error('useSidebar deve ser usado dentro de um SidebarProvider');
   return context;
 };

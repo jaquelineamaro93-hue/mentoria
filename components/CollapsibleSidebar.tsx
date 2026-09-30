@@ -1,206 +1,139 @@
 'use client';
 
-import { useState } from 'react';
-import { useSidebar } from '@/lib/contexts/SidebarContext';
-import { useUser } from '@/lib/contexts/UserContext';
-import { PanelLeftClose, PanelLeft, LayoutDashboard, Zap, Calendar, BookOpen, User, LogOut, Target, MessageCircle, PlayCircle, Award, FileSearch, Users, CreditCard, MapPin, Gift, HelpCircle, TrendingUp, Briefcase, Compass, ShieldCheck } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { ChevronDown, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X } from 'lucide-react';
+import { useSidebar } from '@/lib/contexts/SidebarContext';
+import { useUser } from '@/lib/contexts/UserContext';
 import { createClient } from '@/lib/supabase/client';
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-}
-
-const navItems: NavItem[] = [
-  { label: 'Início', href: '/dashboard', icon: <LayoutDashboard size={20} /> },
-  { label: 'Onboarding', href: '/onboarding', icon: <Zap size={20} /> },
-  { label: 'Mapa Quem Sou Eu', href: '/quem-sou-eu', icon: <Compass size={20} /> },
-  { label: 'Diagnóstico & Perfil', href: '/exercicios', icon: <Zap size={20} /> },
-  { label: 'Primeiros 90 Dias', href: '/primeiros-90-dias', icon: <Calendar size={20} /> },
-  { label: 'PDI & Trilha Estratégica', href: '/meu-pdi', icon: <Target size={20} /> },
-  { label: 'Diário de Bordo', href: '/diario', icon: <BookOpen size={20} /> },
-  { label: 'Feedback entre Colegas', href: '/feedback-pares', icon: <MessageCircle size={20} /> },
-  { label: 'Gravações', href: '/gravacoes', icon: <PlayCircle size={20} /> },
-  { label: 'Meu Passaporte', href: '/passaporte', icon: <Award size={20} /> },
-  { label: 'Simulador de CV', href: '/simulador-cv', icon: <FileSearch size={20} /> },
-  { label: 'SOAR Builder', href: '/entrevista', icon: <Zap size={20} /> },
-  { label: 'Círculos de Influência', href: '/network', icon: <Users size={20} /> },
-  { label: 'Meu Plano', href: '/meu-plano', icon: <CreditCard size={20} /> },
-  { label: 'Votar Encontro', href: '/votar-encontro', icon: <MapPin size={20} /> },
-  { label: 'Indique um Amigo', href: '/indique-um-amigo', icon: <Gift size={20} /> },
-  { label: 'Minha Trilha', href: '/minha-trilha', icon: <TrendingUp size={20} /> },
-  { label: 'Perguntas Frequentes', href: '/faq', icon: <HelpCircle size={20} /> },
-];
+import { limparIdentidade } from '@/lib/posthog';
+import { overviewItem, adminItem, portalNavGroups, supportItems, isPortalRouteActive, type PortalNavItem } from '@/lib/config/portalNavigation';
+import styles from './PortalShell.module.css';
 
 export default function CollapsibleSidebar() {
-  const { isCollapsed, toggleSidebar } = useSidebar();
-  const { profile, initials } = useUser();
+  const { isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
+  const { profile, initials, isLoading } = useUser();
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const compact = isCollapsed && !isMobile;
+  const sidebar = useRef<HTMLElement>(null);
+  const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({});
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState('');
 
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.push('/login');
+  useEffect(() => {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem('soma_navigation_groups') || '{}');
+      if (saved && typeof saved === 'object' && !Array.isArray(saved)) {
+        setClosedGroups(Object.fromEntries(Object.entries(saved).filter(([key, value]) => portalNavGroups.some((group) => group.id === key) && typeof value === 'boolean')));
+      }
+    } catch { /* Ignore invalid preferences. */ }
+  }, []);
+
+  useEffect(() => { closeMobileSidebar(); }, [pathname, closeMobileSidebar]);
+
+  useEffect(() => {
+    if (!isMobileOpen || !isMobile) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const panel = sidebar.current;
+    panel?.querySelector<HTMLElement>('button')?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); closeMobileSidebar(); }
+      if (event.key !== 'Tab' || !panel) return;
+      const elements = Array.from(panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')).filter((element) => element.getClientRects().length > 0);
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => { document.removeEventListener('keydown', onKeyDown); previous?.focus(); };
+  }, [isMobile, isMobileOpen, closeMobileSidebar]);
+
+  function toggleGroup(id: string, currentlyOpen: boolean) {
+    const next = { ...closedGroups, [id]: currentlyOpen };
+    setClosedGroups(next);
+    try { localStorage.setItem('soma_navigation_groups', JSON.stringify(next)); } catch { /* Optional device preference. */ }
   }
 
-  const isActiveRoute = (href: string) => {
-    if (href === '/dashboard') {
-      return pathname === '/dashboard' || pathname === '/';
+  async function handleSignOut() {
+    setSigningOut(true);
+    setSignOutError('');
+    try {
+      const { error } = await createClient().auth.signOut();
+      if (error) throw error;
+      limparIdentidade();
+      router.replace('/login');
+      router.refresh();
+    } catch {
+      setSignOutError('Não foi possível sair. Tente novamente.');
+      setSigningOut(false);
     }
-    return pathname.startsWith(href);
-  };
+  }
 
-  return (
-    <aside
-      className={`
-        fixed left-0 top-0 h-screen bg-gradient-to-b from-[#1A1A1A] to-[#2D2D2D] border-r border-white/5
-        flex flex-col transition-all duration-300 z-50
-        ${isCollapsed ? 'w-16' : 'w-[280px]'}
-      `}
-    >
-      {/* Logo Section - Estilo padrão */}
-      <div className="flex-shrink-0 p-6 md:p-7 border-b border-white/5">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <div>
-              <p className="font-display text-3xl text-white" style={{ fontFamily: "'Crimson Text', serif" }}>SOMA</p>
-              <div className="h-px w-8 my-2.5" style={{ backgroundColor: '#3DD9C8' }} />
-              <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Portal do Mentorado</p>
-            </div>
-          )}
-          <button
-            onClick={toggleSidebar}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-white"
-            title={isCollapsed ? 'Expandir' : 'Recolher'}
-          >
-            {isCollapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
-          </button>
-        </div>
+  function navLink(item: PortalNavItem) {
+    const active = isPortalRouteActive(pathname, item.href);
+    const Icon = item.icon;
+    return <Link key={item.href} href={item.href} prefetch={false} onClick={closeMobileSidebar}
+      className={`${styles.navLink} ${active ? styles.active : ''}`}
+      aria-current={active ? 'page' : undefined} aria-label={compact ? item.label : undefined}
+      title={compact ? item.label : undefined}>
+      <Icon size={20} strokeWidth={1.65} aria-hidden="true" />
+      <span className={styles.linkLabel}>{item.label}</span>
+    </Link>;
+  }
+
+  return <>
+    {isMobile && isMobileOpen && <div className={styles.backdrop} onClick={closeMobileSidebar} aria-hidden="true" />}
+    <aside ref={sidebar} id="soma-navigation" aria-label="Navegação da mentoria"
+      role={isMobile && isMobileOpen ? 'dialog' : undefined} aria-modal={isMobile && isMobileOpen ? true : undefined}
+      inert={isMobile && !isMobileOpen ? true : undefined}
+      className={`${styles.sidebar} ${compact ? styles.compact : ''} ${isMobileOpen ? styles.mobileOpen : ''}`}>
+      <div className={styles.brandRow}>
+        <Link href="/dashboard" onClick={closeMobileSidebar} aria-label="SOMA — Visão geral" className={styles.brand}>
+          <span className={styles.wordmark}>SOMA<span>.</span></span>
+          <span className={styles.brandCaption}>MENTORIA & CARREIRA</span>
+          <span className={styles.smallMark} aria-hidden="true">S<span>.</span></span>
+        </Link>
+        <button type="button" className={styles.iconButton} onClick={isMobile ? closeMobileSidebar : toggleSidebar}
+          aria-label={isMobile ? 'Fechar menu' : compact ? 'Expandir menu' : 'Recolher menu'}
+          title={isMobile ? 'Fechar menu' : 'Alternar menu (Ctrl ou ⌘ + B)'}
+          aria-expanded={isMobile ? isMobileOpen : !isCollapsed} aria-controls="soma-menu-items">
+          {isMobile ? <X size={20} /> : compact ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 flex flex-col gap-1 py-6 px-2 md:px-3 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = isActiveRoute(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
-                group relative text-sm
-                ${
-                  isActive
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/70 hover:bg-white/5 hover:text-white'
-                }
-              `}
-            >
-              <div className="flex-shrink-0">
-                {item.icon}
-              </div>
-
-              {!isCollapsed && (
-                <span className="truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.label}</span>
-              )}
-
-              {isCollapsed && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-white/20 backdrop-blur text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                  {item.label}
-                </div>
-              )}
-            </Link>
-          );
+      <nav id="soma-menu-items" className={styles.navigation} aria-label="Menu principal">
+        <div className={styles.primaryLinks}>
+          {navLink(overviewItem)}
+          {profile?.is_admin === true && navLink(adminItem)}
+        </div>
+        {portalNavGroups.map((group) => {
+          // A group containing the current page stays discoverable, even after a saved collapse.
+          const containsActive = group.items.some((item) => isPortalRouteActive(pathname, item.href));
+          const open = compact || containsActive || !closedGroups[group.id];
+          return <section key={group.id} className={styles.navGroup} aria-label={group.label}>
+            {!compact && <button type="button" className={styles.groupToggle}
+              aria-expanded={open} aria-controls={`nav-group-${group.id}`}
+              onClick={() => toggleGroup(group.id, open)} disabled={containsActive}>
+              <ChevronDown size={14} className={!open ? styles.chevronClosed : ''} aria-hidden="true" />
+              <span>{group.label}</span><span className={styles.groupRule} aria-hidden="true" />
+            </button>}
+            <div id={`nav-group-${group.id}`} hidden={!open} className={styles.groupLinks}>{group.items.map(navLink)}</div>
+          </section>;
         })}
-
-        {/* Admin Panel - Only for admins */}
-        {profile?.is_admin === true && (
-          <Link
-            href="/admin"
-            className={`
-              flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
-              group relative text-sm
-              ${
-                pathname.startsWith('/admin')
-                  ? 'bg-white/10 text-white'
-                  : 'text-white/70 hover:bg-white/5 hover:text-white'
-              }
-            `}
-          >
-            <div className="flex-shrink-0">
-              <ShieldCheck size={20} />
-            </div>
-
-            {!isCollapsed && (
-              <span className="truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>Painel dos mentorados</span>
-            )}
-
-            {isCollapsed && (
-              <div className="absolute left-full ml-2 px-2 py-1 bg-white/20 backdrop-blur text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                Painel dos mentorados
-              </div>
-            )}
-          </Link>
-        )}
+        <div className={styles.supportLinks}>{supportItems.map(navLink)}</div>
       </nav>
 
-      {/* Footer - User Card */}
-      <div className="border-t border-white/5 p-3 md:p-4">
-        {/* User Profile Card */}
-        <Link href="/perfil">
-          <div className="flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded-lg transition-colors group relative mb-3">
-            {profile?.foto_url ? (
-              <img
-                src={profile.foto_url}
-                alt={profile.nome}
-                className="w-9 h-9 rounded-full object-cover shrink-0"
-              />
-            ) : (
-              <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
-                {initials}
-              </div>
-            )}
-
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-xs font-medium truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>{profile?.nome || 'Usuário'}</p>
-                <p className="text-white/60 text-xs truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                  {profile?.tipo_pacote === 'presencial' ? 'MENTORADA PRESENCIAL' : 'MENTORADA ONLINE'}
-                </p>
-              </div>
-            )}
-
-            {isCollapsed && (
-              <div className="absolute left-full ml-2 px-2 py-1 bg-white/20 backdrop-blur text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                Meu Perfil
-              </div>
-            )}
-          </div>
+      <footer className={styles.sidebarFooter}>
+        <Link href="/perfil" onClick={closeMobileSidebar} className={styles.profileLink} aria-label="Meu perfil" title={compact ? 'Meu perfil' : undefined}>
+          {profile?.foto_url ? <img src={profile.foto_url} alt="" className={styles.avatar} /> : <span className={styles.avatar}>{initials || <UserRound size={18} />}</span>}
+          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
         </Link>
-
-        {/* Links adicionais */}
-        {!isCollapsed && (
-          <div className="space-y-1 border-t border-white/10 pt-3">
-            <Link href="/perfil" className="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white text-sm transition-colors">
-              Meu Perfil
-            </Link>
-            <a href="#" className="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white text-sm transition-colors">
-              Termos da mentoria
-            </a>
-            <button
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white text-sm transition-colors"
-            >
-              <LogOut size={16} />
-              Sair
-            </button>
-          </div>
-        )}
-      </div>
+        <button type="button" className={styles.signOut} onClick={handleSignOut} disabled={signingOut} title="Sair da conta" aria-label={signingOut ? 'Saindo da conta' : 'Sair da conta'}><LogOut size={18} /></button>
+        {signOutError && <p role="alert" className={styles.signOutError}>{signOutError}</p>}
+      </footer>
     </aside>
-  );
+  </>;
 }
