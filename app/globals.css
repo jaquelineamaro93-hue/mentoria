@@ -39,6 +39,22 @@
   --color-line-soft: #F9F9F9;
 }
 
+
+/* Fallback crítico para CTAs da jornada.
+   Tailwind v4 lê tokens de @theme; estas regras garantem contraste mesmo
+   se uma utility customizada não for emitida ou houver CSS antigo em cache. */
+.bg-mint-deep {
+  background-color: #0D8071 !important;
+}
+
+.text-mint-deep {
+  color: #0D8071 !important;
+}
+
+.border-mint-deep {
+  border-color: #0D8071 !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
