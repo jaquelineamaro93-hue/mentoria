@@ -31,6 +31,7 @@ interface AnaliseResult {
   palavras_chave_ats: string[];
   resumo: string;
   contexto_soma?: string;
+  source_cv_simulacao_id?: string | null;
 }
 
 interface Mensagem {
@@ -120,6 +121,7 @@ export default function AnaliseFitTab({ vagas, onVagaAdicionada }: Props) {
           gaps: analise.gaps,
           recomendacoes_curriculo: analise.recomendacoes,
           resumo: analise.resumo,
+          cv_simulacao_id: analise.source_cv_simulacao_id ?? null,
           etapa: 'para_aplicar',
         }),
       });
