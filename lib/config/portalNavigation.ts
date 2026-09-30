@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ListChecks, Compass, Sparkles, CalendarDays, Target,
   NotebookPen, PlayCircle, Award, BriefcaseBusiness, Star,
   Users, MessageCircle, MapPin, Gift, CreditCard, HelpCircle, FileText, ShieldCheck,
-  FileSearch, MessageSquare, Linkedin,
+  FileSearch, MessageSquare,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -48,7 +48,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     items: [
       { href: '/carreira?etapa=cv', label: 'Analisar currículo', icon: FileSearch },
       { href: '/gupy', label: 'Gupy & ATS', icon: FileSearch },
-      { href: '/linkedin', label: 'LinkedIn estratégico', icon: Linkedin },
+      { href: '/linkedin', label: 'LinkedIn estratégico', icon: Users },
       { href: '/carreira?etapa=vagas', label: 'Vagas & candidaturas', icon: BriefcaseBusiness },
       { href: '/network', label: 'Rede & oportunidades', icon: Users },
       { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessageSquare },
