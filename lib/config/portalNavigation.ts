@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ListChecks, Compass, Sparkles, CalendarDays, Target,
-  NotebookPen, TrendingUp, PlayCircle, Award, FileSearch, BriefcaseBusiness,
+  NotebookPen, TrendingUp, PlayCircle, Award, BriefcaseBusiness,
   Users, MessageCircle, MapPin, Gift, CreditCard, HelpCircle, FileText, ShieldCheck,
   type LucideIcon,
 } from 'lucide-react';
@@ -30,9 +30,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
   ] },
   { id: 'carreira', label: 'Carreira', items: [
-    { href: '/simulador-cv', label: 'Simulador de CV', icon: FileSearch },
-    { href: '/entrevista', label: 'SOAR Builder', icon: Sparkles },
-    { href: '/vagas', label: 'Minhas candidaturas', icon: BriefcaseBusiness },
+    { href: '/carreira', label: 'Minha jornada de carreira', icon: BriefcaseBusiness },
   ] },
   { id: 'comunidade', label: 'Comunidade', items: [
     { href: '/network', label: 'Círculos de Influência', icon: Users },
@@ -52,6 +50,7 @@ export const supportItems: PortalNavItem[] = [
 export function isPortalRouteActive(pathname: string, href: string) {
   if (href === '/dashboard') return pathname === '/' || pathname === '/dashboard';
   if (href === '/meu-pdi' && (pathname === '/pdi' || pathname.startsWith('/pdi/'))) return true;
+  if (href === '/carreira' && ['/simulador-cv', '/vagas', '/entrevista'].some((legacy) => pathname === legacy || pathname.startsWith(`${legacy}/`))) return true;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 export function getPortalLocation(pathname: string) {
