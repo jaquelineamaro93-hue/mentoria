@@ -54,6 +54,22 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      if (candidaturaId) {
+        const { data: candidatura } = await supabase
+          .from('vagas_candidatura')
+          .select('id')
+          .eq('id', candidaturaId)
+          .eq('mentorado_id', user.id)
+          .maybeSingle();
+
+        if (!candidatura) {
+          return NextResponse.json(
+            { error: 'A candidatura selecionada não foi encontrada.' },
+            { status: 404 }
+          );
+        }
+      }
+
       const [
         { data: via },
         { data: bussola },
@@ -208,13 +224,23 @@ Responda SOMENTE com JSON válido:
         return NextResponse.json({ error: 'Simulação não encontrada.' }, { status: 404 });
       }
 
+      const perguntasSalvas = Array.isArray(simulacao.perguntas) ? simulacao.perguntas as Pergunta[] : [];
+      const perguntaSalva = perguntasSalvas.find((item) => item.id === pergunta.id);
+
+      if (!perguntaSalva) {
+        return NextResponse.json(
+          { error: 'Essa pergunta não pertence à simulação atual.' },
+          { status: 400 }
+        );
+      }
+
       const prompt = `Você é uma recrutadora avaliando uma resposta de entrevista em uma simulação da Mentoria SOMA.
 
 PERGUNTA:
-${pergunta.pergunta}
+${perguntaSalva.pergunta}
 
 OBJETIVO DA PERGUNTA:
-${pergunta.objetivo}
+${perguntaSalva.objetivo}
 
 RESPOSTA DA PESSOA:
 ${resposta}
@@ -262,7 +288,7 @@ Responda SOMENTE com JSON válido:
       }
 
       const feedback: Feedback = {
-        pergunta_id: pergunta.id,
+        pergunta_id: perguntaSalva.id,
         score: Math.max(0, Math.min(100, Math.round(Number(avaliacao.score) || 0))),
         pontos_fortes: Array.isArray(avaliacao.pontos_fortes) ? avaliacao.pontos_fortes : [],
         melhorias: Array.isArray(avaliacao.melhorias) ? avaliacao.melhorias : [],
@@ -320,7 +346,16 @@ Responda SOMENTE com JSON válido:
         return NextResponse.json({ error: 'Simulação não encontrada.' }, { status: 404 });
       }
 
+      const perguntas = Array.isArray(simulacao.perguntas) ? simulacao.perguntas : [];
       const feedbacks = Array.isArray(simulacao.feedbacks) ? simulacao.feedbacks : [];
+
+      if (feedbacks.length < perguntas.length) {
+        return NextResponse.json(
+          { error: 'Responda todas as perguntas antes de concluir a simulação.' },
+          { status: 400 }
+        );
+      }
+
       const scores = feedbacks
         .map((item: any) => Number(item.score))
         .filter((score: number) => Number.isFinite(score));
