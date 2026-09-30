@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BriefcaseBusiness, CheckCircle2, FileSearch, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import SimuladorCVClient from '@/app/(dashboard)/simulador-cv/SimuladorCVClient';
 import VagasClient from '@/app/(dashboard)/vagas/VagasClient';
 import EntrevistaClient from '@/app/(dashboard)/entrevista/EntrevistaClient';
@@ -34,14 +35,19 @@ export default function CarreiraClient({
   latestCurriculo,
   latestVaga,
 }: Props) {
+  const router = useRouter();
   const [etapa, setEtapa] = useState<Etapa>(initialStep);
+
+  useEffect(() => {
+    setEtapa(initialStep);
+  }, [initialStep]);
 
   const steps = [
     {
       id: 'cv' as const,
       numero: '01',
-      titulo: 'CV & aderência',
-      descricao: 'Entenda seu fit e adapte sua narrativa.',
+      titulo: 'Analisar currículo',
+      descricao: 'Compare seu currículo com uma vaga e veja o que fortalecer.',
       icon: FileSearch,
       count: simulacoes.length,
       countLabel: 'análises',
@@ -50,8 +56,8 @@ export default function CarreiraClient({
     {
       id: 'vagas' as const,
       numero: '02',
-      titulo: 'Candidaturas',
-      descricao: 'Compare oportunidades e acompanhe cada processo.',
+      titulo: 'Vagas & candidaturas',
+      descricao: 'Compare oportunidades e acompanhe cada processo seletivo.',
       icon: BriefcaseBusiness,
       count: vagas.length,
       countLabel: 'vagas',
@@ -60,8 +66,8 @@ export default function CarreiraClient({
     {
       id: 'entrevista' as const,
       numero: '03',
-      titulo: 'Entrevista & simulação',
-      descricao: 'Prepare o SOAR e pratique com feedback da IA.',
+      titulo: 'Entrevistas & simulações',
+      descricao: 'Prepare suas histórias e pratique com feedback da IA.',
       icon: Sparkles,
       count: soarCount,
       countLabel: `SOAR · ${interviewSimulationCount} simulaç${interviewSimulationCount === 1 ? 'ão' : 'ões'}`,
@@ -71,24 +77,22 @@ export default function CarreiraClient({
 
   function mudarEtapa(nova: Etapa) {
     setEtapa(nova);
-    const url = new URL(window.location.href);
-    url.searchParams.set('etapa', nova);
-    window.history.replaceState({}, '', url.toString());
+    router.replace(`/carreira?etapa=${nova}`, { scroll: false });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
     <div className="w-full">
       <header className="mb-7">
-        <p className="text-xs uppercase tracking-[0.16em] text-gray-text mb-2">Jornada de carreira</p>
-        <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Da vaga à entrevista, sem recomeçar do zero</h1>
+        <p className="text-xs uppercase tracking-[0.16em] text-gray-text mb-2">Mercado de trabalho</p>
+        <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Prepare-se para novas oportunidades</h1>
         <p className="text-sm md:text-base text-gray-text max-w-3xl leading-relaxed">
-          Seu currículo, análises, candidaturas e preparação de entrevista ficam conectados. A SOMA reaproveita o que
-          você já construiu para que cada etapa gere contexto para a próxima.
+          Use esta área quando estiver buscando uma nova vaga. Analise seu currículo, compare oportunidades,
+          acompanhe candidaturas e pratique entrevistas com todo o contexto conectado.
         </p>
       </header>
 
-      <div className="grid lg:grid-cols-3 gap-3 mb-8" role="tablist" aria-label="Etapas da jornada de carreira">
+      <div className="grid lg:grid-cols-3 gap-3 mb-8" role="tablist" aria-label="Etapas da busca por novas oportunidades">
         {steps.map((step) => {
           const Icon = step.icon;
           const active = etapa === step.id;

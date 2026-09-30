@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Menu, ChevronRight } from 'lucide-react';
 import { SidebarProvider, useSidebar } from '@/lib/contexts/SidebarContext';
 import { UserProvider } from '@/lib/contexts/UserContext';
@@ -14,9 +14,11 @@ import styles from './PortalShell.module.css';
 function AppShellContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
-  const location = getPortalLocation(pathname);
+  const searchParams = useSearchParams();
+  const currentSearch = searchParams.toString();
+  const location = getPortalLocation(pathname, currentSearch);
   const main = useRef<HTMLElement>(null);
-  useEffect(() => { main.current?.scrollTo({ top: 0 }); }, [pathname]);
+  useEffect(() => { main.current?.scrollTo({ top: 0 }); }, [pathname, currentSearch]);
 
   return <div className={`${styles.shell} ${isCollapsed ? styles.shellCompact : ''}`}>
     <a href="#portal-content" className={styles.skipLink}>Pular para o conteúdo</a>
@@ -42,5 +44,13 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  return <UserProvider><SidebarProvider><AppShellContent>{children}</AppShellContent></SidebarProvider></UserProvider>;
+  return (
+    <UserProvider>
+      <SidebarProvider>
+        <Suspense fallback={<div className="min-h-screen bg-white" />}>
+          <AppShellContent>{children}</AppShellContent>
+        </Suspense>
+      </SidebarProvider>
+    </UserProvider>
+  );
 }
