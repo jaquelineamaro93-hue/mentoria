@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     ] = await Promise.all([
       supabase
         .from('cv_simulacoes')
-        .select('curriculo_texto, resultado_json, created_at')
+        .select('id, curriculo_texto, resultado_json, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -195,7 +195,7 @@ Todos os scores devem ser inteiros entre 0 e 100. Português do Brasil.`;
       contexto_setor: clamp(analise.breakdown_por_categoria?.contexto_setor),
     };
 
-    return NextResponse.json(analise);
+    return NextResponse.json({ ...analise, source_cv_simulacao_id: cvMaisRecente?.id ?? null });
   } catch (error) {
     console.error('[VAGAS-ANALISAR-FIT] Erro:', error);
     return NextResponse.json(
