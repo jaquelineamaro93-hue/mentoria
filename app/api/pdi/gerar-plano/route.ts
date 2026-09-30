@@ -4,6 +4,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
 import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
+const KARINY_MORE_ID = "477ff931-0338-4e10-a307-98e8ead54111";
+
 export async function POST(req: NextRequest) {
   try {
     const supabaseAdmin = createClient(
@@ -39,6 +41,18 @@ export async function POST(req: NextRequest) {
     if (erroRespostas || !respostasRaw || respostasRaw.length === 0) {
       return NextResponse.json(
         { erro: "o mentorado ainda não preencheu as seções do PDI" },
+        { status: 400 }
+      );
+    }
+
+    const permitePdiParcial = mentoradoId === KARINY_MORE_ID;
+    const { count: totalSecoes } = await supabaseAdmin
+      .from("pdi_guia_secoes")
+      .select("id", { count: "exact", head: true });
+
+    if (!permitePdiParcial && totalSecoes && respostasRaw.length < totalSecoes) {
+      return NextResponse.json(
+        { erro: `complete as ${totalSecoes} seções do PDI antes de gerar o plano` },
         { status: 400 }
       );
     }
@@ -106,6 +120,13 @@ export async function POST(req: NextRequest) {
         bussola.centro && `Centro (essência): ${bussola.centro}`,
       ].filter(Boolean);
       partesContexto.push(`### Bússola de Posicionamento\n${linhas.join("\n")}`);
+    }
+
+    if (permitePdiParcial) {
+      partesContexto.unshift(
+        `### Contexto deste plano inicial
+Este é um plano inicial autorizado com ${respostasRaw.length} de ${totalSecoes ?? 20} seções do PDI respondidas. Use somente o que está disponível. Não trate perguntas ainda não respondidas como lacunas de competência e não invente conteúdo para completá-las. O plano deve poder ser refinado depois, quando novas respostas forem adicionadas.`
+      );
     }
 
     const contextoAdicional = partesContexto.length > 0 ? partesContexto.join("\n\n") : null;
