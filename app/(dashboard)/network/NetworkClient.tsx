@@ -195,11 +195,11 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
       <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
         <Eyebrow>
           <Network size={14} />
-          Círculos de Influência
+          Rede & oportunidades
         </Eyebrow>
-        <h1 className="font-display text-3xl text-black mb-1">Sua Rede Estratégica</h1>
+        <h1 className="font-display text-3xl text-black mb-1">Quem pode te conectar a novas oportunidades?</h1>
         <p className="text-sm text-gray-text mb-8">
-          Mapeie seus contatos em círculos de influência e receba um plano de ação personalizado para 72 horas.
+          Mapeie sua rede, identifique quem pode te indicar, apresentar pessoas ou aproximar você de novas oportunidades e transforme isso em ações práticas.
         </p>
 
         <div className="flex gap-4 mb-8 border-b border-gray-faint">
@@ -212,7 +212,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             }`}
           >
             <Users size={18} className="inline mr-2" />
-            Meus Círculos
+            Minha rede
           </button>
           <button
             onClick={() => setAba('importar')}
@@ -234,7 +234,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
             }`}
           >
             <Target size={18} className="inline mr-2" />
-            Plano de Ação
+            Plano de conexão
           </button>
         </div>
 
@@ -475,7 +475,7 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
         {aba === 'analise' && (
           <div className="space-y-6">
             <Panel className="bg-mint-light border border-mint p-6">
-              <h3 className="font-display text-xl text-mint mb-6">Seu Plano de Ação de 72 Horas</h3>
+              <h3 className="font-display text-xl text-mint mb-6">Seu plano de conexão para as próximas 72 horas</h3>
 
               {CIRCULOS.map((circulo) => {
                 const contato = contatosPorCirculo(circulo.id)[0];
