@@ -60,8 +60,8 @@ export default function CarreiraClient({
     {
       id: 'entrevista' as const,
       numero: '03',
-      titulo: 'Entrevista SOAR',
-      descricao: 'Transforme experiências em respostas fortes.',
+      titulo: 'Entrevista & simulação',
+      descricao: 'Prepare o SOAR e pratique com feedback da IA.',
       icon: Sparkles,
       count: soarCount,
       countLabel: `SOAR · ${interviewSimulationCount} simulaç${interviewSimulationCount === 1 ? 'ão' : 'ões'}`,
