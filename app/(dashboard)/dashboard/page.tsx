@@ -62,6 +62,39 @@ export default async function DashboardPage() {
     journalNotes = data ?? [];
   } catch { journalNotes = []; }
 
+  let careerJourney = {
+    cvAnalyses: [] as Array<{ id: string; resultado_json: any; created_at: string }>,
+    applications: [] as Array<{ id: string; empresa: string; cargo: string; etapa: string; fit_score: number | null; updated_at: string }>,
+    soarAnalyses: [] as Array<{ id: string; titulo: string | null; created_at: string }>,
+  };
+  try {
+    const [{ data: cvs }, { data: applications }, { data: soars }] = await Promise.all([
+      supabase
+        .from('cv_simulacoes')
+        .select('id, resultado_json, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(2),
+      supabase
+        .from('vagas_candidatura')
+        .select('id, empresa, cargo, etapa, fit_score, updated_at')
+        .eq('mentorado_id', user.id)
+        .order('updated_at', { ascending: false }),
+      supabase
+        .from('soar_analises')
+        .select('id, titulo, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+    ]);
+    careerJourney = {
+      cvAnalyses: cvs ?? [],
+      applications: applications ?? [],
+      soarAnalyses: soars ?? [],
+    };
+  } catch {
+    careerJourney = { cvAnalyses: [], applications: [], soarAnalyses: [] };
+  }
+
   let votacaoAtiva = false;
   try {
     const { data } = await supabase.from('enquetes').select('id').eq('ativo', true).eq('tipo', profile?.tipo_pacote === 'presencial' ? 'presencial' : 'online').limit(1);
@@ -90,6 +123,7 @@ export default async function DashboardPage() {
       journalNotes={journalNotes}
       votacaoAtiva={votacaoAtiva}
       feedbacks={feedbacks}
+      careerJourney={careerJourney}
     />
   );
 }
