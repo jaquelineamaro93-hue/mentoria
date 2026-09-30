@@ -17,6 +17,7 @@ interface Props {
   usadasEsteMes: number;
   vagas: any[];
   soarCount: number;
+  interviewSimulationCount: number;
   latestCurriculo: string;
   latestVaga: string;
 }
@@ -29,6 +30,7 @@ export default function CarreiraClient({
   usadasEsteMes,
   vagas,
   soarCount,
+  interviewSimulationCount,
   latestCurriculo,
   latestVaga,
 }: Props) {
@@ -62,8 +64,8 @@ export default function CarreiraClient({
       descricao: 'Transforme experiências em respostas fortes.',
       icon: Sparkles,
       count: soarCount,
-      countLabel: 'preparações',
-      done: soarCount > 0,
+      countLabel: `SOAR · ${interviewSimulationCount} simulaç${interviewSimulationCount === 1 ? 'ão' : 'ões'}`,
+      done: soarCount > 0 || interviewSimulationCount > 0,
     },
   ];
 
