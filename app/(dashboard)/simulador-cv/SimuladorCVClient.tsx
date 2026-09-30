@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import {
   Loader2,
   Sparkles,
@@ -11,7 +9,8 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-import { Panel } from '@/components/Panel'
+import { Panel } from '@/components/Panel';
+import ResumeDocument from './ResumeDocument';
 import { posthog } from '@/lib/posthog';
 import { formatarTituloInsight } from '@/lib/string-utils';
 import type { CvSimulacao, Profile } from '@/lib/types';
@@ -361,15 +360,11 @@ export default function SimuladorCVClient({
             )}
 
             {aba === 'curriculo' && (
-              <Panel className="p-6 prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-relaxed prose-p:my-3 prose-strong:text-black prose-li:text-black">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {r.curriculo_final_markdown}
-                </ReactMarkdown>
-                <hr className="my-6" />
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {r.carta_apresentacao_markdown}
-                </ReactMarkdown>
-              </Panel>
+              <ResumeDocument
+                markdown={r.curriculo_final_markdown}
+                coverLetterMarkdown={r.carta_apresentacao_markdown}
+                candidateName={profile?.nome}
+              />
             )}
 
             {aba === 'palavras' && (
