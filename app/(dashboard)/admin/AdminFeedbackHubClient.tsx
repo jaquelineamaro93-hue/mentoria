@@ -174,7 +174,7 @@ export default function AdminFeedbackHubClient({
                 dúvidas recorrentes, aprendizados e compromissos.
               </p>
             </div>
-            <AdminJournalClient entries={diarioEntries} />
+            <AdminJournalClient entries={diarioEntries} showHeader={false} />
           </div>
         )}
 
