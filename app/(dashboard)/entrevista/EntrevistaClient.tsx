@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, BookOpen, Briefcase, AlertCircle, Copy, CheckCircle2, Download, ChevronDown, ChevronUp, Trash2, Target, MessageSquare, Loader2 } from 'lucide-react';
+import { Sparkles, BookOpen, Briefcase, AlertCircle, Copy, CheckCircle2, Download, ChevronDown, ChevronUp, Trash2, Target, MessageSquare, Loader2, PlayCircle } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
+import InterviewSimulator from './InterviewSimulator';
 import type { Profile } from '@/lib/types';
 
 interface SOARExperiencia {
@@ -84,7 +85,7 @@ export default function EntrevistaClient({
 }) {
   const router = useRouter();
   const supabase = createClient();
-  const [aba, setAba] = useState<'novo' | 'minhas'>('novo');
+  const [aba, setAba] = useState<'novo' | 'simular' | 'minhas'>('novo');
   const [curriculo, setCurriculo] = useState(initialCurriculo);
   const [descricaoVaga, setDescricaoVaga] = useState(initialDescricaoVaga);
   const [candidaturaId, setCandidaturaId] = useState('');
@@ -236,28 +237,39 @@ export default function EntrevistaClient({
           </Panel>
         )}
 
-        <div className="flex gap-4 mb-8 border-b border-gray-faint">
+        <div className="flex flex-wrap gap-2 sm:gap-4 mb-8 border-b border-gray-faint">
           <button
             onClick={() => setAba('novo')}
-            className={`pb-3 px-4 font-medium transition ${
+            className={`pb-3 px-3 sm:px-4 font-medium transition ${
               aba === 'novo'
                 ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
             <Sparkles size={18} className="inline mr-2" />
-            Gerar SOAR
+            Preparar SOAR
+          </button>
+          <button
+            onClick={() => setAba('simular')}
+            className={`pb-3 px-3 sm:px-4 font-medium transition ${
+              aba === 'simular'
+                ? 'border-b-2 border-mint-deep text-black'
+                : 'text-gray-text hover:text-black'
+            }`}
+          >
+            <PlayCircle size={18} className="inline mr-2" />
+            Simular entrevista
           </button>
           <button
             onClick={() => setAba('minhas')}
-            className={`pb-3 px-4 font-medium transition ${
+            className={`pb-3 px-3 sm:px-4 font-medium transition ${
               aba === 'minhas'
                 ? 'border-b-2 border-mint-deep text-black'
                 : 'text-gray-text hover:text-black'
             }`}
           >
             <BookOpen size={18} className="inline mr-2" />
-            Minhas Análises
+            Minhas análises
           </button>
         </div>
 
@@ -348,6 +360,15 @@ export default function EntrevistaClient({
               </button>
             </div>
           </div>
+        )}
+
+        {aba === 'simular' && (
+          <InterviewSimulator
+            curriculo={curriculo}
+            initialDescricaoVaga={descricaoVaga}
+            applications={applications}
+            initialCandidaturaId={candidaturaId}
+          />
         )}
 
         {aba === 'minhas' && (
@@ -577,14 +598,33 @@ export default function EntrevistaClient({
                   </div>
                 </Panel>
 
-                <div className="flex justify-center gap-3">
-                  <button className="flex items-center gap-2 bg-mint-deep text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                <Panel className="p-5 border-mint bg-mint-light/40">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-black">Preparação pronta. Agora pratique.</p>
+                      <p className="text-sm text-gray-text mt-1">
+                        A simulação faz 5 perguntas personalizadas e avalia cada resposta como um recrutador.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAba('simular')}
+                      className="inline-flex items-center justify-center gap-2 bg-mint-deep text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shrink-0"
+                    >
+                      <PlayCircle size={19} />
+                      Simular entrevista agora
+                    </button>
+                  </div>
+                </Panel>
+
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button className="flex items-center gap-2 border border-mint-deep text-black px-6 py-2.5 rounded-lg font-medium hover:bg-white transition">
                     <Download size={18} />
                     Baixar em PDF
                   </button>
                   <button
                     onClick={() => setAba('novo')}
-                    className="border border-mint-deep text-black px-6 py-2 rounded-lg font-medium hover:bg-white transition"
+                    className="border border-gray-faint text-black px-6 py-2.5 rounded-lg font-medium hover:bg-white transition"
                   >
                     + Gerar novo SOAR
                   </button>
