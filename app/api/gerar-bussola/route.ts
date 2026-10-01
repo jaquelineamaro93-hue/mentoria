@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { chamarClaude } from '@/lib/anthropic';
+import { chamarClaudeJson } from '@/lib/ai-json';
 import { montarPromptBussola } from '@/lib/prompts';
 
 export async function POST() {
@@ -32,10 +32,29 @@ export async function POST() {
 
   try {
     const prompt = montarPromptBussola(respostas);
-    const textoJson = await chamarClaude(prompt);
-
-    const limpo = textoJson.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(limpo);
+    const parsed = await chamarClaudeJson<{
+      norte: string;
+      sul: string;
+      leste: string;
+      oeste: string;
+      centro: string;
+    }>(prompt, {
+      maxTokens: 3000,
+      descricao: 'bússola de posicionamento',
+      validar: (valor): valor is {
+        norte: string;
+        sul: string;
+        leste: string;
+        oeste: string;
+        centro: string;
+      } => {
+        if (!valor || typeof valor !== 'object') return false;
+        const obj = valor as Record<string, unknown>;
+        return ['norte', 'sul', 'leste', 'oeste', 'centro'].every(
+          (chave) => typeof obj[chave] === 'string' && String(obj[chave]).trim().length > 0
+        );
+      },
+    });
 
     const { data: bussola, error } = await supabase
       .from('bussola_posicionamento')
