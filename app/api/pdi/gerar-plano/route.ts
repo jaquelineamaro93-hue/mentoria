@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { chamarClaudeJson } from "@/lib/ai-json";
+import { classificarContextoPdi } from "@/lib/jev-pdi";
 import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
 import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
@@ -116,11 +117,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const { data: secoesGuia } = await supabaseAdmin
+      .from("pdi_guia_secoes")
+      .select("codigo, titulo");
+
+    const tituloPorSecao = new Map(
+      (secoesGuia ?? []).map((secao) => [secao.codigo, secao.titulo])
+    );
+
     const respostas: RespostaSecaoPDI[] = respostasRaw.map((r) => ({
       codigo: r.secao,
-      titulo: r.secao.replace(/_/g, " ").toUpperCase(),
+      titulo: tituloPorSecao.get(r.secao) ?? r.secao.replace(/_/g, " ").toUpperCase(),
       resposta: r.dados?.texto ?? "",
     }));
+
+    const contextoPdi = await classificarContextoPdi(respostas);
+
+    console.info("[PDI contexto]", {
+      mentoradoId,
+      metodo: contextoPdi.metodo,
+      secoesAntes: respostas.length,
+      secoesDepois: contextoPdi.respostas.length,
+      charsAntes: contextoPdi.charsAntes,
+      charsDepois: contextoPdi.charsDepois,
+      reducaoPercentual:
+        contextoPdi.charsAntes > 0
+          ? Math.round((1 - contextoPdi.charsDepois / contextoPdi.charsAntes) * 100)
+          : 0,
+      secoesSelecionadas: contextoPdi.secoesSelecionadas,
+      jevInputTokens: contextoPdi.jevInputTokens,
+    });
 
     // Contexto extra de outras etapas já feitas na mentoria (Mapa Quem Sou Eu,
     // Diagnóstico VIA, Bússola de Posicionamento), pra deixar o plano gerado
@@ -188,12 +214,18 @@ Este é um plano inicial autorizado com ${respostasRaw.length} de ${totalSecoes 
       );
     }
 
+    if (contextoPdi.metodo === "jev") {
+      partesContexto.unshift(
+        "### Seleção de contexto\nAs respostas abaixo foram pré-selecionadas por um classificador de decisão para reduzir contexto redundante. Não trate seções não enviadas como ausência de competência ou como resposta negativa. Baseie o plano apenas nas evidências fornecidas e no histórico complementar disponível."
+      );
+    }
+
     const contextoAdicional = partesContexto.length > 0 ? partesContexto.join("\n\n") : null;
 
     const prompt = montarPromptGeracaoPDI({
       nomeMentorado: perfil.nome ?? "Mentorada",
       cargoAtual: perfil.cargo_atual ?? "Não informado",
-      respostas,
+      respostas: contextoPdi.respostas,
       contextoAdicional,
     });
 
