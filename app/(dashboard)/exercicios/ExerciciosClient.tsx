@@ -18,6 +18,7 @@ interface Props {
   diagnostics: Diagnostic[];
   userId: string;
   viaResultadoInicial?: ViaResultado | null;
+  resumoPerfilInicial?: ResumoPerfil | null;
 }
 
 const FORCAS = [
@@ -36,6 +37,7 @@ export default function ExerciciosClient({
   diagnostics,
   userId,
   viaResultadoInicial = null,
+  resumoPerfilInicial = null,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -60,7 +62,7 @@ export default function ExerciciosClient({
   const [erroVia, setErroVia] = useState<string | null>(null);
   const [extraindoPdf, setExtraindoPdf] = useState(false);
 
-  const [resumoPerfil, setResumoPerfil] = useState<ResumoPerfil | null>(null);
+  const [resumoPerfil, setResumoPerfil] = useState<ResumoPerfil | null>(resumoPerfilInicial);
   const [gerandoResumo, setGerandoResumo] = useState(false);
   const [erroResumo, setErroResumo] = useState<string | null>(null);
 
