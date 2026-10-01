@@ -47,19 +47,17 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
   async function carregarPlano() {
     setCarregando(true);
 
-    if (permitePdiParcial) {
-      const [{ count: respondidas }, { count: total }] = await Promise.all([
-        supabase
-          .from("pdi_respostas")
-          .select("secao", { count: "exact", head: true })
-          .eq("user_id", mentoradoId)
-          .eq("concluido", true),
-        supabase
-          .from("pdi_guia_secoes")
-          .select("id", { count: "exact", head: true }),
-      ]);
-      setProgressoPdi({ respondidas: respondidas ?? 0, total: total ?? 20 });
-    }
+    const [{ count: respondidas }, { count: total }] = await Promise.all([
+      supabase
+        .from("pdi_respostas")
+        .select("secao", { count: "exact", head: true })
+        .eq("user_id", mentoradoId)
+        .eq("concluido", true),
+      supabase
+        .from("pdi_guia_secoes")
+        .select("id", { count: "exact", head: true }),
+    ]);
+    setProgressoPdi({ respondidas: respondidas ?? 0, total: total ?? 20 });
 
     const { data: planoAtivo } = await supabase
       .from("pdi_planos")
@@ -120,6 +118,10 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
     );
   }
 
+  const respondidas = progressoPdi?.respondidas ?? 0;
+  const total = progressoPdi?.total ?? 20;
+  const pdiCompleto = respondidas >= total;
+
   return (
     <div style={{ fontFamily: "Poppins, sans-serif", color: "#1A1A1A" }}>
       {!plano && (
@@ -129,13 +131,15 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
           </p>
           <p style={{ color: "#808080", maxWidth: 520, margin: "0 auto 28px" }}>
             {permitePdiParcial
-              ? `Você já tem material suficiente para um plano inicial, mesmo com ${progressoPdi?.respondidas ?? 0} de ${progressoPdi?.total ?? 20} perguntas respondidas. O que ainda não foi preenchido fica em aberto para ser refinado depois.`
-              : "Você já preencheu as 20 seções do Meu PDI. Agora é só transformar isso em um plano com caminho, prazos e ações que você consegue acompanhar mês a mês."}
+              ? `Você já tem material suficiente para um plano inicial, mesmo com ${respondidas} de ${total} perguntas respondidas. O que ainda não foi preenchido fica em aberto para ser refinado depois.`
+              : pdiCompleto
+                ? `Você concluiu as ${total} seções do Meu PDI. Agora é só transformar isso em um plano com caminho, prazos e ações que você consegue acompanhar mês a mês.`
+                : `Você concluiu ${respondidas} de ${total} seções. Termine as perguntas guia antes de gerar o plano, assim a IA usa todo o contexto e não cria um plano incompleto.`}
           </p>
           {erro && <p style={{ color: "#c85a4a", marginBottom: 16 }}>{erro}</p>}
           <button
             onClick={gerarPlano}
-            disabled={gerando}
+            disabled={gerando || (!permitePdiParcial && !pdiCompleto)}
             style={{
               padding: "14px 32px",
               borderRadius: 8,
@@ -143,10 +147,17 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
               background: "#FFB366",
               color: "#FFFFFF",
               fontSize: 15,
-              cursor: "pointer",
+              cursor: gerando || (!permitePdiParcial && !pdiCompleto) ? "not-allowed" : "pointer",
+              opacity: gerando || (!permitePdiParcial && !pdiCompleto) ? 0.55 : 1,
             }}
           >
-            {gerando ? "Gerando seu plano..." : permitePdiParcial ? "Gerar plano inicial" : "Gerar meu plano"}
+            {gerando
+              ? "Gerando seu plano..."
+              : !permitePdiParcial && !pdiCompleto
+                ? "Complete as perguntas primeiro"
+                : permitePdiParcial
+                  ? "Gerar plano inicial"
+                  : "Gerar meu plano"}
           </button>
         </div>
       )}
