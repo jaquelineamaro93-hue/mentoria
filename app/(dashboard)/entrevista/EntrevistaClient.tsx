@@ -162,6 +162,7 @@ export default function EntrevistaClient({
         body: JSON.stringify({
           curriculo,
           descricaoVaga,
+          candidaturaId: candidaturaId || null,
         }),
       });
 
@@ -173,27 +174,12 @@ export default function EntrevistaClient({
 
       setAnalise(data.analise);
 
-      // Guarda no banco para a análise não sumir ao sair da página.
-      const { data: salva, error: erroSalvar } = await supabase
-        .from('soar_analises')
-        .insert({
-          user_id: userId,
-          titulo: descricaoVaga.trim().split('\n')[0].slice(0, 80),
-          curriculo,
-          descricao_vaga: descricaoVaga,
-          analise: data.analise,
-          candidatura_id: candidaturaId || null,
-        })
-        .select('id, titulo, created_at, analise')
-        .single();
-
-      if (erroSalvar) {
-        console.error('Erro ao salvar análise:', erroSalvar);
-        alert(
-          `A análise foi gerada, mas não consegui salvar: ${erroSalvar.message}. Copie o que precisar antes de sair da página.`
-        );
-      } else if (salva) {
-        setAnalises([salva as AnaliseSalva, ...analises]);
+      if (data.salva) {
+        const salva = data.salva as AnaliseSalva;
+        setAnalises((anteriores) => [
+          salva,
+          ...anteriores.filter((item) => item.id !== salva.id),
+        ]);
         setSelecionada(salva.id);
       }
 
