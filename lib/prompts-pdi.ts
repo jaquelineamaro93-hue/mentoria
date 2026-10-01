@@ -91,9 +91,10 @@ mentoria genérico: cada frase precisa vir de algo que a pessoa efetivamente esc
 }
 
 Regras de conteúdo:
-- Gere entre 3 e 6 pilares. Cada pilar precisa ter entre 2 e 5 ações concretas, verificáveis (a pessoa
+- Gere entre 3 e 5 pilares. Cada pilar precisa ter entre 2 e 4 ações concretas, verificáveis (a pessoa
   precisa conseguir marcar como feita ou não feita sem ambiguidade).
-- O roadmap cobre o ciclo inteiro em blocos de 1 a 3 meses.
+- Mantenha descrições curtas. O JSON inteiro precisa caber confortavelmente na resposta sem ser truncado.
+- O roadmap cobre o ciclo inteiro em 4 a 6 blocos de 1 a 3 meses.
 - Não invente certificações, cursos ou números que a pessoa não mencionou. Se faltar dado para um
   campo, escreva null em vez de inventar.
 - Nunca use travessão (—). Nunca use jargão tipo "sinergia", "empoderar", "destravar potencial",
