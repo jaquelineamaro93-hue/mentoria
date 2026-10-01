@@ -1,12 +1,24 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2, Users, Compass, Target, Sparkles, Video, MapPin } from 'lucide-react';
+import {
+  CheckCircle2,
+  Users,
+  Compass,
+  Target,
+  Sparkles,
+  Video,
+  MapPin,
+  Building2,
+  BriefcaseBusiness,
+  MessageCircle,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
+import SomaProductShowcase from '@/components/public/SomaProductShowcase';
 
 export const metadata: Metadata = {
   title: 'SOMA Mentoria - Transforme sua Carreira',
-  description: 'Mentoria de carreira com Jaqueline Amaro. Metodologia SOMA: sabedoria interna, objetividade magnética, maestria em ação e alquimia de resultados.',
+  description: 'Mentoria de carreira com acompanhamento humano e portal próprio para autoconhecimento, crescimento na empresa, currículo, vagas, LinkedIn, entrevistas e plano de desenvolvimento.',
 };
 
 const PILARES_SOMA = [
@@ -43,19 +55,33 @@ export default async function HomePage() {
 
   const planos = (planosRaw ?? []).filter((p: PlanoMentoria) => Number(p.preco_avista) >= 100);
 
+  const whatsappMessage = encodeURIComponent(
+    'Olá, vim pelo site da SOMA Mentoria e gostaria de tirar algumas dúvidas.'
+  );
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, '');
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
+    : `https://wa.me/?text=${whatsappMessage}`;
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Header Preto */}
+      {/* Header */}
       <header style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-          <h1 className="font-display text-2xl text-white">SOMA Mentoria</h1>
-          <div className="space-x-4">
-            <Link href="/login" className="text-white hover:text-white opacity-90 font-medium">
+        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
+          <a href="#topo" className="font-display text-2xl text-white">SOMA Mentoria</a>
+          <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
+            <a href="#portal" className="hover:text-white transition-colors">Ver por dentro</a>
+            <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
+            <a href="#depoimentos" className="hover:text-white transition-colors">Depoimentos</a>
+            <a href="#planos" className="hover:text-white transition-colors">Planos</a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-sm">
               Entrar
             </Link>
             <Link
               href="/planos"
-              className="text-black px-6 py-2 rounded-lg font-medium transition-colors hover:opacity-90"
+              className="px-5 py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-sm text-white"
               style={{ backgroundColor: '#0D8071' }}
             >
               Começar
@@ -64,28 +90,93 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* Hero Preto Full */}
-      <section style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }} className="w-full px-6 py-20 text-center">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#0D8071' }}>
-            Mentoria de Carreira e Estratégia
+      {/* Hero */}
+      <section id="topo" style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }} className="w-full px-6 py-20 md:py-24 text-center">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
+            Mentoria de carreira + portal de acompanhamento
           </p>
-          <h2 className="font-display text-5xl mb-6">
-            Se você sente que precisa destravar a sua carreira, essa mentoria é para você
+          <h2 className="font-display text-5xl md:text-6xl leading-[1.02] mb-6">
+            Entenda seu momento. Escolha uma direção. Transforme clareza em movimento.
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            A Metodologia SOMA une autodescoberta, estratégia de carreira e execução de alto nível.
-            Para quem cansou de se sentir "em partes" e deseja a plenitude de uma vida profissional alinhada.
+          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
+            A SOMA une autoconhecimento, estratégia e execução para quem quer crescer na empresa,
+            buscar uma nova oportunidade ou simplesmente parar de tomar decisões de carreira no escuro.
+            E o portal mantém sua jornada organizada entre um encontro e outro.
           </p>
-          <Link
-            href="/planos"
-            className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors"
-            style={{ backgroundColor: '#0D8071', color: '#1A1A1A' }}
-          >
-            Ver Planos
-          </Link>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="#portal"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-4 rounded-lg font-medium transition-colors text-white"
+              style={{ backgroundColor: '#0D8071' }}
+            >
+              Ver a SOMA por dentro
+            </a>
+            <Link
+              href="/planos"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors"
+            >
+              Ver planos
+            </Link>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors"
+            >
+              <MessageCircle size={18} />
+              Tirar dúvidas
+            </a>
+          </div>
+
+          <p className="mt-5 text-xs text-white/45">
+            Portal do mentorado · acompanhamento humano · ferramentas práticas de carreira
+          </p>
         </div>
       </section>
+
+      {/* Para qual momento */}
+      <section className="bg-white py-16 border-b border-gray-faint">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <p className="text-xs uppercase tracking-[0.2em] mb-3 text-mint-deep">Seu momento importa</p>
+            <h3 className="font-display text-3xl md:text-4xl text-black">
+              A mesma carreira pode pedir estratégias completamente diferentes.
+            </h3>
+            <p className="mt-4 text-gray-text leading-relaxed">
+              Por isso a SOMA não coloca todo mundo no mesmo caminho. Primeiro entendemos o contexto,
+              depois organizamos a estratégia e as ferramentas certas para ele.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            <div className="rounded-2xl border border-gray-faint p-6">
+              <Building2 size={24} className="text-mint-deep" />
+              <h4 className="font-display text-xl text-black mt-4">Quero crescer onde estou</h4>
+              <p className="text-sm text-gray-text mt-2 leading-relaxed">
+                Leitura de cenário, primeiros 90 dias, posicionamento interno e plano de desenvolvimento.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-faint p-6">
+              <BriefcaseBusiness size={24} className="text-[#d9707e]" />
+              <h4 className="font-display text-xl text-black mt-4">Quero uma nova oportunidade</h4>
+              <p className="text-sm text-gray-text mt-2 leading-relaxed">
+                Currículo, Gupy & ATS, LinkedIn, networking, vagas, candidaturas e entrevistas.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-faint p-6">
+              <Compass size={24} className="text-[#e89b55]" />
+              <h4 className="font-display text-xl text-black mt-4">Ainda preciso entender minha direção</h4>
+              <p className="text-sm text-gray-text mt-2 leading-relaxed">
+                Mapa Quem Sou Eu, diagnóstico, forças, diário e acompanhamento para sair da dúvida com contexto.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SomaProductShowcase />
 
       {/* Sobre — Branco */}
       <section className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
@@ -127,10 +218,13 @@ export default async function HomePage() {
       </section>
 
       {/* Como funciona */}
-      <section className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
+      <section id="como-funciona" className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>Como funciona</p>
-          <h3 className="font-display text-3xl text-center mb-12" style={{ color: '#1A1A1A' }}>Um programa híbrido em dois tempos</h3>
+          <h3 className="font-display text-3xl text-center mb-4" style={{ color: '#1A1A1A' }}>Análise individual + poder do coletivo</h3>
+          <p className="text-center max-w-2xl mx-auto mb-12" style={{ color: '#808080' }}>
+            Você entende seu contexto, organiza a rota e leva situações reais para os encontros. O portal registra o que foi construído para que a evolução não dependa da memória da última conversa.
+          </p>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="border rounded-2xl p-8 bg-white" style={{ borderColor: '#E8E8E8' }}>
@@ -150,7 +244,7 @@ export default async function HomePage() {
                 </li>
                 <li className="flex gap-2">
                   <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span><strong style={{ color: '#1A1A1A' }}>DISC & forças:</strong> descubra como seu comportamento dita seus resultados.</span>
+                  <span><strong style={{ color: '#1A1A1A' }}>Clareza comportamental:</strong> reconheça forças, padrões, motivadores e o que sustenta suas decisões.</span>
                 </li>
               </ul>
             </div>
@@ -168,7 +262,7 @@ export default async function HomePage() {
               <ul className="space-y-3 text-sm" style={{ color: '#808080' }}>
                 <li className="flex gap-2">
                   <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span><strong style={{ color: '#1A1A1A' }}>Encontro com membros:</strong> o poder da troca com quem busca excelência.</span>
+                  <span><strong style={{ color: '#1A1A1A' }}>Encontro com membros:</strong> discuta contextos reais de carreira e ambientes corporativos.</span>
                 </li>
                 <li className="flex gap-2">
                   <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
@@ -181,7 +275,7 @@ export default async function HomePage() {
       </section>
 
       {/* DEPOIMENTOS */}
-      <section className="px-6 py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
+      <section id="depoimentos" className="px-6 py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
         <div className="max-w-5xl mx-auto">
           <p className="text-xs uppercase tracking-wider mb-4 text-center font-semibold" style={{ color: '#808080' }}>Histórias reais</p>
           <h3 className="font-display text-4xl text-center mb-12" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
@@ -236,10 +330,12 @@ export default async function HomePage() {
       </section>
 
       {/* Planos */}
-      <section className="py-20 bg-white">
+      <section id="planos" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h3 className="font-display text-3xl text-center mb-2" style={{ color: '#1A1A1A' }}>Escolha seu Plano</h3>
-          <p className="text-sm text-center mb-12" style={{ color: '#808080' }}>Preços e parcelamentos exatamente como no checkout, sem letras miúdas.</p>
+          <p className="text-sm text-center mb-12" style={{ color: '#808080' }}>
+            Os valores abaixo são carregados da mesma base usada no checkout do Mercado Pago.
+          </p>
 
           <div className="grid md:grid-cols-2 gap-8">
             {planos.map((plano, i) => {
@@ -293,9 +389,21 @@ export default async function HomePage() {
           <Sparkles size={28} className="mx-auto mb-4 opacity-80" style={{ color: '#0D8071' }} />
           <h3 className="font-display text-3xl mb-4 text-white">É o momento de somar suas forças</h3>
           <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto text-white">Para quem não aceita mais perder, busca integrar quem é com o que faz e quer ocupar o seu lugar no mundo.</p>
-          <Link href="/planos" className="inline-block px-8 py-4 rounded-lg font-display text-lg transition-colors" style={{ backgroundColor: '#0D8071', color: '#1A1A1A' }}>
-            Ver Planos e Começar
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/planos" className="inline-flex justify-center px-8 py-4 rounded-lg font-display text-lg transition-colors text-white" style={{ backgroundColor: '#0D8071' }}>
+              Ver Planos e Começar
+            </Link>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg border border-white/25 font-medium text-white hover:bg-white/5 transition-colors"
+            >
+              <MessageCircle size={18} />
+              Falar comigo no WhatsApp
+            </a>
+          </div>
+          <p className="mt-4 text-xs text-white/45">Mensagem pronta: “Olá, vim pelo site da SOMA Mentoria e gostaria de tirar algumas dúvidas.”</p>
         </div>
       </section>
 
@@ -312,6 +420,16 @@ export default async function HomePage() {
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você.</p>
+            </details>
+
+            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+                <span>O que eu encontro dentro do portal?</span>
+                <span className="text-gray-text">+</span>
+              </summary>
+              <p className="text-gray-text mt-4 leading-relaxed">
+                O portal organiza sua jornada em três frentes: autoconhecimento, crescimento na empresa e mercado de trabalho. Você encontra diagnóstico, Mapa Quem Sou Eu, diário, PDI, primeiros 90 dias, leitura de cenário, currículo, Gupy & ATS, LinkedIn, acompanhamento de vagas e preparação para entrevistas. As ferramentas são apoio para a mentoria — não substituem o contexto humano dos encontros.
+              </p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
