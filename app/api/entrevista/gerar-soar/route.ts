@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { curriculo, descricaoVaga } = await request.json();
+    const { curriculo, descricaoVaga, candidaturaId } = await request.json();
 
     if (!curriculo || !descricaoVaga) {
       return NextResponse.json(
@@ -163,7 +163,34 @@ Regras: no máximo 4 experiências (as mais relevantes para a vaga), exatamente 
       );
     }
 
-    return NextResponse.json({ analise });
+    const titulo = descricaoVaga.trim().split('\n')[0].slice(0, 80);
+
+    const { data: salva, error: erroSalvar } = await supabase
+      .from('soar_analises')
+      .insert({
+        user_id: user.id,
+        titulo,
+        curriculo,
+        descricao_vaga: descricaoVaga,
+        analise,
+        candidatura_id: candidaturaId || null,
+      })
+      .select('id, titulo, created_at, analise')
+      .single();
+
+    if (erroSalvar || !salva) {
+      console.error('🔴 [SOAR-SAVE] Erro ao salvar análise:', erroSalvar);
+      return NextResponse.json(
+        {
+          error: 'A análise foi gerada, mas não foi possível salvá-la com segurança.',
+          detalhe: erroSalvar?.message ?? 'Registro não retornado após o salvamento.',
+          analise,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ analise, salva });
   } catch (erro) {
     const detalhe = erro instanceof Error ? erro.message : String(erro);
     console.error('🔴 [SOAR-POST] Erro:', detalhe);
