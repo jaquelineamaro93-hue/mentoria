@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { chamarClaude } from '@/lib/anthropic';
+import { chamarClaudeJson } from '@/lib/ai-json';
 import { VIA_FORCAS } from '@/lib/prompts';
 
 export async function POST(request: Request) {
@@ -34,13 +34,19 @@ TEXTO DO PDF:
 ${textoExtraido.slice(0, 6000)}`;
 
   try {
-    const resposta = await chamarClaude(prompt);
-    const limpo = resposta.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(limpo);
-
-    if (!Array.isArray(parsed.forcas) || parsed.forcas.length !== 24) {
-      throw new Error('A IA não conseguiu extrair as 24 forças com confiança. Tente digitar manualmente.');
-    }
+    const parsed = await chamarClaudeJson<{ forcas: string[] }>(prompt, {
+      maxTokens: 2500,
+      descricao: 'extração do VIA em PDF',
+      validar: (valor): valor is { forcas: string[] } => {
+        if (!valor || typeof valor !== 'object') return false;
+        const forcas = (valor as { forcas?: unknown }).forcas;
+        return (
+          Array.isArray(forcas) &&
+          forcas.length === 24 &&
+          forcas.every((forca) => typeof forca === 'string' && VIA_FORCAS.includes(forca as (typeof VIA_FORCAS)[number]))
+        );
+      },
+    });
 
     return NextResponse.json({ forcas: parsed.forcas });
   } catch (err) {
