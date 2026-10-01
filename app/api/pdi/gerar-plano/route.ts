@@ -1,24 +1,83 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import Anthropic from "@anthropic-ai/sdk";
+import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+import { chamarClaudeJson } from "@/lib/ai-json";
 import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
 import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
 
 const KARINY_MORE_ID = "477ff931-0338-4e10-a307-98e8ead54111";
 
+type PlanoGerado = {
+  diagnostico: {
+    sintese: string;
+    conflito_central: string | null;
+    alertas_sobrecarga: string[];
+  };
+  equacao: string | null;
+  pilares: Array<{
+    titulo: string;
+    meta_smart: Record<string, string>;
+    acoes: Array<{ titulo: string; descricao: string; prazo: string | null }>;
+  }>;
+  roadmap: Array<{ periodo: string; foco: string; marcos: string }>;
+  alertas: Array<{ tipo: string; cor: string; descricao: string }>;
+};
+
+function isPlanoGerado(valor: unknown): valor is PlanoGerado {
+  if (!valor || typeof valor !== "object") return false;
+  const plano = valor as Partial<PlanoGerado>;
+
+  if (
+    !plano.diagnostico ||
+    typeof plano.diagnostico.sintese !== "string" ||
+    !Array.isArray(plano.pilares) ||
+    plano.pilares.length === 0
+  ) {
+    return false;
+  }
+
+  return plano.pilares.every(
+    (pilar) =>
+      !!pilar &&
+      typeof pilar.titulo === "string" &&
+      !!pilar.meta_smart &&
+      typeof pilar.meta_smart === "object" &&
+      Array.isArray(pilar.acoes) &&
+      pilar.acoes.length > 0 &&
+      pilar.acoes.every((acao) => acao && typeof acao.titulo === "string")
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const supabaseAdmin = createClient(
+    const supabase = await createServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ erro: "não autenticado" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const mentoradoId = body.mentoradoId || user.id;
+
+    if (mentoradoId !== user.id) {
+      const { data: solicitante } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!solicitante?.is_admin) {
+        return NextResponse.json({ erro: "acesso não autorizado" }, { status: 403 });
+      }
+    }
+
+    const supabaseAdmin = createSupabaseAdmin(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-    const { mentoradoId } = await req.json();
-    if (!mentoradoId) {
-      return NextResponse.json({ erro: "mentoradoId é obrigatório" }, { status: 400 });
-    }
 
     const { data: perfil, error: erroPerfil } = await supabaseAdmin
       .from("profiles")
@@ -138,41 +197,19 @@ Este é um plano inicial autorizado com ${respostasRaw.length} de ${totalSecoes 
       contextoAdicional,
     });
 
-    const resposta = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
-      messages: [{ role: "user", content: prompt }],
+    const planoGerado = await chamarClaudeJson<PlanoGerado>(prompt, {
+      maxTokens: 7000,
+      validar: isPlanoGerado,
+      descricao: "plano de PDI",
     });
 
-    const textoResposta = resposta.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("\n")
-      .trim();
-
-    const jsonMatch = textoResposta.match(/\{[\s\S]*\}/);
-    const textoJson = jsonMatch ? jsonMatch[0] : textoResposta.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
-
-    let planoGerado: {
-      diagnostico: { sintese: string; conflito_central: string | null; alertas_sobrecarga: string[] };
-      equacao: string | null;
-      pilares: Array<{
-        titulo: string;
-        meta_smart: Record<string, string>;
-        acoes: Array<{ titulo: string; descricao: string; prazo: string | null }>;
-      }>;
-      roadmap: Array<{ periodo: string; foco: string; marcos: string }>;
-      alertas: Array<{ tipo: string; cor: string; descricao: string }>;
-    };
-
-    try {
-      planoGerado = JSON.parse(textoJson);
-    } catch {
-      return NextResponse.json(
-        { erro: "a IA devolveu um formato inválido, tenta gerar de novo" },
-        { status: 502 }
-      );
-    }
+    planoGerado.roadmap = Array.isArray(planoGerado.roadmap) ? planoGerado.roadmap : [];
+    planoGerado.alertas = Array.isArray(planoGerado.alertas) ? planoGerado.alertas : [];
+    planoGerado.diagnostico.alertas_sobrecarga = Array.isArray(
+      planoGerado.diagnostico.alertas_sobrecarga
+    )
+      ? planoGerado.diagnostico.alertas_sobrecarga
+      : [];
 
     // Arquiva plano anterior (se existir) para manter histórico de versões
     await supabaseAdmin
