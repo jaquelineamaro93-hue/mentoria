@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ExerciciosClient from './ExerciciosClient';
-import type { Diagnostic, Profile, ViaResultado } from '@/lib/types';
+import type { Diagnostic, Profile, ResumoPerfil, ViaResultado } from '@/lib/types';
 
 export default async function ExerciciosPage() {
   const supabase = await createClient();
@@ -26,13 +26,22 @@ export default async function ExerciciosPage() {
     .order('created_at', { ascending: true })
     .returns<Diagnostic[]>();
 
-  const { data: viaResultados } = await supabase
-    .from('via_resultados')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .returns<ViaResultado[]>();
+  const [{ data: viaResultados }, { data: resumosPerfil }] = await Promise.all([
+    supabase
+      .from('via_resultados')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .returns<ViaResultado[]>(),
+    supabase
+      .from('resumo_perfil')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('gerado_em', { ascending: false })
+      .limit(1)
+      .returns<ResumoPerfil[]>(),
+  ]);
 
   return (
     <ExerciciosClient
@@ -40,6 +49,7 @@ export default async function ExerciciosPage() {
       diagnostics={diagnostics ?? []}
       userId={user.id}
       viaResultadoInicial={viaResultados?.[0] ?? null}
+      resumoPerfilInicial={resumosPerfil?.[0] ?? null}
     />
   );
 }
