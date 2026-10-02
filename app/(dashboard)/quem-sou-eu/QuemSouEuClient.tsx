@@ -276,7 +276,7 @@ export default function QuemSouEuClient({
                 </Panel>
               ) : (
                 <>
-                  <Panel className="p-6 mb-3 prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
+                  <Panel className="p-6 mb-3 prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{mapa.conteudo_markdown}</ReactMarkdown>
                   </Panel>
                   <button
