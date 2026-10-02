@@ -6,10 +6,6 @@ import {
   Compass,
   Target,
   Sparkles,
-  Video,
-  MapPin,
-  Building2,
-  BriefcaseBusiness,
   MessageCircle,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
@@ -90,9 +86,26 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section id="topo" style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }} className="w-full px-6 py-20 md:py-24 text-center">
-        <div className="max-w-5xl mx-auto">
+      {/* Hero — mesma estrutura aprovada, agora com colagem real das 10 fotos */}
+      <section
+        id="topo"
+        className="relative isolate overflow-hidden w-full px-6 py-20 md:py-24 text-center text-white"
+        style={{ backgroundColor: '#101513' }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 bg-cover bg-center"
+          style={{ backgroundImage: "url('/soma-hero-collage.webp')" }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(8,12,11,0.88) 0%, rgba(8,12,11,0.79) 48%, rgba(8,12,11,0.82) 100%)',
+          }}
+        />
+        <div className="relative max-w-5xl mx-auto">
           <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
             Mentoria de carreira + portal de acompanhamento
           </p>
@@ -151,22 +164,22 @@ export default async function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
-            <div className="rounded-2xl border border-gray-faint p-6">
-              <Building2 size={24} className="text-mint-deep" />
+            <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
+              <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#0D8071]/30 bg-[#0D8071]/[0.07] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#0D8071]">01</span>
               <h4 className="font-display text-xl text-black mt-4">Quero crescer onde estou</h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
                 Leitura de cenário, primeiros 90 dias, posicionamento interno e plano de desenvolvimento.
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-faint p-6">
-              <BriefcaseBusiness size={24} className="text-[#d9707e]" />
+            <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
+              <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#8E3F4A]/25 bg-[#8E3F4A]/[0.06] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#8E3F4A]">02</span>
               <h4 className="font-display text-xl text-black mt-4">Quero uma nova oportunidade</h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
                 Currículo, Gupy & ATS, LinkedIn, networking, vagas, candidaturas e entrevistas.
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-faint p-6">
-              <Compass size={24} className="text-[#e89b55]" />
+            <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
+              <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#8A4B1D]/25 bg-[#8A4B1D]/[0.06] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#8A4B1D]">03</span>
               <h4 className="font-display text-xl text-black mt-4">Ainda preciso entender minha direção</h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
                 Mapa Quem Sou Eu, diagnóstico, forças, diário e acompanhamento para sair da dúvida com contexto.
@@ -202,7 +215,7 @@ export default async function HomePage() {
 
           <div className="grid sm:grid-cols-2 gap-6">
             {PILARES_SOMA.map((pilar) => {
-              const cores: any = { S: '#0D8071', O: '#FF7A8A', M: '#FFB366', A: '#1A1A1A' };
+              const cores: any = { S: '#0D8071', O: '#B24D5B', M: '#A85D24', A: '#1A1A1A' };
               return (
                 <div key={pilar.letra} className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
                   <div className="w-10 h-10 rounded-full text-white flex items-center justify-center font-display text-lg mb-4" style={{ backgroundColor: cores[pilar.letra] }}>
@@ -229,8 +242,8 @@ export default async function HomePage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="border rounded-2xl p-8 bg-white" style={{ borderColor: '#E8E8E8' }}>
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center" style={{ borderColor: '#0D8071', backgroundColor: 'rgba(61, 217, 200, 0.1)' }}>
-                  <Video size={18} style={{ color: '#0D8071' }} />
+                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(13,128,113,.28)', color: '#0D8071', backgroundColor: 'rgba(13,128,113,.06)' }}>
+                  01
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-wide" style={{ color: '#0D8071' }}>Etapa 1 · Online</p>
@@ -251,11 +264,11 @@ export default async function HomePage() {
 
             <div className="border rounded-2xl p-8 bg-white" style={{ borderColor: '#E8E8E8' }}>
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center" style={{ borderColor: '#FF7A8A', backgroundColor: 'rgba(255, 122, 138, 0.1)' }}>
-                  <MapPin size={18} style={{ color: '#FF7A8A' }} />
+                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(142,63,74,.25)', color: '#8E3F4A', backgroundColor: 'rgba(142,63,74,.06)' }}>
+                  02
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-wide" style={{ color: '#FF7A8A' }}>Etapa 2 · Presencial</p>
+                  <p className="text-xs uppercase tracking-wide" style={{ color: '#8E3F4A' }}>Etapa 2 · Presencial</p>
                   <h4 className="font-display text-lg" style={{ color: '#1A1A1A' }}>Fluxo, presença e ambiência</h4>
                 </div>
               </div>
@@ -301,13 +314,13 @@ export default async function HomePage() {
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FF7A8A' }}>GG</div>
                 <div>
                   <p className="font-semibold" style={{ color: '#1A1A1A' }}>Giulia Gomes</p>
-                  <p className="text-xs font-medium" style={{ color: '#FF7A8A' }}>CRM Analyst & Lifecycle Marketing</p>
+                  <p className="text-xs font-medium" style={{ color: '#8E3F4A' }}>CRM Analyst & Lifecycle Marketing</p>
                 </div>
               </div>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"É uma mentoria muito voltada para carreira mesmo. Tenho saído desses encontros com aquela sensação de que estou ajustando o caminho, não só fazendo mais, mas fazendo melhor."</p>
               <div className="flex justify-between items-center">
                 <div className="text-lg">⭐⭐⭐⭐⭐</div>
-                <p className="text-xs font-medium" style={{ color: '#FF7A8A' }}>Ver no LinkedIn →</p>
+                <p className="text-xs font-medium" style={{ color: '#8E3F4A' }}>Ver no LinkedIn →</p>
               </div>
             </a>
 
@@ -316,13 +329,13 @@ export default async function HomePage() {
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FFB366' }}>RA</div>
                 <div>
                   <p className="font-semibold" style={{ color: '#1A1A1A' }}>Rita Alecrim</p>
-                  <p className="text-xs font-medium" style={{ color: '#FFB366' }}>CRM Senior / Product Owner</p>
+                  <p className="text-xs font-medium" style={{ color: '#8A4B1D' }}>CRM Senior / Product Owner</p>
                 </div>
               </div>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Que mentoria incrível! Foram horas de muito conteúdo, trocas e aprendizado prático. Saio dessa mentoria com a bagagem cheia e com a expectativa de aplicar as novas estratégias."</p>
               <div className="flex justify-between items-center">
                 <div className="text-lg">⭐⭐⭐⭐⭐</div>
-                <p className="text-xs font-medium" style={{ color: '#FFB366' }}>Ver no LinkedIn →</p>
+                <p className="text-xs font-medium" style={{ color: '#8A4B1D' }}>Ver no LinkedIn →</p>
               </div>
             </a>
           </div>
@@ -375,7 +388,7 @@ export default async function HomePage() {
               <p className="text-sm" style={{ color: '#808080' }}>Encontros presenciais com quem busca o mesmo nível de excelência.</p>
             </div>
             <div className="text-center">
-              <Target size={32} className="mx-auto mb-4" style={{ color: '#FF7A8A' }} />
+              <Target size={32} className="mx-auto mb-4" style={{ color: '#8E3F4A' }} />
               <h4 className="font-display text-lg mb-2" style={{ color: '#1A1A1A' }}>Plano de ação</h4>
               <p className="text-sm" style={{ color: '#808080' }}>Roteiro prático de 90 dias, não só teoria.</p>
             </div>
