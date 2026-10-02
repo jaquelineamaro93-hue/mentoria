@@ -5,7 +5,6 @@ import {
   Users,
   Compass,
   Target,
-  Sparkles,
   MessageCircle,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
@@ -399,7 +398,7 @@ export default async function HomePage() {
       {/* CTA Final — Preto */}
       <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-6 py-16 text-center">
         <div className="max-w-4xl mx-auto">
-          <Sparkles size={28} className="mx-auto mb-4 opacity-80" style={{ color: '#0D8071' }} />
+          <div className="mx-auto mb-5 h-px w-12 bg-[#55C9B9]" aria-hidden="true" />
           <h3 className="font-display text-3xl mb-4 text-white">É o momento de somar suas forças</h3>
           <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto text-white">Para quem não aceita mais perder, busca integrar quem é com o que faz e quer ocupar o seu lugar no mundo.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
