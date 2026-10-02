@@ -22,18 +22,18 @@ export default async function PlanosPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-white px-4 py-6 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        <Link href="/" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6 sm:mb-8">
           <ArrowLeft size={20} />
           <span>Voltar</span>
         </Link>
 
-        <h1 className="text-4xl font-display text-black mb-12 text-center">Nossos Planos</h1>
+        <h1 className="text-3xl sm:text-4xl font-display text-black mb-8 sm:mb-12 text-center">Nossos Planos</h1>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
           {(planos || []).map((plano: PlanoMentoria) => (
-            <div key={plano.id} className="bg-white border-2 border-gray-faint rounded-2xl p-8 flex flex-col">
+            <div key={plano.id} className="bg-white border-2 border-gray-faint rounded-2xl p-5 sm:p-8 flex flex-col">
               <div className="mb-6">
                 <p className="text-xs font-medium text-blue-600 mb-2">{plano.duracao_meses} MESES</p>
                 <h2 className="text-2xl font-display text-black mb-1">{plano.nome}</h2>
@@ -58,15 +58,15 @@ export default async function PlanosPage() {
 
               <div className="border-t border-gray-faint pt-6 mb-6">
                 <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm">
                     <span className="text-gray-text">PIX</span>
                     <span className="font-bold text-black">R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm">
                     <span className="text-gray-text">Cartão (1x)</span>
                     <span className="font-bold text-black">R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm">
                     <span className="text-gray-text">Recorrente</span>
                     <span className="font-bold text-black">{plano.parcelas_recorrente}x R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
