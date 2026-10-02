@@ -53,23 +53,23 @@ export default async function HomePage() {
     : `https://wa.me/?text=${whatsappMessage}`;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen overflow-x-hidden bg-white">
       {/* Header */}
       <header style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
-          <a href="#topo" className="font-display text-2xl text-white">SOMA Mentoria</a>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3 sm:gap-6">
+          <a href="#topo" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
           <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
             <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
             <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-sm">
               Entrar
             </Link>
             <Link
               href="/planos"
-              className="px-5 py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-sm text-white"
+              className="px-3.5 sm:px-5 py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-xs sm:text-sm text-white whitespace-nowrap"
               style={{ backgroundColor: '#0D8071' }}
             >
               Começar
@@ -81,7 +81,7 @@ export default async function HomePage() {
       {/* Hero — mesma estrutura aprovada, agora com colagem real das 10 fotos */}
       <section
         id="topo"
-        className="relative isolate overflow-hidden w-full px-6 py-20 md:py-24 text-center text-white"
+        className="relative isolate overflow-hidden w-full px-4 sm:px-6 py-14 sm:py-18 md:py-24 text-center text-white"
         style={{ backgroundColor: '#101513' }}
       >
         {/* Usa a montagem original inteira como fundo; sem alterar a foto. */}
@@ -101,10 +101,10 @@ export default async function HomePage() {
           <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
             Mentoria de carreira + portal de acompanhamento
           </p>
-          <h2 className="font-display text-5xl md:text-6xl leading-[1.02] mb-6">
+          <h2 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.04] mb-5 sm:mb-6">
             Entenda seu momento. Escolha uma direção. Transforme clareza em movimento.
           </h2>
-          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl mb-7 sm:mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
             A SOMA une autoconhecimento, estratégia e execução para quem quer crescer na empresa,
             buscar uma nova oportunidade ou simplesmente parar de tomar decisões de carreira no escuro.
             E o portal mantém sua jornada organizada entre um encontro e outro.
@@ -142,8 +142,8 @@ export default async function HomePage() {
       </section>
 
       {/* Para qual momento */}
-      <section className="bg-white py-16 border-b border-gray-faint">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="bg-white py-12 sm:py-16 border-b border-gray-faint">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl mx-auto text-center mb-10">
             <p className="text-xs uppercase tracking-[0.2em] mb-3 text-mint-deep">Seu momento importa</p>
             <h3 className="font-display text-3xl md:text-4xl text-black">
