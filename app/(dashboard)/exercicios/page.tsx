@@ -31,8 +31,8 @@ export default async function ExerciciosPage() {
       .from('via_resultados')
       .select('*')
       .eq('user_id', user.id)
+      .order('data_teste', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(1)
       .returns<ViaResultado[]>(),
     supabase
       .from('resumo_perfil')
@@ -48,7 +48,7 @@ export default async function ExerciciosPage() {
       profile={profile}
       diagnostics={diagnostics ?? []}
       userId={user.id}
-      viaResultadoInicial={viaResultados?.[0] ?? null}
+      viaResultadosIniciais={viaResultados ?? []}
       resumoPerfilInicial={resumosPerfil?.[0] ?? null}
     />
   );
