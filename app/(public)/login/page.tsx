@@ -200,17 +200,17 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden bg-[#101513]">
+    <div className="min-h-[100dvh] w-full flex items-center justify-center px-4 sm:px-6 py-6 sm:py-10 md:py-12 relative overflow-hidden bg-[#101513]">
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-0 bg-cover bg-center"
+        className="absolute inset-0 z-0 bg-cover bg-[position:58%_center] md:bg-center"
         style={{ backgroundImage: "url('/api/hero-collage?v=20261002-2')" }}
       />
       <div aria-hidden="true" className="absolute inset-0 z-10 bg-black/70" />
 
       <div className="w-full max-w-md relative z-20">
-        <div className="text-center mb-10">
-          <p className="font-display text-4xl tracking-wide text-white">
+        <div className="text-center mb-6 sm:mb-8 md:mb-10">
+          <p className="font-display text-3xl sm:text-4xl tracking-wide text-white">
             SOMA <span className="text-mint">MENTORIA</span>
           </p>
           <div className="h-px w-12 bg-white/30 mx-auto my-3" />
@@ -251,7 +251,7 @@ function LoginPageContent() {
             </button>
           </div>
 
-          <div className="p-8">
+          <div className="p-5 sm:p-6 md:p-8">
             {modo === 'entrar' ? (
               <form onSubmit={handleEntrar} className="flex flex-col gap-4">
                 <Field label="E-mail">

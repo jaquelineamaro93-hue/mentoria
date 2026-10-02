@@ -55,9 +55,9 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           <span>Voltar</span>
         </Link>
 
-        <div className="text-center mb-12">
-          <h1 className="font-display text-4xl text-black mb-2">Soma — Mentoria de Carreira</h1>
-          <p className="text-lg text-gray-text">Escolha seu plano e comece sua jornada de transformação profissional.</p>
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="font-display text-3xl sm:text-4xl text-black mb-2">Soma — Mentoria de Carreira</h1>
+          <p className="text-base sm:text-lg text-gray-text">Escolha seu plano e comece sua jornada de transformação profissional.</p>
         </div>
 
         {planoAtualCodigo && (
@@ -66,18 +66,18 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 gap-5 sm:gap-8 mb-8 sm:mb-12">
           {planos.map((p) => {
             const isSelected = planoSelecionado === p.id;
             return (
               <div
                 key={p.id}
                 onClick={() => setPlanoSelecionado(p.id)}
-                className={`border-2 rounded-2xl p-8 cursor-pointer transition-all ${
+                className={`border-2 rounded-2xl p-5 sm:p-8 cursor-pointer transition-all ${
                   isSelected ? 'border-brown-deep bg-white shadow-lg' : 'border-gray-faint hover:border-brown-deep'
                 }`}
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
                     <h2 className="font-display text-2xl text-black">{p.nome}</h2>
                     <p className="text-sm">
@@ -112,9 +112,9 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
           })}
         </div>
         {planoSelecionado && plano && (
-          <div className="bg-white border-2 border-brown-deep rounded-2xl p-8">
+          <div className="bg-white border-2 border-brown-deep rounded-2xl p-5 sm:p-8">
             <h3 className="font-display text-xl text-black mb-6">Como você prefere pagar?</h3>
-            <div className="grid md:grid-cols-3 gap-4 mb-8">
+            <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
               <button
                 onClick={() => setFormaEscolhida('avista')}
                 className={`border-2 rounded-xl p-4 transition-all text-center ${
@@ -163,7 +163,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
               <button
                 onClick={irParaMercadoPago}
                 disabled={processando}
-                className="w-full bg-brown-deep text-white font-medium py-4 rounded-lg hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-brown-deep text-white font-medium py-3.5 sm:py-4 rounded-lg hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {processando ? 'Processando...' : planoAtualCodigo ? 'Renovar com Mercado Pago' : 'Continuar com Mercado Pago'}
               </button>
