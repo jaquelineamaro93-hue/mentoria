@@ -84,22 +84,18 @@ export default async function HomePage() {
         className="relative isolate overflow-hidden w-full px-6 py-20 md:py-24 text-center text-white"
         style={{ backgroundColor: '#101513' }}
       >
-        {/* A montagem permanece exatamente a mesma; o efeito visual vem só da opacidade + overlay. */}
+        {/* Usa a montagem original inteira como fundo; sem alterar a foto. */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('/api/hero-collage')",
-            opacity: 0.34,
+            backgroundImage: "url('/soma-hero-collage.webp')",
           }}
         />
+        {/* O efeito escuro vem somente deste overlay, como nas referências enviadas. */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-10"
-          style={{
-            background:
-              'linear-gradient(90deg, rgba(8,12,11,0.42) 0%, rgba(8,12,11,0.30) 48%, rgba(8,12,11,0.38) 100%)',
-          }}
+          className="absolute inset-0 z-10 bg-black/60"
         />
         <div className="relative z-20 max-w-5xl mx-auto">
           <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
