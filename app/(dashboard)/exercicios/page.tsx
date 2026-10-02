@@ -13,42 +13,37 @@ export default async function ExerciciosPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single<Profile>();
-
-  const { data: diagnostics } = await supabase
-    .from('diagnostics')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .returns<Diagnostic[]>();
-
-  const [{ data: viaResultados }, { data: resumosPerfil }] = await Promise.all([
-    supabase
-      .from('via_resultados')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .returns<ViaResultado[]>(),
-    supabase
-      .from('resumo_perfil')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('gerado_em', { ascending: false })
-      .limit(1)
-      .returns<ResumoPerfil[]>(),
-  ]);
+  const [{ data: profile }, { data: diagnostics }, { data: viaResultados }, { data: resumosPerfil }] =
+    await Promise.all([
+      supabase.from('profiles').select('*').eq('id', user.id).single<Profile>(),
+      supabase
+        .from('diagnostics')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
+        .returns<Diagnostic[]>(),
+      supabase
+        .from('via_resultados')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('data_teste', { ascending: false })
+        .order('created_at', { ascending: false })
+        .returns<ViaResultado[]>(),
+      supabase
+        .from('resumo_perfil')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('gerado_em', { ascending: false })
+        .limit(1)
+        .returns<ResumoPerfil[]>(),
+    ]);
 
   return (
     <ExerciciosClient
       profile={profile}
       diagnostics={diagnostics ?? []}
       userId={user.id}
-      viaResultadoInicial={viaResultados?.[0] ?? null}
+      viaResultadosIniciais={viaResultados ?? []}
       resumoPerfilInicial={resumosPerfil?.[0] ?? null}
     />
   );
