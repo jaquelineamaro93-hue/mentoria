@@ -56,20 +56,20 @@ export default async function HomePage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
-          <a href="#topo" className="font-display text-2xl text-white">SOMA Mentoria</a>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3 sm:gap-6">
+          <a href="#topo" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
           <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
             <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
             <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-sm">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-xs sm:text-sm">
               Entrar
             </Link>
             <Link
               href="/planos"
-              className="px-5 py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-sm text-white"
+              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-xs sm:text-sm text-white whitespace-nowrap"
               style={{ backgroundColor: '#0D8071' }}
             >
               Começar
@@ -81,13 +81,13 @@ export default async function HomePage() {
       {/* Hero — mesma estrutura aprovada, agora com colagem real das 10 fotos */}
       <section
         id="topo"
-        className="relative isolate overflow-hidden w-full px-6 py-20 md:py-24 text-center text-white"
+        className="relative isolate overflow-hidden w-full px-4 sm:px-6 py-14 sm:py-18 md:py-24 text-center text-white"
         style={{ backgroundColor: '#101513' }}
       >
         {/* Usa a montagem original inteira como fundo; sem alterar a foto. */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-0 bg-cover bg-center"
+          className="absolute inset-0 z-0 bg-cover bg-[position:58%_center] md:bg-center"
           style={{
             backgroundImage: "url('/api/hero-collage?v=20261002-2')",
           }}
@@ -98,13 +98,13 @@ export default async function HomePage() {
           className="absolute inset-0 z-10 bg-black/60"
         />
         <div className="relative z-20 max-w-5xl mx-auto">
-          <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.18em] sm:tracking-[0.25em] mb-3 sm:mb-4" style={{ color: '#55C9B9' }}>
             Mentoria de carreira + portal de acompanhamento
           </p>
-          <h2 className="font-display text-5xl md:text-6xl leading-[1.02] mb-6">
+          <h2 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.02] mb-5 sm:mb-6">
             Entenda seu momento. Escolha uma direção. Transforme clareza em movimento.
           </h2>
-          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl mb-7 sm:mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
             A SOMA une autoconhecimento, estratégia e execução para quem quer crescer na empresa,
             buscar uma nova oportunidade ou simplesmente parar de tomar decisões de carreira no escuro.
             E o portal mantém sua jornada organizada entre um encontro e outro.
@@ -113,14 +113,14 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="#portal"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-4 rounded-lg font-medium transition-colors text-white"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-5 sm:px-7 py-3.5 sm:py-4 rounded-lg font-medium transition-colors text-white text-sm sm:text-base"
               style={{ backgroundColor: '#0D8071' }}
             >
               Ver a SOMA por dentro
             </a>
             <Link
               href="/planos"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-5 sm:px-7 py-3.5 sm:py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors text-sm sm:text-base"
             >
               Ver planos
             </Link>
@@ -128,7 +128,7 @@ export default async function HomePage() {
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 sm:py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors text-sm sm:text-base"
             >
               <MessageCircle size={18} />
               Tirar dúvidas
@@ -143,7 +143,7 @@ export default async function HomePage() {
 
       {/* Para qual momento */}
       <section className="bg-white py-16 border-b border-gray-faint">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl mx-auto text-center mb-10">
             <p className="text-xs uppercase tracking-[0.2em] mb-3 text-mint-deep">Seu momento importa</p>
             <h3 className="font-display text-3xl md:text-4xl text-black">
@@ -156,21 +156,21 @@ export default async function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
-            <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
+            <div className="rounded-2xl border border-gray-faint p-5 sm:p-6 transition-transform duration-200 hover:-translate-y-1">
               <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#0D8071]/30 bg-[#0D8071]/[0.07] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#0D8071]">01</span>
               <h4 className="font-display text-xl text-black mt-4">Quero crescer onde estou</h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
                 Leitura de cenário, primeiros 90 dias, posicionamento interno e plano de desenvolvimento.
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
+            <div className="rounded-2xl border border-gray-faint p-5 sm:p-6 transition-transform duration-200 hover:-translate-y-1">
               <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#8E3F4A]/25 bg-[#8E3F4A]/[0.06] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#8E3F4A]">02</span>
               <h4 className="font-display text-xl text-black mt-4">Quero uma nova oportunidade</h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
                 Currículo, Gupy & ATS, LinkedIn, networking, vagas, candidaturas e entrevistas.
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
+            <div className="rounded-2xl border border-gray-faint p-5 sm:p-6 transition-transform duration-200 hover:-translate-y-1">
               <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#8A4B1D]/25 bg-[#8A4B1D]/[0.06] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#8A4B1D]">03</span>
               <h4 className="font-display text-xl text-black mt-4">Ainda preciso entender minha direção</h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
@@ -185,7 +185,7 @@ export default async function HomePage() {
 
       {/* Sobre a mentora — compacto e horizontal */}
       <section className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Sobre a mentora</p>
@@ -195,7 +195,7 @@ export default async function HomePage() {
                 <p>Na SOMA, transforma essa vivência em orientação prática para quem precisa ganhar clareza, se posicionar melhor e transformar estratégia em movimento de carreira.</p>
               </div>
             </div>
-            <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-6">
+            <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-5 sm:p-6">
               <div className="flex items-center gap-4">
                 <img src="https://lh3.googleusercontent.com/a/ACg8ocK5UM1XQO5ZsfxXR9UFYwL0AMIwJbtOw8azK85UTGZE2ljwqCzksQ=s192-c" alt="Jaqueline Amaro" referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-full object-cover" />
                 <div>
@@ -215,7 +215,7 @@ export default async function HomePage() {
 
       {/* SOMA Pilares — compacto */}
       <section className="py-14 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl mb-8">
             <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>A metodologia</p>
             <h3 className="font-display text-3xl mb-3" style={{ color: '#1A1A1A' }}>SOMA: sua totalidade</h3>
@@ -243,7 +243,7 @@ export default async function HomePage() {
 
       {/* Planos — resumo compacto */}
       <section id="planos" className="py-14 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Planos</p>
@@ -262,15 +262,15 @@ export default async function HomePage() {
                 : null;
 
               return (
-                <div key={duracao} className="rounded-2xl border border-gray-faint p-6">
-                  <div className="flex items-start justify-between gap-4">
+                <div key={duracao} className="rounded-2xl border border-gray-faint p-5 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                       <p className="text-xs uppercase tracking-[0.16em] text-gray-text">SOMA</p>
                       <h4 className="mt-1 font-display text-2xl text-black">{duracao} meses</h4>
                       <p className="mt-2 text-sm text-gray-text">{duracao === 6 ? 'Movimento e posicionamento' : 'Consistência e alta performance'}</p>
                     </div>
                     {menorPreco !== null && (
-                      <div className="text-right">
+                      <div className="text-left sm:text-right">
                         <p className="text-[11px] text-gray-text">a partir de</p>
                         <p className="font-display text-xl text-black">
                           R$ {menorPreco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -291,7 +291,7 @@ export default async function HomePage() {
       
 
       {/* CTA Final — Preto */}
-      <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-6 py-12 text-center">
+      <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-4 sm:px-6 py-12 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="mx-auto mb-4 h-px w-12 bg-[#55C9B9]" aria-hidden="true" />
           <h3 className="font-display text-3xl mb-3 text-white">É o momento de somar suas forças</h3>
@@ -310,13 +310,13 @@ export default async function HomePage() {
 
       {/* FAQ Section */}
       <section className="py-14 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="font-display text-4xl text-center text-black mb-2">Perguntas Frequentes</h2>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <h2 className="font-display text-3xl sm:text-4xl text-center text-black mb-2">Perguntas Frequentes</h2>
           <p className="text-center text-gray-text mb-8 text-base">Tire suas dúvidas sobre como a mentoria SOMA funciona</p>
 
           <div className="space-y-4">
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
+              <summary className="font-display text-base sm:text-lg text-black flex justify-between items-center gap-4 cursor-pointer">
                 <span>Como a mentoria SOMA funciona?</span>
                 <span className="text-gray-text">+</span>
               </summary>
