@@ -186,13 +186,13 @@ const SHOWCASES = [
 
 export default function SomaProductShowcase() {
   return (
-    <section id="portal" className="border-y border-gray-faint bg-[#f7f9fb] py-20">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto mb-14 max-w-3xl text-center">
+    <section id="portal" className="border-y border-gray-faint bg-[#f7f9fb] py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto mb-10 sm:mb-14 max-w-3xl text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-mint-deep">
             Veja a SOMA por dentro
           </p>
-          <h2 className="font-display text-4xl text-black md:text-5xl">
+          <h2 className="font-display text-3xl sm:text-4xl text-black md:text-5xl">
             A mentoria não termina quando o encontro acaba.
           </h2>
           <p className="mt-5 text-base leading-relaxed text-gray-text md:text-lg">
@@ -201,7 +201,7 @@ export default function SomaProductShowcase() {
           </p>
         </div>
 
-        <div className="space-y-16">
+        <div className="space-y-12 sm:space-y-16">
           {SHOWCASES.map((item, index) => (
             <article
               key={item.tag}
@@ -211,7 +211,7 @@ export default function SomaProductShowcase() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-mint-deep">
                   {item.tag}
                 </p>
-                <h3 className="mt-3 font-display text-3xl leading-tight text-black">
+                <h3 className="mt-3 font-display text-2xl sm:text-3xl leading-tight text-black">
                   {item.titulo}
                 </h3>
                 <p className="mt-4 text-sm leading-relaxed text-gray-text md:text-base">
@@ -232,9 +232,9 @@ export default function SomaProductShowcase() {
           ))}
         </div>
 
-        <div className="mt-16 rounded-2xl bg-[#15201e] px-6 py-8 text-center text-white md:px-10">
+        <div className="mt-12 sm:mt-16 rounded-2xl bg-[#15201e] px-4 sm:px-6 py-7 sm:py-8 text-center text-white md:px-10">
           <div className="mx-auto h-px w-12 bg-[#55c9b9]" aria-hidden="true" />
-          <p className="mt-4 font-display text-2xl">Humano no que precisa de contexto, tecnologia no que precisa de continuidade.</p>
+          <p className="mt-4 font-display text-xl sm:text-2xl">Humano no que precisa de contexto, tecnologia no que precisa de continuidade.</p>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/70">
             A IA apoia análises e preparação. A mentoria conecta essas informações ao seu momento real,
             às decisões de carreira e ao que você consegue sustentar na prática.
