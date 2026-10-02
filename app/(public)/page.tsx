@@ -197,7 +197,7 @@ export default async function HomePage() {
             </div>
             <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-6">
               <div className="flex items-center gap-4">
-                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#15201e] font-display text-lg text-white">JA</div>
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocK5UM1XQO5ZsfxXR9UFYwL0AMIwJbtOw8azK85UTGZE2ljwqCzksQ=s192-c" alt="Jaqueline Amaro" referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-full object-cover" />
                 <div>
                   <p className="font-semibold text-black">Jaqueline, a mentora</p>
                   <p className="mt-1 text-sm text-gray-text">Estratégia de carreira com repertório real de mercado.</p>
