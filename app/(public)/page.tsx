@@ -101,7 +101,7 @@ export default async function HomePage() {
           className="absolute inset-0 -z-10"
           style={{
             background:
-              'linear-gradient(90deg, rgba(8,12,11,0.88) 0%, rgba(8,12,11,0.79) 48%, rgba(8,12,11,0.82) 100%)',
+              'linear-gradient(90deg, rgba(8,12,11,0.70) 0%, rgba(8,12,11,0.56) 48%, rgba(8,12,11,0.64) 100%)',
           }}
         />
         <div className="relative max-w-5xl mx-auto">
