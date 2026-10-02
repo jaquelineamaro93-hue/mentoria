@@ -157,7 +157,7 @@ export default function DashboardClient({
   const proximoMarcoHref = !quemSouCompleto
     ? '/quem-sou-eu'
     : !viaCompleto
-    ? '/exercicios'
+    ? '/exercicios?tab=via'
     : !bussolaCompleto
     ? '/exercicios'
     : !pdiCompleto
@@ -527,7 +527,7 @@ export default function DashboardClient({
           <Panel className="divide-y divide-line border-gray-faint">
             {[
               { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
-              { label: 'Teste VIA Character Strengths', done: viaCompleto, href: '/exercicios' },
+              { label: 'Teste VIA Character Strengths', done: viaCompleto, href: '/exercicios?tab=via' },
               { label: 'Bússola de Posicionamento', done: bussolaCompleto, href: '/exercicios' },
               { label: 'PDI, Plano de Desenvolvimento Individual', done: pdiCompleto, href: '/pdi' },
             ].map((tarefa) => (
