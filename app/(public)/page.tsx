@@ -84,17 +84,21 @@ export default async function HomePage() {
         className="relative isolate overflow-hidden w-full px-6 py-20 md:py-24 text-center text-white"
         style={{ backgroundColor: '#101513' }}
       >
+        {/* A montagem permanece exatamente a mesma; o efeito visual vem só da opacidade + overlay. */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/api/hero-collage')" }}
+          style={{
+            backgroundImage: "url('/api/hero-collage')",
+            opacity: 0.34,
+          }}
         />
         <div
           aria-hidden="true"
           className="absolute inset-0 z-10"
           style={{
             background:
-              'linear-gradient(90deg, rgba(8,12,11,0.74) 0%, rgba(8,12,11,0.62) 48%, rgba(8,12,11,0.68) 100%)',
+              'linear-gradient(90deg, rgba(8,12,11,0.42) 0%, rgba(8,12,11,0.30) 48%, rgba(8,12,11,0.38) 100%)',
           }}
         />
         <div className="relative z-20 max-w-5xl mx-auto">
