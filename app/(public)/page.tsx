@@ -1,12 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  CheckCircle2,
-  Users,
-  Compass,
-  Target,
-  MessageCircle,
-} from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
@@ -65,7 +59,6 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
           <a href="#topo" className="font-display text-2xl text-white">SOMA Mentoria</a>
           <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
-            <a href="#portal" className="hover:text-white transition-colors">Ver por dentro</a>
             <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
             <a href="#depoimentos" className="hover:text-white transition-colors">Depoimentos</a>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
@@ -93,18 +86,18 @@ export default async function HomePage() {
       >
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-20 bg-cover bg-center"
+          className="absolute inset-0 z-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/soma-hero-collage.webp')" }}
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10"
+          className="absolute inset-0 z-10"
           style={{
             background:
               'linear-gradient(90deg, rgba(8,12,11,0.70) 0%, rgba(8,12,11,0.56) 48%, rgba(8,12,11,0.64) 100%)',
           }}
         />
-        <div className="relative max-w-5xl mx-auto">
+        <div className="relative z-20 max-w-5xl mx-auto">
           <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
             Mentoria de carreira + portal de acompanhamento
           </p>
@@ -190,38 +183,57 @@ export default async function HomePage() {
 
       <SomaProductShowcase />
 
-      {/* Sobre — Branco */}
-      <section className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-4xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>Sobre a mentora</p>
-          <h3 className="font-display text-3xl text-center mb-8" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
-          <div className="leading-relaxed space-y-4 text-center max-w-2xl mx-auto" style={{ color: '#808080' }}>
-            <p>Administradora e Head de CRM, com uma trajetória construída na intersecção entre dados, tecnologia e negócios. Passagens em empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
-            <p>Como head de agência e mentora, já vivi na prática o desafio de transformar arquiteturas em resultados reais e carreiras estagnadas em trajetórias de alta performance.</p>
-            <p>Hoje coloco toda essa vivência de mercado a serviço de profissionais que desejam impulsionar a carreira com intenção estratégica. Através da Metodologia SOMA, entrego o mapa para você sair da execução automática, ganhar autoridade e construir um futuro com propósito e ROI pessoal.</p>
+      {/* Sobre a mentora — compacto e horizontal */}
+      <section className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Sobre a mentora</p>
+              <h3 className="font-display text-3xl mb-4" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
+              <div className="leading-relaxed space-y-3 max-w-3xl" style={{ color: '#808080' }}>
+                <p>Administradora e Head de CRM, com trajetória na intersecção entre dados, tecnologia e negócios e passagens por empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
+                <p>Na SOMA, transforma essa vivência em orientação prática para quem precisa ganhar clareza, se posicionar melhor e transformar estratégia em movimento de carreira.</p>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-6">
+              <div className="flex items-center gap-4">
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#15201e] font-display text-lg text-white">JA</div>
+                <div>
+                  <p className="font-semibold text-black">Jaqueline, a mentora</p>
+                  <p className="mt-1 text-sm text-gray-text">Estratégia de carreira com repertório real de mercado.</p>
+                </div>
+              </div>
+              <div className="mt-5 grid gap-2 text-sm text-gray-text sm:grid-cols-3 lg:grid-cols-1">
+                <span>Dados + negócios</span>
+                <span>Posicionamento + execução</span>
+                <span>Mentoria + acompanhamento</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* SOMA Pilares */}
-      <section className="py-20 bg-white">
+      {/* SOMA Pilares — compacto */}
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>A metodologia</p>
-          <h3 className="font-display text-3xl text-center mb-4" style={{ color: '#1A1A1A' }}>SOMA: sua totalidade</h3>
-          <p className="text-center max-w-2xl mx-auto mb-12" style={{ color: '#808080' }}>
-            A palavra SOMA vem do grego e representa a totalidade do ser: a união entre mente, corpo e espírito. Um chamado para você integrar todas as suas potências e parar de fragmentar quem você é.
-          </p>
+          <div className="max-w-3xl mb-8">
+            <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>A metodologia</p>
+            <h3 className="font-display text-3xl mb-3" style={{ color: '#1A1A1A' }}>SOMA: sua totalidade</h3>
+            <p className="text-sm leading-relaxed" style={{ color: '#808080' }}>
+              Quatro pilares para integrar autoconhecimento, direção, execução e resultado sem fragmentar sua trajetória.
+            </p>
+          </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {PILARES_SOMA.map((pilar) => {
               const cores: any = { S: '#0D8071', O: '#B24D5B', M: '#A85D24', A: '#1A1A1A' };
               return (
-                <div key={pilar.letra} className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
-                  <div className="w-10 h-10 rounded-full text-white flex items-center justify-center font-display text-lg mb-4" style={{ backgroundColor: cores[pilar.letra] }}>
+                <div key={pilar.letra} className="border rounded-2xl p-5 bg-white" style={{ borderColor: '#E8E8E8' }}>
+                  <div className="w-9 h-9 rounded-full text-white flex items-center justify-center font-display text-base mb-3" style={{ backgroundColor: cores[pilar.letra] }}>
                     {pilar.letra}
                   </div>
-                  <h4 className="font-display text-lg mb-2" style={{ color: '#1A1A1A' }}>{pilar.titulo}</h4>
-                  <p className="text-sm" style={{ color: '#808080' }}>{pilar.texto}</p>
+                  <h4 className="font-display text-base mb-2" style={{ color: '#1A1A1A' }}>{pilar.titulo}</h4>
+                  <p className="text-xs leading-relaxed" style={{ color: '#808080' }}>{pilar.texto}</p>
                 </div>
               );
             })}
@@ -229,68 +241,50 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Como funciona */}
-      <section id="como-funciona" className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
+      {/* Como funciona — compacto */}
+      <section id="como-funciona" className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.2em] mb-3 text-center" style={{ color: '#0D8071' }}>Como funciona</p>
-          <h3 className="font-display text-3xl text-center mb-4" style={{ color: '#1A1A1A' }}>Análise individual + poder do coletivo</h3>
-          <p className="text-center max-w-2xl mx-auto mb-12" style={{ color: '#808080' }}>
-            Você entende seu contexto, organiza a rota e leva situações reais para os encontros. O portal registra o que foi construído para que a evolução não dependa da memória da última conversa.
-          </p>
+          <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Como funciona</p>
+              <h3 className="font-display text-3xl" style={{ color: '#1A1A1A' }}>Humano no contexto, portal na continuidade.</h3>
+            </div>
+            <p className="max-w-xl text-sm leading-relaxed" style={{ color: '#808080' }}>
+              O encontro ajuda a ler o momento. O portal registra decisões, ações e evolução para você não recomeçar do zero.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="border rounded-2xl p-8 bg-white" style={{ borderColor: '#E8E8E8' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(13,128,113,.28)', color: '#0D8071', backgroundColor: 'rgba(13,128,113,.06)' }}>
-                  01
-                </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
+              <div className="flex items-start gap-4">
+                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(13,128,113,.28)', color: '#0D8071', backgroundColor: 'rgba(13,128,113,.06)' }}>01</div>
                 <div>
-                  <p className="text-xs uppercase tracking-wide" style={{ color: '#0D8071' }}>Etapa 1 · Online</p>
-                  <h4 className="font-display text-lg" style={{ color: '#1A1A1A' }}>Alinhamento e mapa individual</h4>
+                  <p className="text-xs uppercase tracking-wide" style={{ color: '#0D8071' }}>Online</p>
+                  <h4 className="font-display text-lg mt-1" style={{ color: '#1A1A1A' }}>Alinhamento e mapa individual</h4>
+                  <p className="mt-2 text-sm leading-relaxed" style={{ color: '#808080' }}>Metas, bloqueios, forças, contexto e direção traduzidos em um plano prático.</p>
                 </div>
               </div>
-              <ul className="space-y-3 text-sm" style={{ color: '#808080' }}>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span><strong style={{ color: '#1A1A1A' }}>Mergulho nas metas:</strong> sessão individual para entender seus desejos, o que te bloqueia e onde você quer chegar.</span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span><strong style={{ color: '#1A1A1A' }}>Clareza comportamental:</strong> reconheça forças, padrões, motivadores e o que sustenta suas decisões.</span>
-                </li>
-              </ul>
             </div>
 
-            <div className="border rounded-2xl p-8 bg-white" style={{ borderColor: '#E8E8E8' }}>
-              <div className="flex items-center gap-3 mb-5">
-                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(142,63,74,.25)', color: '#8E3F4A', backgroundColor: 'rgba(142,63,74,.06)' }}>
-                  02
-                </div>
+            <div className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
+              <div className="flex items-start gap-4">
+                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(142,63,74,.25)', color: '#8E3F4A', backgroundColor: 'rgba(142,63,74,.06)' }}>02</div>
                 <div>
-                  <p className="text-xs uppercase tracking-wide" style={{ color: '#8E3F4A' }}>Etapa 2 · Presencial</p>
-                  <h4 className="font-display text-lg" style={{ color: '#1A1A1A' }}>Fluxo, presença e ambiência</h4>
+                  <p className="text-xs uppercase tracking-wide" style={{ color: '#8E3F4A' }}>Presencial ou online</p>
+                  <h4 className="font-display text-lg mt-1" style={{ color: '#1A1A1A' }}>Presença, posicionamento e troca</h4>
+                  <p className="mt-2 text-sm leading-relaxed" style={{ color: '#808080' }}>Situações reais, posicionamento profissional, repertório coletivo e próximos movimentos.</p>
                 </div>
               </div>
-              <ul className="space-y-3 text-sm" style={{ color: '#808080' }}>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span><strong style={{ color: '#1A1A1A' }}>Encontro com membros:</strong> discuta contextos reais de carreira e ambientes corporativos.</span>
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                  <span><strong style={{ color: '#1A1A1A' }}>Estratégia de posicionamento:</strong> LinkedIn e CV sob ótica de quem se destaca.</span>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
       </section>
 
       {/* DEPOIMENTOS */}
-      <section id="depoimentos" className="px-6 py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
+      <section id="depoimentos" className="px-6 py-14 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
         <div className="max-w-5xl mx-auto">
           <p className="text-xs uppercase tracking-wider mb-4 text-center font-semibold" style={{ color: '#808080' }}>Histórias reais</p>
-          <h3 className="font-display text-4xl text-center mb-12" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
+          <h3 className="font-display text-4xl text-center mb-8" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
 
           <div className="grid md:grid-cols-3 gap-6">
             <a href="https://lnkd.in/p/esE9t5fr" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(13, 128, 113, 0.08)', borderColor: '#0D8071' }}>
@@ -341,28 +335,45 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Planos */}
-      <section id="planos" className="py-20 bg-white">
+      {/* Planos — resumo compacto */}
+      <section id="planos" className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6">
-          <h3 className="font-display text-3xl text-center mb-2" style={{ color: '#1A1A1A' }}>Escolha seu Plano</h3>
-          <p className="text-sm text-center mb-12" style={{ color: '#808080' }}>
-            Os valores abaixo são carregados da mesma base usada no checkout do Mercado Pago.
-          </p>
+          <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Planos</p>
+              <h3 className="font-display text-3xl" style={{ color: '#1A1A1A' }}>Escolha o tempo da sua jornada.</h3>
+            </div>
+            <p className="max-w-lg text-sm leading-relaxed" style={{ color: '#808080' }}>
+              Formatos online e híbridos. Valores atualizados pela mesma base do checkout.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {planos.map((plano, i) => {
-              const destaque = i === planos.length - 1 && planos.length > 1;
+          <div className="grid gap-5 md:grid-cols-2">
+            {[6, 12].map((duracao) => {
+              const opcoes = planos.filter((plano) => Number(plano.duracao_meses) === duracao);
+              const menorPreco = opcoes.length
+                ? Math.min(...opcoes.map((plano) => Number(plano.preco_avista)))
+                : null;
+
               return (
-                <div key={plano.id} className="rounded-2xl p-8 border-2" style={{ borderColor: destaque ? '#1A1A1A' : '#E8E8E8', backgroundColor: destaque ? 'rgba(26, 26, 26, 0.02)' : '#FFFFFF' }}>
-                  {destaque && <div className="mb-4"><span className="text-white text-xs font-medium px-3 py-1 rounded-full" style={{ backgroundColor: '#1A1A1A' }}>Mais completo</span></div>}
-                  <h4 className="font-display text-2xl mb-1" style={{ color: '#1A1A1A' }}>{plano.nome}</h4>
-                  {plano.foco && <p className="text-sm mb-6" style={{ color: '#808080' }}>{plano.foco}</p>}
-                  <div className="mb-6">
-                    <p className="font-display text-3xl mb-1" style={{ color: '#1A1A1A' }}>R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                    <p className="text-xs" style={{ color: '#808080' }}>à vista</p>
+                <div key={duracao} className="rounded-2xl border border-gray-faint p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-gray-text">SOMA</p>
+                      <h4 className="mt-1 font-display text-2xl text-black">{duracao} meses</h4>
+                      <p className="mt-2 text-sm text-gray-text">{duracao === 6 ? 'Movimento e posicionamento' : 'Consistência e alta performance'}</p>
+                    </div>
+                    {menorPreco !== null && (
+                      <div className="text-right">
+                        <p className="text-[11px] text-gray-text">a partir de</p>
+                        <p className="font-display text-xl text-black">
+                          R$ {menorPreco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <Link href="/planos" className="w-full block text-center px-6 py-3 rounded-lg font-medium transition-colors" style={{ backgroundColor: destaque ? '#0D8071' : 'rgba(61, 217, 200, 0.1)', color: destaque ? '#1A1A1A' : '#0D8071' }}>
-                    Escolher Plano
+                  <Link href="/planos" className="mt-5 inline-flex items-center text-sm font-semibold text-mint-deep">
+                    Ver formatos e condições →
                   </Link>
                 </div>
               );
@@ -371,46 +382,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Benefícios */}
-      <section className="bg-white py-20" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <h3 className="font-display text-3xl text-center mb-12" style={{ color: '#1A1A1A' }}>Por que SOMA?</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <Compass size={32} className="mx-auto mb-4" style={{ color: '#1A1A1A' }} />
-              <h4 className="font-display text-lg mb-2" style={{ color: '#1A1A1A' }}>Diagnóstico real</h4>
-              <p className="text-sm" style={{ color: '#808080' }}>Análise de perfil feita por quem viveu o mercado, não um teste genérico.</p>
-            </div>
-            <div className="text-center">
-              <Users size={32} className="mx-auto mb-4" style={{ color: '#0D8071' }} />
-              <h4 className="font-display text-lg mb-2" style={{ color: '#1A1A1A' }}>Comunidade</h4>
-              <p className="text-sm" style={{ color: '#808080' }}>Encontros presenciais com quem busca o mesmo nível de excelência.</p>
-            </div>
-            <div className="text-center">
-              <Target size={32} className="mx-auto mb-4" style={{ color: '#8E3F4A' }} />
-              <h4 className="font-display text-lg mb-2" style={{ color: '#1A1A1A' }}>Plano de ação</h4>
-              <p className="text-sm" style={{ color: '#808080' }}>Roteiro prático de 90 dias, não só teoria.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* CTA Final — Preto */}
-      <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-6 py-16 text-center">
+      <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-6 py-12 text-center">
         <div className="max-w-4xl mx-auto">
-          <div className="mx-auto mb-5 h-px w-12 bg-[#55C9B9]" aria-hidden="true" />
-          <h3 className="font-display text-3xl mb-4 text-white">É o momento de somar suas forças</h3>
-          <p className="text-lg mb-8 opacity-90 max-w-xl mx-auto text-white">Para quem não aceita mais perder, busca integrar quem é com o que faz e quer ocupar o seu lugar no mundo.</p>
+          <div className="mx-auto mb-4 h-px w-12 bg-[#55C9B9]" aria-hidden="true" />
+          <h3 className="font-display text-3xl mb-3 text-white">É o momento de somar suas forças</h3>
+          <p className="mb-6 max-w-2xl mx-auto text-white/75">Clareza para decidir, estratégia para se posicionar e acompanhamento para continuar avançando.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/planos" className="inline-flex justify-center px-8 py-4 rounded-lg font-display text-lg transition-colors text-white" style={{ backgroundColor: '#0D8071' }}>
+            <Link href="/planos" className="inline-flex justify-center px-7 py-3.5 rounded-lg font-medium text-white" style={{ backgroundColor: '#0D8071' }}>
               Ver Planos e Começar
             </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg border border-white/25 font-medium text-white hover:bg-white/5 transition-colors"
-            >
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/25 font-medium text-white hover:bg-white/5 transition-colors">
               <MessageCircle size={18} />
               Falar comigo no WhatsApp
             </a>
@@ -419,13 +403,13 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
+      <section className="py-14 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="font-display text-4xl text-center text-black mb-2">Perguntas Frequentes</h2>
-          <p className="text-center text-gray-text mb-12 text-base">Tire suas dúvidas sobre como a mentoria SOMA funciona</p>
+          <p className="text-center text-gray-text mb-8 text-base">Tire suas dúvidas sobre como a mentoria SOMA funciona</p>
 
           <div className="space-y-4">
-            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors" open>
+            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
                 <span>Como a mentoria SOMA funciona?</span>
                 <span className="text-gray-text">+</span>
@@ -433,7 +417,7 @@ export default async function HomePage() {
               <p className="text-gray-text mt-4 leading-relaxed">A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você.</p>
             </details>
 
-            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
                 <span>O que eu encontro dentro do portal?</span>
                 <span className="text-gray-text">+</span>
@@ -443,7 +427,7 @@ export default async function HomePage() {
               </p>
             </details>
 
-            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
                 <span>Quanto tempo preciso dedicar à mentoria?</span>
                 <span className="text-gray-text">+</span>
@@ -451,7 +435,7 @@ export default async function HomePage() {
               <p className="text-gray-text mt-4 leading-relaxed">Oferecemos planos de 6 meses ou 12 meses conforme sua necessidade. A mentoria se adapta ao seu contexto, seja você começando algo novo, enfrentando uma crise ou buscando fazer as coisas com mais excelência. O tempo depende do quanto você quer evoluir e do quanto está disposto a se dedicar.</p>
             </details>
 
-            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
                 <span>Qual é o investimento?</span>
                 <span className="text-gray-text">+</span>
@@ -459,7 +443,7 @@ export default async function HomePage() {
               <p className="text-gray-text mt-4 leading-relaxed">A gente oferece flexibilidade total. Você pode pagar à vista com PIX, em uma parcela no cartão ou parcelar ao longo dos meses. Depois que você confirma o pagamento, já ganha acesso ao portal com todos os materiais, agendamento dos encontros e começa a jornada. Tudo fica guardado lá pra você acompanhar seu progresso.</p>
             </details>
 
-            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
                 <span>Preciso vir presencialmente?</span>
                 <span className="text-gray-text">+</span>
@@ -467,7 +451,7 @@ export default async function HomePage() {
               <p className="text-gray-text mt-4 leading-relaxed">Temos planos 100% online e planos presenciais. Se você não consegue vir pessoalmente, sem problema. Os encontros em grupo podem ser virtuais. O importante é que você realmente quer mudar de patamar na carreira e está aberto pra aprender com quem já passou pelo mesmo que você.</p>
             </details>
 
-            <details className="border border-gray-faint rounded-lg p-6 cursor-pointer hover:border-gray-text transition-colors">
+            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
                 <span>Posso ver quem já fez a mentoria?</span>
                 <span className="text-gray-text">+</span>
