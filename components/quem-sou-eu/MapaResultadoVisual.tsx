@@ -465,6 +465,37 @@ export default function MapaResultadoVisual({
               </div>
             ))}
           </div>
+
+          <div className="grid md:grid-cols-2 gap-4 mt-5">
+            <div className="rounded-2xl border border-mint bg-mint-light/50 p-5">
+              <p className="text-sm font-semibold text-black">Mais importante agora</p>
+              <p className="text-xs text-gray-text mt-1 mb-3">
+                Temas que aparecem ligados ao seu momento atual e à sua contribuição.
+              </p>
+              <p className="text-sm text-black leading-6">
+                {resumo(
+                  [respostas.presenca_atual, respostas.contribuicao, respostas.ciclos_energia]
+                    .filter(Boolean)
+                    .join(' '),
+                  320
+                ) || 'Ainda não há informação suficiente para priorizar.'}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-faint bg-white p-5">
+              <p className="text-sm font-semibold text-black">Pode amadurecer depois</p>
+              <p className="text-xs text-gray-text mt-1 mb-3">
+                Temas valiosos, mas que não precisam virar ação imediata.
+              </p>
+              <p className="text-sm text-black leading-6">
+                {resumo(
+                  [respostas.chamados_esquecidos, respostas.paixoes]
+                    .filter(Boolean)
+                    .join(' '),
+                  320
+                ) || 'Nenhum tema secundário identificado ainda.'}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
