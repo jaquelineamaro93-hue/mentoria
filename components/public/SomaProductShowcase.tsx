@@ -234,7 +234,7 @@ export default function SomaProductShowcase() {
 
         <div className="mt-16 rounded-2xl bg-[#15201e] px-6 py-8 text-center text-white md:px-10">
           <div className="mx-auto h-px w-12 bg-[#55c9b9]" aria-hidden="true" />
-          <p className="mt-4 font-display text-2xl">Humano no que precisa de contexto. Tecnologia no que precisa de continuidade.</p>
+          <p className="mt-4 font-display text-2xl">Humano no que precisa de contexto, tecnologia no que precisa de continuidade.</p>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/70">
             A IA apoia análises e preparação. A mentoria conecta essas informações ao seu momento real,
             às decisões de carreira e ao que você consegue sustentar na prática.
