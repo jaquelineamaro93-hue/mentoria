@@ -38,14 +38,14 @@ export default async function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-white px-4 py-6 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-8">
+        <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6 sm:mb-8">
           <ArrowLeft size={20} />
           <span>Voltar</span>
         </Link>
 
-        <h1 className="text-4xl font-display text-black mb-12 text-center">Checkout</h1>
+        <h1 className="text-3xl sm:text-4xl font-display text-black mb-8 sm:mb-12 text-center">Checkout</h1>
 
         {planoAtualCodigo && (
           <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black">
