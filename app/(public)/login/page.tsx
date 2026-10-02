@@ -200,14 +200,21 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div className="w-full max-w-md relative">
+    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden bg-[#101513]">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/soma-hero-collage.webp')" }}
+      />
+      <div aria-hidden="true" className="absolute inset-0 z-10 bg-black/70" />
+
+      <div className="w-full max-w-md relative z-20">
         <div className="text-center mb-10">
-          <p className="font-display text-4xl tracking-wide text-black">
+          <p className="font-display text-4xl tracking-wide text-white">
             SOMA <span className="text-mint">MENTORIA</span>
           </p>
-          <div className="h-px w-12 bg-brown mx-auto my-3" />
-          <p className="text-xs uppercase tracking-[0.25em] text-gray-text">
+          <div className="h-px w-12 bg-mint mx-auto my-3" />
+          <p className="text-xs uppercase tracking-[0.25em] text-white/65">
             Portal do Mentorado
           </p>
         </div>
