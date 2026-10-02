@@ -62,8 +62,8 @@ export default function OnboardingClient({
       titulo: 'Diagnóstico & Perfil (VIA)',
       descricao: 'Teste de forças de caráter para embasar seu plano de desenvolvimento.',
       feita: progresso.fezVia,
-      href: '/exercicios',
-      cta: 'Fazer diagnóstico',
+      href: '/exercicios?tab=via',
+      cta: 'Fazer teste VIA',
     },
     {
       titulo: 'Meu PDI',
