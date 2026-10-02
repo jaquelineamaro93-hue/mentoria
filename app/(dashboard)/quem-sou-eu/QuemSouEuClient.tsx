@@ -291,20 +291,3 @@ export default function QuemSouEuClient({
     </>
   );
 }
-
-function BussolaCard({
-  titulo,
-  texto,
-  className = '',
-}: {
-  titulo: string;
-  texto: string | null;
-  className?: string;
-}) {
-  return (
-    <Panel className={`p-5 ${className}`}>
-      <p className="text-[11px] uppercase tracking-wide text-mint mb-2">{titulo}</p>
-      <p className="text-sm text-black leading-relaxed">{texto}</p>
-    </Panel>
-  );
-}
