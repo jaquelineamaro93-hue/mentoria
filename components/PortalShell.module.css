@@ -56,10 +56,10 @@
 .breadcrumb > a { font-weight: 600; color: #1a3740; text-decoration: none; }
 .breadcrumb > svg { flex-shrink: 0; color: #8290a2; }
 .breadcrumbGroup { white-space: nowrap; }
-.currentPage { color: #25344a; font-weight: 500; }
+.currentPage { color: #25344a; font-weight: 500; min-width: 0; }
 .portalCaption { margin-left: auto; font-size: 12px; color: #65758b; text-align: right; }
 .main { min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; outline: none; }
-.pageContent { padding: 32px 38px 48px; width: 100%; max-width: 1680px; margin-inline: auto; }
+.pageContent { padding: 32px 38px 48px; width: 100%; max-width: 1680px; margin-inline: auto; min-width: 0; }
 .quickTip:has(> *) { margin-bottom: 24px; }
 .mobileToggle { display: none; }
 .skipLink { position: fixed; top: -100px; left: 16px; z-index: 100; background: #fff; color: #143d36; padding: 12px 18px; border: 2px solid #0d8071; border-radius: 8px; }
@@ -74,9 +74,13 @@
   .brandRow { min-height: 99px; }
   .topbar { min-height: 66px; padding: 12px 16px; gap: 10px; }
   .mobileToggle { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; color: #203447; border: 1px solid #dfe6ed; background: #fff; border-radius: 10px; cursor: pointer; }
-  .breadcrumb { gap: 8px; font-size: 14px; flex-wrap: wrap; }
+  .breadcrumb { gap: 8px; font-size: 13px; flex-wrap: nowrap; overflow: hidden; }
+  .breadcrumb > a { flex-shrink: 0; }
   .breadcrumbGroup { display: none; }
-  .pageContent { padding: 24px 16px 32px; }
+  .currentPage { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pageContent { padding: 20px 14px 30px; }
+  .pageContent :global(.overflow-x-auto) { -webkit-overflow-scrolling: touch; }
+  .pageContent :global(button), .pageContent :global(a) { max-width: 100%; }
   .main { scrollbar-gutter: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .sidebar, .workspace, .navLink, .groupToggle > svg { transition: none; } }
