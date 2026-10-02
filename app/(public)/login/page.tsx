@@ -200,19 +200,26 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden">
-      <div className="w-full max-w-md relative">
+    <div className="min-h-screen w-full flex items-center justify-center px-6 py-12 relative overflow-hidden bg-[#101513]">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/api/hero-collage?v=20261002-2')" }}
+      />
+      <div aria-hidden="true" className="absolute inset-0 z-10 bg-black/70" />
+
+      <div className="w-full max-w-md relative z-20">
         <div className="text-center mb-10">
-          <p className="font-display text-4xl tracking-wide text-black">
+          <p className="font-display text-4xl tracking-wide text-white">
             SOMA <span className="text-mint">MENTORIA</span>
           </p>
-          <div className="h-px w-12 bg-brown mx-auto my-3" />
-          <p className="text-xs uppercase tracking-[0.25em] text-gray-text">
+          <div className="h-px w-12 bg-white/30 mx-auto my-3" />
+          <p className="text-xs uppercase tracking-[0.25em] text-white/65">
             Portal do Mentorado
           </p>
         </div>
 
-        <div className="rounded-xl border border-gray-faint bg-white overflow-hidden">
+        <div className="rounded-xl border border-white/15 bg-white/95 overflow-hidden shadow-2xl backdrop-blur-sm">
           <div className="grid grid-cols-2">
             <button
               onClick={() => {

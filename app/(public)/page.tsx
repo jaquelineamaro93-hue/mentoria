@@ -89,7 +89,7 @@ export default async function HomePage() {
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('/soma-hero-collage.webp')",
+            backgroundImage: "url('/api/hero-collage?v=20261002-2')",
           }}
         />
         {/* O efeito escuro vem somente deste overlay, como nas referências enviadas. */}
