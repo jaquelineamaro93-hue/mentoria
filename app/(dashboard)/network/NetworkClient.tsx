@@ -193,14 +193,33 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   return (
     <>
       <main className="flex-1 overflow-y-auto px-6 py-10 md:px-12 w-full">
-        <Eyebrow>
-          <Network size={14} />
-          Rede & oportunidades
-        </Eyebrow>
-        <h1 className="font-display text-3xl text-black mb-1">Quem pode te conectar a novas oportunidades?</h1>
-        <p className="text-sm text-gray-text mb-8">
-          Mapeie sua rede, identifique quem pode te indicar, apresentar pessoas ou aproximar você de novas oportunidades e transforme isso em ações práticas.
-        </p>
+        <section className="relative isolate overflow-hidden rounded-2xl border border-gray-faint mb-8 min-h-[320px] flex items-center shadow-sm">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 bg-cover bg-center"
+            style={{ backgroundImage: "url('/soma-network-collage.webp')" }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(12,18,17,0.92) 0%, rgba(12,18,17,0.80) 42%, rgba(12,18,17,0.58) 72%, rgba(12,18,17,0.38) 100%)',
+            }}
+          />
+          <div className="relative z-10 p-7 md:p-10 max-w-3xl">
+            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-white/75 mb-4">
+              <Network size={14} />
+              Rede & oportunidades
+            </div>
+            <h1 className="font-display text-3xl md:text-4xl text-white mb-3 leading-tight">
+              Quem pode te conectar a novas oportunidades?
+            </h1>
+            <p className="text-sm md:text-base text-white/80 leading-relaxed max-w-2xl">
+              Mapeie sua rede, identifique quem pode te indicar, apresentar pessoas ou aproximar você de novas oportunidades e transforme isso em ações práticas.
+            </p>
+          </div>
+        </section>
 
         <div className="flex gap-4 mb-8 border-b border-gray-faint">
           <button
