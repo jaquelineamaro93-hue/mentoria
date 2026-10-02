@@ -38,11 +38,11 @@ function BrowserFrame({
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-faint bg-white shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
-      <div className="flex items-center gap-2 border-b border-gray-faint bg-[#f7f8fa] px-4 py-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 border-b border-gray-faint bg-[#f7f8fa] px-3 sm:px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-[#f2a7a7]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#f0d38a]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#91d2b8]" />
-        <div className="ml-2 rounded-md bg-white px-3 py-1 text-[10px] text-gray-text">
+        <div className="ml-1 sm:ml-2 min-w-0 truncate rounded-md bg-white px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] text-gray-text">
           portal SOMA · {label}
         </div>
       </div>
