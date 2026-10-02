@@ -227,7 +227,7 @@ function LoginPageContent() {
                 setErro(null);
                 setSucesso(null);
               }}
-              className={`py-4 text-sm tracking-wide transition-colors ${
+              className={`py-3.5 sm:py-4 text-xs sm:text-sm tracking-wide transition-colors ${
                 modo === 'entrar'
                   ? 'text-black border-b-2 border-brown bg-mint-light'
                   : 'text-gray-text border-b border-gray-faint hover:text-gray-text'
@@ -241,7 +241,7 @@ function LoginPageContent() {
                 setErro(null);
                 setSucesso(null);
               }}
-              className={`py-4 text-sm tracking-wide transition-colors ${
+              className={`py-3.5 sm:py-4 text-xs sm:text-sm tracking-wide transition-colors ${
                 modo === 'cadastrar'
                   ? 'text-black border-b-2 border-brown bg-mint-light'
                   : 'text-gray-text border-b border-gray-faint hover:text-gray-text'
