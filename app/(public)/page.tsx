@@ -415,7 +415,6 @@ export default async function HomePage() {
               Falar comigo no WhatsApp
             </a>
           </div>
-          <p className="mt-4 text-xs text-white/45">Mensagem pronta: “Olá, vim pelo site da SOMA Mentoria e gostaria de tirar algumas dúvidas.”</p>
         </div>
       </section>
 
