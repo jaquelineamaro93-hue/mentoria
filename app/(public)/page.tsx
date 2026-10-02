@@ -87,7 +87,7 @@ export default async function HomePage() {
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/soma-hero-collage.webp')" }}
+          style={{ backgroundImage: "url('/api/hero-collage')" }}
         />
         <div
           aria-hidden="true"
