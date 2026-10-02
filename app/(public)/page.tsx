@@ -59,8 +59,8 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
           <a href="#topo" className="font-display text-2xl text-white">SOMA Mentoria</a>
           <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
-            <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
-            <a href="#depoimentos" className="hover:text-white transition-colors">Depoimentos</a>
+            <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
+            <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
           <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ export default async function HomePage() {
           className="absolute inset-0 z-10"
           style={{
             background:
-              'linear-gradient(90deg, rgba(8,12,11,0.70) 0%, rgba(8,12,11,0.56) 48%, rgba(8,12,11,0.64) 100%)',
+              'linear-gradient(90deg, rgba(8,12,11,0.74) 0%, rgba(8,12,11,0.62) 48%, rgba(8,12,11,0.68) 100%)',
           }}
         />
         <div className="relative z-20 max-w-5xl mx-auto">
@@ -241,100 +241,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Como funciona — compacto */}
-      <section id="como-funciona" className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Como funciona</p>
-              <h3 className="font-display text-3xl" style={{ color: '#1A1A1A' }}>Humano no contexto, portal na continuidade.</h3>
-            </div>
-            <p className="max-w-xl text-sm leading-relaxed" style={{ color: '#808080' }}>
-              O encontro ajuda a ler o momento. O portal registra decisões, ações e evolução para você não recomeçar do zero.
-            </p>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
-              <div className="flex items-start gap-4">
-                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(13,128,113,.28)', color: '#0D8071', backgroundColor: 'rgba(13,128,113,.06)' }}>01</div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide" style={{ color: '#0D8071' }}>Online</p>
-                  <h4 className="font-display text-lg mt-1" style={{ color: '#1A1A1A' }}>Alinhamento e mapa individual</h4>
-                  <p className="mt-2 text-sm leading-relaxed" style={{ color: '#808080' }}>Metas, bloqueios, forças, contexto e direção traduzidos em um plano prático.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border rounded-2xl p-6 bg-white" style={{ borderColor: '#E8E8E8' }}>
-              <div className="flex items-start gap-4">
-                <div className="h-10 min-w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(142,63,74,.25)', color: '#8E3F4A', backgroundColor: 'rgba(142,63,74,.06)' }}>02</div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide" style={{ color: '#8E3F4A' }}>Presencial ou online</p>
-                  <h4 className="font-display text-lg mt-1" style={{ color: '#1A1A1A' }}>Presença, posicionamento e troca</h4>
-                  <p className="mt-2 text-sm leading-relaxed" style={{ color: '#808080' }}>Situações reais, posicionamento profissional, repertório coletivo e próximos movimentos.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* DEPOIMENTOS */}
-      <section id="depoimentos" className="px-6 py-14 bg-white" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs uppercase tracking-wider mb-4 text-center font-semibold" style={{ color: '#808080' }}>Histórias reais</p>
-          <h3 className="font-display text-4xl text-center mb-8" style={{ color: '#1A1A1A' }}>Quem passou por aqui</h3>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <a href="https://lnkd.in/p/esE9t5fr" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(13, 128, 113, 0.08)', borderColor: '#0D8071' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#0D8071' }}>ML</div>
-                <div>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Maria Laura Soares</p>
-                  <p className="text-xs font-medium" style={{ color: '#0D8071' }}>CRM & Lifecycle Marketing</p>
-                </div>
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Percebi que alguns dos meus pontos fortes eu nunca tinha parado para identificar de forma consciente. Os primeiros encontros já ampliaram tanto minha visão, estou imaginando tudo o que tem pela frente."</p>
-              <div className="flex justify-between items-center">
-                <div className="text-lg">⭐⭐⭐⭐⭐</div>
-                <p className="text-xs font-medium" style={{ color: '#0D8071' }}>Ver no LinkedIn →</p>
-              </div>
-            </a>
-
-            <a href="https://lnkd.in/p/eetWmSiv" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(255, 122, 138, 0.08)', borderColor: '#FF7A8A' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FF7A8A' }}>GG</div>
-                <div>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Giulia Gomes</p>
-                  <p className="text-xs font-medium" style={{ color: '#8E3F4A' }}>CRM Analyst & Lifecycle Marketing</p>
-                </div>
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"É uma mentoria muito voltada para carreira mesmo. Tenho saído desses encontros com aquela sensação de que estou ajustando o caminho, não só fazendo mais, mas fazendo melhor."</p>
-              <div className="flex justify-between items-center">
-                <div className="text-lg">⭐⭐⭐⭐⭐</div>
-                <p className="text-xs font-medium" style={{ color: '#8E3F4A' }}>Ver no LinkedIn →</p>
-              </div>
-            </a>
-
-            <a href="https://lnkd.in/p/euSGD_V9" target="_blank" rel="noopener noreferrer" className="rounded-lg p-6 border-2 transition-all hover:shadow-lg" style={{ backgroundColor: 'rgba(255, 179, 102, 0.08)', borderColor: '#FFB366' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: '#FFB366' }}>RA</div>
-                <div>
-                  <p className="font-semibold" style={{ color: '#1A1A1A' }}>Rita Alecrim</p>
-                  <p className="text-xs font-medium" style={{ color: '#8A4B1D' }}>CRM Senior / Product Owner</p>
-                </div>
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#808080' }}>"Que mentoria incrível! Foram horas de muito conteúdo, trocas e aprendizado prático. Saio dessa mentoria com a bagagem cheia e com a expectativa de aplicar as novas estratégias."</p>
-              <div className="flex justify-between items-center">
-                <div className="text-lg">⭐⭐⭐⭐⭐</div>
-                <p className="text-xs font-medium" style={{ color: '#8A4B1D' }}>Ver no LinkedIn →</p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* Planos — resumo compacto */}
       <section id="planos" className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6">
@@ -456,7 +362,7 @@ export default async function HomePage() {
                 <span>Posso ver quem já fez a mentoria?</span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Com certeza. No topo da página você já viu uns depoimentos. Mas se quiser ver mais histórias e histórias completas, é só clicar nos nomes deles que leva para os posts deles no LinkedIn. Lá você vê com as próprias palavras deles como foi a experiência de trabalhar comigo.</p>
+              <p className="text-gray-text mt-4 leading-relaxed">Com certeza. A página de Depoimentos reúne histórias reais de quem já passou pela SOMA, com links para os relatos completos no LinkedIn. Você acessa essa página pelo menu no topo do site.</p>
             </details>
           </div>
         </div>
