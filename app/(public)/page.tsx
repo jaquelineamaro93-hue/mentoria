@@ -1,12 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  CheckCircle2,
-  Users,
-  Compass,
-  Target,
-  MessageCircle,
-} from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
