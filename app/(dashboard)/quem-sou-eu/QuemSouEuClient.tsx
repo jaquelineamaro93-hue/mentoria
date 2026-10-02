@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { ArrowLeft, ArrowRight, Compass, Sparkles, Loader2, Check } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
+import MapaResultadoVisual from '@/components/quem-sou-eu/MapaResultadoVisual';
 import type {
   BussolaPosicionamento,
   MapaEssencia,
@@ -257,8 +256,7 @@ export default function QuemSouEuClient({
                   <div>
                     <p className="text-black mb-1">Você respondeu os 9 blocos</p>
                     <p className="text-sm text-gray-text">
-                      Gere agora o seu Mapa de Essência, uma síntese visual de tudo que você
-                      trouxe.
+                      Gere agora uma síntese visual das informações que você trouxe.
                     </p>
                   </div>
                   <button
@@ -271,79 +269,19 @@ export default function QuemSouEuClient({
                     ) : (
                       <Sparkles size={15} />
                     )}
-                    {gerandoMapa ? 'Gerando...' : 'Gerar Mapa de Essência'}
+                    {gerandoMapa ? 'Gerando...' : 'Gerar síntese'}
                   </button>
                 </Panel>
               ) : (
-                <>
-                  <Panel className="p-6 mb-3 prose prose-sm  prose-headings:font-display prose-headings:text-black prose-p:text-black prose-li:text-black">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{mapa.conteudo_markdown}</ReactMarkdown>
-                  </Panel>
-                  <button
-                    onClick={gerarMapa}
-                    disabled={gerandoMapa}
-                    className="flex items-center gap-1.5 text-xs text-gray-text hover:text-orange transition-colors mb-4"
-                  >
-                    {gerandoMapa ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Sparkles size={12} />
-                    )}
-                    Gerar novamente
-                  </button>
-                </>
-              )}
-
-              {mapa && !bussola && (
-                <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <p className="text-black mb-1">Mapa pronto</p>
-                    <p className="text-sm text-gray-text">
-                      Agora gere sua Bússola de Posicionamento, a tradução do seu mapa em
-                      direção estratégica de carreira.
-                    </p>
-                  </div>
-                  <button
-                    onClick={gerarBussola}
-                    disabled={gerandoBussola}
-                    className="shrink-0 flex items-center gap-2 bg-mint-deep hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
-                  >
-                    {gerandoBussola ? (
-                      <Loader2 size={15} className="animate-spin" />
-                    ) : (
-                      <Compass size={15} />
-                    )}
-                    {gerandoBussola ? 'Gerando...' : 'Gerar Bússola de Posicionamento'}
-                  </button>
-                </Panel>
-              )}
-
-              {bussola && (
-                <>
-                  <div className="grid sm:grid-cols-2 gap-3 mt-4">
-                    <BussolaCard titulo="Norte · Essência" texto={bussola.norte} />
-                    <BussolaCard titulo="Sul · Propósito" texto={bussola.sul} />
-                    <BussolaCard titulo="Leste · Energia" texto={bussola.leste} />
-                    <BussolaCard titulo="Oeste · Mensagem" texto={bussola.oeste} />
-                    <BussolaCard
-                      titulo="Centro · Presença"
-                      texto={bussola.centro}
-                      className="sm:col-span-2"
-                    />
-                  </div>
-                  <button
-                    onClick={gerarBussola}
-                    disabled={gerandoBussola}
-                    className="flex items-center gap-1.5 text-xs text-gray-text hover:text-orange transition-colors mt-3"
-                  >
-                    {gerandoBussola ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Compass size={12} />
-                    )}
-                    Gerar novamente
-                  </button>
-                </>
+                <MapaResultadoVisual
+                  respostas={respostas}
+                  mapa={mapa}
+                  bussola={bussola}
+                  gerandoMapa={gerandoMapa}
+                  gerandoBussola={gerandoBussola}
+                  onGerarMapa={gerarMapa}
+                  onGerarBussola={gerarBussola}
+                />
               )}
             </section>
           )}
@@ -351,22 +289,5 @@ export default function QuemSouEuClient({
       </div>
     </div>
     </>
-  );
-}
-
-function BussolaCard({
-  titulo,
-  texto,
-  className = '',
-}: {
-  titulo: string;
-  texto: string | null;
-  className?: string;
-}) {
-  return (
-    <Panel className={`p-5 ${className}`}>
-      <p className="text-[11px] uppercase tracking-wide text-mint mb-2">{titulo}</p>
-      <p className="text-sm text-black leading-relaxed">{texto}</p>
-    </Panel>
   );
 }
