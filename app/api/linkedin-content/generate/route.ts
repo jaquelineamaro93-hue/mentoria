@@ -51,7 +51,7 @@ function juntarBussola(bussola: any) {
     .join('\n');
 }
 
-function limparResultado<T extends Record<string, any>>(resultado: T): T {
+function limparResultado(resultado: Record<string, any>): Record<string, any> {
   if (typeof resultado.post === 'string') {
     resultado.post = normalizarPostLinkedIn(resultado.post);
   }
