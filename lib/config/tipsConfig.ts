@@ -72,6 +72,10 @@ export const tipsConfig: Record<string, QuickTipData> = {
   '/linkedin': {
     title: 'Posicione seu LinkedIn para o mercado',
   },
+  '/conteudo-linkedin': {
+    title: 'Transforme sua experiência em conteúdo',
+    description: 'Ideias, voz, posicionamento e rascunhos conectados ao que você já construiu na SOMA.',
+  },
   '/gupy': {
     title: 'Audite seu currículo para ATS',
   },
