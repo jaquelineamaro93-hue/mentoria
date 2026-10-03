@@ -49,6 +49,7 @@ export const portalNavGroups: PortalNavGroup[] = [
       { href: '/carreira?etapa=cv', label: 'Analisar currículo', icon: FileSearch },
       { href: '/gupy', label: 'Gupy & ATS', icon: FileSearch },
       { href: '/linkedin', label: 'LinkedIn estratégico', icon: Users },
+      { href: '/conteudo-linkedin', label: 'Conteúdo & marca pessoal', icon: Sparkles },
       { href: '/carreira?etapa=vagas', label: 'Vagas & candidaturas', icon: BriefcaseBusiness },
       { href: '/network', label: 'Rede & oportunidades', icon: Users },
       { href: '/carreira?etapa=entrevista', label: 'Entrevistas & simulações', icon: MessageSquare },
