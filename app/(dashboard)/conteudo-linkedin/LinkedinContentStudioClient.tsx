@@ -137,11 +137,13 @@ function Select({
 }
 
 export default function LinkedinContentStudioClient({
+  userId,
   nome,
   contextoStatus,
   vozInicial,
   historicoInicial,
 }: {
+  userId: string;
   nome: string;
   contextoStatus: ContextoStatus;
   vozInicial: Record<string, any> | null;
@@ -272,7 +274,7 @@ export default function LinkedinContentStudioClient({
 
     const { data, error } = await supabase
       .from('linkedin_content_drafts')
-      .insert(payload)
+      .insert({ ...payload, user_id: userId })
       .select('*')
       .single();
 
