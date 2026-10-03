@@ -323,7 +323,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ resultado });
     }
 
-    if (!body.ideia?.trim() && action !== 'refine') {
+    if (!body.ideia?.trim() && (action === 'hooks' || action === 'post')) {
       return NextResponse.json(
         { error: 'Escreva uma ideia, situação ou assunto para começar.' },
         { status: 400 }
