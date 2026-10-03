@@ -55,6 +55,7 @@ export default async function ConteudoLinkedInPage() {
 
   return (
     <LinkedinContentStudioClient
+      userId={user.id}
       nome={profile.data?.nome || 'Você'}
       contextoStatus={{
         mapa: Boolean(mapa.data?.length),
