@@ -94,7 +94,8 @@ Responda novamente SOMENTE com o JSON solicitado.
 Não use markdown, crases, comentários ou texto antes/depois do JSON.
 Mantenha o conteúdo objetivo e compacto para garantir que o JSON seja fechado por completo.`;
 
-  const segundaResposta = await chamarClaude(promptRetry, maxTokens);
+  const retryMaxTokens = Math.min(Math.max(maxTokens + 1200, Math.ceil(maxTokens * 1.6)), 7000);
+  const segundaResposta = await chamarClaude(promptRetry, retryMaxTokens);
 
   try {
     return parseJsonDaIA<T>(segundaResposta, options.validar);
@@ -104,7 +105,9 @@ Mantenha o conteúdo objetivo e compacto para garantir que o JSON seja fechado p
       descricao,
       segundoErro instanceof Error ? segundoErro.message : 'erro desconhecido',
       'chars:',
-      segundaResposta.length
+      segundaResposta.length,
+      'maxTokensRetry:',
+      retryMaxTokens
     );
     throw new Error(
       'Não consegui montar o resultado estruturado agora. Tente novamente em alguns instantes.'

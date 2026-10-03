@@ -106,6 +106,12 @@ Regras:
 - exatamente 9 ideias
 - nenhuma ideia pode depender de inventar fatos
 - títulos curtos e humanos
+- seja compacto para o JSON fechar por completo
+- "por_que": no máximo 160 caracteres
+- cada subtema: no máximo 60 caracteres
+- "premissa": no máximo 220 caracteres
+- "angulo": no máximo 120 caracteres
+- "evidencia_contexto": no máximo 180 caracteres
 `;
   }
 

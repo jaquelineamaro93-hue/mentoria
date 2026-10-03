@@ -353,7 +353,7 @@ export async function POST(request: NextRequest) {
     });
 
     const maxTokens =
-      action === 'hooks' ? 1200 : action === 'ideas' ? 1800 : action === 'refine' ? 2200 : 3000;
+      action === 'hooks' ? 1400 : action === 'ideas' ? 3200 : action === 'refine' ? 2400 : 3200;
 
     const resultado = limparResultado(
       await chamarClaudeJson<Record<string, any>>(prompt, {
