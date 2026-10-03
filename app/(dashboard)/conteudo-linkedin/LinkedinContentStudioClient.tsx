@@ -178,14 +178,67 @@ export default function LinkedinContentStudioClient({
     [contextoStatus]
   );
 
+  async function postJsonComRetry(payload: Record<string, unknown>, tentativas = 2) {
+    let ultimoErro: unknown = null;
+
+    for (let tentativa = 1; tentativa <= tentativas; tentativa += 1) {
+      try {
+        const response = await fetch('/api/linkedin-content/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify(payload),
+        });
+
+        const raw = await response.text();
+        let data: any = {};
+
+        if (raw) {
+          try {
+            data = JSON.parse(raw);
+          } catch {
+            if (!response.ok) {
+              throw new Error('A geração ficou indisponível por alguns instantes. Tente novamente.');
+            }
+            throw new Error('A resposta da geração veio incompleta. Tente novamente.');
+          }
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Não foi possível gerar agora.');
+        }
+
+        return data;
+      } catch (error) {
+        ultimoErro = error;
+        const mensagem = error instanceof Error ? error.message : String(error);
+        const erroDeRede =
+          error instanceof TypeError ||
+          /load failed|failed to fetch|networkerror|network request|conex[aã]o/i.test(mensagem);
+
+        if (!erroDeRede || tentativa === tentativas) {
+          throw error;
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, 700 * tentativa));
+      }
+    }
+
+    throw ultimoErro instanceof Error
+      ? ultimoErro
+      : new Error('Não foi possível concluir a geração.');
+  }
+
   async function chamarIA(action: string, extras: Record<string, unknown> = {}) {
     setLoading(action);
     setErro(null);
     try {
-      const response = await fetch('/api/linkedin-content/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const data = await postJsonComRetry(
+        {
           action,
           ideia,
           objetivo,
@@ -195,13 +248,20 @@ export default function LinkedinContentStudioClient({
           ctaTipo,
           hook,
           ...extras,
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Não foi possível gerar agora.');
+        },
+        action === 'ideas' ? 2 : 1
+      );
+
       return data.resultado;
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Não foi possível gerar agora.');
+      const mensagem = error instanceof Error ? error.message : '';
+      const erroDeRede = /load failed|failed to fetch|networkerror|network request/i.test(mensagem);
+
+      setErro(
+        erroDeRede
+          ? 'A conexão com a geração oscilou. Toque em gerar novamente, seu conteúdo e suas respostas continuam salvos.'
+          : mensagem || 'Não foi possível gerar agora.'
+      );
       return null;
     } finally {
       setLoading(null);
@@ -356,13 +416,10 @@ export default function LinkedinContentStudioClient({
     setLoading('voice');
     setErro(null);
     try {
-      const response = await fetch('/api/linkedin-content/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'voice', amostrasVoz: amostras }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Não foi possível analisar sua voz.');
+      const data = await postJsonComRetry(
+        { action: 'voice', amostrasVoz: amostras },
+        2
+      );
       setVoz(data.resultado);
     } catch (error) {
       setErro(error instanceof Error ? error.message : 'Não foi possível analisar sua voz.');
