@@ -362,6 +362,31 @@ export async function POST(request: NextRequest) {
       })
     );
 
+    if (action === 'ideas') {
+      const { error: persistenciaError } = await supabase
+        .from('linkedin_content_idea_banks')
+        .upsert(
+          {
+            user_id: user.id,
+            pilares: Array.isArray(resultado.pilares) ? resultado.pilares : [],
+            ideias: Array.isArray(resultado.ideias) ? resultado.ideias : [],
+            contexto_json: {
+              metodo: classificado.metodo,
+              selecionados: classificado.selecionados,
+              charsAntes: classificado.charsAntes,
+              charsDepois: classificado.charsDepois,
+            },
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        );
+
+      if (persistenciaError) {
+        console.error('[LinkedIn Content Studio] falha ao persistir banco de ideias', persistenciaError);
+        throw new Error('As ideias foram geradas, mas não consegui salvá-las no portal. Tente novamente.');
+      }
+    }
+
     return NextResponse.json({
       resultado,
       contexto: {
