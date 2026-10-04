@@ -40,42 +40,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: updatedProfile, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({
-        raw_resume: extractedText,
+        raw_resume: extractedText.slice(0, 120000),
         linkedin_updated_at: new Date().toISOString(),
       })
-      .eq('id', user.user.id)
-      .select()
-      .single();
+      .eq('id', user.user.id);
 
     if (updateError) {
-      console.error('Erro ao salvar perfil:', updateError);
+      console.error('[IMPORTAR-LINKEDIN] Erro ao salvar perfil:', updateError.message);
       return NextResponse.json(
-        { error: 'Erro ao salvar o perfil' },
+        { error: 'Erro ao salvar o perfil do LinkedIn.' },
         { status: 500 }
       );
     }
 
-    try {
-      await supabase
-        .from('user_xp')
-        .insert({
-          user_id: user.user.id,
-          action: 'linkedin_import',
-          points: 50,
-          created_at: new Date().toISOString(),
-        });
-    } catch (xpError) {
-      console.warn('Aviso: Não foi possível registrar XP:', xpError);
+    const { data: xpAwarded, error: xpError } = await supabase.rpc(
+      'registrar_xp_linkedin_import'
+    );
+
+    if (xpError) {
+      console.warn(
+        '[IMPORTAR-LINKEDIN] PDF salvo, mas não foi possível registrar os Impulsos:',
+        xpError.message
+      );
     }
 
     return NextResponse.json({
       success: true,
       message: 'PDF do LinkedIn sincronizado com sucesso',
       profileUpdated: true,
-      xpAwarded: 50,
+      xpAwarded: xpError ? 0 : xpAwarded ? 50 : 0,
+      alreadyAwarded: !xpError && !xpAwarded,
     });
   } catch (error) {
     console.error('🔴 [IMPORTAR-LINKEDIN] Erro:', error);
