@@ -18,6 +18,7 @@ interface Props {
   conquistas: Achievement[];
   desbloqueadas: UserAchievement[];
   recompensas: Reward[];
+  resgatesIniciais: string[];
 }
 
 export default function PassaporteClient({
@@ -26,12 +27,14 @@ export default function PassaporteClient({
   conquistas,
   desbloqueadas,
   recompensas,
+  resgatesIniciais,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [tab, setTab] = useState<Tab>('conquistas');
   const [resgatando, setResgatando] = useState<string | null>(null);
-  const [resgatados, setResgatados] = useState<string[]>([]);
+  const [resgatados, setResgatados] = useState<string[]>(resgatesIniciais);
+  const [erroResgate, setErroResgate] = useState<string | null>(null);
 
   const pontos = profile?.pontos_total ?? 0;
   const idsDesbloqueadas = new Set(desbloqueadas.map((d) => d.achievement_id));
@@ -45,14 +48,26 @@ export default function PassaporteClient({
   }
 
   async function resgatar(reward: Reward) {
+    if (resgatados.includes(reward.id)) return;
+
     setResgatando(reward.id);
-    await supabase.from('reward_redemptions').insert({
+    setErroResgate(null);
+
+    const { error } = await supabase.from('reward_redemptions').insert({
       user_id: userId,
       reward_id: reward.id,
     });
+
+    setResgatando(null);
+
+    if (error) {
+      console.error('[PASSAPORTE] Falha ao resgatar recompensa:', error.message);
+      setErroResgate('Não foi possível registrar o resgate agora. Seus Impulsos não foram alterados.');
+      return;
+    }
+
     posthog.capture('recompensa_resgatada', { reward: reward.titulo });
     setResgatados((prev) => [...prev, reward.id]);
-    setResgatando(null);
   }
 
   return (
@@ -198,6 +213,11 @@ export default function PassaporteClient({
           {tab === 'loja' && (
             <section>
               <Eyebrow>Impulsos Store, troque seus {pontos.toLocaleString('pt-BR')} impulsos por prêmios</Eyebrow>
+              {erroResgate && (
+                <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {erroResgate}
+                </p>
+              )}
               <div className="flex flex-col gap-2.5">
                 {recompensas.map((r) => {
                   const disponivel = pontos >= r.custo_pontos;
@@ -240,7 +260,7 @@ export default function PassaporteClient({
 
           {tab === 'ranking' && (
             <section>
-              <RankingComunidade />
+              <RankingComunidade conquistas={conquistas} />
             </section>
           )}
         </div>
