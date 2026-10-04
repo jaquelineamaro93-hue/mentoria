@@ -110,7 +110,7 @@ export default function RankingComunidade({ conquistas }: { conquistas: Achievem
         Ranking de Aceleração SOMA
       </Eyebrow>
       <p className="text-sm text-gray-text mb-6">
-        Mentores e mentorados mais engajados com a própria evolução.
+        Mentorados mais engajados com a própria evolução.
       </p>
 
       {top3.length > 0 && (
