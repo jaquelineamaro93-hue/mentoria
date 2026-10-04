@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { chamarClaude } from '@/lib/anthropic';
+import { chamarClaudeJson } from '@/lib/ai-json';
 import { montarPromptSimuladorCV } from '@/lib/prompts';
 
 export async function POST(request: Request) {
@@ -56,22 +56,22 @@ export async function POST(request: Request) {
 
   try {
     const prompt = montarPromptSimuladorCV(curriculo, vaga);
-    const respostaTexto = await chamarClaude(prompt, 8000);
-    const limpo = respostaTexto.replace(/```json|```/g, '').trim();
-
-    let resultadoJson;
-    try {
-      resultadoJson = JSON.parse(limpo);
-    } catch (parseErr) {
-      console.error('Falha ao interpretar JSON da IA:', parseErr, '\nResposta recebida:', limpo);
-      return NextResponse.json(
-        {
-          error:
-            'A análise ficou grande demais e foi cortada no meio. Tenta novamente, ou encurta um pouco o texto do currículo e da vaga.',
-        },
-        { status: 500 }
-      );
-    }
+    const resultadoJson = await chamarClaudeJson<Record<string, any>>(prompt, {
+      maxTokens: 8000,
+      descricao: 'simulação de currículo',
+      validar: (valor): valor is Record<string, any> => {
+        if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return false;
+        const item = valor as Record<string, unknown>;
+        return (
+          typeof item.fit_percentual === 'number' &&
+          Array.isArray(item.pontos_fortes) &&
+          Array.isArray(item.pontos_atencao) &&
+          typeof item.curriculo_final_markdown === 'string' &&
+          typeof item.carta_apresentacao_markdown === 'string' &&
+          Array.isArray(item.perguntas_entrevista)
+        );
+      },
+    });
 
     if (jaUsouGratis && temCredito) {
       await supabase
