@@ -19,6 +19,7 @@ export default async function ConteudoLinkedInPage() {
     linkedin,
     resumo,
     voz,
+    ideiasSalvas,
     drafts,
   ] = await Promise.all([
     supabase.from('profiles').select('nome').eq('id', user.id).maybeSingle(),
@@ -44,6 +45,11 @@ export default async function ConteudoLinkedInPage() {
       .eq('user_id', user.id)
       .maybeSingle(),
     supabase
+      .from('linkedin_content_idea_banks')
+      .select('pilares, ideias, updated_at')
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    supabase
       .from('linkedin_content_drafts')
       .select(
         'id, titulo, ideia, objetivo, audiencia, formato, angulo, cta_tipo, hook_escolhido, conteudo, resultado_json, status, created_at, updated_at'
@@ -66,6 +72,8 @@ export default async function ConteudoLinkedInPage() {
         resumo: Boolean(resumo.data?.length),
       }}
       vozInicial={(voz.data?.profile_json as Record<string, unknown> | null) ?? null}
+      pilaresIniciais={(ideiasSalvas.data?.pilares as any[]) ?? []}
+      ideiasIniciais={(ideiasSalvas.data?.ideias as any[]) ?? []}
       historicoInicial={(drafts.data ?? []) as any[]}
     />
   );
