@@ -89,7 +89,7 @@ export default function PassaporteClient({
               <p className="font-display text-4xl text-[#f1e6d6]">{pontos.toLocaleString('pt-BR')}</p>
             </div>
             <p className="text-sm text-[#d9c8ab] ">
-              Cada meta concluída, anotação registrada ou encontro participado soma impulsos aqui.
+              As conquistas registradas no portal somam Impulsos aqui e atualizam seu Passaporte.
             </p>
           </div>
 
