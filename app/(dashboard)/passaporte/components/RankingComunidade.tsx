@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Zap, Loader } from 'lucide-react';
+import { Zap, Loader, RefreshCw } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import type { Achievement } from '@/lib/types';
 
 interface RankingItem {
   posicao: number;
@@ -20,28 +21,48 @@ interface RankingData {
   };
 }
 
-export default function RankingComunidade() {
+export default function RankingComunidade({ conquistas }: { conquistas: Achievement[] }) {
   const [ranking, setRanking] = useState<RankingItem[]>([]);
   const [usuarioLogado, setUsuarioLogado] = useState<{
     userId: string;
     posicao: number | null;
   } | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function carregarRanking() {
+    setCarregando(true);
+    setErro(null);
+
+    try {
+      const res = await fetch('/api/passaporte/ranking', {
+        cache: 'no-store',
+        credentials: 'same-origin',
+      });
+      const raw = await res.text();
+      const data = raw ? (JSON.parse(raw) as Partial<RankingData> & { error?: string }) : {};
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Não foi possível carregar o ranking.');
+      }
+
+      setRanking(Array.isArray(data.ranking) ? data.ranking : []);
+      setUsuarioLogado(data.usuarioLogado ?? null);
+    } catch (error) {
+      console.error('Erro ao carregar ranking:', error);
+      setRanking([]);
+      setUsuarioLogado(null);
+      setErro(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível carregar o ranking agora.'
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   useEffect(() => {
-    async function carregarRanking() {
-      try {
-        const res = await fetch('/api/passaporte/ranking');
-        const data: RankingData = await res.json();
-        setRanking(data.ranking);
-        setUsuarioLogado(data.usuarioLogado);
-      } catch (erro) {
-        console.error('Erro ao carregar ranking:', erro);
-      } finally {
-        setCarregando(false);
-      }
-    }
-
     carregarRanking();
   }, []);
 
@@ -65,6 +86,23 @@ export default function RankingComunidade() {
     );
   }
 
+  if (erro) {
+    return (
+      <Panel className="p-6 border border-red-200 bg-red-50">
+        <p className="text-sm font-medium text-red-800">Não foi possível carregar o ranking.</p>
+        <p className="mt-1 text-xs text-red-700">{erro}</p>
+        <button
+          type="button"
+          onClick={carregarRanking}
+          className="mt-4 inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-medium text-red-800"
+        >
+          <RefreshCw size={14} />
+          Tentar novamente
+        </button>
+      </Panel>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <Eyebrow>
@@ -72,12 +110,12 @@ export default function RankingComunidade() {
         Ranking de Aceleração SOMA
       </Eyebrow>
       <p className="text-sm text-gray-text mb-6">
-        Mentores e mentorados mais engajados com a própria evolução.
+        Mentorados mais engajados com a própria evolução.
       </p>
 
       {top3.length > 0 && (
         <div className="mb-8">
-          <div className="flex items-flex-end justify-center gap-3">
+          <div className="flex items-end justify-center gap-3">
             {top3[1] && (
               <div className="text-center flex flex-col items-center">
                 <div className="w-24 h-60 bg-gradient-to-b from-white to-white rounded-t-xl border-2 border-gray-faint flex flex-col items-center justify-start pt-4 shadow-md hover:shadow-lg transition-shadow">
@@ -108,8 +146,8 @@ export default function RankingComunidade() {
             )}
 
             {top3[0] && (
-              <div className="text-center flex flex-col items-center">
-                <div className="absolute -translate-y-20 text-6xl animate-bounce" style={{ animationDuration: '2s' }}>👑</div>
+              <div className="relative text-center flex flex-col items-center">
+                <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-14 text-5xl" aria-hidden="true">👑</div>
                 <div className="w-28 h-72 bg-gradient-to-b from-mustard-light to-gold-matte rounded-t-2xl border-4 border-brown-deep flex flex-col items-center justify-start pt-6 shadow-xl hover:shadow-2xl transition-shadow">
                   <span className="text-5xl mb-3">🥇</span>
                   {top3[0].foto_url ? (
@@ -251,15 +289,25 @@ export default function RankingComunidade() {
 
       <Panel className="p-4 bg-emerald-light border border-gray-faint">
         <p className="text-xs text-gray-text mb-3 font-medium">
-          Como ganhar Impulsos:
+          Como ganhar Impulsos hoje:
         </p>
         <ul className="space-y-1.5 text-xs text-black">
-          <li><span className="font-bold">+50 Impulsos</span> ao importar PDF do LinkedIn</li>
-          <li><span className="font-bold">+20 Impulsos</span> por cada análise de fit realizada</li>
-          <li><span className="font-bold">+100 Impulsos</span> por vaga em Entrevista Agendada</li>
-          <li><span className="font-bold">+30 Impulsos</span> por anotação no Diário de Bordo</li>
-          <li><span className="font-bold">+50 Impulsos</span> por participação em encontros</li>
+          {conquistas
+            .slice()
+            .sort((a, b) => a.pontos - b.pontos)
+            .map((conquista) => (
+              <li key={conquista.id}>
+                <span className="font-bold">+{conquista.pontos} Impulsos</span>{' '}
+                {conquista.descricao || conquista.titulo}
+              </li>
+            ))}
+          <li>
+            <span className="font-bold">+50 Impulsos</span> na primeira sincronização do PDF do LinkedIn
+          </li>
         </ul>
+        <p className="mt-3 text-[11px] leading-relaxed text-gray-text">
+          O ranking usa somente Impulsos efetivamente registrados no seu Passaporte.
+        </p>
       </Panel>
     </div>
   );

@@ -97,7 +97,7 @@ Responda SOMENTE JSON válido:
     {"nome":"", "por_que":"", "subtemas":["","",""]}
   ],
   "ideias": [
-    {"titulo":"", "premissa":"", "formato":"texto|micropost|case|lista|carrossel", "angulo":"", "evidencia_contexto":""}
+    {"titulo":"", "premissa":"", "formato":"texto|micropost|case|lista|carrossel", "angulo":""}
   ]
 }
 
@@ -111,7 +111,6 @@ Regras:
 - cada subtema: no máximo 60 caracteres
 - "premissa": no máximo 220 caracteres
 - "angulo": no máximo 120 caracteres
-- "evidencia_contexto": no máximo 180 caracteres
 `;
   }
 

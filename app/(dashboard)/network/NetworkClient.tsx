@@ -17,6 +17,72 @@ interface Contact {
   linkedinUrl?: string;
 }
 
+function parseCsv(texto: string): string[][] {
+  const linhas: string[][] = [];
+  let linha: string[] = [];
+  let campo = '';
+  let aspas = false;
+
+  for (let i = 0; i < texto.length; i += 1) {
+    const char = texto[i];
+    const proximo = texto[i + 1];
+
+    if (char === '"') {
+      if (aspas && proximo === '"') {
+        campo += '"';
+        i += 1;
+      } else {
+        aspas = !aspas;
+      }
+      continue;
+    }
+
+    if (char === ',' && !aspas) {
+      linha.push(campo.trim());
+      campo = '';
+      continue;
+    }
+
+    if ((char === '\n' || char === '\r') && !aspas) {
+      if (char === '\r' && proximo === '\n') i += 1;
+      linha.push(campo.trim());
+      campo = '';
+      if (linha.some(Boolean)) linhas.push(linha);
+      linha = [];
+      continue;
+    }
+
+    campo += char;
+  }
+
+  if (campo.length > 0 || linha.length > 0) {
+    linha.push(campo.trim());
+    if (linha.some(Boolean)) linhas.push(linha);
+  }
+
+  return linhas;
+}
+
+function normalizarHeader(valor: string) {
+  return valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function valorPorHeader(
+  row: string[],
+  headers: string[],
+  candidatos: string[]
+) {
+  const norm = headers.map(normalizarHeader);
+  const wanted = candidatos.map(normalizarHeader);
+  const index = norm.findIndex((h) => wanted.includes(h));
+  return index >= 0 ? (row[index] || '').trim() : '';
+}
+
 const CIRCULOS = [
   {
     id: 'raiz',
@@ -69,6 +135,9 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   const [carregando, setCarregando] = useState(true);
   const [copiado, setCopiado] = useState<string | null>(null);
   const [mostraFormulario, setMostraFormulario] = useState(false);
+  const [importandoCsv, setImportandoCsv] = useState(false);
+  const [mensagemImportacao, setMensagemImportacao] = useState<string | null>(null);
+  const [erroImportacao, setErroImportacao] = useState<string | null>(null);
   const [circuloSelecionado, setCirculoSelecionado] = useState<'raiz' | 'ponte' | 'presenca' | 'futuro' | 'recomeço'>('raiz');
   const [novoContato, setNovoContato] = useState<Contact>({
     nome: '',
@@ -99,18 +168,108 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
   const handleImportarCSV = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.csv';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const csv = event.target?.result as string;
-          console.log('CSV importado:', csv);
-        };
-        reader.readAsText(file);
+    input.accept = '.csv,text/csv';
+
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      setImportandoCsv(true);
+      setMensagemImportacao(null);
+      setErroImportacao(null);
+
+      try {
+        const csv = await file.text();
+        const linhas = parseCsv(csv);
+
+        if (linhas.length < 2) {
+          throw new Error('O CSV não tem contatos para importar.');
+        }
+
+        const headers = linhas[0];
+        const atuais = new Set(
+          contatos.map((contato) =>
+            [contato.linkedinUrl || '', contato.nome.trim().toLowerCase()].join('|')
+          )
+        );
+
+        const novos = linhas
+          .slice(1)
+          .map((row) => {
+            const first = valorPorHeader(row, headers, ['First Name', 'Nome']);
+            const last = valorPorHeader(row, headers, ['Last Name', 'Sobrenome']);
+            const nomeCompleto =
+              valorPorHeader(row, headers, ['Name', 'Nome completo']) ||
+              [first, last].filter(Boolean).join(' ').trim();
+            const company = valorPorHeader(row, headers, ['Company', 'Empresa']);
+            const position = valorPorHeader(row, headers, ['Position', 'Cargo']);
+            const url = valorPorHeader(row, headers, ['URL', 'LinkedIn URL', 'Perfil']);
+            const relacao = [position, company].filter(Boolean).join(' · ');
+
+            return {
+              user_id: userId,
+              nome: nomeCompleto,
+              relacao,
+              potencial: '',
+              circulo: 'presenca' as const,
+              acao: '',
+              linkedin_url: url || null,
+            };
+          })
+          .filter((item) => item.nome)
+          .filter((item) => {
+            const chave = [item.linkedin_url || '', item.nome.trim().toLowerCase()].join('|');
+            if (atuais.has(chave)) return false;
+            atuais.add(chave);
+            return true;
+          });
+
+        if (novos.length === 0) {
+          setMensagemImportacao('Nenhum contato novo foi encontrado. Os contatos existentes foram preservados.');
+          return;
+        }
+
+        const inseridos: Contact[] = [];
+        const TAMANHO_LOTE = 150;
+
+        for (let i = 0; i < novos.length; i += TAMANHO_LOTE) {
+          const lote = novos.slice(i, i + TAMANHO_LOTE);
+          const { data, error } = await supabase
+            .from('contatos_rede')
+            .insert(lote)
+            .select('id, nome, relacao, potencial, circulo, acao, linkedin_url');
+
+          if (error) throw error;
+
+          inseridos.push(
+            ...((data ?? []).map((item: any) => ({
+              id: item.id,
+              nome: item.nome,
+              relacao: item.relacao || '',
+              potencial: item.potencial || '',
+              circulo: item.circulo,
+              acao: item.acao || '',
+              linkedinUrl: item.linkedin_url || undefined,
+            })) as Contact[])
+          );
+        }
+
+        setContatos((lista) => [...lista, ...inseridos]);
+        setMensagemImportacao(
+          `${inseridos.length} contato${inseridos.length === 1 ? '' : 's'} importado${inseridos.length === 1 ? '' : 's'} para o Círculo da Presença. Agora você pode reorganizar a rede com intenção.`
+        );
+      } catch (error) {
+        console.error('[NETWORK-CSV] Falha na importação:', error);
+        setErroImportacao(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível importar este CSV.'
+        );
+      } finally {
+        setImportandoCsv(false);
       }
     };
+
     input.click();
   };
 
@@ -124,11 +283,21 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
     async function carregarContatos() {
       const { data, error } = await supabase
         .from('contatos_rede')
-        .select('id, nome, relacao, potencial, circulo, acao')
+        .select('id, nome, relacao, potencial, circulo, acao, linkedin_url')
         .order('created_at', { ascending: true });
 
       if (!error && data) {
-        setContatos(data as Contact[]);
+        setContatos(
+          data.map((item: any) => ({
+            id: item.id,
+            nome: item.nome,
+            relacao: item.relacao || '',
+            potencial: item.potencial || '',
+            circulo: item.circulo,
+            acao: item.acao || '',
+            linkedinUrl: item.linkedin_url || undefined,
+          })) as Contact[]
+        );
       }
       setCarregando(false);
     }
@@ -340,16 +509,29 @@ export default function NetworkClient({ userId, profile }: { userId: string; pro
                 Importar do LinkedIn
               </h3>
               <p className="text-sm text-gray-text mb-6">
-                Exporte suas conexões do LinkedIn em bulk e categorize automaticamente em Círculos de Influência.
+                Exporte suas conexões do LinkedIn em CSV. A SOMA importa os novos contatos para o Círculo da Presença sem apagar sua rede atual; depois você organiza quem é Raiz, Ponte, Futuro ou Recomeço.
               </p>
 
               <button
                 onClick={handleImportarCSV}
-                className="w-full bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown transition mb-8 inline-flex items-center justify-center gap-2"
+                disabled={importandoCsv}
+                className="w-full bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown transition mb-4 inline-flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 <Upload size={18} />
-                Selecionar arquivo CSV
+                {importandoCsv ? 'Importando com segurança...' : 'Selecionar arquivo CSV'}
               </button>
+
+              {mensagemImportacao && (
+                <p className="mb-4 rounded-lg border border-mint bg-mint-light px-4 py-3 text-sm text-black">
+                  {mensagemImportacao}
+                </p>
+              )}
+
+              {erroImportacao && (
+                <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {erroImportacao}
+                </p>
+              )}
 
               <div className="bg-mint-light border border-mint p-4 rounded-lg text-left text-sm text-mint space-y-2">
                 <p className="font-medium mb-3">📋 Como exportar do LinkedIn:</p>
