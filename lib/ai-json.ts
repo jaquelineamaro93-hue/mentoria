@@ -94,7 +94,10 @@ Responda novamente SOMENTE com o JSON solicitado.
 Não use markdown, crases, comentários ou texto antes/depois do JSON.
 Mantenha o conteúdo objetivo e compacto para garantir que o JSON seja fechado por completo.`;
 
-  const retryMaxTokens = Math.min(Math.max(maxTokens + 1200, Math.ceil(maxTokens * 1.6)), 7000);
+  const retryMaxTokens = Math.max(
+    maxTokens,
+    Math.min(Math.max(maxTokens + 1200, Math.ceil(maxTokens * 1.5)), 12000)
+  );
   const segundaResposta = await chamarClaude(promptRetry, retryMaxTokens);
 
   try {

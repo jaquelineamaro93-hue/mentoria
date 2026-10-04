@@ -30,12 +30,19 @@ export default async function PassaportePage() {
     .eq('user_id', user.id)
     .returns<UserAchievement[]>();
 
-  const { data: recompensas } = await supabase
-    .from('rewards')
-    .select('*')
-    .eq('ativo', true)
-    .order('custo_pontos', { ascending: true })
-    .returns<Reward[]>();
+  const [{ data: recompensas }, { data: resgates }] = await Promise.all([
+    supabase
+      .from('rewards')
+      .select('*')
+      .eq('ativo', true)
+      .order('custo_pontos', { ascending: true })
+      .returns<Reward[]>(),
+    supabase
+      .from('reward_redemptions')
+      .select('reward_id, status')
+      .eq('user_id', user.id)
+      .neq('status', 'negado'),
+  ]);
 
   return (
     <PassaporteClient
@@ -44,6 +51,7 @@ export default async function PassaportePage() {
       conquistas={conquistas ?? []}
       desbloqueadas={desbloqueadas ?? []}
       recompensas={recompensas ?? []}
+      resgatesIniciais={(resgates ?? []).map((r) => r.reward_id)}
     />
   );
 }
