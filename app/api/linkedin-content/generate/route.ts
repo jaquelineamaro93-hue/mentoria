@@ -11,6 +11,7 @@ import {
   serializarContextoLinkedIn,
   type FragmentoContexto,
 } from '@/lib/jev-linkedin-content';
+import { validarResultadoLinkedIn } from '@/lib/validators-linkedin-content';
 
 export const maxDuration = 120;
 
@@ -309,6 +310,7 @@ export async function POST(request: NextRequest) {
       const resultado = await chamarClaudeJson<Record<string, any>>(prompt, {
         maxTokens: 1800,
         descricao: 'perfil de voz LinkedIn',
+        validar: validarResultadoLinkedIn('voice'),
       });
 
       const { error } = await supabase.from('linkedin_content_voice_profiles').upsert({
@@ -359,6 +361,7 @@ export async function POST(request: NextRequest) {
       await chamarClaudeJson<Record<string, any>>(prompt, {
         maxTokens,
         descricao: `Estúdio LinkedIn: ${action}`,
+        validar: validarResultadoLinkedIn(action),
       })
     );
 
