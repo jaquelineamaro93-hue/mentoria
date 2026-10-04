@@ -141,12 +141,16 @@ export default function LinkedinContentStudioClient({
   nome,
   contextoStatus,
   vozInicial,
+  pilaresIniciais,
+  ideiasIniciais,
   historicoInicial,
 }: {
   userId: string;
   nome: string;
   contextoStatus: ContextoStatus;
   vozInicial: Record<string, any> | null;
+  pilaresIniciais: Pilar[];
+  ideiasIniciais: Idea[];
   historicoInicial: Draft[];
 }) {
   const supabase = createClient();
@@ -168,8 +172,8 @@ export default function LinkedinContentStudioClient({
   const [copiado, setCopiado] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [historico, setHistorico] = useState<Draft[]>(historicoInicial);
-  const [ideias, setIdeias] = useState<Idea[]>([]);
-  const [pilares, setPilares] = useState<Pilar[]>([]);
+  const [ideias, setIdeias] = useState<Idea[]>(ideiasIniciais);
+  const [pilares, setPilares] = useState<Pilar[]>(pilaresIniciais);
   const [voz, setVoz] = useState<Record<string, any> | null>(vozInicial);
   const [amostras, setAmostras] = useState(['', '', '']);
 
@@ -326,7 +330,12 @@ export default function LinkedinContentStudioClient({
         .eq('id', draftId)
         .select('*')
         .single();
-      if (!error && data) {
+      if (error) {
+        console.error('[LinkedIn Content Studio] erro ao atualizar rascunho', error);
+        setErro('O conteúdo foi gerado, mas não consegui salvar o rascunho no portal. Tente salvar novamente.');
+        return;
+      }
+      if (data) {
         setHistorico((lista) => [data as Draft, ...lista.filter((x) => x.id !== data.id)]);
       }
       return;
@@ -338,7 +347,12 @@ export default function LinkedinContentStudioClient({
       .select('*')
       .single();
 
-    if (!error && data) {
+    if (error) {
+      console.error('[LinkedIn Content Studio] erro ao criar rascunho', error);
+      setErro('O conteúdo foi gerado, mas não consegui salvar o rascunho no portal. Tente salvar novamente.');
+      return;
+    }
+    if (data) {
       setDraftId(data.id);
       setHistorico((lista) => [data as Draft, ...lista]);
     }
