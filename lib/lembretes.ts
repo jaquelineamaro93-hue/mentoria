@@ -16,6 +16,14 @@ export interface ResultadoLembretes {
   encontros: number;
   votacao: number;
   erros: string[];
+  base: {
+    ativosConsiderados: number;
+    nuncaAcessaram: number;
+    inativos7dias: number;
+    onboardingPendentes: number;
+    cooldownInatividade: number;
+    cooldownOnboarding: number;
+  };
 }
 
 // Roda toda a lógica de lembretes automáticos: inatividade, onboarding
@@ -30,19 +38,37 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
     encontros: 0,
     votacao: 0,
     erros: [],
+    base: {
+      ativosConsiderados: 0,
+      nuncaAcessaram: 0,
+      inativos7dias: 0,
+      onboardingPendentes: 0,
+      cooldownInatividade: 0,
+      cooldownOnboarding: 0,
+    },
   };
 
   const limiteInatividade = new Date(Date.now() - DIAS_INATIVIDADE * 86400000).toISOString();
 
   const { data: perfis } = await supabase
     .from('profiles')
-    .select('id, nome, email, last_login_at, onboarding_concluido, tipo_pacote, status_assinatura')
+    .select('id, nome, email, last_login_at, last_activity_at, onboarding_concluido, tipo_pacote, status_assinatura')
     .eq('is_admin', false);
 
-  for (const perfil of perfis ?? []) {
-    const inativo = !perfil.last_login_at || perfil.last_login_at < limiteInatividade;
+  const perfisAtivos = (perfis ?? []).filter((perfil) => perfil.status_assinatura === 'ativo');
+  resultado.base.ativosConsiderados = perfisAtivos.length;
+
+  for (const perfil of perfisAtivos) {
+    const ultimaAtividade = perfil.last_activity_at ?? perfil.last_login_at;
+
+    if (!ultimaAtividade) {
+      resultado.base.nuncaAcessaram++;
+    }
+
+    const inativo = !!ultimaAtividade && ultimaAtividade < limiteInatividade;
 
     if (inativo) {
+      resultado.base.inativos7dias++;
       const { data: ultimoEnvio } = await supabase
         .from('emails_enviados')
         .select('enviado_em')
@@ -55,6 +81,10 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
       const podeReenviar =
         !ultimoEnvio ||
         Date.now() - new Date(ultimoEnvio.enviado_em).getTime() > DIAS_ENTRE_LEMBRETES * 86400000;
+
+      if (!podeReenviar) {
+        resultado.base.cooldownInatividade++;
+      }
 
       if (podeReenviar) {
         try {
@@ -72,6 +102,8 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
     }
 
     if (!perfil.onboarding_concluido) {
+      resultado.base.onboardingPendentes++;
+
       const { data: ultimoEnvioOnboarding } = await supabase
         .from('emails_enviados')
         .select('enviado_em')
@@ -85,6 +117,10 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
         !ultimoEnvioOnboarding ||
         Date.now() - new Date(ultimoEnvioOnboarding.enviado_em).getTime() >
           DIAS_ENTRE_LEMBRETES * 86400000;
+
+      if (!podeReenviarOnboarding) {
+        resultado.base.cooldownOnboarding++;
+      }
 
       if (podeReenviarOnboarding) {
         try {
@@ -128,7 +164,7 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
 
       const idsJaEnviados = new Set((jaEnviados ?? []).map((e) => e.user_id));
 
-      for (const perfil of perfis ?? []) {
+      for (const perfil of perfisAtivos) {
         if (idsJaEnviados.has(perfil.id)) continue;
 
         try {
@@ -164,7 +200,7 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
     .eq('tipo', 'presencial');
   const idsJaVotaram = new Set((quemJaVotou ?? []).map((v) => v.user_id));
 
-  for (const perfil of perfis ?? []) {
+  for (const perfil of perfisAtivos) {
     // O encontro é presencial: só alunos ativos desse plano recebem o convite.
     if (perfil.tipo_pacote !== 'presencial') continue;
     if (perfil.status_assinatura !== 'ativo') continue;
