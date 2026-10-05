@@ -12,6 +12,7 @@ interface Insights {
   viaIndicacao: number;
   jaIndicaramAlguem: number;
   nuncaAcessaram: number;
+  inativos7Dias: number;
   onboardingPendente: number;
 }
 
@@ -45,7 +46,7 @@ export default function CrescimentoClient({
 
         
 
-        <div className="grid sm:grid-cols-3 gap-4 mb-10">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
           <Panel className="p-5">
             <Users2 size={18} className="text-mint mb-2" />
             <p className="font-display text-2xl text-black">{percentualIndicacao}%</p>
@@ -62,8 +63,13 @@ export default function CrescimentoClient({
           </Panel>
           <Panel className="p-5">
             <RotateCcw size={18} className="text-amber-600 mb-2" />
+            <p className="font-display text-2xl text-black">{insights.inativos7Dias}</p>
+            <p className="text-xs text-gray-text">sem atividade há mais de 7 dias</p>
+          </Panel>
+          <Panel className="p-5">
+            <RotateCcw size={18} className="text-amber-600 mb-2" />
             <p className="font-display text-2xl text-black">{insights.nuncaAcessaram}</p>
-            <p className="text-xs text-gray-text">nunca acessaram o portal</p>
+            <p className="text-xs text-gray-text">nunca acessaram de verdade</p>
           </Panel>
         </div>
 
@@ -103,9 +109,10 @@ export default function CrescimentoClient({
               <h2 className="font-display text-lg text-black">Reative antes de captar gente nova</h2>
             </div>
             <p className="text-sm text-gray-text leading-relaxed">
-              {insights.nuncaAcessaram > 0
-                ? `${insights.nuncaAcessaram} pessoa(s) nunca acessaram o portal, ` +
-                  `e ${insights.onboardingPendente} ainda não fizeram onboarding. `
+              {insights.nuncaAcessaram > 0 || insights.inativos7Dias > 0
+                ? `${insights.nuncaAcessaram} pessoa(s) nunca acessaram o portal e ` +
+                  `${insights.inativos7Dias} estão sem atividade há mais de 7 dias. ` +
+                  `${insights.onboardingPendente} ainda não fizeram onboarding. `
                 : 'Sua base está com acesso em dia. '}
               É mais barato reativar quem já pagou do que captar alguém novo. O lembrete automático
               de inatividade já está rodando, mas uma mensagem pessoal (áudio de 30 segundos) costuma
