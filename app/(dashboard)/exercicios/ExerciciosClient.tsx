@@ -124,9 +124,9 @@ export default function ExerciciosClient({
   const rankingCompleto = viaForcas.every(Boolean);
   const viaTemDuplicadas = rankingCompleto && new Set(viaForcas).size !== 24;
 
-  const comparacaoTop5 = useMemo(
+  const comparacaoCompleta = useMemo(
     () =>
-      viaAtual?.forcas.slice(0, 5).map((forca, i) => ({
+      viaAtual?.forcas.slice(0, 24).map((forca, i) => ({
         forca,
         posicao: i + 1,
         movimento: movimento(forca, i + 1, viaAnterior),
@@ -719,22 +719,33 @@ export default function ExerciciosClient({
                   <Panel className="p-6">
                     {viaAnterior ? (
                       <>
-                        <p className="text-sm text-black mb-5">
-                          Comparando {dataPtBr(viaAnterior.data_teste)} →{' '}
-                          {dataPtBr(viaAtual.data_teste)}
-                        </p>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
-                          {comparacaoTop5.map(({ forca, posicao, movimento: mov }) => (
-                            <div key={forca} className="rounded-xl border border-gray-faint p-4">
-                              <p className="text-[11px] uppercase tracking-wide text-gray-text">
-                                {posicao}ª agora
-                              </p>
-                              <p className="text-sm font-medium text-black mt-1.5 leading-5">
-                                {forca}
-                              </p>
+                        <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-sm text-black">
+                            Comparando {dataPtBr(viaAnterior.data_teste)} →{' '}
+                            {dataPtBr(viaAtual.data_teste)}
+                          </p>
+                          <p className="text-xs text-gray-text">
+                            24 forças ordenadas pela posição atual
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5 mb-6">
+                          {comparacaoCompleta.map(({ forca, posicao, movimento: mov }) => (
+                            <div
+                              key={forca}
+                              className="min-w-0 min-h-[112px] overflow-hidden rounded-xl border border-gray-faint bg-white p-3 flex flex-col justify-between"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-[10px] uppercase tracking-[0.08em] text-gray-text leading-4">
+                                  {posicao}ª agora
+                                </p>
+                                <p className="mt-1 text-[13px] font-medium leading-[1.25rem] text-black break-words">
+                                  {forca}
+                                </p>
+                              </div>
+
                               <div
                                 className={[
-                                  'mt-3 inline-flex items-center gap-1 text-xs',
+                                  'mt-2.5 flex min-w-0 items-start gap-1.5 text-[11px] leading-4 font-medium',
                                   mov.tipo === 'subiu'
                                     ? 'text-emerald-700'
                                     : mov.tipo === 'caiu'
@@ -742,9 +753,13 @@ export default function ExerciciosClient({
                                       : 'text-gray-text',
                                 ].join(' ')}
                               >
-                                {mov.tipo === 'subiu' && <TrendingUp size={13} />}
-                                {mov.tipo === 'caiu' && <TrendingDown size={13} />}
-                                {mov.texto}
+                                {mov.tipo === 'subiu' && (
+                                  <TrendingUp size={13} className="mt-0.5 shrink-0" />
+                                )}
+                                {mov.tipo === 'caiu' && (
+                                  <TrendingDown size={13} className="mt-0.5 shrink-0" />
+                                )}
+                                <span className="min-w-0 break-words">{mov.texto}</span>
                               </div>
                             </div>
                           ))}
