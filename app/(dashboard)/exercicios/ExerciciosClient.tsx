@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Activity,
   BarChart3,
   Compass,
   ExternalLink,
@@ -22,7 +23,13 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { VIA_FORCAS } from '@/lib/prompts';
 import { extrairTextoPdf } from '@/lib/pdf';
-import type { Diagnostic, Profile, ResumoPerfil, ViaResultado } from '@/lib/types';
+import type {
+  Diagnostic,
+  Profile,
+  ResumoPerfil,
+  ViaEvolucaoAnalise,
+  ViaResultado,
+} from '@/lib/types';
 
 interface Props {
   profile: Profile | null;
@@ -32,7 +39,7 @@ interface Props {
   resumoPerfilInicial?: ResumoPerfil | null;
 }
 
-type Tab = 'diagnostico' | 'via' | 'resumo' | 'evolucao';
+type Tab = 'diagnostico' | 'via' | 'resumo' | 'evolucao' | 'acompanhamento';
 
 const FORCAS = [
   'Comunicação',
@@ -49,7 +56,8 @@ const TABS = [
   { id: 'diagnostico' as Tab, label: 'Diagnóstico', icon: Compass },
   { id: 'via' as Tab, label: 'VIA', icon: Sparkles },
   { id: 'resumo' as Tab, label: 'Resumo de perfil', icon: FileText },
-  { id: 'evolucao' as Tab, label: 'Evolução', icon: BarChart3 },
+  { id: 'evolucao' as Tab, label: 'Evolução VIA', icon: BarChart3 },
+  { id: 'acompanhamento' as Tab, label: 'Acompanhamento', icon: Activity },
 ];
 
 function dataPtBr(data?: string | null) {
@@ -117,6 +125,10 @@ export default function ExerciciosClient({
   const [gerandoResumo, setGerandoResumo] = useState(false);
   const [erroResumo, setErroResumo] = useState<string | null>(null);
 
+  const [analiseEvolucaoVia, setAnaliseEvolucaoVia] = useState<ViaEvolucaoAnalise | null>(null);
+  const [carregandoEvolucaoVia, setCarregandoEvolucaoVia] = useState(false);
+  const [erroEvolucaoVia, setErroEvolucaoVia] = useState<string | null>(null);
+
   const viaAtual = viaResultados[0] ?? null;
   const viaAnterior = viaResultados[1] ?? null;
   const primeiro = diagnostics[0];
@@ -133,6 +145,55 @@ export default function ExerciciosClient({
       })) ?? [],
     [viaAtual, viaAnterior]
   );
+
+  useEffect(() => {
+    if (activeTab !== 'evolucao' || !viaAtual || !viaAnterior) return;
+
+    let cancelado = false;
+
+    async function carregarEvolucaoVia() {
+      setCarregandoEvolucaoVia(true);
+      setErroEvolucaoVia(null);
+
+      try {
+        const response = await fetch('/api/gerar-evolucao-via', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          body: JSON.stringify({
+            resultadoAtualId: viaAtual.id,
+            resultadoAnteriorId: viaAnterior.id,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Não foi possível gerar a leitura da evolução.');
+        }
+
+        if (!cancelado) {
+          setAnaliseEvolucaoVia(data.analise as ViaEvolucaoAnalise);
+          posthog.capture('via_evolucao_visualizada', { cached: Boolean(data.cached) });
+        }
+      } catch (error) {
+        if (!cancelado) {
+          setErroEvolucaoVia(
+            error instanceof Error
+              ? error.message
+              : 'Não foi possível gerar a leitura da evolução agora.'
+          );
+        }
+      } finally {
+        if (!cancelado) setCarregandoEvolucaoVia(false);
+      }
+    }
+
+    void carregarEvolucaoVia();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [activeTab, viaAtual?.id, viaAnterior?.id]);
 
   function toggleForca(forca: string) {
     setForcasSelecionadas((prev) =>
