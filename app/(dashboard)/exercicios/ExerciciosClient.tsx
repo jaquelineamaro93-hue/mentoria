@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   BarChart3,
   Compass,
+  ExternalLink,
   FileText,
   Loader2,
   RefreshCw,
@@ -460,16 +461,8 @@ export default function ExerciciosClient({
                       {viaAtual ? 'Adicionar uma nova medição' : 'Faça seu primeiro registro VIA'}
                     </p>
                     <p className="text-sm leading-6 text-gray-text mt-1 max-w-2xl">
-                      Faça o teste em{' '}
-                      <a
-                        href="https://www.viacharacter.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-brown-deep underline"
-                      >
-                        viacharacter.org
-                      </a>{' '}
-                      e envie o PDF ou informe as 24 forças manualmente.
+                      Primeiro faça o teste oficial do VIA Character Strengths. Depois volte para a
+                      SOMA e envie o PDF do resultado ou informe as 24 forças manualmente.
                     </p>
                   </div>
                   {viaAtual && (
@@ -483,7 +476,62 @@ export default function ExerciciosClient({
                   )}
                 </div>
 
+                <div className="rounded-xl border border-mint bg-mint-light/45 p-5 mb-5">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-5">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-mint-deep mb-1">
+                        Passo 1
+                      </p>
+                      <p className="font-medium text-black">Faça o teste no site oficial do VIA</p>
+                      <p className="text-sm leading-6 text-gray-text mt-1 max-w-2xl">
+                        O teste é feito fora da SOMA. Use o site oficial abaixo e, ao terminar,
+                        salve o relatório em PDF para importar aqui.
+                      </p>
+                    </div>
+
+                    <a
+                      href="https://www.viacharacter.org/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => posthog.capture('via_site_oficial_aberto')}
+                      className="shrink-0 inline-flex items-center justify-center gap-2 rounded-lg bg-brown hover:bg-brown-deep text-white text-sm font-medium px-4 py-2.5 transition-colors"
+                    >
+                      Abrir site oficial do VIA
+                      <ExternalLink size={15} />
+                    </a>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {[
+                      ['1', 'Acesse viacharacter.org e clique em “Take the Free Survey”.'],
+                      ['2', 'Para maiores de 18 anos, escolha “VIA Adult Survey” e responda o teste.'],
+                      ['3', 'Ao terminar, abra seus resultados para visualizar o ranking completo das 24 forças.'],
+                      ['4', 'Role a página de resultados até o final e clique em “Save as PDF”. Depois volte para a SOMA.'],
+                    ].map(([numero, texto]) => (
+                      <div
+                        key={numero}
+                        className="flex items-start gap-3 rounded-lg border border-mint/70 bg-white/75 p-3"
+                      >
+                        <span className="w-6 h-6 rounded-full bg-mint-deep text-white text-xs font-medium grid place-items-center shrink-0">
+                          {numero}
+                        </span>
+                        <p className="text-sm leading-5 text-black">{texto}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-xs leading-5 text-gray-text mt-4">
+                    O visual do site VIA pode mudar com o tempo. Se os nomes dos botões estiverem
+                    diferentes, procure a opção de fazer o teste gratuito e, na tela de resultados,
+                    a opção para salvar o relatório em PDF.
+                  </p>
+                </div>
+
                 <div className="rounded-xl border border-gray-faint p-4 mb-5">
+                  <div className="mb-3">
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-gray-text">Passo 2</p>
+                    <p className="text-sm font-medium text-black mt-1">Envie o PDF do resultado</p>
+                  </div>
                   <div className="flex items-center gap-3 flex-wrap">
                     <label className="flex items-center gap-2 text-sm bg-mint-light text-black px-4 py-2.5 rounded-lg cursor-pointer">
                       {extraindoPdf ? (
