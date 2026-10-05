@@ -13,6 +13,13 @@ function AuthConfirmContent() {
     let isSubscribed = true;
 
     const handleAuth = async () => {
+      const registrarLogin = async () => {
+        const { error } = await supabase.rpc('registrar_login_portal');
+        if (error) {
+          console.warn('[AUTH-CONFIRM] Não foi possível registrar o login:', error.message);
+        }
+      };
+
       // 1. Escuta eventos do Supabase
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!isSubscribed) return;
@@ -24,6 +31,7 @@ function AuthConfirmContent() {
           router.push('/reset-password'); 
         } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
           console.log('✅ SIGNED_IN com usuário:', session.user.email);
+          await registrarLogin();
           router.push('/dashboard');
         }
       });
@@ -37,6 +45,7 @@ function AuthConfirmContent() {
           setStatus("Verificando login com Google...");
           const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
           if (otpError) { router.push('/login?error=token_invalid'); return; }
+          await registrarLogin();
           router.push('/dashboard');
           return;
         }
@@ -67,6 +76,7 @@ function AuthConfirmContent() {
             console.error('❌ setSession error:', error);
           } else {
             console.log('✅ setSession sucesso:', data.user?.email);
+            await registrarLogin();
             
             if (type === 'recovery') {
               console.log('➡️ Redirecionando para reset-password');
