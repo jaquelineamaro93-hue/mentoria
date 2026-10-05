@@ -108,11 +108,27 @@ export default function AdminClient({
       const res = await fetch('/api/admin/enviar-lembretes', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.erro ?? 'Erro ao enviar lembretes.');
+      const totalEnviado =
+        Number(data.inatividade || 0) +
+        Number(data.onboarding || 0) +
+        Number(data.encontros || 0) +
+        Number(data.votacao || 0);
+
+      const base = data.base;
+      const diagnosticoBase = base
+        ? `Base real: ${base.ativosConsiderados} mentorados ativos, ${base.nuncaAcessaram} nunca acessaram, ` +
+          `${base.inativos7dias} estão sem atividade há mais de 7 dias e ${base.onboardingPendentes} têm onboarding pendente.\n` +
+          `Em cooldown: ${base.cooldownInatividade} de inatividade e ${base.cooldownOnboarding} de onboarding.\n\n`
+        : '';
+
       const resumo =
-        `Enviados agora: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
+        diagnosticoBase +
+        `Enviados nesta execução: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
         `${data.encontros} de encontro, ${data.votacao} de votação. ` +
         (data.erros?.length ? `Erros: ${data.erros.length}.` : 'Sem erros.') +
-        ' Uma cópia de cada foi enviada em cópia oculta para jaqueline.amaro93@gmail.com.';
+        (totalEnviado > 0
+          ? ' As mensagens enviadas foram copiadas em BCC para jaqueline.amaro93@gmail.com.'
+          : ' Nenhum e-mail foi enviado nesta execução, então não houve cópia em BCC.');
       const detalheErros = data.erros?.length
         ? `\n\nDetalhe dos erros (até 5):\n${data.erros.slice(0, 5).join('\n')}`
         : '';
