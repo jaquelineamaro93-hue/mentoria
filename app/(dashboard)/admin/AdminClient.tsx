@@ -29,6 +29,7 @@ export default function AdminClient({
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
   const [buscaMentorado, setBuscaMentorado] = useState('');
+  const [filtroAtividade, setFiltroAtividade] = useState<'todos' | 'ativos7' | 'inativos7' | 'nunca'>('todos');
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
@@ -107,11 +108,27 @@ export default function AdminClient({
       const res = await fetch('/api/admin/enviar-lembretes', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.erro ?? 'Erro ao enviar lembretes.');
+      const totalEnviado =
+        Number(data.inatividade || 0) +
+        Number(data.onboarding || 0) +
+        Number(data.encontros || 0) +
+        Number(data.votacao || 0);
+
+      const base = data.base;
+      const diagnosticoBase = base
+        ? `Base real: ${base.ativosConsiderados} mentorados ativos, ${base.nuncaAcessaram} nunca acessaram, ` +
+          `${base.inativos7dias} estão sem atividade há mais de 7 dias e ${base.onboardingPendentes} têm onboarding pendente.\n` +
+          `Em cooldown: ${base.cooldownInatividade} de inatividade e ${base.cooldownOnboarding} de onboarding.\n\n`
+        : '';
+
       const resumo =
-        `Enviados agora: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
+        diagnosticoBase +
+        `Enviados nesta execução: ${data.inatividade} de inatividade, ${data.onboarding} de onboarding, ` +
         `${data.encontros} de encontro, ${data.votacao} de votação. ` +
         (data.erros?.length ? `Erros: ${data.erros.length}.` : 'Sem erros.') +
-        ' Uma cópia de cada foi enviada em cópia oculta para jaqueline.amaro93@gmail.com.';
+        (totalEnviado > 0
+          ? ' As mensagens enviadas foram copiadas em BCC para jaqueline.amaro93@gmail.com.'
+          : ' Nenhum e-mail foi enviado nesta execução, então não houve cópia em BCC.');
       const detalheErros = data.erros?.length
         ? `\n\nDetalhe dos erros (até 5):\n${data.erros.slice(0, 5).join('\n')}`
         : '';
@@ -222,20 +239,37 @@ export default function AdminClient({
   }
 
   const total = linhas.length;
+  const agora = Date.now();
+  const diasDesdeAtividade = (data: string | null | undefined) =>
+    data ? Math.max(0, Math.floor((agora - new Date(data).getTime()) / 86400000)) : null;
+
   const ativos7dias = linhas.filter((l) => {
-    if (!l.profile.last_login_at) return false;
-    const dias = (Date.now() - new Date(l.profile.last_login_at).getTime()) / 86400000;
-    return dias <= 7;
+    const dias = diasDesdeAtividade(l.profile.last_activity_at);
+    return dias !== null && dias <= 7;
   }).length;
-  const semAcessoNunca = linhas.filter((l) => !l.profile.last_login_at).length;
+
+  const inativos7dias = linhas.filter((l) => {
+    const dias = diasDesdeAtividade(l.profile.last_activity_at);
+    return dias !== null && dias > 7;
+  }).length;
+
+  const semAcessoNunca = linhas.filter((l) => !l.profile.last_activity_at).length;
   const emailsNaoConfirmados = linhas.filter((l) => !l.emailConfirmado);
   const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
   const linhasFiltradas = linhas.filter((l) => {
-    if (!termoMentorado) return true;
-    return (
+    const combinaBusca =
+      !termoMentorado ||
       l.profile.nome?.toLocaleLowerCase('pt-BR').includes(termoMentorado) ||
-      l.profile.email?.toLocaleLowerCase('pt-BR').includes(termoMentorado)
-    );
+      l.profile.email?.toLocaleLowerCase('pt-BR').includes(termoMentorado);
+
+    if (!combinaBusca) return false;
+
+    const dias = diasDesdeAtividade(l.profile.last_activity_at);
+    if (filtroAtividade === 'ativos7') return dias !== null && dias <= 7;
+    if (filtroAtividade === 'inativos7') return dias !== null && dias > 7;
+    if (filtroAtividade === 'nunca') return dias === null;
+
+    return true;
   });
   const usuariosFiltrados = usuarios.filter((u) => {
     if (filtroUsuarios === "admin" && !u.is_admin) return false;
@@ -322,7 +356,7 @@ export default function AdminClient({
           </div>
         )}
 
-        <div className="grid sm:grid-cols-3 gap-4 mb-10">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
           <Panel className="p-5">
             <Users size={18} className="text-mint mb-2" />
             <p className="font-display text-2xl text-black">{total}</p>
@@ -335,8 +369,13 @@ export default function AdminClient({
           </Panel>
           <Panel className="p-5">
             <Clock size={18} className="text-mint mb-2" />
+            <p className="font-display text-2xl text-black">{inativos7dias}</p>
+            <p className="text-xs text-gray-text">Sem atividade há mais de 7 dias</p>
+          </Panel>
+          <Panel className="p-5">
+            <Clock size={18} className="text-mint mb-2" />
             <p className="font-display text-2xl text-black">{semAcessoNunca}</p>
-            <p className="text-xs text-gray-text">Nunca acessaram</p>
+            <p className="text-xs text-gray-text">Nunca acessaram de verdade</p>
           </Panel>
         </div>
 
@@ -354,16 +393,29 @@ export default function AdminClient({
           </div>
 
           <div className="mb-3">
-            <label className="relative block max-w-xl">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
-              <input
-                type="search"
-                value={buscaMentorado}
-                onChange={(e) => setBuscaMentorado(e.target.value)}
-                placeholder="Buscar mentorado por nome ou e-mail..."
-                className="w-full rounded-lg border border-gray-faint bg-white py-2.5 pl-9 pr-3 text-sm text-black focus:outline-none focus:border-mint-deep"
-              />
-            </label>
+            <div className="flex flex-col sm:flex-row gap-3 max-w-3xl">
+              <label className="relative block flex-1">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
+                <input
+                  type="search"
+                  value={buscaMentorado}
+                  onChange={(e) => setBuscaMentorado(e.target.value)}
+                  placeholder="Buscar mentorado por nome ou e-mail..."
+                  className="w-full rounded-lg border border-gray-faint bg-white py-2.5 pl-9 pr-3 text-sm text-black focus:outline-none focus:border-mint-deep"
+                />
+              </label>
+              <select
+                value={filtroAtividade}
+                onChange={(e) => setFiltroAtividade(e.target.value as typeof filtroAtividade)}
+                className="rounded-lg border border-gray-faint bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-mint-deep"
+                aria-label="Filtrar por atividade"
+              >
+                <option value="todos">Todos os acessos</option>
+                <option value="ativos7">Ativos em até 7 dias</option>
+                <option value="inativos7">Sem atividade há mais de 7 dias</option>
+                <option value="nunca">Nunca acessaram</option>
+              </select>
+            </div>
             <p className="mt-1.5 text-xs text-gray-text">
               {linhasFiltradas.length} de {linhas.length} mentorados
             </p>
@@ -380,7 +432,7 @@ export default function AdminClient({
                     Pacote
                   </th>
                   <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Último acesso
+                    Última atividade
                   </th>
                   <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
                     Onboarding
@@ -416,15 +468,30 @@ export default function AdminClient({
                     <td className="px-4 py-3 text-gray-text capitalize">
                       {l.profile.tipo_pacote}
                     </td>
-                    <td className="px-4 py-3 text-gray-text">
-                      {l.profile.last_login_at
-                        ? new Date(l.profile.last_login_at).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : 'Nunca'}
+                    <td className="px-4 py-3 text-gray-text whitespace-nowrap">
+                      {l.profile.last_activity_at ? (
+                        <>
+                          <p>
+                            {new Date(l.profile.last_activity_at).toLocaleDateString('pt-BR', {
+                              day: '2-digit',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                          <p className="text-[10px] mt-0.5">
+                            {(() => {
+                              const dias = diasDesdeAtividade(l.profile.last_activity_at);
+                              if (dias === null) return '';
+                              if (dias === 0) return 'Hoje';
+                              if (dias === 1) return 'Há 1 dia';
+                              return `Há ${dias} dias`;
+                            })()}
+                          </p>
+                        </>
+                      ) : (
+                        <span className="text-amber-700 font-medium">Nunca acessou</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <label className="flex items-center gap-2 cursor-pointer">

@@ -92,10 +92,60 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const currentSearch = searchParams.toString();
   const location = getPortalLocation(pathname, currentSearch);
   const main = useRef<HTMLElement>(null);
+  const lastActivityPing = useRef(0);
 
   useEffect(() => {
     main.current?.scrollTo({ top: 0 });
   }, [pathname, currentSearch]);
+
+  useEffect(() => {
+    const INTERVALO_MINIMO_MS = 10 * 60 * 1000;
+
+    async function registrarAtividade() {
+      if (document.visibilityState !== 'visible') return;
+
+      const agora = Date.now();
+      if (agora - lastActivityPing.current < INTERVALO_MINIMO_MS) return;
+
+      lastActivityPing.current = agora;
+
+      try {
+        const response = await fetch('/api/activity', {
+          method: 'POST',
+          cache: 'no-store',
+          credentials: 'same-origin',
+          keepalive: true,
+        });
+
+        if (!response.ok && response.status !== 401) {
+          lastActivityPing.current = 0;
+        }
+      } catch {
+        lastActivityPing.current = 0;
+      }
+    }
+
+    void registrarAtividade();
+
+    const interval = window.setInterval(() => {
+      void registrarAtividade();
+    }, INTERVALO_MINIMO_MS);
+
+    const registrarSeVoltar = () => {
+      if (document.visibilityState === 'visible') {
+        void registrarAtividade();
+      }
+    };
+
+    document.addEventListener('visibilitychange', registrarSeVoltar);
+    window.addEventListener('focus', registrarSeVoltar);
+
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', registrarSeVoltar);
+      window.removeEventListener('focus', registrarSeVoltar);
+    };
+  }, [pathname]);
 
   return (
     <div className={`${styles.shell} ${isCollapsed ? styles.shellCompact : ''}`}>

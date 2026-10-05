@@ -20,7 +20,7 @@ export default async function CrescimentoPage() {
 
   const { data: mentorados } = await supabase
     .from('profiles')
-    .select('id, nome, indicado_por_id, codigo_indicacao, sessoes_bonus_resgatadas, onboarding_concluido, last_login_at')
+    .select('id, nome, indicado_por_id, codigo_indicacao, sessoes_bonus_resgatadas, onboarding_concluido, last_activity_at')
     .eq('is_admin', false);
 
   const total = mentorados?.length ?? 0;
@@ -28,7 +28,12 @@ export default async function CrescimentoPage() {
   const jaIndicaramAlguem = new Set(
     (mentorados ?? []).filter((m) => m.indicado_por_id).map((m) => m.indicado_por_id)
   ).size;
-  const nuncaAcessaram = mentorados?.filter((m) => !m.last_login_at).length ?? 0;
+  const limite7Dias = Date.now() - 7 * 86400000;
+  const nuncaAcessaram = mentorados?.filter((m) => !m.last_activity_at).length ?? 0;
+  const inativos7Dias =
+    mentorados?.filter(
+      (m) => m.last_activity_at && new Date(m.last_activity_at).getTime() < limite7Dias
+    ).length ?? 0;
   const onboardingPendente = mentorados?.filter((m) => !m.onboarding_concluido).length ?? 0;
 
   return (
@@ -39,6 +44,7 @@ export default async function CrescimentoPage() {
         viaIndicacao,
         jaIndicaramAlguem,
         nuncaAcessaram,
+        inativos7Dias,
         onboardingPendente,
       }}
     />

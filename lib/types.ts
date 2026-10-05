@@ -14,6 +14,7 @@ export interface Profile {
   pontos_total: number;
   is_admin: boolean;
   last_login_at: string | null;
+  last_activity_at: string | null;
   status_assinatura: 'ativo' | 'inadimplente' | 'encerrado';
   origem_assinatura: 'manual' | 'mercadopago';
   proxima_cobranca: string | null;

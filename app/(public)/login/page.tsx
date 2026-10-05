@@ -99,10 +99,10 @@ function LoginPageContent() {
     if (data.user) {
       identificarMentorado(data.user.id, { email: data.user.email });
       posthog.capture('login_realizado');
-      await supabase
-        .from('profiles')
-        .update({ last_login_at: new Date().toISOString() })
-        .eq('id', data.user.id);
+      const { error: activityError } = await supabase.rpc('registrar_login_portal');
+      if (activityError) {
+        console.warn('[LOGIN] Não foi possível registrar o acesso:', activityError.message);
+      }
     }
 
     router.push('/dashboard');
@@ -184,6 +184,10 @@ function LoginPageContent() {
 
           if (!erroLogin) {
             posthog.capture('login_realizado');
+            const { error: activityError } = await supabase.rpc('registrar_login_portal');
+            if (activityError) {
+              console.warn('[CADASTRO] Não foi possível registrar o primeiro acesso:', activityError.message);
+            }
             setLoading(false);
             router.push('/dashboard');
             router.refresh();

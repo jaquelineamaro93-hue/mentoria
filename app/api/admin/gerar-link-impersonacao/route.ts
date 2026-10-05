@@ -58,10 +58,22 @@ export async function POST(request: Request) {
       usuario_alvo_id: targetUserId,
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       tokenHash: linkData.properties.hashed_token,
       email: targetProfile.email,
     });
+
+    // Marca esta sessão como impersonação para que o tracker de atividade
+    // não atribua à mentorada uma navegação feita pela administração.
+    response.cookies.set('soma_impersonation_target', targetUserId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 2 * 60 * 60,
+    });
+
+    return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erro desconhecido.';
     return NextResponse.json({ error: message }, { status: 500 });
