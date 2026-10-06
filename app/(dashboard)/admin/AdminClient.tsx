@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink, Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical, Search, BarChart3 } from 'lucide-react';
+import { Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical, Search, BarChart3 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -17,7 +17,6 @@ interface Props {
   totalSecoesPdi: number;
 }
 
-const POSTHOG_URL = 'https://us.posthog.com';
 
 export default function AdminClient({
   profile,
@@ -387,16 +386,14 @@ export default function AdminClient({
         </div>
 
         <section className="mb-10">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between gap-3 mb-4">
             <Eyebrow>Atividade por mentorado</Eyebrow>
-            <a
-              href={POSTHOG_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-mint hover:text-black transition-colors"
+            <Link
+              href="/admin/analytics"
+              className="flex items-center gap-1.5 text-xs text-mint-deep hover:text-black transition-colors"
             >
-              Ver sessões e localização no PostHog <ExternalLink size={12} />
-            </a>
+              Ver uso por feature <BarChart3 size={12} />
+            </Link>
           </div>
 
           <div className="mb-3">
