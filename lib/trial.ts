@@ -55,17 +55,31 @@ export async function iniciarTrialParaUsuario(
     return { ok: false as const, status: 409, error: 'O teste gratuito já foi utilizado nesta conta.' };
   }
 
-  if (
-    profile.trial_status === 'active' &&
-    profile.trial_ends_at &&
-    new Date(profile.trial_ends_at).getTime() > Date.now()
-  ) {
+  if (profile.trial_status === 'active') {
+    const endsAtMs = profile.trial_ends_at
+      ? new Date(profile.trial_ends_at).getTime()
+      : Number.NaN;
+
+    if (Number.isFinite(endsAtMs) && endsAtMs > Date.now()) {
+      return {
+        ok: true as const,
+        alreadyActive: true,
+        trialEndsAt: profile.trial_ends_at,
+        variant: profile.trial_prompt_variant as TrialPromptVariant | null,
+        planId: profile.trial_plan_id,
+      };
+    }
+
+    await admin
+      .from('profiles')
+      .update({ trial_status: 'expired' })
+      .eq('id', userId)
+      .eq('trial_status', 'active');
+
     return {
-      ok: true as const,
-      alreadyActive: true,
-      trialEndsAt: profile.trial_ends_at,
-      variant: profile.trial_prompt_variant as TrialPromptVariant | null,
-      planId: profile.trial_plan_id,
+      ok: false as const,
+      status: 409,
+      error: 'O teste gratuito já foi utilizado nesta conta.',
     };
   }
 
