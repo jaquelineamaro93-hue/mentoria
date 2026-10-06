@@ -304,7 +304,8 @@ export default async function AdminAnalyticsPage({
         .filter(
           (profile) =>
             profile.trial_status === 'converted' &&
-            profile.trial_prompt_variant === variant
+            profile.trial_prompt_variant === variant &&
+            assignedUsers.has(profile.id)
         )
         .map((profile) => profile.id)
     );
