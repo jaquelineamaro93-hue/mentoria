@@ -25,6 +25,7 @@ import { VIA_FORCAS } from '@/lib/prompts';
 import { extrairTextoPdf } from '@/lib/pdf';
 import type {
   Diagnostic,
+  Feedback360Summary,
   Profile,
   ResumoPerfil,
   ViaEvolucaoAnalise,
@@ -37,6 +38,7 @@ interface Props {
   userId: string;
   viaResultadosIniciais?: ViaResultado[];
   resumoPerfilInicial?: ResumoPerfil | null;
+  feedback360SummaryInicial?: Feedback360Summary | null;
 }
 
 type Tab = 'diagnostico' | 'via' | 'resumo' | 'evolucao' | 'acompanhamento';
@@ -94,6 +96,7 @@ export default function ExerciciosClient({
   userId,
   viaResultadosIniciais = [],
   resumoPerfilInicial = null,
+  feedback360SummaryInicial = null,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -1000,6 +1003,71 @@ export default function ExerciciosClient({
               Aqui ficam os registros que você escreveu no diagnóstico de carreira. A evolução VIA
               fica separada para não misturar percepção pessoal com o ranking das forças.
             </p>
+
+            {feedback360SummaryInicial?.resumo_json && (
+              <Panel className="p-5 md:p-6 mb-6 border-mint">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-mint-deep">
+                      Percepção externa
+                    </p>
+                    <h2 className="font-display text-xl text-black mt-1">
+                      Como outras pessoas vêm percebendo você
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-black max-w-4xl">
+                      {feedback360SummaryInicial.resumo_json.resumo}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/percepcao-360')}
+                    className="shrink-0 rounded-lg border border-mint bg-mint-light px-3.5 py-2 text-xs font-medium text-black"
+                  >
+                    Ver Percepção 360
+                  </button>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3 mt-4">
+                  <div className="rounded-lg border border-gray-faint bg-white p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-text mb-2">
+                      Forças recorrentes
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {feedback360SummaryInicial.resumo_json.forcas_recorrentes.slice(0, 4).map((item) => (
+                        <span
+                          key={item.tema}
+                          className="rounded-full bg-mint-light px-2.5 py-1 text-[11px] text-black"
+                        >
+                          {item.tema}
+                        </span>
+                      ))}
+                      {feedback360SummaryInicial.resumo_json.forcas_recorrentes.length === 0 && (
+                        <span className="text-xs text-gray-text">Ainda sem recorrência suficiente.</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-gray-faint bg-white p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-text mb-2">
+                      Prioridades para observar
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {feedback360SummaryInicial.resumo_json.prioridades_pdi.slice(0, 2).map((item) => (
+                        <span
+                          key={item.titulo}
+                          className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] text-amber-900"
+                        >
+                          {item.titulo}
+                        </span>
+                      ))}
+                      {feedback360SummaryInicial.resumo_json.prioridades_pdi.length === 0 && (
+                        <span className="text-xs text-gray-text">Nenhuma prioridade consolidada.</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+            )}
 
             {diagnostics.length === 0 ? (
               <Panel className="p-6 text-sm leading-6 text-gray-text">
