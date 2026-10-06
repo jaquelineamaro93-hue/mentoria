@@ -12,10 +12,25 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [initials, setInitials] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+function getInitials(profile: Profile | null) {
+  const partes = profile?.nome?.split(' ') || [];
+  return partes
+    .slice(0, 2)
+    .map((p: string) => p[0])
+    .join('')
+    .toUpperCase() || '';
+}
+
+export function UserProvider({
+  children,
+  initialProfile = null,
+}: {
+  children: React.ReactNode;
+  initialProfile?: Profile | null;
+}) {
+  const [profile, setProfile] = useState<Profile | null>(initialProfile);
+  const [initials, setInitials] = useState(() => getInitials(initialProfile));
+  const [isLoading, setIsLoading] = useState(!initialProfile);
   const supabase = createClient();
 
   useEffect(() => {
@@ -34,13 +49,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         if (!error && data && isMounted) {
           setProfile(data);
-          const partes = data.nome?.split(' ') || [];
-          const iniciais = partes
-            .slice(0, 2)
-            .map((p: string) => p[0])
-            .join('')
-            .toUpperCase() || '';
-          setInitials(iniciais);
+          setInitials(getInitials(data));
         }
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
