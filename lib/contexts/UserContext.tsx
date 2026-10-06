@@ -10,21 +10,56 @@ interface UserContextType {
   isLoading: boolean;
 }
 
+interface UserProviderProps {
+  children: React.ReactNode;
+  initialProfile?: Profile | null;
+}
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [initials, setInitials] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+function buildInitials(nome?: string | null) {
+  return (nome ?? '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0])
+    .join('')
+    .toUpperCase();
+}
+
+export function UserProvider({
+  children,
+  initialProfile = null,
+}: UserProviderProps) {
+  const [profile, setProfile] = useState<Profile | null>(initialProfile);
+  const [initials, setInitials] = useState(buildInitials(initialProfile?.nome));
+  const [isLoading, setIsLoading] = useState(!initialProfile);
   const supabase = createClient();
 
   useEffect(() => {
     let isMounted = true;
 
+    // O layout autenticado já injeta o perfil carregado no servidor. Isso evita
+    // o "pisca" em que itens condicionais (como Administração) somem enquanto
+    // o navegador ainda está resolvendo a sessão.
+    if (initialProfile) {
+      setProfile(initialProfile);
+      setInitials(buildInitials(initialProfile.nome));
+      setIsLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
     const loadUserProfile = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || !isMounted) return;
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user || !isMounted) {
+          return;
+        }
 
         const { data, error } = await supabase
           .from('profiles')
@@ -34,13 +69,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         if (!error && data && isMounted) {
           setProfile(data);
-          const partes = data.nome?.split(' ') || [];
-          const iniciais = partes
-            .slice(0, 2)
-            .map((p: string) => p[0])
-            .join('')
-            .toUpperCase() || '';
-          setInitials(iniciais);
+          setInitials(buildInitials(data.nome));
         }
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
@@ -49,12 +78,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    loadUserProfile();
+    void loadUserProfile();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialProfile, supabase]);
 
   return (
     <UserContext.Provider value={{ profile, initials, isLoading }}>
