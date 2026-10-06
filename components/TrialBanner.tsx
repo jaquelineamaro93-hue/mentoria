@@ -97,10 +97,10 @@ export default function TrialBanner({ pathname }: { pathname: string }) {
         path: pathname,
         sessionId: getProductSessionId(),
         metadata: {
-          variant: state.variant,
-          trial_day: state.elapsedDays,
+          variant: state?.variant,
+          trial_day: state?.elapsedDays,
           days_left: dias,
-          plan_id: state.planId,
+          plan_id: state?.planId,
         },
       }),
     }).catch(() => {});
