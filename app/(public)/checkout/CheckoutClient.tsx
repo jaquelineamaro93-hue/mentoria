@@ -79,6 +79,10 @@ export default function CheckoutClient({
           formaPagamento: formaEscolhida,
         }),
       });
+      if (res.status === 401) {
+        window.location.href = '/login?next=' + encodeURIComponent('/checkout?plan=' + plano.id);
+        return;
+      }
       const data = await res.json();
       if (data.init_point) {
         window.location.href = data.init_point;

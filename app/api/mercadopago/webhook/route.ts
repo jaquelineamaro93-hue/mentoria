@@ -1,198 +1,59 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { buscarPreapprovalMercadoPago, buscarPagamentoMercadoPago } from '@/lib/mercadopago';
+import { buscarPreapprovalMercadoPago, buscarPagamentoMercadoPago, buscarPagamentoAssinaturaMercadoPago } from '@/lib/mercadopago';
 import { verificarAssinaturaWebhook } from '@/lib/mercadopago-webhook-security';
-import { enviarEmail, templateBoasVindas } from '@/lib/sendgrid';
-import { marcarTrialConvertido } from '@/lib/trial';
-
-async function enviarBoasVindasSeNecessario(
-  supabase: ReturnType<typeof createAdminClient>,
-  userId: string
-) {
-  const { data: perfil } = await supabase
-    .from('profiles')
-    .select('nome, email, boas_vindas_enviado')
-    .eq('id', userId)
-    .single();
-
-  if (!perfil || perfil.boas_vindas_enviado) return;
-
-  try {
-    await enviarEmail({
-      para: perfil.email,
-      assunto: 'Bem-vinda à Mentoria SOMA',
-      html: templateBoasVindas(perfil.nome),
-    });
-    await supabase.from('profiles').update({ boas_vindas_enviado: true }).eq('id', userId);
-  } catch (err) {
-    console.error('Falha ao enviar e-mail de boas-vindas:', err);
-  }
-}
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body;
+  try { body = await request.json(); } catch {
+    return NextResponse.json({ error: 'JSON inválido.' }, { status: 400 });
+  }
+  const id = new URL(request.url).searchParams.get('data.id');
+  if (!body || typeof body !== 'object') return NextResponse.json({ error: 'JSON inválido.' }, { status: 400 });
   const tipo = body.type ?? body.topic;
-  const id = body.data?.id ?? body.id;
-
-  if (!id) {
-    return NextResponse.json({ ignorado: true });
+  if (!id || (body.data?.id != null && String(body.data.id) !== id)) {
+    return NextResponse.json({ error: 'Identificador ausente ou divergente.' }, { status: 400 });
   }
-
-  const assinatura = verificarAssinaturaWebhook(
-    request.headers.get('x-signature'),
-    request.headers.get('x-request-id'),
-    String(id)
-  );
-
-  if (!assinatura.valido) {
-    console.error('Webhook do Mercado Pago rejeitado:', assinatura.motivo);
-    return NextResponse.json({ error: 'Assinatura inválida.' }, { status: 401 });
-  }
-
-  const supabase = createAdminClient();
-
-  // Pagamento avulso (dois tipos possíveis: crédito de simulação de CV, ou
-  // plano da mentoria pago à vista/cartão). Descobrimos qual é pelo
-  // external_reference: se bate com um registro em pagamentos_avulsos, é
-  // crédito de CV. Senão, tratamos como o próprio user_id (compra de plano).
-  if (tipo === 'payment') {
-    try {
-      const pagamento = await buscarPagamentoMercadoPago(id);
-      const referencia = pagamento.external_reference;
-
-      if (!referencia) {
-        return NextResponse.json({ ignorado: true });
-      }
-
-      const { data: registroAvulso } = await supabase
-        .from('pagamentos_avulsos')
-        .select('user_id, quantidade, status')
-        .eq('id', referencia)
-        .maybeSingle();
-
-      if (registroAvulso) {
-        if (pagamento.status === 'approved' && registroAvulso.status !== 'aprovado') {
-          await supabase
-            .from('pagamentos_avulsos')
-            .update({ status: 'aprovado', mp_payment_id: String(id) })
-            .eq('id', referencia);
-
-          await supabase.rpc('incrementar_creditos_simulacao_cv', {
-            p_user_id: registroAvulso.user_id,
-            p_quantidade: registroAvulso.quantidade,
-          });
-        } else if (pagamento.status === 'rejected') {
-          await supabase
-            .from('pagamentos_avulsos')
-            .update({ status: 'rejeitado', mp_payment_id: String(id) })
-            .eq('id', referencia);
-        }
-
-        return NextResponse.json({ ok: true });
-      }
-
-      // Não é crédito de CV: tratamos como compra de plano (à vista ou cartão)
-      const userId = referencia;
-
-      if (pagamento.status === 'approved') {
-        await supabase
-          .from('profiles')
-          .update({ status_assinatura: 'ativo', origem_assinatura: 'mercadopago' })
-          .eq('id', userId);
-
-        // Se esse mentorado foi indicado por alguém, marca a indicação como convertida
-        const { data: perfilPago } = await supabase
-          .from('profiles')
-          .select('indicado_por_id')
-          .eq('id', userId)
-          .single();
-
-        if (perfilPago?.indicado_por_id) {
-          await supabase
-            .from('indicacoes')
-            .update({ status: 'convertido', convertido_em: new Date().toISOString() })
-            .eq('indicado_id', userId)
-            .eq('status', 'pendente');
-        }
-
-        await supabase.from('pagamentos_historico').insert({
-          user_id: userId,
-          valor: pagamento.transaction_amount ?? null,
-          status: pagamento.status,
-          mp_payment_id: String(id),
-        });
-
-        await marcarTrialConvertido(supabase, userId, {
-          payment_type: 'payment',
-          payment_method: 'mercadopago',
-          value: pagamento.transaction_amount ?? null,
-        });
-
-        await enviarBoasVindasSeNecessario(supabase, userId);
-      } else if (pagamento.status === 'rejected') {
-        await supabase.from('pagamentos_historico').insert({
-          user_id: userId,
-          valor: pagamento.transaction_amount ?? null,
-          status: pagamento.status,
-          mp_payment_id: String(id),
-        });
-      }
-
-      return NextResponse.json({ ok: true });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erro desconhecido.';
-      return NextResponse.json({ error: message }, { status: 500 });
-    }
-  }
-
-  // Assinatura recorrente (parcelas do plano)
-  if (tipo !== 'preapproval') {
-    return NextResponse.json({ ignorado: true });
-  }
-
+  const assinatura = verificarAssinaturaWebhook(request.headers.get('x-signature'), request.headers.get('x-request-id'), id);
+  if (!assinatura.valido) return NextResponse.json({ error: 'Assinatura inválida.' }, { status: 401 });
   try {
-    const preapproval = await buscarPreapprovalMercadoPago(id);
-    const userId = preapproval.external_reference;
-
-    if (!userId) {
-      return NextResponse.json({ erro: 'Sem external_reference' }, { status: 400 });
+    const admin = createAdminClient();
+    if (tipo === 'subscription_preapproval' || tipo === 'preapproval') {
+      const subscription = await buscarPreapprovalMercadoPago(id);
+      const { data: pedido, error } = await admin.from('mp_pedidos').select('id, mp_resource_id')
+        .eq('id', subscription.external_reference).eq('forma_pagamento', 'recorrente').maybeSingle();
+      if (error) throw error;
+      if (!pedido) return NextResponse.json({ ignorado: true });
+      if (pedido.mp_resource_id !== String(subscription.id)) throw new Error('Assinatura divergente.');
+      // Authorization alone does not prove payment; actual charge events grant access.
+      const { error: updateError } = await admin.from('mp_pedidos').update({ status: subscription.status }).eq('id', pedido.id);
+      if (updateError) throw updateError;
+      return NextResponse.json({ ok: true });
     }
-
-    const novoStatus =
-      preapproval.status === 'authorized'
-        ? 'ativo'
-        : preapproval.status === 'cancelled' || preapproval.status === 'paused'
-          ? 'encerrado'
-          : 'inadimplente';
-
-    await supabase
-      .from('profiles')
-      .update({
-        status_assinatura: novoStatus,
-        origem_assinatura: 'mercadopago',
-        mp_subscription_id: preapproval.id,
-      })
-      .eq('id', userId);
-
-    await supabase.from('pagamentos_historico').insert({
-      user_id: userId,
-      valor: preapproval.auto_recurring?.transaction_amount ?? null,
-      status: preapproval.status,
-      mp_payment_id: preapproval.id,
+    let paymentId = id;
+    let subscriptionReference: string | undefined;
+    if (tipo === 'subscription_authorized_payment') {
+      const charge = await buscarPagamentoAssinaturaMercadoPago(id);
+      if (!charge.payment?.id) return NextResponse.json({ ignorado: true });
+      paymentId = String(charge.payment.id);
+      const subscription = await buscarPreapprovalMercadoPago(String(charge.preapproval_id));
+      subscriptionReference = subscription.external_reference;
+      const { data: pedido, error } = await admin.from('mp_pedidos').select('mp_resource_id')
+        .eq('id', subscriptionReference).maybeSingle();
+      if (error || !pedido || pedido.mp_resource_id !== String(subscription.id)) throw new Error('Assinatura divergente.');
+    } else if (tipo !== 'payment') return NextResponse.json({ ignorado: true });
+    const payment = await buscarPagamentoMercadoPago(paymentId);
+    if (String(payment.id) !== paymentId) throw new Error('Pagamento divergente.');
+    if (subscriptionReference && payment.external_reference && payment.external_reference !== subscriptionReference) throw new Error('Referência divergente.');
+    const reference = subscriptionReference || payment.external_reference;
+    if (!reference) return NextResponse.json({ ignorado: true });
+    const { data, error } = await admin.rpc('processar_mp_pagamento', {
+      p_pedido: reference, p_payment_id: paymentId,
+      p_status: payment.status, p_valor: payment.transaction_amount, p_currency: payment.currency_id,
     });
-
-    if (novoStatus === 'ativo') {
-      await marcarTrialConvertido(supabase, userId, {
-        payment_type: 'preapproval',
-        payment_method: 'mercadopago',
-        value: preapproval.auto_recurring?.transaction_amount ?? null,
-      });
-      await enviarBoasVindasSeNecessario(supabase, userId);
-    }
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erro desconhecido.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (error || data === 'pedido_desconhecido') throw new Error('Pedido não reconciliado.');
+    return NextResponse.json({ ok: true, resultado: data });
+  } catch {
+    return NextResponse.json({ error: 'Não foi possível processar a notificação.' }, { status: 500 });
   }
 }

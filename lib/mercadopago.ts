@@ -56,8 +56,7 @@ export async function criarAssinaturaMercadoPago({
   });
 
   if (!response.ok) {
-    const detalhe = await response.text();
-    throw new Error(`Erro ao criar assinatura no Mercado Pago: ${response.status} ${detalhe}`);
+    throw new Error(`Erro ao criar assinatura no Mercado Pago: ${response.status}`);
   }
 
   const data = await response.json();
@@ -102,6 +101,7 @@ export async function criarPagamentoUnicoMercadoPago({
         },
       ],
       external_reference: externalReference,
+      notification_url: `${appUrl}/api/mercadopago/webhook`,
       back_urls: {
         success: urlRetorno,
         pending: urlRetorno,
@@ -112,8 +112,7 @@ export async function criarPagamentoUnicoMercadoPago({
   });
 
   if (!response.ok) {
-    const detalhe = await response.text();
-    throw new Error(`Erro ao criar pagamento no Mercado Pago: ${response.status} ${detalhe}`);
+    throw new Error(`Erro ao criar pagamento no Mercado Pago: ${response.status}`);
   }
 
   const data = await response.json();
@@ -147,5 +146,15 @@ export async function buscarPreapprovalMercadoPago(id: string) {
     throw new Error(`Erro ao buscar assinatura no Mercado Pago: ${response.status}`);
   }
 
+  return response.json();
+}
+
+export async function buscarPagamentoAssinaturaMercadoPago(id: string) {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado.');
+  const response = await fetch(`${MP_API}/authorized_payments/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(`Erro ao buscar cobrança: ${response.status}`);
   return response.json();
 }

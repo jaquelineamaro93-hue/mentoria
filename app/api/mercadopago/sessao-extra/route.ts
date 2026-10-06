@@ -1,35 +1,21 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { criarPagamentoUnicoMercadoPago } from '@/lib/mercadopago';
+import { registrarPedido, vincularCobranca } from '@/lib/mercadopago-orders';
 
-export async function POST(request: Request) {
+export async function POST() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
-  }
-
-  const { preco, tipo } = await request.json();
-
-  if (tipo !== 'sessao-extra' || preco !== 200) {
-    return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
-  }
-
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
   try {
+    const pedido = await registrarPedido({ user_id: user.id, email: user.email,
+      tipo: 'sessao_extra', valor: 200, forma_pagamento: 'avista' });
     const pagamento = await criarPagamentoUnicoMercadoPago({
-      titulo: 'Sessão Individual Extra - SOMA',
-      valor: preco,
-      externalReference: `sessao-extra-${user.id}-${Date.now()}`,
-      backUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://mentoria-pi-taupe.vercel.app'}/dashboard`,
+      titulo: 'Sessão Individual Extra — SOMA', valor: 200, externalReference: pedido.id,
     });
-
+    await vincularCobranca(pedido.admin, pedido.id, pagamento.id);
     return NextResponse.json({ init_point: pagamento.init_point });
-  } catch (error) {
-    console.error('Erro Mercado Pago:', error);
-    const message = error instanceof Error ? error.message : 'Erro ao processar pagamento';
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Não foi possível iniciar o pagamento.' }, { status: 500 });
   }
 }

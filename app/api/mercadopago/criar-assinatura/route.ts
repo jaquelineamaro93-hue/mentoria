@@ -1,3 +1,4 @@
+import { registrarPedido, vincularCobranca } from '@/lib/mercadopago-orders';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { criarAssinaturaMercadoPago, criarPagamentoUnicoMercadoPago } from '@/lib/mercadopago';
@@ -8,32 +9,20 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const body = await request.json();
-  const planoCodigo: string = body.planoCodigo;
-  const formaPagamento: 'avista' | 'cartao' | 'recorrente' = body.formaPagamento;
-  const emailLead: string = body.email;
-
-  if (!planoCodigo || !formaPagamento) {
-    return NextResponse.json({ error: 'Plano ou forma de pagamento não informados.' }, { status: 400 });
+  if (!user?.email) {
+    return NextResponse.json({ error: 'Entre na sua conta antes de pagar.' }, { status: 401 });
   }
-
-  let email = '';
-  let userId = '';
-  let profile = null;
-
-  if (user) {
-    const { data: userProfile } = await supabase
-      .from('profiles')
-      .select('nome, email')
-      .eq('id', user.id)
-      .single();
-
-    if (userProfile) {
-      profile = userProfile;
-      email = userProfile.email;
-      userId = user.id;
-    }
+  let body;
+  try { body = await request.json(); } catch {
+    return NextResponse.json({ error: 'JSON inválido.' }, { status: 400 });
   }
+  const planoCodigo = body?.planoCodigo;
+  const formaPagamento = body?.formaPagamento;
+  if (typeof planoCodigo !== 'string' || !['avista', 'cartao', 'recorrente'].includes(formaPagamento)) {
+    return NextResponse.json({ error: 'Plano ou forma de pagamento inválidos.' }, { status: 400 });
+  }
+  const email = user.email;
+  const userId = user.id;
 
   const { data: plano } = await supabase
     .from('planos_mentoria')
@@ -47,17 +36,22 @@ export async function POST(request: Request) {
   }
 
   try {
-    const externalReference = userId || crypto.randomUUID();
-
-    if (user && profile) {
-      await supabase
-        .from('profiles')
-        .update({ plano_id: plano.id, forma_pagamento_escolhida: formaPagamento })
-        .eq('id', user.id);
+    if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Informe um e-mail válido.' }, { status: 400 });
     }
+    const parcelas = Number(plano.parcelas_recorrente);
+    if (formaPagamento === 'recorrente' && (!Number.isInteger(parcelas) || parcelas < 1)) {
+      throw new Error('Parcelamento inválido.');
+    }
+    const valorPedido = formaPagamento === 'recorrente'
+      ? Math.round(Number(plano.preco_recorrente_total) / parcelas * 100) / 100
+      : Number(formaPagamento === 'avista' ? plano.preco_avista : plano.preco_cartao);
+    const pedido = await registrarPedido({ user_id: userId || null, email, tipo: 'plano',
+      valor: valorPedido, plano_id: plano.id, forma_pagamento: formaPagamento });
+    const externalReference = pedido.id;
 
     if (formaPagamento === 'recorrente') {
-      const valorParcela = Number(plano.preco_recorrente_total) / plano.parcelas_recorrente;
+      const valorParcela = valorPedido;
 
       const assinatura = await criarAssinaturaMercadoPago({
         email,
@@ -67,17 +61,12 @@ export async function POST(request: Request) {
         externalReference,
       });
 
-      if (user && profile) {
-        await supabase
-          .from('profiles')
-          .update({ mp_subscription_id: assinatura.id })
-          .eq('id', user.id);
-      }
+      await vincularCobranca(pedido.admin, pedido.id, assinatura.id);
 
       return NextResponse.json({ init_point: assinatura.init_point });
     }
 
-    const valor = formaPagamento === 'avista' ? plano.preco_avista : plano.preco_cartao;
+    const valor = valorPedido;
 
     const pagamento = await criarPagamentoUnicoMercadoPago({
       titulo: `${plano.nome} — Mentoria SOMA (${formaPagamento === 'avista' ? 'à vista' : 'cartão'})`,
@@ -85,6 +74,7 @@ export async function POST(request: Request) {
       externalReference,
     });
 
+    await vincularCobranca(pedido.admin, pedido.id, pagamento.id);
     return NextResponse.json({ init_point: pagamento.init_point });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erro desconhecido.';
