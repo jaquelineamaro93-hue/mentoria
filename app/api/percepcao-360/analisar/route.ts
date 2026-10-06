@@ -342,6 +342,20 @@ export async function POST(request: NextRequest) {
 
     const resumo = normalizarResumo(bruto);
 
+    const { data: rodadaAtualizada, error: roundStatusError } = await admin
+      .from('feedback_360_rounds')
+      .update({ status: 'concluida' })
+      .eq('id', roundId)
+      .eq('user_id', user.id)
+      .select('updated_at')
+      .single();
+
+    if (roundStatusError) {
+      console.warn('[FEEDBACK-360] Leitura pronta, mas status da rodada não atualizou:', roundStatusError.message);
+    }
+
+    const sourceUpdatedAt = rodadaAtualizada?.updated_at ?? rodada.updated_at;
+
     const { error: saveError } = await admin.from('feedback_360_summaries').upsert(
       {
         round_id: roundId,
@@ -349,7 +363,7 @@ export async function POST(request: NextRequest) {
         resumo_json: resumo,
         status: 'concluida',
         erro_analise: null,
-        source_updated_at: rodada.updated_at,
+        source_updated_at: sourceUpdatedAt,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'round_id,user_id' }
@@ -365,12 +379,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    await admin
-      .from('feedback_360_rounds')
-      .update({ status: 'concluida' })
-      .eq('id', roundId)
-      .eq('user_id', user.id);
 
     return NextResponse.json(
       { resumo, cached: false },
