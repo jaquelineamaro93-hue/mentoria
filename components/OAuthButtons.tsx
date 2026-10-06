@@ -25,7 +25,7 @@ interface CredentialResponse {
   credential: string;
 }
 
-export default function OAuthButtons() {
+export default function OAuthButtons({ trialPlanId }: { trialPlanId?: string | null }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,6 +68,7 @@ export default function OAuthButtons() {
               name: decodedToken.name,
               picture: decodedToken.picture,
             },
+            trialPlanId: trialPlanId || null,
           }),
         });
 
@@ -101,7 +102,7 @@ export default function OAuthButtons() {
         text: 'signin_with',
       });
     }
-  }, []);
+  }, [trialPlanId]);
 
   return (
     <div className="space-y-3 my-6">
