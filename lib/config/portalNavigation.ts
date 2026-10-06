@@ -28,6 +28,7 @@ export const portalNavGroups: PortalNavGroup[] = [
       { href: '/onboarding', label: 'Primeiros passos', icon: ListChecks },
       { href: '/quem-sou-eu', label: 'Mapa Quem Sou Eu', icon: Sparkles },
       { href: '/exercicios', label: 'Diagnóstico & Perfil', icon: Compass },
+      { href: '/percepcao-360', label: 'Percepção 360', icon: Users },
       { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
       { href: '/feedbacks', label: 'Feedbacks recebidos', icon: MessageCircle },
       { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
