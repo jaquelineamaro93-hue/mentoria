@@ -120,6 +120,7 @@ export default function ExerciciosClient({
   const [enviandoVia, setEnviandoVia] = useState(false);
   const [extraindoPdf, setExtraindoPdf] = useState(false);
   const [erroVia, setErroVia] = useState<string | null>(null);
+  const [avisoVia, setAvisoVia] = useState<string | null>(null);
 
   const [resumoPerfil, setResumoPerfil] = useState<ResumoPerfil | null>(resumoPerfilInicial);
   const [gerandoResumo, setGerandoResumo] = useState(false);
@@ -274,6 +275,7 @@ export default function ExerciciosClient({
 
     setEnviandoVia(true);
     setErroVia(null);
+    setAvisoVia(null);
     try {
       const res = await fetch('/api/gerar-analise-via', {
         method: 'POST',
@@ -285,6 +287,7 @@ export default function ExerciciosClient({
 
       const novo = data.resultado as ViaResultado;
       setViaResultados((anteriores) => [novo, ...anteriores]);
+      setAvisoVia(data.aviso || null);
       setMostrarFormularioVia(false);
       setViaForcas(Array(24).fill(''));
       setViaData('');
@@ -465,6 +468,12 @@ export default function ExerciciosClient({
                 </button>
               )}
             </div>
+
+            {avisoVia && !mostrarFormularioVia && (
+              <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+                {avisoVia}
+              </p>
+            )}
 
             {viaAtual && !mostrarFormularioVia && (
               <Panel className="p-6 md:p-7">
