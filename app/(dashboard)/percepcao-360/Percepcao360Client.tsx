@@ -115,6 +115,7 @@ export default function Percepcao360Client({
   const [savingRespondent, setSavingRespondent] = useState(false);
 
   const [savingQuestions, setSavingQuestions] = useState(false);
+  const [editingQuestions, setEditingQuestions] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
@@ -219,13 +220,14 @@ export default function Percepcao360Client({
 
     setSelectedRoundId(String(data));
     setShowNewRound(false);
+    setEditingQuestions(false);
     setSucesso('Rodada criada e salva no portal.');
     posthog.capture('feedback_360_rodada_criada', { perguntas: perguntasValidas.length });
     router.refresh();
   }
 
   async function saveQuestions() {
-    if (!selectedRound || !perguntasEditaveis) return;
+    if (!selectedRound || !perguntasEditaveis || !editingQuestions) return;
 
     const atuais = selectedQuestions.filter((question) => question.pergunta.trim());
     if (atuais.length === 0) {
@@ -251,12 +253,13 @@ export default function Percepcao360Client({
     }
 
     setSavingQuestions(false);
+    setEditingQuestions(false);
     setSucesso('Perguntas atualizadas.');
     router.refresh();
   }
 
   async function addQuestion() {
-    if (!selectedRound || !perguntasEditaveis) return;
+    if (!selectedRound || !perguntasEditaveis || !editingQuestions) return;
 
     const nextOrder =
       selectedQuestions.length > 0
@@ -283,7 +286,7 @@ export default function Percepcao360Client({
   }
 
   async function deleteQuestion(questionId: string) {
-    if (!selectedRound || !perguntasEditaveis || selectedQuestions.length <= 1) return;
+    if (!selectedRound || !perguntasEditaveis || !editingQuestions || selectedQuestions.length <= 1) return;
 
     const { error } = await supabase
       .from('feedback_360_questions')
@@ -468,6 +471,7 @@ export default function Percepcao360Client({
                       onClick={() => {
                         setSelectedRoundId(round.id);
                         setShowNewRound(false);
+                        setEditingQuestions(false);
                         resetRespondentForm();
                         setErro(null);
                         setSucesso(null);
@@ -618,11 +622,26 @@ export default function Percepcao360Client({
                     <p className="text-xs uppercase tracking-wide text-gray-text">Perguntas da rodada</p>
                     <p className="text-sm text-black mt-1">
                       {perguntasEditaveis
-                        ? 'Você pode ajustar enquanto ainda não houver respostas.'
+                        ? editingQuestions
+                          ? 'Modo de edição ativo. Altere apenas o questionário; as respostas são preenchidas na seção “Registrar feedback” abaixo.'
+                          : 'Estas são as perguntas que a pessoa vai responder. Elas ficam protegidas por padrão para evitar respostas digitadas no lugar errado.'
                         : 'As perguntas ficam protegidas depois que a coleta começa.'}
                     </p>
                   </div>
-                  {perguntasEditaveis && (
+                  {perguntasEditaveis && !editingQuestions && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingQuestions(true);
+                        setErro(null);
+                        setSucesso(null);
+                      }}
+                      className="rounded-lg border border-gray-faint bg-white px-3 py-2 text-xs font-medium text-black whitespace-nowrap"
+                    >
+                      Editar perguntas
+                    </button>
+                  )}
+                  {perguntasEditaveis && editingQuestions && (
                     <button
                       type="button"
                       onClick={addQuestion}
@@ -639,7 +658,7 @@ export default function Percepcao360Client({
                       <span className="mt-2 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-mint-light text-[11px] text-black">
                         {question.ordem}
                       </span>
-                      {perguntasEditaveis ? (
+                      {perguntasEditaveis && editingQuestions ? (
                         <textarea
                           value={question.pergunta}
                           onChange={(e) =>
@@ -658,7 +677,7 @@ export default function Percepcao360Client({
                         <p className="flex-1 pt-2 text-sm leading-5 text-black">{question.pergunta}</p>
                       )}
 
-                      {perguntasEditaveis && selectedQuestions.length > 1 && (
+                      {perguntasEditaveis && editingQuestions && selectedQuestions.length > 1 && (
                         <button
                           type="button"
                           onClick={() => deleteQuestion(question.id)}
@@ -672,16 +691,30 @@ export default function Percepcao360Client({
                   ))}
                 </div>
 
-                {perguntasEditaveis && (
-                  <button
-                    type="button"
-                    onClick={saveQuestions}
-                    disabled={savingQuestions}
-                    className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gray-faint bg-white px-3.5 py-2 text-xs font-medium text-black disabled:opacity-50"
-                  >
-                    {savingQuestions ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                    Salvar perguntas
-                  </button>
+                {perguntasEditaveis && editingQuestions && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={saveQuestions}
+                      disabled={savingQuestions}
+                      className="inline-flex items-center gap-2 rounded-lg bg-brown px-3.5 py-2 text-xs font-medium text-white disabled:opacity-50"
+                    >
+                      {savingQuestions ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                      Salvar perguntas
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuestions(questionsProp);
+                        setEditingQuestions(false);
+                        setErro(null);
+                      }}
+                      disabled={savingQuestions}
+                      className="rounded-lg border border-gray-faint bg-white px-3.5 py-2 text-xs font-medium text-black disabled:opacity-50"
+                    >
+                      Cancelar edição
+                    </button>
+                  </div>
                 )}
               </Panel>
 
@@ -689,11 +722,11 @@ export default function Percepcao360Client({
                 <Panel className="p-5 md:p-6">
                   <div className="mb-5">
                     <Eyebrow>
-                      <Users size={13} /> {editingRespondentId ? 'Editar feedback' : 'Adicionar pessoa'}
+                      <Users size={13} /> {editingRespondentId ? 'Editar feedback' : 'Registrar feedback'}
                     </Eyebrow>
                     <p className="text-sm leading-6 text-gray-text">
-                      Nome é opcional. Cargo, relação e convivência ajudam a interpretar o contexto
-                      sem transformar uma opinião isolada em verdade.
+                      <strong>É aqui que a pessoa responde.</strong> Preencha o contexto e escreva as respostas
+                      nos campos logo abaixo. A área “Perguntas da rodada” serve apenas para configurar o questionário.
                     </p>
                   </div>
 
