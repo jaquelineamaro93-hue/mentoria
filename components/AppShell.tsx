@@ -15,6 +15,7 @@ import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import TrialBanner from '@/components/TrialBanner';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
+import type { Profile } from '@/lib/types';
 
 function SectionNavigationCards({
   pathname,
@@ -223,9 +224,15 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({
+  children,
+  initialProfile = null,
+}: {
+  children: React.ReactNode;
+  initialProfile?: Profile | null;
+}) {
   return (
-    <UserProvider>
+    <UserProvider initialProfile={initialProfile}>
       <SidebarProvider>
         <Suspense fallback={<div className="min-h-screen bg-white" />}>
           <AppShellContent>{children}</AppShellContent>
