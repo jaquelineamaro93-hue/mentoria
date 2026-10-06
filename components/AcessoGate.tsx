@@ -30,7 +30,7 @@ export default function AcessoGate() {
 
       const { data: perfil } = await supabase
         .from('profiles')
-        .select('status_pagamento, data_fim_acesso, is_admin, trial_status, trial_ends_at')
+        .select('status_pagamento, status_assinatura, data_fim_acesso, is_admin, trial_status, trial_ends_at')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -53,7 +53,18 @@ export default function AcessoGate() {
       const passouDoPrazo =
         perfil.data_fim_acesso && perfil.data_fim_acesso < new Date().toISOString().slice(0, 10);
 
-      if (!trialAtivo && (perfil.status_pagamento === 'encerrado' || passouDoPrazo)) {
+      const trialExpirado =
+        perfil.trial_status === 'expired' ||
+        (perfil.trial_status === 'active' &&
+          !!perfil.trial_ends_at &&
+          new Date(perfil.trial_ends_at).getTime() <= Date.now());
+
+      if (
+        !trialAtivo &&
+        ((trialExpirado && perfil.status_assinatura !== 'ativo') ||
+          perfil.status_pagamento === 'encerrado' ||
+          passouDoPrazo)
+      ) {
         router.push('/assinatura');
         return;
       }
