@@ -87,6 +87,9 @@ export interface ViaResultado {
   data_teste: string;
   analise_ia: string | null;
   arquivo_original_url: string | null;
+  analise_status?: 'pendente' | 'concluida' | 'erro';
+  analise_erro?: string | null;
+  updated_at?: string;
   created_at: string;
 }
 
