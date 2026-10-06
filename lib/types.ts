@@ -15,13 +15,13 @@ export interface Profile {
   is_admin: boolean;
   last_login_at: string | null;
   last_activity_at: string | null;
-  trial_status: 'not_started' | 'active' | 'converted' | 'expired';
-  trial_started_at: string | null;
-  trial_ends_at: string | null;
-  trial_converted_at: string | null;
-  trial_plan_id: string | null;
-  trial_prompt_variant: string | null;
-  trial_prompted_at: string | null;
+  trial_status?: 'not_started' | 'active' | 'converted' | 'expired';
+  trial_started_at?: string | null;
+  trial_ends_at?: string | null;
+  trial_converted_at?: string | null;
+  trial_plan_id?: string | null;
+  trial_prompt_variant?: string | null;
+  trial_prompted_at?: string | null;
   status_assinatura: 'ativo' | 'inadimplente' | 'encerrado';
   origem_assinatura: 'manual' | 'mercadopago';
   proxima_cobranca: string | null;
@@ -262,9 +262,9 @@ export interface PlanoMentoria {
   ativo: boolean;
   visivel_checkout: boolean;
   ordem: number;
-  trial_enabled: boolean;
-  trial_days: number;
-  trial_label: string;
+  trial_enabled?: boolean;
+  trial_days?: number;
+  trial_label?: string;
 }
 
 export interface Announcement {
