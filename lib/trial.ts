@@ -130,3 +130,54 @@ export async function iniciarTrialParaUsuario(
     trialDays,
   };
 }
+
+
+export async function marcarTrialConvertido(
+  admin: SupabaseClient,
+  userId: string,
+  metadata: Record<string, unknown> = {}
+) {
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('trial_status,trial_started_at,trial_prompt_variant,trial_plan_id')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (!profile || !profile.trial_started_at || profile.trial_status === 'converted') {
+    return;
+  }
+
+  const convertedAt = new Date();
+  const startedAt = new Date(profile.trial_started_at);
+  const elapsedHours = Math.max(
+    0,
+    (convertedAt.getTime() - startedAt.getTime()) / (60 * 60 * 1000)
+  );
+  const conversionDay = Math.max(0, Math.floor(elapsedHours / 24));
+
+  await admin
+    .from('profiles')
+    .update({
+      trial_status: 'converted',
+      trial_converted_at: convertedAt.toISOString(),
+    })
+    .eq('id', userId);
+
+  await admin.from('product_events').upsert(
+    {
+      user_id: userId,
+      event_name: 'trial_converted',
+      feature_key: 'trial',
+      metadata: {
+        variant: profile.trial_prompt_variant,
+        trial_plan_id: profile.trial_plan_id,
+        conversion_day: conversionDay,
+        conversion_hours: Math.round(elapsedHours * 10) / 10,
+        ...metadata,
+      },
+      dedupe_key: `${userId}:trial_converted`,
+      occurred_at: convertedAt.toISOString(),
+    },
+    { onConflict: 'dedupe_key', ignoreDuplicates: true }
+  );
+}
