@@ -287,3 +287,124 @@ export interface CheckinMensal {
   sugestao_melhoria: string | null;
   created_at: string;
 }
+
+
+export type Feedback360Relationship =
+  | 'gestor_direto'
+  | 'lideranca_indireta'
+  | 'responde_a_mim'
+  | 'par'
+  | 'stakeholder'
+  | 'cliente'
+  | 'fornecedor'
+  | 'colega_faculdade'
+  | 'professor'
+  | 'amigo_pessoal'
+  | 'outro';
+
+export type Feedback360Closeness = 'alta' | 'media' | 'baixa';
+
+export interface Feedback360Round {
+  id: string;
+  user_id: string;
+  titulo: string;
+  objetivo: string | null;
+  status: 'rascunho' | 'em_coleta' | 'concluida';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Feedback360Question {
+  id: string;
+  round_id: string;
+  user_id: string;
+  ordem: number;
+  pergunta: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Feedback360Respondent {
+  id: string;
+  round_id: string;
+  user_id: string;
+  nome: string | null;
+  cargo_funcao: string | null;
+  empresa_contexto: string | null;
+  relacao: Feedback360Relationship;
+  relacao_outro: string | null;
+  convivencia: Feedback360Closeness;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Feedback360Answer {
+  id: string;
+  round_id: string;
+  user_id: string;
+  respondent_id: string;
+  question_id: string;
+  resposta: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Feedback360Evidence {
+  fonte: string;
+  sinal: string;
+}
+
+export interface Feedback360Pattern {
+  tema: string;
+  contagem: number;
+  leitura: string;
+  evidencias: Feedback360Evidence[];
+}
+
+export interface Feedback360Isolated {
+  tema: string;
+  fonte: string;
+  leitura: string;
+}
+
+export interface Feedback360BlindSpot {
+  tema: string;
+  leitura: string;
+  base: string;
+}
+
+export interface Feedback360SelfExternal {
+  tema: string;
+  tipo: 'convergencia' | 'tensao' | 'hipotese';
+  leitura: string;
+}
+
+export interface Feedback360PdiPriority {
+  titulo: string;
+  por_que: string;
+  acao: string;
+}
+
+export interface Feedback360SummaryData {
+  resumo: string;
+  forcas_recorrentes: Feedback360Pattern[];
+  desenvolvimento_recorrente: Feedback360Pattern[];
+  percepcoes_isoladas: Feedback360Isolated[];
+  pontos_cegos: Feedback360BlindSpot[];
+  autopercepcao_vs_externa: Feedback360SelfExternal[];
+  prioridades_pdi: Feedback360PdiPriority[];
+  confianca_leitura: 'alta' | 'media' | 'baixa';
+  observacao_amostra: string;
+}
+
+export interface Feedback360Summary {
+  id: string;
+  round_id: string;
+  user_id: string;
+  resumo_json: Feedback360SummaryData | null;
+  status: 'pendente' | 'concluida' | 'erro';
+  erro_analise: string | null;
+  source_updated_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
