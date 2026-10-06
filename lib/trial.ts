@@ -163,21 +163,22 @@ export async function marcarTrialConvertido(
     })
     .eq('id', userId);
 
-  await admin.from('product_events').upsert(
-    {
-      user_id: userId,
-      event_name: 'trial_converted',
-      feature_key: 'trial',
-      metadata: {
-        variant: profile.trial_prompt_variant,
-        trial_plan_id: profile.trial_plan_id,
-        conversion_day: conversionDay,
-        conversion_hours: Math.round(elapsedHours * 10) / 10,
-        ...metadata,
-      },
-      dedupe_key: `${userId}:trial_converted`,
-      occurred_at: convertedAt.toISOString(),
+  const { error: eventError } = await admin.from('product_events').insert({
+    user_id: userId,
+    event_name: 'trial_converted',
+    feature_key: 'trial',
+    metadata: {
+      variant: profile.trial_prompt_variant,
+      trial_plan_id: profile.trial_plan_id,
+      conversion_day: conversionDay,
+      conversion_hours: Math.round(elapsedHours * 10) / 10,
+      ...metadata,
     },
-    { onConflict: 'dedupe_key', ignoreDuplicates: true }
-  );
+    dedupe_key: `${userId}:trial_converted`,
+    occurred_at: convertedAt.toISOString(),
+  });
+
+  if (eventError && eventError.code !== '23505') {
+    console.warn('[TRIAL] Conversão salva no perfil, mas evento não foi registrado:', eventError.message);
+  }
 }
