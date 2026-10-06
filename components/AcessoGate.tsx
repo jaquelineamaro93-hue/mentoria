@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-const ROTAS_LIBERADAS = ['/login', '/assinatura', '/magic-login', '/reset-password'];
+const ROTAS_LIBERADAS = ['/login', '/renovar', '/magic-login', '/reset-password'];
 
 export default function AcessoGate() {
   const supabase = createClient();
@@ -65,7 +65,7 @@ export default function AcessoGate() {
           perfil.status_pagamento === 'encerrado' ||
           passouDoPrazo)
       ) {
-        router.push('/assinatura');
+        router.push('/renovar');
         return;
       }
 
