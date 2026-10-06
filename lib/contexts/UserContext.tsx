@@ -34,7 +34,6 @@ export function UserProvider({
   const [profile, setProfile] = useState<Profile | null>(initialProfile);
   const [initials, setInitials] = useState(buildInitials(initialProfile?.nome));
   const [isLoading, setIsLoading] = useState(!initialProfile);
-  const supabase = createClient();
 
   useEffect(() => {
     let isMounted = true;
@@ -50,6 +49,8 @@ export function UserProvider({
         isMounted = false;
       };
     }
+
+    const supabase = createClient();
 
     const loadUserProfile = async () => {
       try {
@@ -83,7 +84,7 @@ export function UserProvider({
     return () => {
       isMounted = false;
     };
-  }, [initialProfile, supabase]);
+  }, [initialProfile]);
 
   return (
     <UserContext.Provider value={{ profile, initials, isLoading }}>
