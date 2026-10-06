@@ -21,6 +21,7 @@ import remarkGfm from 'remark-gfm';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
+import { getProductSessionId } from '@/lib/product-analytics';
 import { VIA_FORCAS } from '@/lib/prompts';
 import { extrairTextoPdf } from '@/lib/pdf';
 import type {
@@ -150,6 +151,30 @@ export default function ExerciciosClient({
       })) ?? [],
     [viaAtual, viaAnterior]
   );
+
+  useEffect(() => {
+    const featureKey =
+      activeTab === 'via' || activeTab === 'evolucao'
+        ? 'via'
+        : 'diagnostico_perfil';
+
+    const sessionId = getProductSessionId();
+
+    void fetch('/api/product-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      keepalive: true,
+      body: JSON.stringify({
+        eventName: 'feature_view',
+        featureKey,
+        path: `/exercicios#${activeTab}`,
+        sessionId,
+        metadata: { subtab: activeTab },
+        dedupeKey: `feature_view:${featureKey}:exercicios:${activeTab}:${sessionId ?? 'session'}`,
+      }),
+    }).catch(() => {});
+  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab !== 'evolucao' || !viaAtual || !viaAnterior) return;
