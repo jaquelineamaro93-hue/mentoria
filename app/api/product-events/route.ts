@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +52,14 @@ export async function POST(request: NextRequest) {
   };
 
   const { error } = await supabase.from('product_events').insert(payload);
+
+  if (!error && eventName === 'trial_prompt_view') {
+    await createAdminClient()
+      .from('profiles')
+      .update({ trial_prompted_at: new Date().toISOString() })
+      .eq('id', user.id)
+      .is('trial_prompted_at', null);
+  }
 
   if (error) {
     if (error.code === '23505' && dedupeKey) {
