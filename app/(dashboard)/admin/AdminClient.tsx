@@ -290,6 +290,13 @@ export default function AdminClient({
           </div>
           <div className="flex flex-col gap-2 shrink-0">
             <Link
+              href="/admin/analytics"
+              className="flex items-center justify-center gap-2 bg-mint-deep hover:opacity-90 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <BarChart3 size={15} />
+              Analytics & testes A/B
+            </Link>
+            <Link
               href="/admin/financeiro"
               className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
             >
