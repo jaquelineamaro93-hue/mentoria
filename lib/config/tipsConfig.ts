@@ -11,6 +11,10 @@ export const tipsConfig: Record<string, QuickTipData> = {
   '/exercicios': {
     title: 'Diagnóstico Estratégico',
   },
+  '/percepcao-360': {
+    title: 'Percepção 360',
+    description: 'Registre como pessoas de contextos diferentes percebem suas forças e pontos de desenvolvimento.',
+  },
   '/primeiros-90-dias': {
     title: 'Planejamento de Transição',
   },
