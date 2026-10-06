@@ -125,15 +125,12 @@ export default function Percepcao360Client({
     setRespondents(respondentsProp);
     setAnswers(answersProp);
     setSummaries(summariesProp);
-
-    if (!selectedRoundId && roundsProp[0]?.id) {
-      setSelectedRoundId(roundsProp[0].id);
-    }
-
-    if (selectedRoundId && !roundsProp.some((round) => round.id === selectedRoundId)) {
-      setSelectedRoundId(roundsProp[0]?.id ?? '');
-    }
-  }, [roundsProp, questionsProp, respondentsProp, answersProp, summariesProp, selectedRoundId]);
+    setSelectedRoundId((current) =>
+      roundsProp.some((round) => round.id === current)
+        ? current
+        : roundsProp[0]?.id ?? ''
+    );
+  }, [roundsProp, questionsProp, respondentsProp, answersProp, summariesProp]);
 
   const selectedRound = rounds.find((round) => round.id === selectedRoundId) ?? null;
 
