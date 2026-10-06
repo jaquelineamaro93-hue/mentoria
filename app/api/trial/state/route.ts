@@ -55,19 +55,20 @@ export async function GET() {
       .eq('id', user.id)
       .eq('trial_status', 'active');
 
-    await admin.from('product_events').upsert(
-      {
-        user_id: user.id,
-        event_name: 'trial_expired',
-        feature_key: 'trial',
-        metadata: {
-          variant: profile.trial_prompt_variant,
-          trial_plan_id: profile.trial_plan_id,
-        },
-        dedupe_key: `${user.id}:trial_expired`,
+    const { error: expiredEventError } = await admin.from('product_events').insert({
+      user_id: user.id,
+      event_name: 'trial_expired',
+      feature_key: 'trial',
+      metadata: {
+        variant: profile.trial_prompt_variant,
+        trial_plan_id: profile.trial_plan_id,
       },
-      { onConflict: 'dedupe_key', ignoreDuplicates: true }
-    );
+      dedupe_key: `${user.id}:trial_expired`,
+    });
+
+    if (expiredEventError && expiredEventError.code !== '23505') {
+      console.warn('[TRIAL] Não foi possível registrar expiração:', expiredEventError.message);
+    }
 
     return NextResponse.json(
       { state: { status: 'expired' } },
