@@ -76,19 +76,42 @@ function featureTone(signal: string) {
   return 'bg-gray-50 text-gray-text';
 }
 
+type PagedQuery = PromiseLike<{
+  data: any[] | null;
+  error: { message?: string } | null;
+}>;
+
+async function allRows(
+  loadPage: (from: number, to: number) => PagedQuery,
+  pageSize = 1000
+): Promise<any[]> {
+  const result: any[] = [];
+
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await loadPage(from, from + pageSize - 1);
+    if (error) {
+      throw new Error(error.message || 'Falha ao carregar dados de analytics.');
+    }
+
+    const page = data ?? [];
+    result.push(...page);
+
+    if (page.length < pageSize) break;
+  }
+
+  return result;
+}
+
 async function rows(
-  query: PromiseLike<{ data: unknown[] | null; error: unknown }>,
+  loadPage: (from: number, to: number) => PagedQuery,
   userField: string,
   timeField: string
 ): Promise<TimedRow[]> {
-  const result = await query;
-  return (result.data ?? []).map((row) => {
-    const item = row as Record<string, unknown>;
-    return {
-      userId: String(item[userField] ?? ''),
-      timestamp: item[timeField] ? String(item[timeField]) : null,
-    };
-  });
+  const data = await allRows(loadPage);
+  return data.map((row) => ({
+    userId: String(row[userField] ?? ''),
+    timestamp: row[timeField] ? String(row[timeField]) : null,
+  }));
 }
 
 export default async function AdminAnalyticsPage({
@@ -119,10 +142,10 @@ export default async function AdminAnalyticsPage({
   const admin = createAdminClient();
 
   const [
-    profilesResp,
-    eventsResp,
-    experimentsResp,
-    assignmentsResp,
+    profiles,
+    events,
+    experiments,
+    assignments,
     diagnostics,
     via,
     pdi,
@@ -136,51 +159,108 @@ export default async function AdminAnalyticsPage({
     primeiros90,
     checkins,
     cvs,
-    somaAnalisesResp,
+    somaAnalises,
   ] = await Promise.all([
-    admin
-      .from('profiles')
-      .select(
-        'id,created_at,last_activity_at,status_assinatura,trial_status,trial_started_at,trial_ends_at,trial_converted_at,trial_prompt_variant,is_admin'
-      )
-      .eq('is_admin', false),
-    admin
-      .from('product_events')
-      .select('user_id,event_name,feature_key,metadata,occurred_at')
-      .gte('occurred_at', cutoffIso)
-      .order('occurred_at', { ascending: false }),
-    admin
-      .from('product_experiments')
-      .select('*')
-      .order('created_at', { ascending: false }),
-    admin
-      .from('product_experiment_assignments')
-      .select('experiment_id,user_id,variant,assigned_at'),
-    rows(admin.from('diagnostics').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('via_resultados').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('pdi_respostas').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('journal_notes').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('quem_sou_eu_respostas').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('feedback_360_rounds').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('linkedin_content_drafts').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('entrevista_simulacoes').select('user_id,updated_at'), 'user_id', 'updated_at'),
-    rows(admin.from('vagas_candidatura').select('mentorado_id,updated_at'), 'mentorado_id', 'updated_at'),
-    rows(admin.from('contatos_rede').select('user_id,created_at'), 'user_id', 'created_at'),
+    allRows((from, to) =>
+      admin
+        .from('profiles')
+        .select(
+          'id,created_at,last_activity_at,status_assinatura,trial_status,trial_started_at,trial_ends_at,trial_converted_at,trial_prompt_variant,is_admin'
+        )
+        .eq('is_admin', false)
+        .range(from, to)
+    ),
+    allRows((from, to) =>
+      admin
+        .from('product_events')
+        .select('user_id,event_name,feature_key,metadata,occurred_at')
+        .gte('occurred_at', cutoffIso)
+        .order('occurred_at', { ascending: false })
+        .range(from, to)
+    ),
+    allRows((from, to) =>
+      admin
+        .from('product_experiments')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, to)
+    ),
+    allRows((from, to) =>
+      admin
+        .from('product_experiment_assignments')
+        .select('experiment_id,user_id,variant,assigned_at')
+        .range(from, to)
+    ),
     rows(
-      admin.from('primeiros_90_dias_respostas').select('user_id,updated_at'),
+      (from, to) => admin.from('diagnostics').select('user_id,updated_at').range(from, to),
       'user_id',
       'updated_at'
     ),
-    rows(admin.from('checkins_mensais').select('user_id,created_at'), 'user_id', 'created_at'),
-    rows(admin.from('cv_simulacoes').select('user_id,created_at'), 'user_id', 'created_at'),
-    admin.from('soma_analises').select('user_id,ferramenta,created_at'),
+    rows(
+      (from, to) => admin.from('via_resultados').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('pdi_respostas').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('journal_notes').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('quem_sou_eu_respostas').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('feedback_360_rounds').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('linkedin_content_drafts').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('entrevista_simulacoes').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('vagas_candidatura').select('mentorado_id,updated_at').range(from, to),
+      'mentorado_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('contatos_rede').select('user_id,created_at').range(from, to),
+      'user_id',
+      'created_at'
+    ),
+    rows(
+      (from, to) =>
+        admin.from('primeiros_90_dias_respostas').select('user_id,updated_at').range(from, to),
+      'user_id',
+      'updated_at'
+    ),
+    rows(
+      (from, to) => admin.from('checkins_mensais').select('user_id,created_at').range(from, to),
+      'user_id',
+      'created_at'
+    ),
+    rows(
+      (from, to) => admin.from('cv_simulacoes').select('user_id,created_at').range(from, to),
+      'user_id',
+      'created_at'
+    ),
+    allRows((from, to) =>
+      admin.from('soma_analises').select('user_id,ferramenta,created_at').range(from, to)
+    ),
   ]);
-
-  const profiles = profilesResp.data ?? [];
-  const events = eventsResp.data ?? [];
-  const experiments = experimentsResp.data ?? [];
-  const assignments = assignmentsResp.data ?? [];
-  const somaAnalises = somaAnalisesResp.data ?? [];
 
   const base = profiles.length;
   const active7 = profiles.filter(
