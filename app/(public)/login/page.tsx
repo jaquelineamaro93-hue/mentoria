@@ -36,9 +36,12 @@ function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const codigoIndicacao = searchParams.get('ref');
+  const trialPlanId = searchParams.get('trial_plan');
   const supabase = createClient();
 
-  const [modo, setModo] = useState<Modo>('entrar');
+  const [modo, setModo] = useState<Modo>(
+    searchParams.get('mode') === 'cadastrar' || trialPlanId ? 'cadastrar' : 'entrar'
+  );
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
@@ -48,6 +51,30 @@ function LoginPageContent() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [tipoPacote, setTipoPacote] = useState<TipoPacote>('online');
+
+  async function iniciarTrialSeSolicitado() {
+    if (!trialPlanId) return true;
+
+    const response = await fetch('/api/trial/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({ planId: trialPlanId, source: 'login' }),
+    });
+
+    if (response.ok) return true;
+
+    const data = await response.json().catch(() => ({}));
+    if (response.status === 409 && String(data.error || '').includes('acesso ativo')) {
+      return true;
+    }
+
+    setErro(
+      data.error ||
+        'Sua conta foi acessada, mas não consegui iniciar o teste gratuito deste plano.'
+    );
+    return false;
+  }
 
   useEffect(() => {
     const processarMagicLink = async () => {
@@ -102,6 +129,12 @@ function LoginPageContent() {
       const { error: activityError } = await supabase.rpc('registrar_login_portal');
       if (activityError) {
         console.warn('[LOGIN] Não foi possível registrar o acesso:', activityError.message);
+      }
+
+      const trialOk = await iniciarTrialSeSolicitado();
+      if (!trialOk) {
+        setLoading(false);
+        return;
       }
     }
 
@@ -188,6 +221,13 @@ function LoginPageContent() {
             if (activityError) {
               console.warn('[CADASTRO] Não foi possível registrar o primeiro acesso:', activityError.message);
             }
+
+            const trialOk = await iniciarTrialSeSolicitado();
+            if (!trialOk) {
+              setLoading(false);
+              return;
+            }
+
             setLoading(false);
             router.push('/dashboard');
             router.refresh();
@@ -312,7 +352,7 @@ function LoginPageContent() {
                   </div>
                 </div>
 
-                <OAuthButtons />
+                <OAuthButtons trialPlanId={trialPlanId} />
               </form>
             ) : (
               <form onSubmit={handleCadastrar} className="flex flex-col gap-4">
