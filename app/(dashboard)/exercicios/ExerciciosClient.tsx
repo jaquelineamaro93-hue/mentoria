@@ -128,6 +128,7 @@ export default function ExerciciosClient({
   const [analiseEvolucaoVia, setAnaliseEvolucaoVia] = useState<ViaEvolucaoAnalise | null>(null);
   const [carregandoEvolucaoVia, setCarregandoEvolucaoVia] = useState(false);
   const [erroEvolucaoVia, setErroEvolucaoVia] = useState<string | null>(null);
+  const [tentativaEvolucaoVia, setTentativaEvolucaoVia] = useState(0);
 
   const viaAtual = viaResultados[0] ?? null;
   const viaAnterior = viaResultados[1] ?? null;
@@ -193,7 +194,7 @@ export default function ExerciciosClient({
     return () => {
       cancelado = true;
     };
-  }, [activeTab, viaAtual?.id, viaAnterior?.id]);
+  }, [activeTab, viaAtual?.id, viaAnterior?.id, tentativaEvolucaoVia]);
 
   function toggleForca(forca: string) {
     setForcasSelecionadas((prev) =>
