@@ -15,6 +15,13 @@ export interface Profile {
   is_admin: boolean;
   last_login_at: string | null;
   last_activity_at: string | null;
+  trial_status: 'not_started' | 'active' | 'converted' | 'expired';
+  trial_started_at: string | null;
+  trial_ends_at: string | null;
+  trial_converted_at: string | null;
+  trial_plan_id: string | null;
+  trial_prompt_variant: string | null;
+  trial_prompted_at: string | null;
   status_assinatura: 'ativo' | 'inadimplente' | 'encerrado';
   origem_assinatura: 'manual' | 'mercadopago';
   proxima_cobranca: string | null;
@@ -255,6 +262,9 @@ export interface PlanoMentoria {
   ativo: boolean;
   visivel_checkout: boolean;
   ordem: number;
+  trial_enabled: boolean;
+  trial_days: number;
+  trial_label: string;
 }
 
 export interface Announcement {
@@ -405,6 +415,35 @@ export interface Feedback360Summary {
   status: 'pendente' | 'concluida' | 'erro';
   erro_analise: string | null;
   source_updated_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+
+export interface ProductEvent {
+  id: string;
+  user_id: string | null;
+  event_name: string;
+  feature_key: string | null;
+  path: string | null;
+  session_id: string | null;
+  metadata: Record<string, unknown>;
+  dedupe_key: string | null;
+  occurred_at: string;
+}
+
+export type TrialPromptVariant = 'adaptive_value' | 'fixed_day_7';
+
+export interface ProductExperiment {
+  id: string;
+  key: string;
+  name: string;
+  hypothesis: string | null;
+  status: 'draft' | 'running' | 'paused' | 'ended';
+  variants: Array<{ key: string; label: string }>;
+  primary_event: string | null;
+  started_at: string | null;
+  ended_at: string | null;
   created_at: string;
   updated_at: string;
 }
