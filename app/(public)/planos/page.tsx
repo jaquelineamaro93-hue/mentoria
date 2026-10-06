@@ -73,12 +73,22 @@ export default async function PlanosPage() {
                 </div>
               </div>
 
-              <Link
-                href={`/checkout?plan=${plano.id}`}
-                className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown text-center transition"
-              >
-                Comprar
-              </Link>
+              <div className="space-y-2.5">
+                {plano.trial_enabled && (
+                  <Link
+                    href={`/login?mode=cadastrar&trial_plan=${plano.id}`}
+                    className="w-full inline-flex items-center justify-center border border-mint-deep bg-mint-light text-black py-3 rounded-lg font-medium hover:bg-mint/30 text-center transition"
+                  >
+                    {plano.trial_label || 'Teste grátis'} por até {plano.trial_days} dias
+                  </Link>
+                )}
+                <Link
+                  href={`/checkout?plan=${plano.id}`}
+                  className="w-full inline-flex items-center justify-center bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown text-center transition"
+                >
+                  Comprar
+                </Link>
+              </div>
             </div>
           ))}
         </div>
