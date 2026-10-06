@@ -702,18 +702,6 @@ export default function Percepcao360Client({
                       {savingQuestions ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                       Salvar perguntas
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setQuestions(questionsProp);
-                        setEditingQuestions(false);
-                        setErro(null);
-                      }}
-                      disabled={savingQuestions}
-                      className="rounded-lg border border-gray-faint bg-white px-3.5 py-2 text-xs font-medium text-black disabled:opacity-50"
-                    >
-                      Cancelar edição
-                    </button>
                   </div>
                 )}
               </Panel>
