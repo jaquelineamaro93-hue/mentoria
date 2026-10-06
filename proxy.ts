@@ -46,11 +46,18 @@ export async function proxy(request: NextRequest) {
       !!profile.trial_ends_at &&
       new Date(profile.trial_ends_at).getTime() > Date.now();
 
+    const trialExpirado =
+      profile?.trial_status === 'expired' ||
+      (profile?.trial_status === 'active' &&
+        !!profile.trial_ends_at &&
+        new Date(profile.trial_ends_at).getTime() <= Date.now());
+
     const precisaPagar =
       profile &&
       !profile.is_admin &&
       !trialAtivo &&
-      (profile.status_assinatura === 'encerrado' ||
+      ((trialExpirado && profile.status_assinatura !== 'ativo') ||
+        profile.status_assinatura === 'encerrado' ||
         (profile.status_assinatura === 'inadimplente' && profile.origem_assinatura === 'mercadopago'));
 
     if (precisaPagar) {
