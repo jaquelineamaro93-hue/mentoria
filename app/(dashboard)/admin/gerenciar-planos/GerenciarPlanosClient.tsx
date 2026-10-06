@@ -33,6 +33,10 @@ export default function GerenciarPlanosClient({
   const [mostrarFormPlano, setMostrarFormPlano] = useState(false);
   const [criandoPlano, setCriandoPlano] = useState(false);
   const [buscaMentorado, setBuscaMentorado] = useState('');
+  const [trialEdicao, setTrialEdicao] = useState<
+    Record<string, { enabled: boolean; days: number; label: string }>
+  >({});
+  const [salvandoTrial, setSalvandoTrial] = useState<string | null>(null);
   const [novoPlano, setNovoPlano] = useState({
     nome: '',
     duracaoMeses: '',
@@ -51,6 +55,53 @@ export default function GerenciarPlanosClient({
       m.email?.toLocaleLowerCase('pt-BR').includes(termoMentorado)
     );
   });
+
+  function trialConfig(plano: PlanoMentoria) {
+    return (
+      trialEdicao[plano.id] ?? {
+        enabled: plano.trial_enabled ?? false,
+        days: plano.trial_days ?? 15,
+        label: plano.trial_label ?? 'Teste grátis',
+      }
+    );
+  }
+
+  async function salvarTrial(plano: PlanoMentoria) {
+    const config = trialConfig(plano);
+    setSalvandoTrial(plano.id);
+
+    try {
+      const response = await fetch('/api/admin/planos/trial', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: plano.id,
+          enabled: config.enabled,
+          days: config.days,
+          label: config.label,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Não foi possível salvar o trial.');
+
+      setPlanos((prev) => prev.map((item) => (item.id === plano.id ? data.plan : item)));
+      setTrialEdicao((prev) => {
+        const next = { ...prev };
+        delete next[plano.id];
+        return next;
+      });
+      posthog.capture('admin_trial_plano_atualizado', {
+        plan_id: plano.id,
+        enabled: config.enabled,
+        days: config.days,
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Não foi possível salvar o trial.');
+    } finally {
+      setSalvandoTrial(null);
+    }
+  }
 
   function formatarMoeda(valor: number | null | undefined) {
     if (valor === null || valor === undefined) return '—';
@@ -133,7 +184,12 @@ export default function GerenciarPlanosClient({
       }
       if (changes.status_pagamento) {
         updateData.status_pagamento = changes.status_pagamento;
-        updateData.status_assinatura = changes.status_pagamento === 'ativo' ? 'ativo' : 'cancelado';
+        updateData.status_assinatura =
+          changes.status_pagamento === 'ativo'
+            ? 'ativo'
+            : changes.status_pagamento === 'encerrado'
+              ? 'encerrado'
+              : 'inadimplente';
       }
 
       const { error } = await supabase
@@ -250,6 +306,102 @@ export default function GerenciarPlanosClient({
         </div>
       )}
 
+      <section className="mb-8">
+        <div className="flex flex-col gap-1 mb-3">
+          <p className="text-xs uppercase tracking-[0.12em] text-gray-text">Trial por pacote</p>
+          <h2 className="font-display text-xl text-black">Teste gratuito e janela de conversão</h2>
+          <p className="text-xs leading-5 text-gray-text max-w-3xl">
+            O trial fica desligado por padrão. Ative somente nos pacotes em que quiser oferecer
+            acesso gratuito. O período máximo é 15 dias; o experimento muda apenas o momento do
+            convite para compra, nunca reduz o tempo de acesso.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-3">
+          {planos.map((plano) => {
+            const trial = trialConfig(plano);
+            const alterado = Boolean(trialEdicao[plano.id]);
+
+            return (
+              <div key={plano.id} className="rounded-xl border border-gray-faint bg-white p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-black">{plano.nome}</p>
+                    <p className="text-[11px] text-gray-text mt-0.5">
+                      {plano.duracao_meses} meses · {plano.visivel_checkout ? 'visível no checkout' : 'uso interno'}
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-black">
+                    <input
+                      type="checkbox"
+                      checked={trial.enabled}
+                      onChange={(event) =>
+                        setTrialEdicao((prev) => ({
+                          ...prev,
+                          [plano.id]: {
+                            ...trial,
+                            enabled: event.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    Oferecer trial
+                  </label>
+                </div>
+
+                <div className="grid sm:grid-cols-[110px_minmax(0,1fr)_auto] gap-2 mt-4">
+                  <label className="text-xs text-gray-text">
+                    Dias
+                    <input
+                      type="number"
+                      min={1}
+                      max={15}
+                      value={trial.days}
+                      onChange={(event) =>
+                        setTrialEdicao((prev) => ({
+                          ...prev,
+                          [plano.id]: {
+                            ...trial,
+                            days: Math.max(1, Math.min(15, Number(event.target.value) || 15)),
+                          },
+                        }))
+                      }
+                      className="mt-1 w-full rounded border border-gray-faint px-2.5 py-2 text-sm text-black"
+                    />
+                  </label>
+
+                  <label className="text-xs text-gray-text">
+                    Texto
+                    <input
+                      value={trial.label}
+                      onChange={(event) =>
+                        setTrialEdicao((prev) => ({
+                          ...prev,
+                          [plano.id]: {
+                            ...trial,
+                            label: event.target.value,
+                          },
+                        }))
+                      }
+                      className="mt-1 w-full rounded border border-gray-faint px-2.5 py-2 text-sm text-black"
+                    />
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => salvarTrial(plano)}
+                    disabled={!alterado || salvandoTrial === plano.id}
+                    className="self-end rounded-lg bg-mint-deep px-3.5 py-2 text-xs font-medium text-white disabled:opacity-40"
+                  >
+                    {salvandoTrial === plano.id ? 'Salvando...' : 'Salvar'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       <div className="mb-3">
         <label className="relative block max-w-xl">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
@@ -350,6 +502,7 @@ export default function GerenciarPlanosClient({
                     >
                       <option value="ativo">Ativo</option>
                       <option value="inadimplente">Inadimplente</option>
+                      <option value="encerrado">Encerrado</option>
                     </select>
                   </td>
                   <td className="py-3 px-4">
