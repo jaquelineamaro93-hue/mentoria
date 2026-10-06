@@ -11,6 +11,8 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
   const [processando, setProcessando] = useState(false);
+  const [processandoTrial, setProcessandoTrial] = useState(false);
+  const [erroTrial, setErroTrial] = useState<string | null>(null);
 
   useEffect(() => {
     const planParam = searchParams.get('plan');
@@ -21,6 +23,39 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
 
   const plano = planos.find((p) => p.id === planoSelecionado);
   const planoSafe = plano as PlanoMentoria;
+
+  async function iniciarTrial() {
+    if (!plano || !plano.trial_enabled) return;
+
+    if (!logado) {
+      window.location.href = `/login?mode=cadastrar&trial_plan=${plano.id}`;
+      return;
+    }
+
+    setProcessandoTrial(true);
+    setErroTrial(null);
+
+    try {
+      const response = await fetch('/api/trial/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ planId: plano.id, source: 'checkout' }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Não foi possível iniciar o teste gratuito.');
+      }
+
+      window.location.href = '/dashboard';
+    } catch (error) {
+      setErroTrial(
+        error instanceof Error ? error.message : 'Não foi possível iniciar o teste gratuito.'
+      );
+      setProcessandoTrial(false);
+    }
+  }
 
   async function irParaMercadoPago() {
     if (!plano || !formaEscolhida) return;
@@ -113,6 +148,34 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
         </div>
         {planoSelecionado && plano && (
           <div className="bg-white border-2 border-brown-deep rounded-2xl p-5 sm:p-8">
+            {plano.trial_enabled && !planoAtualCodigo && (
+              <div className="mb-6 rounded-xl border border-mint bg-mint-light/45 p-4">
+                <p className="text-xs uppercase tracking-[0.12em] text-mint-deep">
+                  Experimente antes de decidir
+                </p>
+                <p className="mt-1 text-sm font-medium text-black">
+                  {plano.trial_label || 'Teste grátis'} por até {plano.trial_days} dias
+                </p>
+                <p className="mt-1 text-xs leading-5 text-gray-text">
+                  Explore o portal durante todo o período. A SOMA pode mostrar a opção de continuar
+                  antes do último dia, mas seu acesso não é encurtado.
+                </p>
+                {erroTrial && <p className="mt-2 text-xs text-red-700">{erroTrial}</p>}
+                <button
+                  type="button"
+                  onClick={iniciarTrial}
+                  disabled={processandoTrial}
+                  className="mt-3 inline-flex items-center justify-center rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {processandoTrial
+                    ? 'Iniciando teste...'
+                    : logado
+                      ? 'Começar teste gratuito'
+                      : 'Criar conta e testar grátis'}
+                </button>
+              </div>
+            )}
+
             <h3 className="font-display text-xl text-black mb-6">Como você prefere pagar?</h3>
             <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
               <button
