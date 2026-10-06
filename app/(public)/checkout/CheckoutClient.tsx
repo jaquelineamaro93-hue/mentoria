@@ -6,7 +6,17 @@ import { Check, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import type { PlanoMentoria } from '@/lib/types';
 
-export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { planos: PlanoMentoria[]; logado: boolean; planoAtualCodigo: string | null }) {
+export default function CheckoutClient({
+  planos,
+  logado,
+  planoAtualCodigo,
+  trialEligible,
+}: {
+  planos: PlanoMentoria[];
+  logado: boolean;
+  planoAtualCodigo: string | null;
+  trialEligible: boolean;
+}) {
   const searchParams = useSearchParams();
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
@@ -148,7 +158,7 @@ export default function CheckoutClient({ planos, logado, planoAtualCodigo }: { p
         </div>
         {planoSelecionado && plano && (
           <div className="bg-white border-2 border-brown-deep rounded-2xl p-5 sm:p-8">
-            {plano.trial_enabled && !planoAtualCodigo && (
+            {plano.trial_enabled && trialEligible && (
               <div className="mb-6 rounded-xl border border-mint bg-mint-light/45 p-4">
                 <p className="text-xs uppercase tracking-[0.12em] text-mint-deep">
                   Experimente antes de decidir
