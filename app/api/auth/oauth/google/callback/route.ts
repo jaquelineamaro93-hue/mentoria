@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { iniciarTrialParaUsuario } from '@/lib/trial';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('[OAUTH-GOOGLE-CALLBACK] Iniciando...');
     const body = await request.json();
-    const { token, user: googleUser } = body;
+    const { token, user: googleUser, trialPlanId } = body;
     console.log('[OAUTH-GOOGLE-CALLBACK] Dados recebidos:', { hasToken: !!token, email: googleUser?.email, id: googleUser?.id });
 
     if (!token || !googleUser) {
@@ -104,6 +105,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    let trialStarted = false;
+    if (trialPlanId) {
+      const trialResult = await iniciarTrialParaUsuario(
+        supabase,
+        userId,
+        String(trialPlanId),
+        'google_oauth'
+      );
+
+      if (trialResult.ok) {
+        trialStarted = true;
+      } else {
+        console.warn('[OAUTH-GOOGLE-CALLBACK] Trial não iniciado:', trialResult.error);
+      }
+    }
+
     // Gerar session
     console.log('[OAUTH-GOOGLE-CALLBACK] Gerando magic link...');
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com';
@@ -143,6 +160,7 @@ export async function POST(request: NextRequest) {
       success: true,
       loginUrl: actionLink,
       userId,
+      trialStarted,
     });
   } catch (error) {
     console.error('[OAUTH-GOOGLE-CALLBACK] Erro capturado:', error);
