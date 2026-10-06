@@ -90,6 +90,23 @@ export interface ViaResultado {
   created_at: string;
 }
 
+export interface ViaEvolucaoMovimento {
+  forca: string;
+  posicao_anterior: number;
+  posicao_atual: number;
+  leitura: string;
+}
+
+export interface ViaEvolucaoAnalise {
+  resumo: string;
+  assinatura_agora: string;
+  suporte_e_equilibrio: string;
+  contrastes_e_pontos_cegos: string;
+  alavancagem_profissional: string;
+  movimentos_chave: ViaEvolucaoMovimento[];
+  acoes: string[];
+}
+
 export interface PdiGuiaSecao {
   id: string;
   codigo: string;

@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Activity,
   BarChart3,
   Compass,
   ExternalLink,
@@ -22,7 +23,13 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { VIA_FORCAS } from '@/lib/prompts';
 import { extrairTextoPdf } from '@/lib/pdf';
-import type { Diagnostic, Profile, ResumoPerfil, ViaResultado } from '@/lib/types';
+import type {
+  Diagnostic,
+  Profile,
+  ResumoPerfil,
+  ViaEvolucaoAnalise,
+  ViaResultado,
+} from '@/lib/types';
 
 interface Props {
   profile: Profile | null;
@@ -32,7 +39,7 @@ interface Props {
   resumoPerfilInicial?: ResumoPerfil | null;
 }
 
-type Tab = 'diagnostico' | 'via' | 'resumo' | 'evolucao';
+type Tab = 'diagnostico' | 'via' | 'resumo' | 'evolucao' | 'acompanhamento';
 
 const FORCAS = [
   'Comunicação',
@@ -49,7 +56,8 @@ const TABS = [
   { id: 'diagnostico' as Tab, label: 'Diagnóstico', icon: Compass },
   { id: 'via' as Tab, label: 'VIA', icon: Sparkles },
   { id: 'resumo' as Tab, label: 'Resumo de perfil', icon: FileText },
-  { id: 'evolucao' as Tab, label: 'Evolução', icon: BarChart3 },
+  { id: 'evolucao' as Tab, label: 'Evolução VIA', icon: BarChart3 },
+  { id: 'acompanhamento' as Tab, label: 'Acompanhamento', icon: Activity },
 ];
 
 function dataPtBr(data?: string | null) {
@@ -117,6 +125,11 @@ export default function ExerciciosClient({
   const [gerandoResumo, setGerandoResumo] = useState(false);
   const [erroResumo, setErroResumo] = useState<string | null>(null);
 
+  const [analiseEvolucaoVia, setAnaliseEvolucaoVia] = useState<ViaEvolucaoAnalise | null>(null);
+  const [carregandoEvolucaoVia, setCarregandoEvolucaoVia] = useState(false);
+  const [erroEvolucaoVia, setErroEvolucaoVia] = useState<string | null>(null);
+  const [tentativaEvolucaoVia, setTentativaEvolucaoVia] = useState(0);
+
   const viaAtual = viaResultados[0] ?? null;
   const viaAnterior = viaResultados[1] ?? null;
   const primeiro = diagnostics[0];
@@ -133,6 +146,55 @@ export default function ExerciciosClient({
       })) ?? [],
     [viaAtual, viaAnterior]
   );
+
+  useEffect(() => {
+    if (activeTab !== 'evolucao' || !viaAtual || !viaAnterior) return;
+
+    let cancelado = false;
+
+    async function carregarEvolucaoVia() {
+      setCarregandoEvolucaoVia(true);
+      setErroEvolucaoVia(null);
+
+      try {
+        const response = await fetch('/api/gerar-evolucao-via', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          body: JSON.stringify({
+            resultadoAtualId: viaAtual.id,
+            resultadoAnteriorId: viaAnterior.id,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Não foi possível gerar a leitura da evolução.');
+        }
+
+        if (!cancelado) {
+          setAnaliseEvolucaoVia(data.analise as ViaEvolucaoAnalise);
+          posthog.capture('via_evolucao_visualizada', { cached: Boolean(data.cached) });
+        }
+      } catch (error) {
+        if (!cancelado) {
+          setErroEvolucaoVia(
+            error instanceof Error
+              ? error.message
+              : 'Não foi possível gerar a leitura da evolução agora.'
+          );
+        }
+      } finally {
+        if (!cancelado) setCarregandoEvolucaoVia(false);
+      }
+    }
+
+    void carregarEvolucaoVia();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [activeTab, viaAtual?.id, viaAnterior?.id, tentativaEvolucaoVia]);
 
   function toggleForca(forca: string) {
     setForcasSelecionadas((prev) =>
@@ -684,191 +746,368 @@ export default function ExerciciosClient({
         {activeTab === 'evolucao' && (
           <section>
             <Eyebrow>
-              <BarChart3 size={13} /> Evolução
+              <BarChart3 size={13} /> Evolução VIA
             </Eyebrow>
             <h1 className="font-display text-2xl md:text-3xl text-black mt-3">
-              O que mudou na sua jornada
+              Como o seu mapa de forças mudou
             </h1>
-            <p className="text-sm text-gray-text mt-2 mb-7 max-w-2xl">
-              Compare medições ao longo do tempo, sem perder os resultados anteriores.
+            <p className="text-sm text-gray-text mt-2 mb-7 max-w-3xl">
+              Compare as 24 forças entre duas aplicações e entenda mudanças de assinatura,
+              suporte, contrastes e pontos de atenção sem tratar posições baixas como fraquezas.
             </p>
 
-            <div className="space-y-8">
+            <div className="flex items-center justify-between gap-4 mb-3">
               <div>
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <div>
-                    <h2 className="font-display text-xl text-black">Evolução VIA</h2>
-                    <p className="text-sm text-gray-text mt-1">
-                      {viaResultados.length > 1
-                        ? `${viaResultados.length} medições salvas`
-                        : viaResultados.length === 1
-                          ? '1 medição salva — refaça no futuro para comparar'
-                          : 'Nenhuma medição salva ainda'}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('via')}
-                    className="text-sm text-brown-deep hover:underline"
-                  >
-                    {viaAtual ? 'Novo teste' : 'Fazer VIA'}
-                  </button>
-                </div>
+                <h2 className="font-display text-xl text-black">Comparação VIA</h2>
+                <p className="text-sm text-gray-text mt-1">
+                  {viaResultados.length > 1
+                    ? `${viaResultados.length} medições salvas`
+                    : viaResultados.length === 1
+                      ? '1 medição salva. Refaça o VIA no futuro para comparar.'
+                      : 'Nenhuma medição salva ainda'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab('via')}
+                className="text-sm text-brown-deep hover:underline"
+              >
+                {viaAtual ? 'Novo teste' : 'Fazer VIA'}
+              </button>
+            </div>
 
-                {viaAtual ? (
-                  <Panel className="p-6">
-                    {viaAnterior ? (
-                      <>
-                        <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-sm text-black">
-                            Comparando {dataPtBr(viaAnterior.data_teste)} →{' '}
-                            {dataPtBr(viaAtual.data_teste)}
+            {viaAtual ? (
+              <Panel className="p-5 md:p-6">
+                {viaAnterior ? (
+                  <>
+                    <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm text-black">
+                        Comparando {dataPtBr(viaAnterior.data_teste)} → {dataPtBr(viaAtual.data_teste)}
+                      </p>
+                      <p className="text-xs text-gray-text">
+                        24 forças ordenadas pela posição atual
+                      </p>
+                    </div>
+
+                    <div className="mb-6 rounded-xl border border-mint bg-mint-light/30 p-4 md:p-5">
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.12em] text-mint-deep">
+                            Leitura integrada da evolução
                           </p>
-                          <p className="text-xs text-gray-text">
-                            24 forças ordenadas pela posição atual
+                          <p className="text-xs leading-5 text-gray-text mt-1 max-w-3xl">
+                            A leitura cruza os movimentos das 24 forças. Mudança de posição é relativa,
+                            não significa ganho ou perda de capacidade.
                           </p>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5 mb-6">
-                          {comparacaoCompleta.map(({ forca, posicao, movimento: mov }) => (
-                            <div
-                              key={forca}
-                              className="min-w-0 min-h-[112px] overflow-hidden rounded-xl border border-gray-faint bg-white p-3 flex flex-col justify-between"
-                            >
-                              <div className="min-w-0">
-                                <p className="text-[10px] uppercase tracking-[0.08em] text-gray-text leading-4">
-                                  {posicao}ª agora
-                                </p>
-                                <p className="mt-1 text-[13px] font-medium leading-[1.25rem] text-black break-words">
-                                  {forca}
-                                </p>
-                              </div>
+                        <Sparkles size={18} className="shrink-0 text-mint-deep" />
+                      </div>
 
-                              <div
-                                className={[
-                                  'mt-2.5 flex min-w-0 items-start gap-1.5 text-[11px] leading-4 font-medium',
-                                  mov.tipo === 'subiu'
-                                    ? 'text-emerald-700'
-                                    : mov.tipo === 'caiu'
-                                      ? 'text-amber-700'
-                                      : 'text-gray-text',
-                                ].join(' ')}
-                              >
-                                {mov.tipo === 'subiu' && (
-                                  <TrendingUp size={13} className="mt-0.5 shrink-0" />
-                                )}
-                                {mov.tipo === 'caiu' && (
-                                  <TrendingDown size={13} className="mt-0.5 shrink-0" />
-                                )}
-                                <span className="min-w-0 break-words">{mov.texto}</span>
-                              </div>
-                            </div>
-                          ))}
+                      {carregandoEvolucaoVia ? (
+                        <div className="flex items-center gap-2 py-5 text-sm text-gray-text">
+                          <Loader2 size={16} className="animate-spin shrink-0" />
+                          Analisando as duas medições...
                         </div>
-                      </>
-                    ) : (
-                      <p className="text-sm leading-6 text-gray-text mb-6">
-                        Sua primeira referência está salva. Quando houver uma nova medição, esta
-                        área mostrará o movimento de cada força.
-                      </p>
-                    )}
-
-                    <div className="border-t border-gray-faint pt-5">
-                      <p className="text-xs uppercase tracking-wide text-gray-text mb-3">
-                        Histórico de aplicações
-                      </p>
-                      <div className="space-y-3">
-                        {viaResultados.map((resultado, indice) => (
-                          <div
-                            key={resultado.id}
-                            className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-5 rounded-xl border border-gray-faint px-4 py-4"
+                      ) : erroEvolucaoVia ? (
+                        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                          <p className="text-sm text-red-700">{erroEvolucaoVia}</p>
+                          <button
+                            type="button"
+                            onClick={() => setTentativaEvolucaoVia((valor) => valor + 1)}
+                            className="mt-3 text-xs font-medium text-red-800 underline"
                           >
-                            <div className="lg:w-40 shrink-0">
-                              <p className="text-sm font-medium text-black">
-                                {indice === 0
-                                  ? 'Mais recente'
-                                  : `Medição ${viaResultados.length - indice}`}
-                              </p>
-                              <p className="text-xs text-gray-text mt-0.5">
-                                {dataPtBr(resultado.data_teste)}
-                              </p>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {resultado.forcas.slice(0, 5).map((forca, i) => (
-                                <span
-                                  key={`${resultado.id}-${forca}`}
-                                  className="text-[11px] px-2.5 py-1 rounded-full bg-white border border-gray-faint text-black"
+                            Tentar novamente
+                          </button>
+                        </div>
+                      ) : analiseEvolucaoVia ? (
+                        <div className="space-y-5">
+                          <p className="text-sm leading-6 text-black max-w-4xl">
+                            {analiseEvolucaoVia.resumo}
+                          </p>
+
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {[
+                              ['Assinatura agora', analiseEvolucaoVia.assinatura_agora],
+                              ['Base e equilíbrio', analiseEvolucaoVia.suporte_e_equilibrio],
+                              ['Contrastes e pontos cegos', analiseEvolucaoVia.contrastes_e_pontos_cegos],
+                              ['Alavancagem profissional', analiseEvolucaoVia.alavancagem_profissional],
+                            ].map(([titulo, texto]) => (
+                              <div
+                                key={titulo}
+                                className="min-w-0 rounded-lg border border-gray-faint bg-white p-3.5"
+                              >
+                                <p className="text-[11px] uppercase tracking-wide text-gray-text">
+                                  {titulo}
+                                </p>
+                                <p className="mt-1.5 text-sm leading-6 text-black break-words">
+                                  {texto}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div>
+                            <p className="text-xs uppercase tracking-wide text-gray-text mb-2">
+                              Movimentos que mais ajudam a explicar a mudança
+                            </p>
+                            <div className="grid md:grid-cols-2 gap-2.5">
+                              {analiseEvolucaoVia.movimentos_chave.map((movimento) => (
+                                <div
+                                  key={`${movimento.forca}-${movimento.posicao_anterior}-${movimento.posicao_atual}`}
+                                  className="min-w-0 rounded-lg border border-gray-faint bg-white p-3"
                                 >
-                                  {i + 1}º {forca}
-                                </span>
+                                  <div className="flex items-start justify-between gap-3">
+                                    <p className="text-sm font-medium text-black break-words min-w-0">
+                                      {movimento.forca}
+                                    </p>
+                                    <span className="shrink-0 rounded-full bg-mint-light px-2 py-0.5 text-[10px] text-black">
+                                      {movimento.posicao_anterior}ª → {movimento.posicao_atual}ª
+                                    </span>
+                                  </div>
+                                  <p className="mt-1.5 text-xs leading-5 text-gray-text break-words">
+                                    {movimento.leitura}
+                                  </p>
+                                </div>
                               ))}
                             </div>
                           </div>
-                        ))}
-                      </div>
+
+                          <div>
+                            <p className="text-xs uppercase tracking-wide text-gray-text mb-2">
+                              Próximos passos
+                            </p>
+                            <div className="grid md:grid-cols-2 gap-2.5">
+                              {analiseEvolucaoVia.acoes.map((acao, indice) => (
+                                <div
+                                  key={acao}
+                                  className="flex min-w-0 items-start gap-2.5 rounded-lg border border-mint bg-white p-3"
+                                >
+                                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-mint-deep text-[11px] font-medium text-white">
+                                    {indice + 1}
+                                  </span>
+                                  <p className="text-sm leading-5 text-black break-words">{acao}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
-                  </Panel>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5 mb-6">
+                      {comparacaoCompleta.map(({ forca, posicao, movimento: mov }) => (
+                        <div
+                          key={forca}
+                          className="min-w-0 min-h-[112px] overflow-hidden rounded-xl border border-gray-faint bg-white p-3 flex flex-col justify-between"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-[10px] uppercase tracking-[0.08em] text-gray-text leading-4">
+                              {posicao}ª agora
+                            </p>
+                            <p className="mt-1 text-[13px] font-medium leading-[1.25rem] text-black break-words">
+                              {forca}
+                            </p>
+                          </div>
+
+                          <div
+                            className={[
+                              'mt-2.5 flex min-w-0 items-start gap-1.5 text-[11px] leading-4 font-medium',
+                              mov.tipo === 'subiu'
+                                ? 'text-emerald-700'
+                                : mov.tipo === 'caiu'
+                                  ? 'text-amber-700'
+                                  : 'text-gray-text',
+                            ].join(' ')}
+                          >
+                            {mov.tipo === 'subiu' && (
+                              <TrendingUp size={13} className="mt-0.5 shrink-0" />
+                            )}
+                            {mov.tipo === 'caiu' && (
+                              <TrendingDown size={13} className="mt-0.5 shrink-0" />
+                            )}
+                            <span className="min-w-0 break-words">{mov.texto}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 ) : (
-                  <Panel className="p-6 text-sm leading-6 text-gray-text">
-                    Faça o primeiro VIA para começar sua linha de evolução.
-                  </Panel>
+                  <p className="text-sm leading-6 text-gray-text mb-6">
+                    Sua primeira referência está salva. Quando houver uma nova medição, esta área
+                    mostrará o movimento das 24 forças e uma leitura integrada da mudança.
+                  </p>
                 )}
-              </div>
 
-              <div>
-                <h2 className="font-display text-xl text-black">Evolução do diagnóstico</h2>
-                <p className="text-sm text-gray-text mt-1 mb-3">
-                  Primeiro registro versus momento mais recente.
-                </p>
-
-                {diagnostics.length === 0 ? (
-                  <Panel className="p-6 text-sm leading-6 text-gray-text">
-                    Salve seu primeiro diagnóstico para começar esta linha.
-                  </Panel>
-                ) : (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Panel className="p-6">
-                      <p className="text-[11px] uppercase tracking-wide text-gray-text mb-3">
-                        Inicial · {dataPtBr(primeiro.created_at)}
-                      </p>
-                      <p className="text-sm text-black leading-7">
-                        {primeiro.momento_carreira || 'Sem registro de momento de carreira.'}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5 mt-4">
-                        {((primeiro.habilidades?.forcas as string[]) ?? []).map((forca) => (
-                          <span
-                            key={forca}
-                            className="text-[11px] px-2 py-1 rounded-full bg-white border border-gray-faint text-gray-text"
-                          >
-                            {forca}
-                          </span>
-                        ))}
+                <div className="border-t border-gray-faint pt-5">
+                  <p className="text-xs uppercase tracking-wide text-gray-text mb-3">
+                    Histórico de aplicações VIA
+                  </p>
+                  <div className="space-y-3">
+                    {viaResultados.map((resultado, indice) => (
+                      <div
+                        key={resultado.id}
+                        className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-5 rounded-xl border border-gray-faint px-4 py-3"
+                      >
+                        <div className="lg:w-40 shrink-0">
+                          <p className="text-sm font-medium text-black">
+                            {indice === 0 ? 'Mais recente' : `Medição ${viaResultados.length - indice}`}
+                          </p>
+                          <p className="text-xs text-gray-text mt-0.5">
+                            {dataPtBr(resultado.data_teste)}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {resultado.forcas.slice(0, 5).map((forca, i) => (
+                            <span
+                              key={`${resultado.id}-${forca}`}
+                              className="text-[11px] px-2.5 py-1 rounded-full bg-white border border-gray-faint text-black"
+                            >
+                              {i + 1}º {forca}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </Panel>
-
-                    <Panel className="p-6 border-mint">
-                      <p className="text-[11px] uppercase tracking-wide text-brown-deep mb-3">
-                        Atual · {dataPtBr(ultimo.created_at)}
-                      </p>
-                      <p className="text-sm text-black leading-7">
-                        {ultimo.momento_carreira || 'Sem registro de momento de carreira.'}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5 mt-4">
-                        {((ultimo.habilidades?.forcas as string[]) ?? []).map((forca) => (
-                          <span
-                            key={forca}
-                            className="text-[11px] px-2 py-1 rounded-full bg-mint-light border border-mint text-black"
-                          >
-                            {forca}
-                          </span>
-                        ))}
-                      </div>
-                    </Panel>
+                    ))}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              </Panel>
+            ) : (
+              <Panel className="p-6 text-sm leading-6 text-gray-text">
+                Faça o primeiro VIA para começar sua linha de evolução.
+              </Panel>
+            )}
           </section>
         )}
+
+        {activeTab === 'acompanhamento' && (
+          <section>
+            <Eyebrow>
+              <Activity size={13} /> Acompanhamento
+            </Eyebrow>
+            <h1 className="font-display text-2xl md:text-3xl text-black mt-3">
+              Como o seu diagnóstico vem mudando
+            </h1>
+            <p className="text-sm text-gray-text mt-2 mb-7 max-w-3xl">
+              Aqui ficam os registros que você escreveu no diagnóstico de carreira. A evolução VIA
+              fica separada para não misturar percepção pessoal com o ranking das forças.
+            </p>
+
+            {diagnostics.length === 0 ? (
+              <Panel className="p-6 text-sm leading-6 text-gray-text">
+                Salve seu primeiro diagnóstico para começar o acompanhamento.
+              </Panel>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid lg:grid-cols-2 gap-4">
+                  {[
+                    { titulo: 'Inicial', registro: primeiro, destaque: false },
+                    { titulo: 'Atual', registro: ultimo, destaque: true },
+                  ].map(({ titulo, registro, destaque }) => (
+                    <Panel key={titulo} className={`p-5 md:p-6 ${destaque ? 'border-mint' : ''}`}>
+                      <p
+                        className={`text-[11px] uppercase tracking-wide mb-4 ${
+                          destaque ? 'text-mint-deep' : 'text-gray-text'
+                        }`}
+                      >
+                        {titulo} · {dataPtBr(registro.created_at)}
+                      </p>
+
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-text mb-1">
+                            Momento de carreira
+                          </p>
+                          <p className="text-sm leading-6 text-black break-words">
+                            {registro.momento_carreira || 'Sem registro de momento de carreira.'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-text mb-1">
+                            Objetivos com a mentoria
+                          </p>
+                          <p className="text-sm leading-6 text-black break-words">
+                            {registro.objetivos || 'Sem objetivo registrado.'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-text mb-2">
+                            Pontos fortes selecionados
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {((registro.habilidades?.forcas as string[]) ?? []).length > 0 ? (
+                              ((registro.habilidades?.forcas as string[]) ?? []).map((forca) => (
+                                <span
+                                  key={forca}
+                                  className={`text-[11px] px-2.5 py-1 rounded-full border ${
+                                    destaque
+                                      ? 'bg-mint-light border-mint text-black'
+                                      : 'bg-white border-gray-faint text-gray-text'
+                                  }`}
+                                >
+                                  {forca}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-xs text-gray-text">Nenhum ponto forte selecionado.</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </Panel>
+                  ))}
+                </div>
+
+                <Panel className="p-5 md:p-6">
+                  <div className="mb-4">
+                    <p className="text-xs uppercase tracking-wide text-gray-text">
+                      Histórico do acompanhamento
+                    </p>
+                    <p className="text-sm text-gray-text mt-1">
+                      {diagnostics.length} {diagnostics.length === 1 ? 'registro salvo' : 'registros salvos'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {[...diagnostics].reverse().map((registro, indice) => (
+                      <div
+                        key={registro.id}
+                        className="rounded-xl border border-gray-faint bg-white px-4 py-3"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-black">
+                              {indice === 0 ? 'Mais recente' : `Registro ${diagnostics.length - indice}`}
+                            </p>
+                            <p className="text-xs text-gray-text mt-0.5">
+                              {dataPtBr(registro.created_at)}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 sm:justify-end">
+                            {((registro.habilidades?.forcas as string[]) ?? []).slice(0, 5).map((forca) => (
+                              <span
+                                key={`${registro.id}-${forca}`}
+                                className="text-[10px] px-2 py-0.5 rounded-full bg-mint-light/60 border border-mint text-black"
+                              >
+                                {forca}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <p className="mt-2 text-xs leading-5 text-gray-text break-words">
+                          {registro.momento_carreira || 'Sem descrição do momento de carreira.'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </Panel>
+              </div>
+            )}
+          </section>
+        )}
+
       </main>
     </>
   );

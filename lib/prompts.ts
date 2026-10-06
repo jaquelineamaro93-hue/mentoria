@@ -239,33 +239,134 @@ export const VIA_FORCAS = [
 ] as const;
 
 export function montarPromptAnaliseVia(forcasOrdenadas: string[]): string {
-  const blocos = [
-    { nome: 'Forças de Assinatura (1ª a 5ª)', itens: forcasOrdenadas.slice(0, 5) },
-    { nome: 'Forças Secundárias (6ª a 10ª)', itens: forcasOrdenadas.slice(5, 10) },
-    { nome: 'Forças Terciárias (11ª a 15ª)', itens: forcasOrdenadas.slice(10, 15) },
-    { nome: 'Forças de Suporte (16ª a 20ª)', itens: forcasOrdenadas.slice(15, 20) },
-    { nome: 'Forças Escondidas (21ª a 24ª)', itens: forcasOrdenadas.slice(20, 24) },
-  ];
+  const assinatura = forcasOrdenadas.slice(0, 5);
+  const suporte = forcasOrdenadas.slice(5, 18);
+  const menores = forcasOrdenadas.slice(18, 24);
 
-  const listagem = blocos
-    .map((b) => `${b.nome}: ${b.itens.join(', ')}`)
+  return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA, especialista em VIA Character Strengths.
+
+${REGRAS_DE_ESTILO}
+
+Analise a lista completa das 24 forças como um sistema integrado, não como 24 tópicos isolados.
+
+Use esta leitura:
+- Forças de Assinatura, 1ª a 5ª: tendem a aparecer com mais naturalidade e ajudam a explicar o estilo espontâneo de pensar, agir e decidir.
+- Forças de Suporte, 6ª a 18ª: repertório acessado conforme contexto e necessidade. Podem equilibrar ou sustentar as forças de assinatura.
+- Forças Menores, 19ª a 24ª: não são fraquezas. São forças menos acessadas naquele momento e podem exigir mais intenção ou energia quando uma situação pede uso constante.
+
+FORÇAS DE ASSINATURA:
+${assinatura.map((forca, i) => `${i + 1}ª. ${forca}`).join('\n')}
+
+FORÇAS DE SUPORTE:
+${suporte.map((forca, i) => `${i + 6}ª. ${forca}`).join('\n')}
+
+FORÇAS MENORES:
+${menores.map((forca, i) => `${i + 19}ª. ${forca}`).join('\n')}
+
+Gere uma análise em Markdown com exatamente estas seções:
+
+## Visão geral e forças de assinatura
+Explique como o Top 5 se combina e qual estilo natural essa configuração sugere para pensar, agir e tomar decisões.
+
+## Lado sombra do Top 3
+Para as três primeiras forças, mostre riscos do excesso no trabalho e nos relacionamentos. Não trate a força como defeito.
+
+## A força da base
+Mostre como as forças de suporte, da 6ª à 18ª, sustentam ou equilibram o Top 5. Destaque até 3 forças especialmente relevantes.
+
+## Cruzamentos e pontos cegos
+Compare o Top 5 com as forças da 19ª à 24ª. Explique tensões possíveis sem diagnosticar a pessoa e sem dizer que uma força baixa é ausência de capacidade.
+
+## Estratégia de alavancagem profissional
+Mostre como usar forças de assinatura para realizar tarefas que exigem forças menores sem aumentar desgaste desnecessário.
+
+## Plano de ação
+Dê exatamente 2 recomendações concretas e observáveis para o trabalho.
+
+Regras de precisão:
+- O ranking é relativo entre as 24 forças. Uma posição baixa não significa fraqueza, incapacidade ou problema psicológico.
+- Use linguagem de hipótese quando fizer inferências, por exemplo "pode indicar", "sugere", "vale observar".
+- Não faça diagnóstico clínico.
+- Não invente comportamentos, conflitos ou fatos que não estejam sustentados pela combinação das forças.
+- Não use travessão.
+
+Tom: direto, humano e profissional, como uma mentora experiente conversando de igual para igual.`;
+}
+
+export function montarPromptEvolucaoVia(
+  forcasAnteriores: string[],
+  forcasAtuais: string[]
+): string {
+  const posAnterior = new Map(forcasAnteriores.map((forca, i) => [forca, i + 1]));
+  const movimentos = forcasAtuais
+    .map((forca, i) => {
+      const atual = i + 1;
+      const anterior = posAnterior.get(forca) ?? atual;
+      return {
+        forca,
+        anterior,
+        atual,
+        delta: anterior - atual,
+      };
+    })
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+  const topMovimentos = movimentos
+    .slice(0, 8)
+    .map((m) => {
+      const sentido = m.delta > 0 ? `subiu ${m.delta}` : m.delta < 0 ? `caiu ${Math.abs(m.delta)}` : 'manteve';
+      return `${m.forca}: ${m.anterior}ª → ${m.atual}ª (${sentido})`;
+    })
     .join('\n');
 
   return `Atue como um Mentor de Autoconhecimento e Posicionamento Estratégico da metodologia SOMA, especialista em VIA Character Strengths.
 
 ${REGRAS_DE_ESTILO}
 
-O objetivo desta análise não é apenas dizer no que a pessoa é boa, é mostrar a dinâmica de energia dela. O resultado abaixo lista 24 forças de caráter, da mais natural (1ª, força de assinatura) à que exige mais esforço racional (24ª, força escondida).
+Compare duas aplicações do VIA e produza uma leitura de EVOLUÇÃO. O objetivo é explicar como a configuração relativa das 24 forças mudou, sem transformar movimento de ranking em diagnóstico psicológico.
 
-RESULTADO DO TESTE:
-${listagem}
+LEITURA DO RANKING:
+- 1ª a 5ª: forças de assinatura.
+- 6ª a 18ª: forças de suporte.
+- 19ª a 24ª: forças menores, não fraquezas.
 
-Gere uma análise em Markdown com:
+APLICAÇÃO ANTERIOR:
+${forcasAnteriores.map((forca, i) => `${i + 1}ª. ${forca}`).join('\n')}
 
-1. Uma leitura da dinâmica geral (o que essa combinação de forças de assinatura revela sobre como essa pessoa opera no automático).
-2. Para cada uma das 5 forças de assinatura (1ª a 5ª), uma reflexão sobre o "lado sombra": como essa força, usada no ambiente errado ou em excesso, pode virar uma armadilha profissional. Use como referência o tom deste exemplo real: a força "Amor" pode gerar frustração no ambiente corporativo porque a pessoa espera reciprocidade onde só existe troca de interesse.
-3. Uma nota sobre as forças escondidas (21ª a 24ª): reforce que não são fraquezas, são músculos pouco usados, e que exigir essas forças por muito tempo causa esgotamento.
-4. Um fechamento prático: 2 a 3 sugestões de como essa pessoa pode usar essas forças de forma mais consciente na carreira.
+APLICAÇÃO ATUAL:
+${forcasAtuais.map((forca, i) => `${i + 1}ª. ${forca}`).join('\n')}
 
-Tom: direto, humano, sem jargão de RH, como uma mentora experiente conversando de igual para igual.`;
+MAIORES MOVIMENTOS CALCULADOS:
+${topMovimentos}
+
+Responda SOMENTE com JSON válido no formato:
+{
+  "resumo": "2 a 4 frases sobre a mudança mais importante do perfil relativo entre as duas aplicações.",
+  "assinatura_agora": "Como o Top 5 atual se combina e o que mudou na assinatura em relação ao teste anterior.",
+  "suporte_e_equilibrio": "Como as forças da 6ª à 18ª passaram a sustentar ou equilibrar o Top 5.",
+  "contrastes_e_pontos_cegos": "Leitura dos contrastes entre forças altas e forças menores, sem chamar força baixa de fraqueza.",
+  "alavancagem_profissional": "Como usar as forças altas para lidar com demandas que exigem forças menores.",
+  "movimentos_chave": [
+    {
+      "forca": "nome da força",
+      "posicao_anterior": 1,
+      "posicao_atual": 2,
+      "leitura": "1 frase curta explicando uma hipótese útil sobre esse movimento."
+    }
+  ],
+  "acoes": [
+    "ação concreta 1",
+    "ação concreta 2"
+  ]
+}
+
+Regras:
+- movimentos_chave deve ter de 3 a 5 itens e priorizar mudanças com maior impacto, principalmente entrada ou saída do Top 5 e movimentos grandes.
+- Não conclua que uma força que caiu deixou de existir.
+- Não diga, por exemplo, que Bondade caiu e por isso a pessoa ficou mais racional, a menos que outras mudanças no ranking sustentem essa hipótese. Se a evidência for insuficiente, diga que a mudança isolada não permite essa conclusão.
+- Use "pode indicar", "sugere" e "vale observar" quando estiver interpretando.
+- Não invente fatos profissionais, emocionais ou relacionais.
+- Não faça diagnóstico clínico.
+- Cada campo deve ser compacto para leitura em tela.
+- Não use travessão.`;
 }
