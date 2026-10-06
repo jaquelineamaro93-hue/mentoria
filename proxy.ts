@@ -37,14 +37,27 @@ export async function proxy(request: NextRequest) {
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status_assinatura, origem_assinatura, is_admin')
+      .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at')
       .eq('id', user.id)
       .maybeSingle();
+
+    const trialAtivo =
+      profile?.trial_status === 'active' &&
+      !!profile.trial_ends_at &&
+      new Date(profile.trial_ends_at).getTime() > Date.now();
+
+    const trialExpirado =
+      profile?.trial_status === 'expired' ||
+      (profile?.trial_status === 'active' &&
+        !!profile.trial_ends_at &&
+        new Date(profile.trial_ends_at).getTime() <= Date.now());
 
     const precisaPagar =
       profile &&
       !profile.is_admin &&
-      (profile.status_assinatura === 'encerrado' ||
+      !trialAtivo &&
+      ((trialExpirado && profile.status_assinatura !== 'ativo') ||
+        profile.status_assinatura === 'encerrado' ||
         (profile.status_assinatura === 'inadimplente' && profile.origem_assinatura === 'mercadopago'));
 
     if (precisaPagar) {

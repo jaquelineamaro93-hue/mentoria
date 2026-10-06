@@ -12,6 +12,8 @@ import {
   portalNavGroups,
 } from '@/lib/config/portalNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
+import TrialBanner from '@/components/TrialBanner';
+import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
 
 function SectionNavigationCards({
@@ -147,6 +149,34 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    const feature = resolveProductFeature(pathname, currentSearch);
+    if (!feature || pathname.startsWith('/admin')) return;
+
+    const sessionId = getProductSessionId();
+    const dedupeKey = `feature_view:${feature.key}:${pathname}:${currentSearch}:${sessionId ?? 'session'}`;
+
+    void fetch('/api/product-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      keepalive: true,
+      body: JSON.stringify({
+        eventName: 'feature_view',
+        featureKey: feature.key,
+        path: currentSearch ? `${pathname}?${currentSearch}` : pathname,
+        sessionId,
+        metadata: {
+          feature_label: feature.label,
+          feature_group: feature.group,
+        },
+        dedupeKey,
+      }),
+    }).catch(() => {
+      // Analytics nunca deve bloquear a navegação.
+    });
+  }, [pathname, currentSearch]);
+
   return (
     <div className={`${styles.shell} ${isCollapsed ? styles.shellCompact : ''}`}>
       <a href="#portal-content" className={styles.skipLink}>
@@ -183,6 +213,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
         <main ref={main} id="portal-content" tabIndex={-1} className={styles.main}>
           <div className={styles.pageContent}>
+            {!pathname.startsWith('/admin') && <TrialBanner pathname={pathname} />}
             <SectionNavigationCards pathname={pathname} currentSearch={currentSearch} />
             {children}
           </div>

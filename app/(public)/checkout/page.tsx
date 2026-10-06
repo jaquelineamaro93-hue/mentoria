@@ -25,16 +25,23 @@ export default async function CheckoutPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   let planoAtualCodigo: string | null = null;
+  let trialEligible = !user;
+
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('tipo_pacote')
+      .select('tipo_pacote,status_assinatura,trial_status,trial_started_at')
       .eq('id', user.id)
       .single();
 
-    if (profile?.tipo_pacote) {
+    if (profile?.status_assinatura === 'ativo' && profile.tipo_pacote) {
       planoAtualCodigo = profile.tipo_pacote;
     }
+
+    trialEligible =
+      profile?.status_assinatura !== 'ativo' &&
+      profile?.trial_status === 'not_started' &&
+      !profile?.trial_started_at;
   }
 
   return (
@@ -53,7 +60,12 @@ export default async function CheckoutPage() {
           </div>
         )}
 
-        <CheckoutClient planos={planos || []} logado={!!user} planoAtualCodigo={planoAtualCodigo} />
+        <CheckoutClient
+          planos={planos || []}
+          logado={!!user}
+          planoAtualCodigo={planoAtualCodigo}
+          trialEligible={trialEligible}
+        />
       </div>
     </div>
   );

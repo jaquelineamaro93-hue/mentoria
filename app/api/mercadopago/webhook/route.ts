@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { buscarPreapprovalMercadoPago, buscarPagamentoMercadoPago } from '@/lib/mercadopago';
 import { verificarAssinaturaWebhook } from '@/lib/mercadopago-webhook-security';
 import { enviarEmail, templateBoasVindas } from '@/lib/sendgrid';
+import { marcarTrialConvertido } from '@/lib/trial';
 
 async function enviarBoasVindasSeNecessario(
   supabase: ReturnType<typeof createAdminClient>,
@@ -121,6 +122,12 @@ export async function POST(request: Request) {
           mp_payment_id: String(id),
         });
 
+        await marcarTrialConvertido(supabase, userId, {
+          payment_type: 'payment',
+          payment_method: 'mercadopago',
+          value: pagamento.transaction_amount ?? null,
+        });
+
         await enviarBoasVindasSeNecessario(supabase, userId);
       } else if (pagamento.status === 'rejected') {
         await supabase.from('pagamentos_historico').insert({
@@ -175,6 +182,11 @@ export async function POST(request: Request) {
     });
 
     if (novoStatus === 'ativo') {
+      await marcarTrialConvertido(supabase, userId, {
+        payment_type: 'preapproval',
+        payment_method: 'mercadopago',
+        value: preapproval.auto_recurring?.transaction_amount ?? null,
+      });
       await enviarBoasVindasSeNecessario(supabase, userId);
     }
 

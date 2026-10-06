@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-const ROTAS_LIBERADAS = ['/login', '/assinatura', '/magic-login', '/reset-password'];
+const ROTAS_LIBERADAS = ['/login', '/renovar', '/magic-login', '/reset-password'];
 
 export default function AcessoGate() {
   const supabase = createClient();
@@ -30,7 +30,7 @@ export default function AcessoGate() {
 
       const { data: perfil } = await supabase
         .from('profiles')
-        .select('status_pagamento, data_fim_acesso, is_admin')
+        .select('status_pagamento, status_assinatura, data_fim_acesso, is_admin, trial_status, trial_ends_at')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -45,11 +45,27 @@ export default function AcessoGate() {
         return;
       }
 
+      const trialAtivo =
+        perfil.trial_status === 'active' &&
+        !!perfil.trial_ends_at &&
+        new Date(perfil.trial_ends_at).getTime() > Date.now();
+
       const passouDoPrazo =
         perfil.data_fim_acesso && perfil.data_fim_acesso < new Date().toISOString().slice(0, 10);
 
-      if (perfil.status_pagamento === 'encerrado' || passouDoPrazo) {
-        router.push('/assinatura');
+      const trialExpirado =
+        perfil.trial_status === 'expired' ||
+        (perfil.trial_status === 'active' &&
+          !!perfil.trial_ends_at &&
+          new Date(perfil.trial_ends_at).getTime() <= Date.now());
+
+      if (
+        !trialAtivo &&
+        ((trialExpirado && perfil.status_assinatura !== 'ativo') ||
+          perfil.status_pagamento === 'encerrado' ||
+          passouDoPrazo)
+      ) {
+        router.push('/renovar');
         return;
       }
 
