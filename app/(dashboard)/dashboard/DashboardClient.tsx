@@ -149,7 +149,7 @@ export default function DashboardClient({
     : !bussolaCompleto
     ? 'Concluir seu posicionamento no Mapa Quem Sou Eu'
     : !pdiCompleto
-    ? 'Entrega da versão do PDI Estratégico'
+    ? 'Concluir seu Plano de desenvolvimento (PDI)'
     : streakSemanas < 4
     ? 'Manter o Diário de Bordo ativo por 4 semanas seguidas'
     : 'Consolidação de resultados e check-in final do ciclo';
