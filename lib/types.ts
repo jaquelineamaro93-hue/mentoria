@@ -419,6 +419,18 @@ export interface Feedback360Summary {
   updated_at: string;
 }
 
+export interface Feedback360ShareLink {
+  id: string;
+  round_id: string;
+  user_id: string;
+  token: string;
+  active: boolean;
+  responses_count: number;
+  last_response_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 
 export interface ProductEvent {
   id: string;
