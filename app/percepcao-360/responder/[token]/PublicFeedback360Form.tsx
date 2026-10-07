@@ -97,6 +97,8 @@ export default function PublicFeedback360Form({
     event.preventDefault();
     setErro('');
 
+    if (!data) return;
+
     const respostasValidas = data.questions.map((question) => ({
       question_id: question.id,
       resposta: (respostas[question.id] ?? '').trim(),
