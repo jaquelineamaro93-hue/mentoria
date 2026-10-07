@@ -1,10 +1,13 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   const { email, code } = await request.json();
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  const normalizedCode = typeof code === 'string' ? code.trim() : String(code ?? '').trim();
 
-  if (!email || !code) {
+  if (!normalizedEmail || !/^\\d{6}$/.test(normalizedCode)) {
     return NextResponse.json(
       { error: 'Email e código são obrigatórios' },
       { status: 400 }
@@ -17,8 +20,8 @@ export async function POST(request: Request) {
     // Busca o código armazenado
     const { data: magicCode, error: fetchError } = await supabase
       .from('magic_codes')
-      .select('code, expires_at')
-      .eq('email', email)
+      .select('code, expires_at, attempts')
+      .eq('email', normalizedEmail)
       .single();
 
     if (fetchError || !magicCode) {
@@ -36,19 +39,37 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verifica se o código está correto
-    if (magicCode.code !== code) {
+    const attempts = Number(magicCode.attempts ?? 0);
+    if (attempts >= 5) {
+      await supabase.from('magic_codes').delete().eq('email', normalizedEmail);
       return NextResponse.json(
-        { error: 'Código inválido' },
-        { status: 401 }
+        { error: 'Limite de tentativas atingido. Solicite um novo código.' },
+        { status: 429 }
       );
+    }
+
+    const expected = Buffer.from(String(magicCode.code));
+    const received = Buffer.from(normalizedCode);
+    const valid =
+      expected.length === received.length && crypto.timingSafeEqual(expected, received);
+
+    if (!valid) {
+      const nextAttempts = attempts + 1;
+      await supabase
+        .from('magic_codes')
+        .update({ attempts: nextAttempts, updated_at: new Date().toISOString() })
+        .eq('email', normalizedEmail);
+      if (nextAttempts >= 5) {
+        await supabase.from('magic_codes').delete().eq('email', normalizedEmail);
+      }
+      return NextResponse.json({ error: 'Código inválido' }, { status: 401 });
     }
 
     // Verifica se o usuário existe
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id')
-      .eq('email', email)
+      .ilike('email', normalizedEmail)
       .single();
 
     if (profileError || !profile) {
@@ -61,7 +82,7 @@ export async function POST(request: Request) {
     // Gera um link de login
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'magiclink',
-      email: email,
+      email: profile.email,
       options: {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/auth/confirm`,
       },
@@ -84,8 +105,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Limpa o código usado
-    await supabase.from('magic_codes').delete().eq('email', email);
+    // Consome o código antes de devolver o link para impedir reutilização.
+    await supabase.from('magic_codes').delete().eq('email', normalizedEmail).eq('code', normalizedCode);
 
     return NextResponse.json({
       message: 'Código verificado com sucesso!',
