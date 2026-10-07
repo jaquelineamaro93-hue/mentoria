@@ -43,6 +43,8 @@ import TourPortal from '@/components/TourPortal';
 interface Props {
   profile: Profile | null;
   diagnostic: Diagnostic | null;
+  quemSouRespostasCompletas: number;
+  totalBlocosQuemSouEu: number;
   bussola: BussolaPosicionamento | null;
   viaResultado: ViaResultado | null;
   pdiSecoes: PdiGuiaSecao[];
@@ -79,6 +81,8 @@ function StatusBadge({ status }: { status: FaseStatus }) {
 export default function DashboardClient({
   profile,
   diagnostic,
+  quemSouRespostasCompletas,
+  totalBlocosQuemSouEu,
   bussola,
   viaResultado,
   pdiSecoes,
@@ -101,19 +105,34 @@ export default function DashboardClient({
 
   const primeiroNome = profile?.nome?.split(' ')[0] ?? 'Mentorada';
 
-  // ---- Diagnóstico dos sinais disponíveis (sem inventar dados) ----
-  const quemSouCompleto = useMemo(
-    () => !!diagnostic?.quem_sou_data && Object.keys(diagnostic.quem_sou_data).length > 0,
-    [diagnostic]
+  // ---- Diagnóstico dos sinais disponíveis usando as fontes atuais do portal ----
+  const quemSouCompleto =
+    totalBlocosQuemSouEu > 0 && quemSouRespostasCompletas >= totalBlocosQuemSouEu;
+
+  const forcasDiagnostico = Array.isArray(diagnostic?.habilidades?.forcas)
+    ? diagnostic.habilidades.forcas
+    : [];
+  const diagnosticoBaseCompleto = !!(
+    diagnostic?.momento_carreira?.trim() &&
+    diagnostic?.objetivos?.trim() &&
+    forcasDiagnostico.length > 0
   );
-  const viaCompleto = !!viaResultado?.forcas?.length;
+
+  const viaCompleto = viaResultado?.forcas?.length === 24;
+  const diagnosticoCompleto = diagnosticoBaseCompleto && viaCompleto;
+
   const bussolaCompleto = !!(
     bussola && (bussola.norte || bussola.sul || bussola.leste || bussola.oeste || bussola.centro)
   );
 
   const pdiTotal = pdiSecoes.length;
-  const pdiConcluidas = pdiRespostas.filter((r) => r.concluido).length;
-  const pdiCompleto = pdiTotal > 0 && pdiConcluidas >= pdiTotal;
+  const secoesPdiValidas = new Set(pdiSecoes.map((secao) => secao.codigo));
+  const pdiConcluidas = new Set(
+    pdiRespostas
+      .filter((resposta) => resposta.concluido && secoesPdiValidas.has(resposta.secao))
+      .map((resposta) => resposta.secao)
+  ).size;
+  const pdiCompleto = pdiTotal > 0 && pdiConcluidas === pdiTotal;
 
   const streakSemanas = useMemo(() => {
     if (!journalNotes.length) return 0;
@@ -128,7 +147,7 @@ export default function DashboardClient({
   }, [journalNotes]);
 
   // ---- Status das 3 fases do programa (90 dias) ----
-  const fase1Itens = [quemSouCompleto, viaCompleto, bussolaCompleto];
+  const fase1Itens = [quemSouCompleto, diagnosticoCompleto, bussolaCompleto];
   const fase1Feitos = fase1Itens.filter(Boolean).length;
   const fase1Status: FaseStatus =
     fase1Feitos === fase1Itens.length ? 'concluida' : fase1Feitos > 0 ? 'em_andamento' : 'pendente';
@@ -143,7 +162,9 @@ export default function DashboardClient({
       : 'pendente';
 
   const proximoMarco = !quemSouCompleto
-    ? 'Preencher o Mapa Quem Sou Eu'
+    ? `Concluir o Mapa Quem Sou Eu (${quemSouRespostasCompletas}/${totalBlocosQuemSouEu} blocos)`
+    : !diagnosticoBaseCompleto
+    ? 'Concluir o Diagnóstico de carreira em Diagnóstico & Perfil'
     : !viaCompleto
     ? 'Concluir o VIA em Diagnóstico & Perfil'
     : !bussolaCompleto
@@ -156,6 +177,8 @@ export default function DashboardClient({
 
   const proximoMarcoHref = !quemSouCompleto
     ? '/quem-sou-eu'
+    : !diagnosticoBaseCompleto
+    ? '/exercicios'
     : !viaCompleto
     ? '/exercicios'
     : !bussolaCompleto
@@ -167,7 +190,7 @@ export default function DashboardClient({
   // ---- Passaporte de conquistas (apenas o que dá para verificar com os dados carregados) ----
   const sinaisDisponiveis: Record<string, boolean> = {
     quem_sou_eu_completo: quemSouCompleto,
-    diagnostico_completo: viaCompleto,
+    diagnostico_completo: diagnosticoCompleto,
     bussola_completa: bussolaCompleto,
     pdi_completo: pdiCompleto,
     diario_comecado: journalNotes.length > 0,
@@ -209,7 +232,7 @@ export default function DashboardClient({
     },
   ];
 
-  const etapasConcluidas = [quemSouCompleto, viaCompleto, bussolaCompleto, pdiCompleto].filter(Boolean).length;
+  const etapasConcluidas = [quemSouCompleto, diagnosticoCompleto, bussolaCompleto, pdiCompleto].filter(Boolean).length;
   const pontosTotais = profile?.pontos_total ?? 0;
 
   const fitAtual =
@@ -527,7 +550,7 @@ export default function DashboardClient({
           <Panel className="divide-y divide-line border-gray-faint">
             {[
               { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
-              { label: 'VIA · Diagnóstico & Perfil', done: viaCompleto, href: '/exercicios' },
+              { label: 'Diagnóstico & Perfil (diagnóstico + VIA)', done: diagnosticoCompleto, href: '/exercicios' },
               { label: 'Posicionamento · Mapa Quem Sou Eu', done: bussolaCompleto, href: '/quem-sou-eu' },
               { label: 'Plano de desenvolvimento (PDI)', done: pdiCompleto, href: '/meu-pdi' },
             ].map((tarefa) => (
