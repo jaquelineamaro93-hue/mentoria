@@ -6,6 +6,7 @@ import type {
   Feedback360Question,
   Feedback360Respondent,
   Feedback360Round,
+  Feedback360ShareLink,
   Feedback360Summary,
 } from '@/lib/types';
 
@@ -23,6 +24,7 @@ export default async function Percepcao360Page() {
     { data: respondents },
     { data: answers },
     { data: summaries },
+    { data: shareLinks },
   ] = await Promise.all([
     supabase
       .from('feedback_360_rounds')
@@ -54,6 +56,12 @@ export default async function Percepcao360Page() {
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
       .returns<Feedback360Summary[]>(),
+    supabase
+      .from('feedback_360_share_links')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .returns<Feedback360ShareLink[]>(),
   ]);
 
   return (
@@ -64,6 +72,7 @@ export default async function Percepcao360Page() {
       respondents={respondents ?? []}
       answers={answers ?? []}
       summaries={summaries ?? []}
+      shareLinks={shareLinks ?? []}
     />
   );
 }

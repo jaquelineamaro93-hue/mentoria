@@ -3,8 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Check,
   ChevronRight,
   CircleUserRound,
+  Copy,
+  ExternalLink,
+  Link2,
   Loader2,
   Plus,
   Save,
@@ -22,6 +26,7 @@ import type {
   Feedback360Relationship,
   Feedback360Respondent,
   Feedback360Round,
+  Feedback360ShareLink,
   Feedback360Summary,
   Feedback360SummaryData,
 } from '@/lib/types';
@@ -33,6 +38,7 @@ interface Props {
   respondents: Feedback360Respondent[];
   answers: Feedback360Answer[];
   summaries: Feedback360Summary[];
+  shareLinks: Feedback360ShareLink[];
 }
 
 const PERGUNTAS_PADRAO = [
@@ -85,6 +91,7 @@ export default function Percepcao360Client({
   respondents: respondentsProp,
   answers: answersProp,
   summaries: summariesProp,
+  shareLinks: shareLinksProp,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -94,6 +101,8 @@ export default function Percepcao360Client({
   const [respondents, setRespondents] = useState(respondentsProp);
   const [answers, setAnswers] = useState(answersProp);
   const [summaries, setSummaries] = useState(summariesProp);
+  const [shareLinks, setShareLinks] = useState(shareLinksProp);
+  const [copiedRoundId, setCopiedRoundId] = useState<string | null>(null);
 
   const [selectedRoundId, setSelectedRoundId] = useState(roundsProp[0]?.id ?? '');
   const [showNewRound, setShowNewRound] = useState(roundsProp.length === 0);
@@ -126,12 +135,13 @@ export default function Percepcao360Client({
     setRespondents(respondentsProp);
     setAnswers(answersProp);
     setSummaries(summariesProp);
+    setShareLinks(shareLinksProp);
     setSelectedRoundId((current) =>
       roundsProp.some((round) => round.id === current)
         ? current
         : roundsProp[0]?.id ?? ''
     );
-  }, [roundsProp, questionsProp, respondentsProp, answersProp, summariesProp]);
+  }, [roundsProp, questionsProp, respondentsProp, answersProp, summariesProp, shareLinksProp]);
 
   const selectedRound = rounds.find((round) => round.id === selectedRoundId) ?? null;
 
@@ -156,12 +166,37 @@ export default function Percepcao360Client({
   const selectedSummary =
     summaries.find((summary) => summary.round_id === selectedRoundId) ?? null;
 
+  const selectedShareLink =
+    shareLinks.find((link) => link.round_id === selectedRoundId && link.active) ?? null;
+
   const perguntasEditaveis = selectedRespondents.length === 0;
   const pessoasComRespostas = selectedRespondents.filter((respondent) =>
     selectedAnswers.some(
       (answer) => answer.respondent_id === respondent.id && Boolean(answer.resposta?.trim())
     )
   ).length;
+
+  async function copyShareLink(token: string, roundId: string) {
+    const url = `https://somamentoria.com/percepcao-360/responder/${token}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const input = document.createElement('textarea');
+      input.value = url;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+    }
+
+    setCopiedRoundId(roundId);
+    setSucesso('Link copiado. A pessoa poderá responder sem entrar na SOMA.');
+    window.setTimeout(() => setCopiedRoundId((current) => (current === roundId ? null : current)), 2500);
+    posthog.capture('feedback_360_link_copiado', { round_id: roundId });
+  }
 
   function resetRespondentForm() {
     setEditingRespondentId(null);
@@ -615,6 +650,59 @@ export default function Percepcao360Client({
                   </div>
                 </div>
               </Panel>
+
+              {selectedShareLink && (
+                <Panel className="p-5 md:p-6 border-mint/70">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    <div className="min-w-0">
+                      <Eyebrow>
+                        <Link2 size={13} /> Link para terceiros
+                      </Eyebrow>
+                      <h3 className="text-base font-medium text-black mt-2">
+                        Envie este link para quem vai falar sobre você
+                      </h3>
+                      <p className="mt-1 text-sm leading-6 text-gray-text max-w-3xl">
+                        A pessoa não precisa criar conta nem entrar na SOMA. O formulário identifica esta
+                        rodada e salva cada resposta automaticamente no seu perfil.
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-mint-light px-3 py-1.5 text-[11px] font-medium text-mint-deep">
+                      Vinculado à sua rodada
+                    </span>
+                  </div>
+
+                  <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                    <input
+                      readOnly
+                      value={`https://somamentoria.com/percepcao-360/responder/${selectedShareLink.token}`}
+                      aria-label="Link público da rodada"
+                      className="min-w-0 flex-1 rounded-lg border border-gray-faint bg-gray-50 px-3 py-2.5 text-xs text-black"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => copyShareLink(selectedShareLink.token, selectedRound.id)}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-medium text-white"
+                    >
+                      {copiedRoundId === selectedRound.id ? <Check size={15} /> : <Copy size={15} />}
+                      {copiedRoundId === selectedRound.id ? 'Copiado' : 'Copiar link'}
+                    </button>
+                    <a
+                      href={`https://somamentoria.com/percepcao-360/responder/${selectedShareLink.token}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-faint bg-white px-4 py-2.5 text-sm font-medium text-black"
+                    >
+                      <ExternalLink size={15} />
+                      Testar
+                    </a>
+                  </div>
+
+                  <p className="mt-3 text-xs leading-5 text-gray-text">
+                    Este link é exclusivo desta rodada. Respostas recebidas por ele entram na mesma contagem
+                    acima e ficam vinculadas ao mentorado correto automaticamente.
+                  </p>
+                </Panel>
+              )}
 
               <Panel className="p-5 md:p-6">
                 <div className="flex items-start justify-between gap-4 mb-4">
