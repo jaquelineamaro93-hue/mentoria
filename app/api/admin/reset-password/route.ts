@@ -1,67 +1,71 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/security/require-admin';
 
 export async function POST(request: Request) {
+  const authorization = await requireAdmin();
+  if (!authorization.ok) return authorization.response;
+
   const { userId, email } = await request.json();
 
   if (!userId || !email) {
-    return NextResponse.json({ error: 'userId e email são obrigatórios' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'userId e email são obrigatórios' },
+      { status: 400 }
+    );
   }
 
   try {
-    console.log(`📧 [ADMIN-RESET-PASSWORD] Iniciando reset para: ${email}`);
-
-    console.log(`🔑 [ADMIN-RESET-PASSWORD] Criando admin client...`);
     const supabase = createAdminClient();
-    console.log(`✅ [ADMIN-RESET-PASSWORD] Admin client criado, chamando generateLink...`);
+    const { data: userData, error: userError } =
+      await supabase.auth.admin.getUserById(userId);
+
+    const accountEmail = userData.user?.email?.trim().toLowerCase();
+    const requestedEmail = String(email).trim().toLowerCase();
+
+    if (userError || !accountEmail || accountEmail !== requestedEmail) {
+      return NextResponse.json(
+        { error: 'Usuário e e-mail não conferem.' },
+        { status: 400 }
+      );
+    }
 
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
-      email: email,
+      email: accountEmail,
       options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/reset-password`,
       },
     });
 
     if (error || !data) {
-      console.error('🔴 Erro ao gerar link de reset:', {
-        error: error,
-        errorMessage: error?.message,
-        errorStatus: (error as any)?.status,
-        data: data,
-        email: email,
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      });
+      console.error('[ADMIN-RESET-PASSWORD] Falha ao gerar link:', error?.message);
       return NextResponse.json(
         { error: 'Erro ao gerar link de reset' },
         { status: 500 }
       );
     }
 
-    console.log(`✅ [ADMIN-RESET-PASSWORD] generateLink retornou com sucesso`);
-
-    const resetUrl = (data.properties as any)?.action_link || (data as any)?.action_link;
-
+    const resetUrl = (data.properties as { action_link?: string } | null)?.action_link;
     if (!resetUrl) {
-      console.error(`🔴 [ADMIN-RESET-PASSWORD] Link não encontrado na resposta:`, data);
       return NextResponse.json(
         { error: 'Erro ao gerar link de reset' },
         { status: 500 }
       );
     }
 
-    console.log(`✅ [ADMIN-RESET-PASSWORD] Link extraído com sucesso`);
-
-    return NextResponse.json({
-      message: 'Link gerado com sucesso',
-      link: resetUrl,
-    });
+    return NextResponse.json(
+      {
+        message: 'Link gerado com sucesso',
+        link: resetUrl,
+      },
+      { headers: { 'Cache-Control': 'no-store' } }
+    );
   } catch (error) {
-    console.error('🔴 [ADMIN-RESET-PASSWORD] Erro no catch block:', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    console.error(
+      '[ADMIN-RESET-PASSWORD] Falha inesperada:',
+      error instanceof Error ? error.message : String(error)
+    );
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }

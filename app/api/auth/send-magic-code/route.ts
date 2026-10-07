@@ -1,43 +1,88 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { enviarEmail } from '@/lib/sendgrid';
 
+const GENERIC_RESPONSE = {
+  message: 'Se o email existe e está habilitado, você receberá um código.',
+};
+
 export async function POST(request: Request) {
   const { email } = await request.json();
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
 
-  if (!email) {
-    return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 });
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
   }
 
   try {
-    console.log(`📧 [MAGIC-CODE] Solicitação para: ${email}`);
-
-    // Gera código sem verificar se o perfil existe
-    // (por segurança, não revelamos se o email existe ou não)
-    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-
     const supabaseAdmin = createAdminClient();
+
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('id,email')
+      .ilike('email', normalizedEmail)
+      .maybeSingle();
+
+    if (!profile) {
+      return NextResponse.json(GENERIC_RESPONSE, {
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+
+    const { data: authData } = await supabaseAdmin.auth.admin.getUserById(profile.id);
+    const bannedUntil = authData.user?.banned_until
+      ? new Date(authData.user.banned_until).getTime()
+      : 0;
+
+    if (bannedUntil > Date.now()) {
+      return NextResponse.json(GENERIC_RESPONSE, {
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+
+    const { data: existing } = await supabaseAdmin
+      .from('magic_codes')
+      .select('created_at')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (
+      existing?.created_at &&
+      Date.now() - new Date(existing.created_at).getTime() < 60_000
+    ) {
+      return NextResponse.json(GENERIC_RESPONSE, {
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 10 * 60 * 1000);
+
     const { error: insertError } = await supabaseAdmin
       .from('magic_codes')
-      .upsert({
-        email,
-        code: codigo,
-        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      }, { onConflict: 'email' });
+      .upsert(
+        {
+          email: normalizedEmail,
+          code,
+          attempts: 0,
+          expires_at: expiresAt.toISOString(),
+          created_at: now.toISOString(),
+          updated_at: now.toISOString(),
+        },
+        { onConflict: 'email' }
+      );
 
     if (insertError) {
-      console.error(`🔴 [MAGIC-CODE] Erro ao salvar código:`, insertError);
-      return NextResponse.json(
-        { error: 'Erro ao gerar código' },
-        { status: 500 }
-      );
+      console.error('[MAGIC-CODE] Falha ao armazenar código:', insertError.message);
+      return NextResponse.json({ error: 'Erro ao gerar código' }, { status: 500 });
     }
-    console.log(`✅ [MAGIC-CODE] Código ${codigo} salvo para: ${email}`);
 
     try {
       await enviarEmail({
         from: 'consultoria@camarocrm.com',
-      to: email,
+        to: normalizedEmail,
         assunto: 'Seu código de acesso - SOMA Mentoria',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -47,11 +92,11 @@ export async function POST(request: Request) {
             </p>
             <div style="background: #f5f1ed; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
               <p style="font-size: 32px; font-weight: bold; color: #2a5ba8; letter-spacing: 4px; margin: 0;">
-                ${codigo}
+                ${code}
               </p>
             </div>
             <p style="color: #999; font-size: 12px;">
-              Este código expira em 15 minutos.
+              Este código expira em 10 minutos e possui limite de tentativas.
             </p>
             <p style="color: #999; font-size: 12px; margin-top: 20px;">
               Com carinho,<br>
@@ -61,14 +106,20 @@ export async function POST(request: Request) {
         `,
       });
     } catch (emailError) {
-      console.error(`🔴 [MAGIC-CODE] Erro ao enviar código para ${email}:`, emailError);
+      console.error(
+        '[MAGIC-CODE] Falha no envio:',
+        emailError instanceof Error ? emailError.message : String(emailError)
+      );
     }
 
-    return NextResponse.json({
-      message: 'Se o email existe, você receberá um código.',
+    return NextResponse.json(GENERIC_RESPONSE, {
+      headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
-    console.error('🔴 [MAGIC-CODE] Erro:', error);
+    console.error(
+      '[MAGIC-CODE] Falha inesperada:',
+      error instanceof Error ? error.message : String(error)
+    );
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }

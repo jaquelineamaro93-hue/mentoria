@@ -1,17 +1,23 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
 
 function MagicLoginContent() {
   const router = useRouter();
-  const [stage, setStage] = useState<'email' | 'code'>('email');
-  const [email, setEmail] = useState('');
+  const searchParams = useSearchParams();
+  const initialEmail = searchParams.get('email')?.trim().toLowerCase() ?? '';
+  const codeAlreadySent = searchParams.get('sent') === '1' && Boolean(initialEmail);
+
+  const [stage, setStage] = useState<'email' | 'code'>(codeAlreadySent ? 'code' : 'email');
+  const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState('');
+  const [sucesso, setSucesso] = useState(
+    codeAlreadySent ? 'Código enviado! Verifique seu email.' : ''
+  );
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
