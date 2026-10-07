@@ -43,13 +43,13 @@ export async function POST(request: Request) {
 
     const { data: existing } = await supabaseAdmin
       .from('magic_codes')
-      .select('updated_at')
+      .select('created_at')
       .eq('email', normalizedEmail)
       .maybeSingle();
 
     if (
-      existing?.updated_at &&
-      Date.now() - new Date(existing.updated_at).getTime() < 60_000
+      existing?.created_at &&
+      Date.now() - new Date(existing.created_at).getTime() < 60_000
     ) {
       return NextResponse.json(GENERIC_RESPONSE, {
         headers: { 'Cache-Control': 'no-store' },
