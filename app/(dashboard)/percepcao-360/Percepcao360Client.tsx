@@ -143,6 +143,75 @@ export default function Percepcao360Client({
     );
   }, [roundsProp, questionsProp, respondentsProp, answersProp, summariesProp, shareLinksProp]);
 
+  useEffect(() => {
+    let active = true;
+    let syncing = false;
+    const syncClient = createClient();
+
+    async function syncFeedback() {
+      if (!active || syncing || document.visibilityState === 'hidden') return;
+      syncing = true;
+
+      try {
+        const [
+          { data: freshRounds },
+          { data: freshRespondents },
+          { data: freshAnswers },
+          { data: freshSummaries },
+        ] = await Promise.all([
+          syncClient
+            .from('feedback_360_rounds')
+            .select('*')
+            .eq('user_id', userId)
+            .order('updated_at', { ascending: false })
+            .returns<Feedback360Round[]>(),
+          syncClient
+            .from('feedback_360_respondents')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at')
+            .returns<Feedback360Respondent[]>(),
+          syncClient
+            .from('feedback_360_answers')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at')
+            .returns<Feedback360Answer[]>(),
+          syncClient
+            .from('feedback_360_summaries')
+            .select('*')
+            .eq('user_id', userId)
+            .order('updated_at', { ascending: false })
+            .returns<Feedback360Summary[]>(),
+        ]);
+
+        if (!active) return;
+        if (freshRounds) setRounds(freshRounds);
+        if (freshRespondents) setRespondents(freshRespondents);
+        if (freshAnswers) setAnswers(freshAnswers);
+        if (freshSummaries) setSummaries(freshSummaries);
+      } finally {
+        syncing = false;
+      }
+    }
+
+    function syncWhenVisible() {
+      if (document.visibilityState === 'visible') void syncFeedback();
+    }
+
+    void syncFeedback();
+    const interval = window.setInterval(() => void syncFeedback(), 15000);
+    window.addEventListener('focus', syncWhenVisible);
+    document.addEventListener('visibilitychange', syncWhenVisible);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener('focus', syncWhenVisible);
+      document.removeEventListener('visibilitychange', syncWhenVisible);
+    };
+  }, [userId]);
+
   const selectedRound = rounds.find((round) => round.id === selectedRoundId) ?? null;
 
   const selectedQuestions = useMemo(
