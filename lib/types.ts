@@ -444,7 +444,7 @@ export interface ProductEvent {
   occurred_at: string;
 }
 
-export type TrialPromptVariant = 'adaptive_value' | 'fixed_day_7';
+export type TrialPromptVariant = 'adaptive_value' | 'fixed_day_5';
 
 export interface ProductExperiment {
   id: string;

@@ -348,12 +348,12 @@ export default async function AdminAnalyticsPage({
       ? conversionDays.reduce((sum, value) => sum + value, 0) / conversionDays.length
       : null;
 
-  const experiment = experiments.find((item) => item.key === 'trial_prompt_timing_v1');
+  const experiment = experiments.find((item) => item.key === 'trial_prompt_timing_v2');
   const experimentAssignments = experiment
     ? assignments.filter((item) => item.experiment_id === experiment.id)
     : [];
 
-  const variants = ['adaptive_value', 'fixed_day_7'].map((variant) => {
+  const variants = ['adaptive_value', 'fixed_day_5'].map((variant) => {
     const assignedUsers = new Set(
       experimentAssignments.filter((item) => item.variant === variant).map((item) => item.user_id)
     );
@@ -573,7 +573,7 @@ export default async function AdminAnalyticsPage({
           </div>
 
           <p className="mt-4 text-xs leading-5 text-gray-text">
-            O acesso continua disponível por até 15 dias. O experimento testa quando mostrar o convite
+            O acesso continua disponível por até 7 dias. O experimento testa quando mostrar o convite
             para continuar, não quando encerrar o trial.
           </p>
         </Panel>
@@ -595,7 +595,7 @@ export default async function AdminAnalyticsPage({
                   <p className="text-sm font-medium text-black">
                     {variant.variant === 'adaptive_value'
                       ? 'A · Depois de valor percebido'
-                      : 'B · Dia 7'}
+                      : 'B · Dia 5'}
                   </p>
                   <span className="text-xs text-gray-text">{variant.conversionRate}% conversão</span>
                 </div>

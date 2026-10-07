@@ -32,7 +32,7 @@ export async function proxy(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const rotaLiberada =
-    path.startsWith('/login') || path === '/renovar' || path.startsWith('/api') || path.startsWith('/auth');
+    path.startsWith('/login') || path.startsWith('/checkout') || path === '/planos' || path === '/reset-password' || path === '/renovar' || path.startsWith('/api') || path.startsWith('/auth');
 
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase

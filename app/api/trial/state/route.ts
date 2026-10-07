@@ -108,9 +108,9 @@ export async function GET() {
   const variant = profile.trial_prompt_variant || 'adaptive_value';
 
   const shouldPrompt =
-    variant === 'fixed_day_7'
-      ? elapsedDays >= 7
-      : (elapsedDays >= 2 && coreFeatures.size >= 2) || elapsedDays >= 12;
+    variant === 'fixed_day_5'
+      ? elapsedDays >= 5
+      : (elapsedDays >= 2 && coreFeatures.size >= 2) || elapsedDays >= 5;
 
   return NextResponse.json(
     {
@@ -118,7 +118,7 @@ export async function GET() {
         status: 'active',
         planId: profile.trial_plan_id,
         planName: plan?.nome ?? 'SOMA',
-        trialDays: Number(plan?.trial_days ?? 15),
+        trialDays: Number(plan?.trial_days ?? 7),
         startedAt: profile.trial_started_at,
         endsAt: profile.trial_ends_at,
         elapsedDays,

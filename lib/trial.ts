@@ -1,12 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { TrialPromptVariant } from '@/lib/types';
 
-export const TRIAL_EXPERIMENT_KEY = 'trial_prompt_timing_v1';
-export const TRIAL_MAX_DAYS = 15;
+export const TRIAL_EXPERIMENT_KEY = 'trial_prompt_timing_v2';
+export const TRIAL_MAX_DAYS = 7;
 
 function escolherVariante(userId: string): TrialPromptVariant {
   const soma = userId.replace(/-/g, '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return soma % 2 === 0 ? 'adaptive_value' : 'fixed_day_7';
+  return soma % 2 === 0 ? 'adaptive_value' : 'fixed_day_5';
 }
 
 export async function iniciarTrialParaUsuario(
@@ -99,7 +99,7 @@ export async function iniciarTrialParaUsuario(
     );
   }
 
-  const { error: updateError } = await admin
+  const { data: startedProfile, error: updateError } = await admin
     .from('profiles')
     .update({
       trial_status: 'active',
@@ -111,11 +111,20 @@ export async function iniciarTrialParaUsuario(
       trial_prompted_at: null,
       plano_id: plan.id,
     })
-    .eq('id', userId);
+    .eq('id', userId)
+    .eq('trial_status', 'not_started')
+    .is('trial_started_at', null)
+    .or('status_assinatura.is.null,status_assinatura.neq.ativo')
+    .select('id')
+    .maybeSingle();
 
   if (updateError) {
     console.error('[TRIAL] Falha ao iniciar trial:', updateError.message);
     return { ok: false as const, status: 500, error: 'Não foi possível iniciar o teste gratuito.' };
+  }
+
+  if (!startedProfile) {
+    return { ok: false as const, status: 409, error: 'O teste já foi iniciado ou o acesso foi atualizado. Atualize a página.' };
   }
 
   await admin.from('product_events').insert({

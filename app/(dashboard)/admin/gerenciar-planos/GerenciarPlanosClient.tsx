@@ -60,7 +60,7 @@ export default function GerenciarPlanosClient({
     return (
       trialEdicao[plano.id] ?? {
         enabled: plano.trial_enabled ?? false,
-        days: plano.trial_days ?? 15,
+        days: plano.trial_days ?? 7,
         label: plano.trial_label ?? 'Teste grátis',
       }
     );
@@ -312,7 +312,7 @@ export default function GerenciarPlanosClient({
           <h2 className="font-display text-xl text-black">Teste gratuito e janela de conversão</h2>
           <p className="text-xs leading-5 text-gray-text max-w-3xl">
             O trial fica desligado por padrão. Ative somente nos pacotes em que quiser oferecer
-            acesso gratuito. O período máximo é 15 dias; o experimento muda apenas o momento do
+            acesso gratuito. O período máximo é 7 dias; o experimento muda apenas o momento do
             convite para compra, nunca reduz o tempo de acesso.
           </p>
         </div>
@@ -355,14 +355,14 @@ export default function GerenciarPlanosClient({
                     <input
                       type="number"
                       min={1}
-                      max={15}
+                      max={7}
                       value={trial.days}
                       onChange={(event) =>
                         setTrialEdicao((prev) => ({
                           ...prev,
                           [plano.id]: {
                             ...trial,
-                            days: Math.max(1, Math.min(15, Number(event.target.value) || 15)),
+                            days: Math.max(1, Math.min(7, Number(event.target.value) || 7)),
                           },
                         }))
                       }

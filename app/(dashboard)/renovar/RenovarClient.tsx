@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Loader2, ExternalLink, Check } from 'lucide-react';
+import Link from 'next/link';
+import { Lock, Loader2, Check, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import type { PlanoMentoria, Profile } from '@/lib/types';
@@ -10,11 +11,12 @@ import type { PlanoMentoria, Profile } from '@/lib/types';
 interface Props {
   profile: Profile | null;
   planos: PlanoMentoria[];
+  trialExpirado: boolean;
 }
 
 type FormaPagamento = 'avista' | 'cartao' | 'recorrente';
 
-export default function RenovarClient({ profile, planos }: Props) {
+export default function RenovarClient({ profile, planos, trialExpirado }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [carregando, setCarregando] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export default function RenovarClient({ profile, planos }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       posthog.capture('checkout_iniciado', { plano: planoCodigo, forma: formaPagamento });
-      window.location.href = data.init_point;
+      window.location.assign(data.init_point);
     } catch (e) {
       setErro(
         e instanceof Error
@@ -50,6 +52,28 @@ export default function RenovarClient({ profile, planos }: Props) {
       );
       setCarregando(null);
     }
+  }
+
+  if (trialExpirado) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/55 p-5 backdrop-blur-sm">
+        <section role="dialog" aria-modal="true" aria-labelledby="trial-ended-title" className="my-auto w-full max-w-xl rounded-3xl bg-white px-6 py-10 text-center shadow-2xl sm:px-10">
+          <Sparkles className="mx-auto mb-5 text-amber-400" size={40} aria-hidden="true" />
+          <h1 id="trial-ended-title" className="text-3xl font-bold text-black">Seu teste grátis acabou</h1>
+          <p className="mt-4 text-base leading-7 text-gray-text">Seu período gratuito terminou. Para voltar a usar as ferramentas da SOMA, escolha um plano.</p>
+          <div className="mt-8 space-y-3">
+            {planos.map((plano, index) => (
+              <Link key={plano.id} href={`/checkout?plan=${plano.id}`} className={`block rounded-xl px-5 py-4 text-base font-semibold transition ${index === 0 ? 'bg-brown-deep text-white hover:bg-brown' : 'border border-gray-faint text-black hover:bg-gray-50'}`}>
+                Assinar {plano.nome} · {Number(plano.preco_avista).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} à vista
+              </Link>
+            ))}
+            {planos.length === 0 && <p className="text-sm text-gray-text">Nenhum plano disponível no momento. Entre em contato com a SOMA.</p>}
+          </div>
+          <p className="mt-5 text-xs text-gray-text">Consulte parcelamento e detalhes no checkout. O acesso retorna após a aprovação do pagamento.</p>
+          <button onClick={() => void handleSignOut()} className="mt-8 text-sm text-gray-text underline">Assinou com outro e-mail? Entrar com outra conta</button>
+        </section>
+      </div>
+    );
   }
 
   return (

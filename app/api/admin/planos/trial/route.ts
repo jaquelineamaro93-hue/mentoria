@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest) {
     | null;
 
   const planId = body?.planId?.trim();
-  const days = Math.max(1, Math.min(15, Math.round(Number(body?.days) || 15)));
+  const days = Math.max(1, Math.min(7, Math.round(Number(body?.days) || 7)));
 
   if (!planId || typeof body?.enabled !== 'boolean') {
     return NextResponse.json({ error: 'Plano e configuração do trial são obrigatórios.' }, { status: 400 });

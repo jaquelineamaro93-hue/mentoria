@@ -1,0 +1,25 @@
+const {PGlite}=require(process.env.MP_TEST_PGLITE_PATH || '@electric-sql/pglite');
+const fs=require('node:fs');const assert=require('node:assert/strict');
+(async()=>{
+const db=new PGlite();
+await db.exec(`create role authenticated;create schema auth;
+create function auth.uid() returns uuid language sql as $$ select nullif(current_setting('test.actor_id',true),'')::uuid $$;
+create function is_admin() returns boolean language sql as 'select false';
+create table profiles(id uuid primary key,trial_status text,trial_started_at timestamptz,trial_ends_at timestamptz,trial_converted_at timestamptz,trial_plan_id uuid,trial_prompt_variant text,trial_prompted_at timestamptz);
+create table product_events(user_id uuid,event_name text,feature_key text,metadata jsonb,dedupe_key text,occurred_at timestamptz);
+create unique index event_dedupe on product_events(dedupe_key) where dedupe_key is not null;
+create table product_experiments(key text unique,name text,hypothesis text,status text,variants jsonb,primary_event text,started_at timestamptz);
+create table planos_mentoria(ativo bool,visivel_checkout bool,preco_avista numeric,trial_enabled bool,trial_days int,trial_label text);
+insert into planos_mentoria values(true,true,650,false,15,''),(true,true,0.01,false,15,''),(true,false,650,false,15,'');
+insert into profiles(id,trial_status,trial_started_at,trial_ends_at) values('00000000-0000-0000-0000-000000000001','active','2026-10-01T00:00Z','2026-10-16T00:00Z');`);
+await db.exec(fs.readFileSync('supabase/migrations/20261007220000_trial_conversion_integrity.sql','utf8'));
+assert.equal((await db.query('select count(*)::int as n from planos_mentoria where trial_enabled')).rows[0].n,1);
+assert.equal((await db.query('select max(trial_days) as days from planos_mentoria')).rows[0].days,7);
+await assert.rejects(db.exec('update planos_mentoria set trial_days=8'));
+await db.exec("set test.actor_id='00000000-0000-0000-0000-000000000001';update profiles set trial_ends_at='2027-01-01',trial_status='converted';");
+assert.equal((await db.query('select trial_status from profiles')).rows[0].trial_status,'active');
+assert.equal((await db.query('select * from product_events')).rows.length,0);
+await db.exec("set test.actor_id='';update profiles set trial_status='converted',trial_converted_at='2026-10-03T12:00Z';update profiles set trial_status='converted';");
+const rows=(await db.query('select metadata from product_events')).rows;assert.equal(rows.length,1);assert.equal(rows[0].metadata.conversion_day,2);assert.equal(rows[0].metadata.conversion_hours,60);
+await db.close();console.log('PASS: eligible packages, protected trial dates, exact conversion timing, deduplication');
+})().catch(e=>{console.error(e);process.exitCode=1});
