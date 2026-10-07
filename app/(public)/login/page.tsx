@@ -198,49 +198,27 @@ function LoginPageContent() {
       identificarMentorado(data.user.id, { email, nome, tipo_pacote: tipoPacote });
       posthog.capture('cadastro_realizado', { tipo_pacote: tipoPacote });
 
-      // Confirma o cadastro pelo servidor e já entra direto, em vez de
-      // depender do envio do e-mail de confirmação (instável e já travou
-      // cadastros legítimos várias vezes). Se por algum motivo essa etapa
-      // falhar, cai pro fluxo antigo (pede pra checar o e-mail).
+      // Segurança: não confirmamos mais contas apenas pelo userId.
+      // O código enviado ao e-mail comprova que a pessoa controla o endereço.
       try {
-        const res = await fetch('/api/auth/confirmar-cadastro', {
+        const res = await fetch('/api/auth/send-magic-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: data.user.id }),
+          body: JSON.stringify({ email }),
         });
 
         if (res.ok) {
-          const { error: erroLogin } = await supabase.auth.signInWithPassword({
-            email,
-            password: senha,
-          });
-
-          if (!erroLogin) {
-            posthog.capture('login_realizado');
-            const { error: activityError } = await supabase.rpc('registrar_login_portal');
-            if (activityError) {
-              console.warn('[CADASTRO] Não foi possível registrar o primeiro acesso:', activityError.message);
-            }
-
-            const trialOk = await iniciarTrialSeSolicitado();
-            if (!trialOk) {
-              setLoading(false);
-              return;
-            }
-
-            setLoading(false);
-            router.push('/dashboard');
-            router.refresh();
-            return;
-          }
+          setLoading(false);
+          router.push(`/magic-login?email=${encodeURIComponent(email)}&sent=1`);
+          return;
         }
       } catch {
-        // segue pro fluxo de "verifique seu e-mail" abaixo
+        // Se o envio falhar, mantém a conta criada e orienta o fluxo seguro abaixo.
       }
     }
 
     setLoading(false);
-    setSucesso('Conta criada! Verifique seu e-mail para confirmar o acesso.');
+    setSucesso('Conta criada! Entre com o código enviado ao seu e-mail para confirmar o acesso.');
   }
 
   return (
