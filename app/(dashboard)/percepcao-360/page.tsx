@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Percepcao360Client from './Percepcao360Client';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import type {
   Feedback360Answer,
   Feedback360Question,
