@@ -43,6 +43,8 @@ import TourPortal from '@/components/TourPortal';
 interface Props {
   profile: Profile | null;
   diagnostic: Diagnostic | null;
+  quemSouRespostasCompletas: number;
+  totalBlocosQuemSouEu: number;
   bussola: BussolaPosicionamento | null;
   viaResultado: ViaResultado | null;
   pdiSecoes: PdiGuiaSecao[];
@@ -79,6 +81,8 @@ function StatusBadge({ status }: { status: FaseStatus }) {
 export default function DashboardClient({
   profile,
   diagnostic,
+  quemSouRespostasCompletas,
+  totalBlocosQuemSouEu,
   bussola,
   viaResultado,
   pdiSecoes,
@@ -101,19 +105,34 @@ export default function DashboardClient({
 
   const primeiroNome = profile?.nome?.split(' ')[0] ?? 'Mentorada';
 
-  // ---- Diagnóstico dos sinais disponíveis (sem inventar dados) ----
-  const quemSouCompleto = useMemo(
-    () => !!diagnostic?.quem_sou_data && Object.keys(diagnostic.quem_sou_data).length > 0,
-    [diagnostic]
+  // ---- Diagnóstico dos sinais disponíveis usando as fontes atuais do portal ----
+  const quemSouCompleto =
+    totalBlocosQuemSouEu > 0 && quemSouRespostasCompletas >= totalBlocosQuemSouEu;
+
+  const forcasDiagnostico = Array.isArray(diagnostic?.habilidades?.forcas)
+    ? diagnostic.habilidades.forcas
+    : [];
+  const diagnosticoBaseCompleto = !!(
+    diagnostic?.momento_carreira?.trim() &&
+    diagnostic?.objetivos?.trim() &&
+    forcasDiagnostico.length > 0
   );
-  const viaCompleto = !!viaResultado?.forcas?.length;
+
+  const viaCompleto = viaResultado?.forcas?.length === 24;
+  const diagnosticoCompleto = diagnosticoBaseCompleto && viaCompleto;
+
   const bussolaCompleto = !!(
     bussola && (bussola.norte || bussola.sul || bussola.leste || bussola.oeste || bussola.centro)
   );
 
   const pdiTotal = pdiSecoes.length;
-  const pdiConcluidas = pdiRespostas.filter((r) => r.concluido).length;
-  const pdiCompleto = pdiTotal > 0 && pdiConcluidas >= pdiTotal;
+  const secoesPdiValidas = new Set(pdiSecoes.map((secao) => secao.codigo));
+  const pdiConcluidas = new Set(
+    pdiRespostas
+      .filter((resposta) => resposta.concluido && secoesPdiValidas.has(resposta.secao))
+      .map((resposta) => resposta.secao)
+  ).size;
+  const pdiCompleto = pdiTotal > 0 && pdiConcluidas === pdiTotal;
 
   const streakSemanas = useMemo(() => {
     if (!journalNotes.length) return 0;
@@ -128,7 +147,7 @@ export default function DashboardClient({
   }, [journalNotes]);
 
   // ---- Status das 3 fases do programa (90 dias) ----
-  const fase1Itens = [quemSouCompleto, viaCompleto, bussolaCompleto];
+  const fase1Itens = [quemSouCompleto, diagnosticoCompleto, bussolaCompleto];
   const fase1Feitos = fase1Itens.filter(Boolean).length;
   const fase1Status: FaseStatus =
     fase1Feitos === fase1Itens.length ? 'concluida' : fase1Feitos > 0 ? 'em_andamento' : 'pendente';
@@ -143,31 +162,35 @@ export default function DashboardClient({
       : 'pendente';
 
   const proximoMarco = !quemSouCompleto
-    ? 'Preencher o Mapa Quem Sou Eu'
+    ? `Concluir o Mapa Quem Sou Eu (${quemSouRespostasCompletas}/${totalBlocosQuemSouEu} blocos)`
+    : !diagnosticoBaseCompleto
+    ? 'Concluir o Diagnóstico de carreira em Diagnóstico & Perfil'
     : !viaCompleto
-    ? 'Concluir o teste VIA Character Strengths'
+    ? 'Concluir o VIA em Diagnóstico & Perfil'
     : !bussolaCompleto
-    ? 'Definir sua Bússola de Posicionamento'
+    ? 'Concluir seu posicionamento no Mapa Quem Sou Eu'
     : !pdiCompleto
-    ? 'Entrega da versão do PDI Estratégico'
+    ? 'Concluir seu Plano de desenvolvimento (PDI)'
     : streakSemanas < 4
     ? 'Manter o Diário de Bordo ativo por 4 semanas seguidas'
     : 'Consolidação de resultados e check-in final do ciclo';
 
   const proximoMarcoHref = !quemSouCompleto
     ? '/quem-sou-eu'
+    : !diagnosticoBaseCompleto
+    ? '/exercicios'
     : !viaCompleto
     ? '/exercicios'
     : !bussolaCompleto
-    ? '/exercicios'
+    ? '/quem-sou-eu'
     : !pdiCompleto
-    ? '/pdi'
+    ? '/meu-pdi'
     : '/diario';
 
   // ---- Passaporte de conquistas (apenas o que dá para verificar com os dados carregados) ----
   const sinaisDisponiveis: Record<string, boolean> = {
     quem_sou_eu_completo: quemSouCompleto,
-    diagnostico_completo: viaCompleto,
+    diagnostico_completo: diagnosticoCompleto,
     bussola_completa: bussolaCompleto,
     pdi_completo: pdiCompleto,
     diario_comecado: journalNotes.length > 0,
@@ -190,7 +213,7 @@ export default function DashboardClient({
       style: { backgroundColor: '#FF857A', color: '#FFFFFF', borderColor: '#E5685D' },
       texto: bussola?.norte
         ? bussola.norte
-        : 'Sem posicionamento definido, preencha sua Bússola.',
+        : 'Sem posicionamento definido, finalize o Mapa Quem Sou Eu.',
     },
     {
       key: 'maestria',
@@ -209,7 +232,7 @@ export default function DashboardClient({
     },
   ];
 
-  const etapasConcluidas = [quemSouCompleto, viaCompleto, bussolaCompleto, pdiCompleto].filter(Boolean).length;
+  const etapasConcluidas = [quemSouCompleto, diagnosticoCompleto, bussolaCompleto, pdiCompleto].filter(Boolean).length;
   const pontosTotais = profile?.pontos_total ?? 0;
 
   const fitAtual =
@@ -362,9 +385,9 @@ export default function DashboardClient({
           <Panel className="p-6 border-gray-faint">
             <p className="text-sm text-black leading-relaxed mb-4">
               {viaResultado?.forcas?.length && bussolaCompleto
-                ? `Suas forças de assinatura (${viaResultado.forcas.slice(0, 2).join(', ')}) combinadas com o posicionamento definido na Bússola formam a base do seu ciclo. O próximo passo é transformar esse mapeamento em ações concretas no PDI.`
+                ? `Suas forças de assinatura (${viaResultado.forcas.slice(0, 2).join(', ')}) combinadas com o posicionamento construído no Mapa Quem Sou Eu formam a base do seu ciclo. O próximo passo é transformar esse mapeamento em ações concretas no Plano de desenvolvimento.`
                 : viaResultado?.forcas?.length
-                ? `Suas forças de assinatura já estão mapeadas: ${viaResultado.forcas.slice(0, 3).join(', ')}. Complete a Bússola de Posicionamento para conectar esse perfil com sua direção de carreira.`
+                ? `Suas forças de assinatura já estão mapeadas: ${viaResultado.forcas.slice(0, 3).join(', ')}. Complete seu posicionamento no Mapa Quem Sou Eu para conectar esse perfil com sua direção de carreira.`
                 : 'Complete o Diagnóstico & Perfil para gerar sua síntese estratégica personalizada.'}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -406,11 +429,11 @@ export default function DashboardClient({
                     <strong className="text-black">{viaResultado?.forcas?.length ? viaResultado.forcas.slice(0, 3).join(' · ') : 'A mapear'}</strong>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-text">Bússola</span>
+                    <span className="text-gray-text">Posicionamento do mapa</span>
                     <strong className="text-black">{bussolaCompleto ? 'Definida' : 'Pendente'}</strong>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-text">PDI</span>
+                    <span className="text-gray-text">Plano de desenvolvimento</span>
                     <strong className="text-black">{pdiConcluidas}/{pdiTotal || '—'} seções</strong>
                   </div>
                   <div className="flex items-center justify-between gap-4">
@@ -527,9 +550,9 @@ export default function DashboardClient({
           <Panel className="divide-y divide-line border-gray-faint">
             {[
               { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
-              { label: 'Teste VIA Character Strengths', done: viaCompleto, href: '/exercicios' },
-              { label: 'Bússola de Posicionamento', done: bussolaCompleto, href: '/exercicios' },
-              { label: 'PDI, Plano de Desenvolvimento Individual', done: pdiCompleto, href: '/pdi' },
+              { label: 'Diagnóstico & Perfil (diagnóstico + VIA)', done: diagnosticoCompleto, href: '/exercicios' },
+              { label: 'Posicionamento · Mapa Quem Sou Eu', done: bussolaCompleto, href: '/quem-sou-eu' },
+              { label: 'Plano de desenvolvimento (PDI)', done: pdiCompleto, href: '/meu-pdi' },
             ].map((tarefa) => (
               <Link
                 key={tarefa.label}
@@ -611,7 +634,7 @@ export default function DashboardClient({
                   Diagnóstico & Perfil
                 </p>
                 <p className="text-sm text-gray-text">
-                  Preencha seu mapa &quot;Quem Sou&quot; e acompanhe sua evolução.
+                  Registre seu momento de carreira, VIA e acompanhe a evolução do seu perfil.
                 </p>
               </Panel>
             </Link>
