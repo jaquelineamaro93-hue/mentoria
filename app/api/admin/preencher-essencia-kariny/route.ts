@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/security/require-admin';
 
 export async function POST(request: Request) {
+  const authorization = await requireAdmin();
+  if (!authorization.ok) return authorization.response;
+
   try {
     const supabase = createAdminClient();
 
@@ -19,7 +23,6 @@ export async function POST(request: Request) {
     }
 
     const kariny = profiles[0];
-    console.log(`Preenchendo dados para: ${kariny.nome} (ID: ${kariny.id})`);
 
     // Dados do Mapa da Essência
     let mapaMarkdown = '# Mapa de Quem Sou Eu - KARINY MORÉ\n\n';
