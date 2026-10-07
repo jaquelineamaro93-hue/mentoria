@@ -33,6 +33,7 @@ export async function POST(request: Request) {
 
     // Verifica se expirou
     if (new Date(magicCode.expires_at) < new Date()) {
+      await supabase.from('magic_codes').delete().eq('email', normalizedEmail);
       return NextResponse.json(
         { error: 'Código expirado. Solicite um novo.' },
         { status: 401 }
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
     // Verifica se o usuário existe
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id,email')
       .ilike('email', normalizedEmail)
       .single();
 
@@ -79,7 +80,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Gera um link de login
+    const { data: authData, error: authUserError } =
+      await supabase.auth.admin.getUserById(profile.id);
+    const bannedUntil = authData.user?.banned_until
+      ? new Date(authData.user.banned_until).getTime()
+      : 0;
+
+    if (authUserError || bannedUntil > Date.now()) {
+      await supabase.from('magic_codes').delete().eq('email', normalizedEmail);
+      return NextResponse.json({ error: 'Acesso indisponível.' }, { status: 403 });
+    }
+
+    const { data: consumed, error: consumeError } = await supabase
+      .from('magic_codes')
+      .delete()
+      .eq('email', normalizedEmail)
+      .eq('code', normalizedCode)
+      .select('id')
+      .maybeSingle();
+
+    if (consumeError || !consumed) {
+      return NextResponse.json(
+        { error: 'Código inválido ou expirado' },
+        { status: 401 }
+      );
+    }
+
+    // Gera um link de login somente depois de consumir o código.
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'magiclink',
       email: profile.email,
@@ -104,9 +131,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-
-    // Consome o código antes de devolver o link para impedir reutilização.
-    await supabase.from('magic_codes').delete().eq('email', normalizedEmail).eq('code', normalizedCode);
 
     return NextResponse.json({
       message: 'Código verificado com sucesso!',
