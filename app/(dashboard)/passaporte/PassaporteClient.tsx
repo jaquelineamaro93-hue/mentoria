@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Check, Lock, Loader2, Award, ShoppingBag, Zap } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
-import { posthog, limparIdentidade } from '@/lib/posthog';
-import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
+import { posthog } from '@/lib/posthog';
+import { SOMA_ACHIEVEMENTS, getNomePilar } from '@/lib/soma-badges';
 import CareerJourney from '@/components/soma/CareerJourney';
 import RankingComunidade from './components/RankingComunidade';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
@@ -30,7 +29,6 @@ export default function PassaporteClient({
   recompensas,
   resgatesIniciais,
 }: Props) {
-  const router = useRouter();
   const supabase = createClient();
   const [tab, setTab] = useState<Tab>('conquistas');
   const [resgatando, setResgatando] = useState<string | null>(null);
@@ -39,14 +37,6 @@ export default function PassaporteClient({
 
   const pontos = profile?.pontos_total ?? 0;
   const idsDesbloqueadas = new Set(desbloqueadas.map((d) => d.achievement_id));
-
-  async function handleSignOut() {
-    posthog.capture('logout_realizado');
-    await supabase.auth.signOut();
-    limparIdentidade();
-    router.push('/login');
-    router.refresh();
-  }
 
   async function resgatar(reward: Reward) {
     if (resgatados.includes(reward.id)) return;
@@ -82,45 +72,33 @@ export default function PassaporteClient({
           </p>
           <h1 className="font-display text-3xl text-black mb-8">Meu mapa de carreira</h1>
 
-          <CareerJourney points={pontos} earned={conquistas.filter(item => idsDesbloqueadas.has(item.id)).length} total={conquistas.length} />
-
-          <div className="flex gap-1 mb-6 border-b border-gray-faint overflow-x-auto">
-            <button
-              onClick={() => setTab('conquistas')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                tab === 'conquistas'
-                  ? 'border-mint-deep text-mint'
-                  : 'border-transparent text-gray-text hover:text-black'
-              }`}
-            >
-              <Award className="w-4 h-4" />
-              Conquistas
-            </button>
-
-            <button
-              onClick={() => setTab('loja')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                tab === 'loja'
-                  ? 'border-mint-deep text-mint'
-                  : 'border-transparent text-gray-text hover:text-black'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Impulsos Store
-            </button>
-
-            <button
-              onClick={() => setTab('ranking')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
-                tab === 'ranking'
-                  ? 'border-mint-deep text-mint'
-                  : 'border-transparent text-gray-text hover:text-black'
-              }`}
-            >
-              <Zap className="w-4 h-4" />
-              Ranking da Comunidade
-            </button>
+          <div role="tablist" aria-label="Áreas do Passaporte" className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-[#DDE6E0] bg-white p-2 sm:grid-cols-3">
+            {([
+              { id: 'conquistas', label: 'Conquistas', description: 'Sua jornada e próximas missões', Icon: Award },
+              { id: 'loja', label: 'Loja de recompensas', description: 'Troque seus Impulsos', Icon: ShoppingBag },
+              { id: 'ranking', label: 'Ranking da comunidade', description: 'Celebre a evolução do grupo', Icon: Zap },
+            ] as const).map(({ id, label, description, Icon }, index, tabs) => (
+              <button key={id} id={`passaporte-tab-${id}`} type="button" role="tab" aria-selected={tab === id} aria-controls={`passaporte-panel-${id}`} tabIndex={tab === id ? 0 : -1}
+                onClick={() => setTab(id)}
+                onKeyDown={(event) => {
+                  let next = index;
+                  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+                  else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index + tabs.length - 1) % tabs.length;
+                  else if (event.key === 'Home') next = 0;
+                  else if (event.key === 'End') next = tabs.length - 1;
+                  else return;
+                  event.preventDefault();
+                  setTab(tabs[next].id);
+                  document.getElementById(`passaporte-tab-${tabs[next].id}`)?.focus();
+                }}
+                className={`flex min-h-[72px] items-center gap-3 rounded-xl px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#183F37] focus-visible:ring-offset-2 ${tab === id ? 'bg-[#183F37] text-white shadow-sm' : 'text-[#334B41] hover:bg-[#EEF5EF]'}`}>
+                <Icon size={21} aria-hidden="true" className="shrink-0"/><span><span className="block text-sm font-semibold">{label}</span><span className={`mt-1 block text-xs ${tab === id ? 'text-[#D0E3D9]' : 'text-[#52675B]'}`}>{description}</span></span>
+              </button>
+            ))}
           </div>
+          {(['conquistas', 'loja', 'ranking'] as const).filter(id => id !== tab).map(id => <div key={id} hidden id={`passaporte-panel-${id}`} role="tabpanel" aria-labelledby={`passaporte-tab-${id}`} />)}
+          <div id={`passaporte-panel-${tab}`} role="tabpanel" aria-labelledby={`passaporte-tab-${tab}`} tabIndex={0} className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#386657]">
+          {tab === 'conquistas' && <CareerJourney points={pontos} earned={conquistas.filter(item => idsDesbloqueadas.has(item.id)).length} total={conquistas.length} />}
 
           {tab === 'conquistas' && (
             <div className="space-y-10">
@@ -140,33 +118,28 @@ export default function PassaporteClient({
                 </div>
               </section>
 
-              <section>
-                <Eyebrow>Pilares SOMA</Eyebrow>
-                {['sabedoria', 'objetividade', 'maestria', 'alquimia'].map((pilar) => {
-                  const badgesDosPilar = SOMA_ACHIEVEMENTS.filter(b => b.pilar === pilar);
-                  const cores = getCoresDosPilares();
-
-                  return (
-                    <div key={pilar} className="mb-6">
-                      <p className="text-sm font-medium mb-2" style={{ color: cores[pilar as keyof typeof cores] }}>
-                        {getNomePilar(pilar)}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {badgesDosPilar.map((badge) => (
-                          <div
-                            key={badge.id}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs"
-                            style={{ borderColor: cores[pilar as keyof typeof cores], backgroundColor: cores[pilar as keyof typeof cores] + '10' }}
-                            title={badge.descricao}
-                          >
-                            <span>{badge.emoji}</span>
-                            <span style={{ color: cores[pilar as keyof typeof cores] }}>{badge.nome}</span>
-                          </div>
-                        ))}
-                      </div>
+              <section aria-labelledby="soma-pillars-title">
+                <h2 id="soma-pillars-title" className="text-xl font-semibold text-[#183F37]">Quatro forças para sua carreira</h2>
+                <p className="mt-2 mb-5 text-sm leading-6 text-[#52675B]">Entenda o que cada ação desenvolve. As descrições ficam visíveis também no celular.</p>
+                <div className="grid gap-5 lg:grid-cols-2">
+                {(['sabedoria', 'objetividade', 'maestria', 'alquimia'] as const).map((pilar, index) => {
+                  const guides = ['Lume · Reconheça suas forças', 'Norte · Transforme intenção em direção', 'Brasa · Construa constância', 'Íris · Abra novas oportunidades'];
+                  const accents = ['#E9B95F', '#E79574', '#8AC6B1', '#B9A3DF'];
+                  return <article key={pilar} className="overflow-hidden rounded-2xl border border-[#DDE6E0] bg-white">
+                    <div className="border-b border-[#E4EAE5] px-5 py-4" style={{borderTop: `4px solid ${accents[index]}`}}>
+                      <p className="text-xs font-semibold text-[#52675B]">{guides[index]}</p>
+                      <h3 className="mt-1 text-lg font-semibold text-[#183F37]">{getNomePilar(pilar)}</h3>
                     </div>
-                  );
+                    <ul className="divide-y divide-[#E4EAE5] px-5">
+                    {SOMA_ACHIEVEMENTS.filter(item => item.pilar === pilar).map(item => {
+                      const linked = conquistas.find(c => c.codigo === item.id);
+                      const earned = !!linked && idsDesbloqueadas.has(linked.id);
+                      return <li key={item.id} className="flex gap-3 py-4"><span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F5EF] text-lg">{item.emoji}</span><div><h4 className="text-sm font-semibold text-[#273F34]">{item.nome}</h4><p className="mt-1 text-sm leading-5 text-[#52675B]">{item.descricao}</p>{earned && <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#24533C]"><Check size={12} aria-hidden="true"/>Conquista registrada</span>}</div></li>;
+                    })}
+                    </ul>
+                  </article>;
                 })}
+                </div>
               </section>
             </div>
           )}
@@ -224,6 +197,7 @@ export default function PassaporteClient({
               <RankingComunidade conquistas={conquistas} />
             </section>
           )}
+          </div>
         </div>
       </main>
     </div>
