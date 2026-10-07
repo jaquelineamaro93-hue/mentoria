@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
   const normalizedCode = typeof code === 'string' ? code.trim() : String(code ?? '').trim();
 
-  if (!normalizedEmail || !/^\\d{6}$/.test(normalizedCode)) {
+  if (!normalizedEmail || !/^\d{6}$/.test(normalizedCode)) {
     return NextResponse.json(
       { error: 'Email e código são obrigatórios' },
       { status: 400 }
