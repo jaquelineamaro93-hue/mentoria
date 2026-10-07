@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DashboardClient from './DashboardClient';
+import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import type {
   Profile,
   Diagnostic,
@@ -29,9 +30,35 @@ export default async function DashboardPage() {
 
   let diagnostic: Diagnostic | null = null;
   try {
-    const { data } = await supabase.from('diagnostics').select('*').eq('user_id', user.id).maybeSingle<Diagnostic>();
+    const { data } = await supabase
+      .from('diagnostics')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle<Diagnostic>();
     diagnostic = data;
   } catch { diagnostic = null; }
+
+  let quemSouRespostasCompletas = 0;
+  try {
+    const { data } = await supabase
+      .from('quem_sou_eu_respostas')
+      .select('bloco, resposta')
+      .eq('user_id', user.id);
+
+    const blocosPreenchidos = new Set(
+      (data ?? [])
+        .filter((item) => typeof item.resposta === 'string' && item.resposta.trim().length > 0)
+        .map((item) => item.bloco)
+    );
+
+    quemSouRespostasCompletas = BLOCOS_QUEM_SOU_EU.filter((bloco) =>
+      blocosPreenchidos.has(bloco.codigo)
+    ).length;
+  } catch {
+    quemSouRespostasCompletas = 0;
+  }
 
   let bussola: BussolaPosicionamento | null = null;
   try {
@@ -116,6 +143,8 @@ export default async function DashboardPage() {
     <DashboardClient
       profile={profile}
       diagnostic={diagnostic}
+      quemSouRespostasCompletas={quemSouRespostasCompletas}
+      totalBlocosQuemSouEu={BLOCOS_QUEM_SOU_EU.length}
       bussola={bussola}
       viaResultado={viaResultado}
       pdiSecoes={pdiSecoes}
