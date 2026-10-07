@@ -23,7 +23,6 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Sincroniza sessão (IMPORTANTE: isso popula os cookies na response)
   await supabase.auth.getSession();
 
   const {
@@ -31,8 +30,39 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+
+  // Defesa em profundidade: endpoints administrativos nunca são públicos.
+  // Cada rota /api/admin também valida o papel novamente antes de usar service_role.
+  if (path.startsWith('/api/admin')) {
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Não autenticado.' },
+        { status: 401, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
+
+    const { data: adminProfile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!adminProfile?.is_admin) {
+      return NextResponse.json(
+        { error: 'Acesso negado.' },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
+  }
+
   const rotaLiberada =
-    path.startsWith('/login') || path.startsWith('/checkout') || path === '/planos' || path === '/reset-password' || path === '/renovar' || path.startsWith('/api') || path.startsWith('/auth');
+    path.startsWith('/login') ||
+    path.startsWith('/checkout') ||
+    path === '/planos' ||
+    path === '/reset-password' ||
+    path === '/renovar' ||
+    path.startsWith('/api') ||
+    path.startsWith('/auth');
 
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase
@@ -58,7 +88,8 @@ export async function proxy(request: NextRequest) {
       !trialAtivo &&
       ((trialExpirado && profile.status_assinatura !== 'ativo') ||
         profile.status_assinatura === 'encerrado' ||
-        (profile.status_assinatura === 'inadimplente' && profile.origem_assinatura === 'mercadopago'));
+        (profile.status_assinatura === 'inadimplente' &&
+          profile.origem_assinatura === 'mercadopago'));
 
     if (precisaPagar) {
       const url = request.nextUrl.clone();
