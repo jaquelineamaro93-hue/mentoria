@@ -514,6 +514,12 @@ export default function Percepcao360Client({
   }
 
   const resumo = selectedSummary?.resumo_json ?? null;
+  const leituraDesatualizada = Boolean(
+    selectedRound &&
+      selectedSummary?.source_updated_at &&
+      new Date(selectedRound.updated_at).getTime() >
+        new Date(selectedSummary.source_updated_at).getTime()
+  );
 
   return (
     <main className="px-6 py-8 md:px-12 md:py-10 w-full">
@@ -1054,11 +1060,25 @@ export default function Percepcao360Client({
                     {generating ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
                     {generating
                       ? 'Analisando...'
-                      : resumo
-                        ? 'Atualizar leitura'
-                        : 'Gerar leitura 360'}
+                      : leituraDesatualizada
+                        ? 'Atualizar com novos feedbacks'
+                        : resumo
+                          ? 'Atualizar leitura'
+                          : 'Gerar leitura 360'}
                   </button>
                 </div>
+
+                {leituraDesatualizada && pessoasComRespostas > 0 && (
+                  <div className="mt-4 rounded-xl border border-mint bg-mint-light/45 px-4 py-3">
+                    <p className="text-sm font-medium text-black">
+                      Há novos feedbacks que ainda não entraram nesta leitura.
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-gray-text">
+                      Clique em “Atualizar com novos feedbacks” para recalcular forças recorrentes,
+                      pontos de desenvolvimento, pontos cegos e prioridades de PDI com a base atual.
+                    </p>
+                  </div>
+                )}
 
                 {selectedSummary?.status === 'erro' && !resumo && (
                   <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
