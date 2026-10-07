@@ -63,7 +63,7 @@ function featureSignal(row: FeatureRow, base: number) {
   if (adoption >= 35 && row.recentUsers >= 5) return 'Core: aprofundar valor';
   if (adoption >= 25 && row.recentUsers <= 2) return 'Boa adoção, uso recente baixo';
   if (row.views >= 5 && row.recentUsers <= 1) return 'Visita sem uso salvo: investigar fricção';
-  if (adoption <= 10 && row.views <= 2) return 'Baixa descoberta: revisar navegação';
+  if (adoption <= 10 && row.views <= 2) return 'Hipótese: ampliar descoberta';
   return 'Acompanhar';
 }
 
@@ -72,7 +72,7 @@ function featureTone(signal: string) {
   if (signal.includes('fricção') || signal.includes('uso recente baixo')) {
     return 'bg-amber-50 text-amber-800';
   }
-  if (signal.includes('Baixa descoberta')) return 'bg-rose-50 text-rose-800';
+  if (signal.includes('ampliar descoberta')) return 'bg-rose-50 text-rose-800';
   return 'bg-gray-50 text-gray-text';
 }
 
@@ -136,8 +136,11 @@ export default async function AdminAnalyticsPage({
 
   const params = await searchParams;
   const requestedDays = Number(params.period ?? 30);
-  const periodDays = [7, 30, 90].includes(requestedDays) ? requestedDays : 30;
-  const cutoff = Date.now() - periodDays * 86400000;
+  const periodDays = [7, 14, 30, 90].includes(requestedDays) ? requestedDays : 30;
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+  const todayStart = new Date(`${today}T00:00:00-03:00`).getTime();
+  const cutoff = todayStart - (periodDays - 1) * 86400000;
+  const periodLabel = `${new Date(cutoff).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })} a ${new Date(todayStart).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`;
   const cutoffIso = new Date(cutoff).toISOString();
   const admin = createAdminClient();
 
@@ -266,20 +269,22 @@ export default async function AdminAnalyticsPage({
   const active7 = profiles.filter(
     (profile) =>
       profile.last_activity_at &&
-      new Date(profile.last_activity_at).getTime() >= Date.now() - 7 * 86400000
+      new Date(profile.last_activity_at).getTime() >= todayStart - 6 * 86400000
   ).length;
   const active30 = profiles.filter(
     (profile) =>
       profile.last_activity_at &&
-      new Date(profile.last_activity_at).getTime() >= Date.now() - 30 * 86400000
+      new Date(profile.last_activity_at).getTime() >= todayStart - 29 * 86400000
   ).length;
   const newPeriod = profiles.filter(
     (profile) => new Date(profile.created_at).getTime() >= cutoff
   ).length;
   const never = profiles.filter((profile) => !profile.last_activity_at).length;
 
+  const profileIds = new Set(profiles.map((profile) => profile.id));
   const viewMap = new Map<string, Set<string>>();
   for (const event of events) {
+    if (!profileIds.has(event.user_id)) continue;
     if (event.event_name !== 'feature_view' || !event.feature_key || !event.user_id) continue;
     const current = viewMap.get(event.feature_key) ?? new Set<string>();
     current.add(event.user_id);
@@ -321,9 +326,9 @@ export default async function AdminAnalyticsPage({
       key: feature.key,
       label: feature.label,
       group: feature.group,
-      allUsers: uniqueUsers(feature.data),
-      recentUsers: uniqueUsers(feature.data, cutoff),
-      recentActions: recentActions(feature.data, cutoff),
+      allUsers: uniqueUsers(feature.data.filter((row) => profileIds.has(row.userId))),
+      recentUsers: uniqueUsers(feature.data.filter((row) => profileIds.has(row.userId)), cutoff),
+      recentActions: recentActions(feature.data.filter((row) => profileIds.has(row.userId)), cutoff),
       views: viewMap.get(feature.key)?.size ?? 0,
       isNew: feature.isNew,
     }))
@@ -402,22 +407,21 @@ export default async function AdminAnalyticsPage({
     };
   });
 
+  const dateKey = (date: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(date);
   const dayBuckets = Array.from({ length: periodDays }, (_, index) => {
-    const date = new Date();
-    date.setHours(0, 0, 0, 0);
-    date.setDate(date.getDate() - (periodDays - 1 - index));
-    const key = date.toISOString().slice(0, 10);
+    const date = new Date(cutoff + index * 86400000);
+    const key = dateKey(date);
     return {
       key,
-      label: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+      label: date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }),
       users: new Set<string>(),
     };
   });
 
   const dayMap = new Map(dayBuckets.map((bucket) => [bucket.key, bucket]));
   for (const event of events) {
-    if (!event.user_id) continue;
-    const key = new Date(event.occurred_at).toISOString().slice(0, 10);
+    if (!event.user_id || !profileIds.has(event.user_id)) continue;
+    const key = dateKey(new Date(event.occurred_at));
     dayMap.get(key)?.users.add(event.user_id);
   }
 
@@ -444,22 +448,24 @@ export default async function AdminAnalyticsPage({
           </p>
         </div>
 
-        <div className="inline-flex rounded-lg border border-gray-faint bg-white p-1">
-          {[7, 30, 90].map((days) => (
+        <div className="flex flex-wrap gap-1 rounded-xl border border-gray-faint bg-white p-2" aria-label="Período da análise">
+          {[7, 14, 30, 90].map((days) => (
             <Link
               key={days}
               href={`/admin/analytics?period=${days}`}
+              aria-current={periodDays === days ? 'page' : undefined}
               className={[
-                'rounded-md px-3 py-1.5 text-xs font-medium',
+                'rounded-lg px-4 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep',
                 periodDays === days ? 'bg-mint-deep text-white' : 'text-gray-text hover:text-black',
               ].join(' ')}
             >
-              {days}d
+              {days} dias
             </Link>
           ))}
         </div>
       </div>
 
+      <p className="mb-5 text-sm text-black">Período selecionado: <strong>{periodLabel}</strong> · Horário de Brasília · Hoje ainda está em andamento.</p>
       <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-3 mb-8">
         {[
           { label: 'Mentorados', value: base, icon: Users },
@@ -476,13 +482,40 @@ export default async function AdminAnalyticsPage({
         ))}
       </div>
 
+      <section aria-labelledby="activity-title" className="mb-8">
+        <div className="mb-3">
+          <Eyebrow>Atividade no período</Eyebrow>
+          <h2 id="activity-title" className="font-display text-2xl text-black mt-1">Pessoas ativas por dia</h2>
+          <p className="text-sm text-gray-text mt-2">{periodLabel} · Cada pessoa conta uma vez por dia. Dias sem eventos aparecem com zero.</p>
+        </div>
+        <Panel className="p-5">
+          <p className="mb-4 text-sm text-black"><strong>{new Set(events.filter((event) => profileIds.has(event.user_id)).map((event) => event.user_id)).size}</strong> pessoas com eventos no período · pico diário de <strong>{Math.max(0, ...dayBuckets.map((bucket) => bucket.users.size))}</strong>.</p>
+          {events.length === 0 && <p className="mb-4 text-sm text-gray-text">Nenhum evento registrado neste período. Isso não significa ausência de uso antes do início da coleta.</p>}
+          <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Gráfico diário; role horizontalmente para ver todas as datas" >
+            <div className="flex h-56 items-end gap-2 border-b border-gray-300" style={{ minWidth: periodDays * 42 }} aria-hidden="true">
+              {dayBuckets.map((bucket) => (
+                <div key={bucket.key} className="flex flex-1 flex-col items-center justify-end gap-2">
+                  <span className="text-xs text-gray-700">{bucket.users.size}</span>
+                  <div className="w-full max-w-12 rounded-t bg-mint-deep" style={{ height: bucket.users.size / maxDaily * 160 }} />
+                  <span className="text-xs text-gray-700 pb-2">{bucket.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <details className="mt-5 text-sm">
+            <summary className="cursor-pointer py-3 font-medium text-mint-deep focus-visible:outline-2">Ver dados em tabela</summary>
+            <table className="w-full text-left"><caption className="sr-only">Pessoas com eventos por dia, {periodLabel}</caption><thead><tr><th scope="col" className="py-2">Data</th><th scope="col">Pessoas</th></tr></thead><tbody>{dayBuckets.map((bucket) => <tr key={bucket.key} className="border-t border-gray-faint"><th scope="row" className="py-2 font-normal">{bucket.label}</th><td>{bucket.users.size}</td></tr>)}</tbody></table>
+          </details>
+        </Panel>
+      </section>
+
       <section className="mb-8">
         <div className="mb-3">
           <p className="text-xs uppercase tracking-[0.12em] text-gray-text">Priorização de produto</p>
           <h2 className="font-display text-2xl text-black mt-1">O que as pessoas realmente usam</h2>
           <p className="text-xs leading-5 text-gray-text mt-1 max-w-3xl">
             “Adoção” considera usuários que já salvaram algo naquela ferramenta. “Usuários recentes”
-            e “ações” usam os últimos {periodDays} dias. “Visitas” começa a acumular após esta atualização.
+            e “ações” usam os últimos {periodDays} dias. “Visitas” conta pessoas distintas com eventos de página no período. Os sinais são hipóteses para testar, não conclusões sobre interesse. Ações refletem registros criados ou atualizados, não todos os cliques.
           </p>
         </div>
 
@@ -490,8 +523,8 @@ export default async function AdminAnalyticsPage({
           <table className="w-full min-w-[860px] text-sm">
             <thead>
               <tr className="border-b border-gray-faint bg-gray-50/70">
-                <th className="px-4 py-3 text-left font-medium text-black">Feature</th>
-                <th className="px-4 py-3 text-right font-medium text-black">Adoção</th>
+                <th className="px-4 py-3 text-left font-medium text-black">Ferramenta</th>
+                <th className="px-4 py-3 text-right font-medium text-black">Adoção histórica</th>
                 <th className="px-4 py-3 text-right font-medium text-black">Usuários {periodDays}d</th>
                 <th className="px-4 py-3 text-right font-medium text-black">Ações {periodDays}d</th>
                 <th className="px-4 py-3 text-right font-medium text-black">Visitas {periodDays}d</th>
@@ -534,6 +567,7 @@ export default async function AdminAnalyticsPage({
                 <FlaskConical size={13} /> Trial
               </Eyebrow>
               <h2 className="font-display text-xl text-black">Funil do teste gratuito</h2>
+              <p className="mt-2 text-xs text-gray-700">Histórico completo dos testes iniciados. Não é limitado pelo período acima.</p>
             </div>
             <Link
               href="/admin/gerenciar-planos"
@@ -584,7 +618,7 @@ export default async function AdminAnalyticsPage({
           </Eyebrow>
           <h2 className="font-display text-xl text-black">Momento do convite de conversão</h2>
           <p className="mt-1 text-xs leading-5 text-gray-text">
-            Variante A usa sinais de valor percebido; variante B espera o 7º dia. A conversão paga é
+            Variante A usa sinais de valor percebido; variante B espera o 5º dia. A conversão paga é
             a métrica principal.
           </p>
 
@@ -617,48 +651,13 @@ export default async function AdminAnalyticsPage({
           </div>
 
           <p className="mt-4 text-[11px] leading-5 text-gray-text">
-            Não declare vencedor com amostra pequena. Primeiro observe volume, equilíbrio entre variantes
+            Atribuições e pagamentos são históricos; convites e checkouts usam o período selecionado. Não declare vencedor com amostra pequena. Primeiro observe volume, equilíbrio entre variantes
             e conversões suficientes para uma decisão confiável.
           </p>
         </Panel>
       </section>
 
-      <section>
-        <div className="mb-3">
-          <p className="text-xs uppercase tracking-[0.12em] text-gray-text">Telemetria própria</p>
-          <h2 className="font-display text-2xl text-black mt-1">Usuários com eventos por dia</h2>
-        </div>
 
-        <Panel className="p-5">
-          {events.length === 0 ? (
-            <p className="text-sm leading-6 text-gray-text">
-              A coleta de eventos do portal começa com esta versão. O histórico de features acima
-              continua disponível porque é reconstruído pelos dados já salvos no Supabase.
-            </p>
-          ) : (
-            <div className="flex h-44 items-end gap-1 overflow-x-auto pt-4">
-              {dayBuckets.map((bucket) => {
-                const height = Math.max(4, Math.round((bucket.users.size / maxDaily) * 130));
-                return (
-                  <div key={bucket.key} className="flex min-w-[18px] flex-1 flex-col items-center justify-end gap-1">
-                    <span className="text-[9px] text-gray-text">{bucket.users.size || ''}</span>
-                    <div
-                      className="w-full rounded-t bg-mint-deep/75"
-                      style={{ height }}
-                      title={`${bucket.label}: ${bucket.users.size} usuários`}
-                    />
-                    {periodDays <= 30 && (
-                      <span className="text-[8px] text-gray-text [writing-mode:vertical-rl]">
-                        {bucket.label}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </Panel>
-      </section>
     </main>
   );
 }

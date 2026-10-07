@@ -294,6 +294,26 @@ export default function DashboardClient({
           </div>
         </div>
 
+        <section aria-labelledby="discover-tools" className="mb-8 rounded-2xl border border-mint-deep/20 bg-white p-5 sm:p-6">
+          <p className="text-xs uppercase tracking-widest text-mint-deep">Da reflexão à oportunidade</p>
+          <h2 id="discover-tools" className="mt-2 font-display text-2xl text-lotus-brown">O que você quer destravar hoje?</h2>
+          <p className="mt-2 text-sm text-gray-700">Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { href: '/gupy', title: 'Passar pela triagem', description: 'Entenda como apresentar sua experiência para Gupy e outros sistemas de seleção.', action: 'Explorar Gupy & ATS' },
+              { href: '/linkedin', title: 'Ser encontrada no LinkedIn', description: 'Trabalhe seu posicionamento para comunicar o valor que você entrega.', action: 'Revisar meu posicionamento' },
+              { href: '/entrevista', title: 'Chegar preparada à entrevista', description: 'Pratique suas respostas e organize exemplos da sua trajetória.', action: 'Preparar minha entrevista' },
+              { href: '/network', title: 'Ampliar minhas oportunidades', description: 'Organize contatos e transforme conexões em próximos passos concretos.', action: 'Construir minha rede' },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="flex flex-col rounded-xl border border-gray-faint p-4 transition-colors hover:border-mint-deep hover:bg-mint-deep/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep">
+                <h3 className="font-semibold text-lotus-brown">{item.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-6 text-gray-700">{item.description}</p>
+                <span className="mt-4 text-sm font-semibold text-mint-deep">{item.action} →</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* Timeline dos 90 dias */}
         <section className="mb-8">
           <div className="grid sm:grid-cols-3 gap-3">
