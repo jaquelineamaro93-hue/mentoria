@@ -7,6 +7,7 @@ import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS, getNomePilar, getCoresDosPilares } from '@/lib/soma-badges';
+import CareerJourney from '@/components/soma/CareerJourney';
 import RankingComunidade from './components/RankingComunidade';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
 
@@ -77,21 +78,11 @@ export default function PassaporteClient({
         <main className="flex-1 overflow-auto">
         <div className="px-6 py-10 md:px-12 w-full">
           <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-            Sua jornada em pontos
+            Carreira em movimento
           </p>
-          <h1 className="font-display text-3xl text-black mb-8">Meu Passaporte</h1>
+          <h1 className="font-display text-3xl text-black mb-8">Meu mapa de carreira</h1>
 
-          <div className="rounded-2xl bg-brown-deep px-8 py-7 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-wide text-[#cbb896] mb-1">
-                Impulsos acumulados
-              </p>
-              <p className="font-display text-4xl text-[#f1e6d6]">{pontos.toLocaleString('pt-BR')}</p>
-            </div>
-            <p className="text-sm text-[#d9c8ab] ">
-              As conquistas registradas no portal somam Impulsos aqui e atualizam seu Passaporte.
-            </p>
-          </div>
+          <CareerJourney points={pontos} earned={conquistas.filter(item => idsDesbloqueadas.has(item.id)).length} total={conquistas.length} />
 
           <div className="flex gap-1 mb-6 border-b border-gray-faint overflow-x-auto">
             <button
@@ -134,47 +125,17 @@ export default function PassaporteClient({
           {tab === 'conquistas' && (
             <div className="space-y-10">
               <section>
-                <Eyebrow>Emblemas & Conquistas</Eyebrow>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                <Eyebrow>Missões que movem sua história</Eyebrow>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {conquistas.map((c) => {
                     const desbloqueada = idsDesbloqueadas.has(c.id);
-                    const pillarAchievement = SOMA_ACHIEVEMENTS.find(s => s.id === c.codigo);
-                    const emoji = pillarAchievement?.emoji || '⭐';
-                    return (
-                      <div key={c.id} className="flex flex-col items-center text-center gap-2.5">
-                        {/* Medal/Shield Badge */}
-                        <div className="relative w-20 h-24 flex items-center justify-center">
-                          {/* Shield Shape */}
-                          <div
-                            className={`w-20 h-20 rounded-t-3xl rounded-b-lg border-2 flex items-center justify-center shadow-lg transition-all overflow-hidden ${
-                              desbloqueada
-                                ? 'bg-gradient-to-br from-brown-emblem to-ink-soft border-brown-deep text-white'
-                                : 'bg-gradient-to-br from-white to-white border-gray-faint text-gray-text opacity-60'
-                            }`}
-                            style={{
-                              clipPath: 'polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)',
-                            }}
-                          >
-                            <span className="text-2xl leading-none">{emoji}</span>
-                          </div>
-                          {/* Gold Accent (only for unlocked) */}
-                          {desbloqueada && (
-                            <div
-                              className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-6 h-6 bg-gold-matte rounded-full border-2 border-brown-emblem flex items-center justify-center"
-                              style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
-                            >
-                              <span className="text-xs">★</span>
-                            </div>
-                          )}
-                        </div>
-                        <p
-                          className={`text-xs font-medium ${desbloqueada ? 'text-black' : 'text-gray-text'}`}
-                        >
-                          {c.titulo}
-                        </p>
-                        <p className="text-[10px] text-gray-text">+{c.pontos} Impulsos</p>
-                      </div>
-                    );
+                    const achievement = SOMA_ACHIEVEMENTS.find(item => item.id === c.codigo);
+                    return <article key={c.id} className={`relative overflow-hidden rounded-2xl border p-5 ${desbloqueada ? 'border-[#B6D7C5] bg-[#EEF7F1]' : 'border-gray-faint bg-white'}`}>
+                      <div className="flex items-center justify-between"><span className={`flex h-11 w-11 items-center justify-center rounded-xl text-xl ${desbloqueada ? 'bg-white' : 'bg-[#F4F3EE]'}`}>{achievement?.emoji ?? '✦'}</span><span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold ${desbloqueada ? 'bg-[#D6EBDC] text-[#24533C]' : 'bg-gray-100 text-gray-text'}`}>{desbloqueada ? <Check size={12}/> : <Lock size={11}/>} {desbloqueada ? 'Na sua história' : 'Próxima conquista'}</span></div>
+                      <h3 className="mt-4 text-sm font-semibold text-black">{c.titulo}</h3>
+                      <p className="mt-2 text-xs leading-5 text-gray-text">{achievement?.descricao ?? (desbloqueada ? 'Um passo real que você já deu na sua carreira.' : 'Complete esta ação no portal para avançar na sua jornada.')}</p>
+                      <p className="mt-4 text-xs font-bold text-[#386657]">+{c.pontos} Impulsos · {desbloqueada ? 'Conquistados' : 'Esperando seu próximo passo'}</p>
+                    </article>;
                   })}
                 </div>
               </section>

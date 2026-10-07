@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Zap, Loader, RefreshCw } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
+import { CareerCompanion } from '@/components/soma/CareerJourney';
 import type { Achievement } from '@/lib/types';
 
 interface RankingItem {
@@ -277,6 +278,7 @@ export default function RankingComunidade({ conquistas }: { conquistas: Achievem
                         <span className="text-lg font-bold text-black">
                           {item.pontos.toLocaleString('pt-BR')} Impulsos
                         </span>
+                        <div className="mt-1 flex justify-end"><CareerCompanion points={item.pontos}/></div>
                       </td>
                     </tr>
                   ))}
