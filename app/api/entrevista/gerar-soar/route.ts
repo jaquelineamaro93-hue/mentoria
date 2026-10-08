@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -11,6 +12,20 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+
+    const aiAllowed = await consumeIdentifierRateLimit({
+      scope: 'ai_entrevista_soar',
+      identifier: user.id,
+      limit: 30,
+      windowSeconds: 60 * 60,
+    });
+
+    if (!aiAllowed) {
+      return NextResponse.json(
+        { error: 'Limite temporário atingido. Tente novamente mais tarde.' },
+        { status: 429 }
+      );
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {
