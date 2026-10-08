@@ -3,20 +3,21 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Ferramentas de carreira | SOMA Mentoria',
   description: 'Conheça as opções de acesso à SOMA Mentoria e explore ferramentas de currículo, LinkedIn, Gupy e desenvolvimento de carreira.',
+  alternates: { canonical: 'https://www.somamentoria.com/planos' },
   openGraph: {
-    title: 'LinkedIn, currículo e Gupy em um só lugar | SOMA Mentoria',
-    description: 'Conheça as ferramentas de carreira e explore as opções de acesso à SOMA',
-    url: 'https://somamentoria.com/planos',
+    title: 'Novidades SOMA | LinkedIn, currículo, Gupy e Percepção 360',
+    description: 'Explore as novidades da SOMA com os quatro mascotes, Percepção 360, Meu Passaporte e ferramentas de carreira',
+    url: 'https://www.somamentoria.com/planos',
     siteName: 'SOMA Mentoria',
     locale: 'pt_BR',
     type: 'website',
-    images: [{ url: '/planos/opengraph-image', width: 1200, height: 630, alt: 'SOMA Mentoria com os quatro mascotes oficiais' }],
+    images: [{ url: 'https://www.somamentoria.com/api/social/planos?v=20261008-3', width: 1200, height: 630, alt: 'SOMA Mentoria com os quatro mascotes, Percepção 360 e novidades da plataforma' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ferramentas de carreira | SOMA Mentoria',
-    description: 'LinkedIn, currículo, Gupy e desenvolvimento profissional',
-    images: ['/planos/opengraph-image'],
+    description: 'LinkedIn, currículo, Gupy, Percepção 360 e Meu Passaporte',
+    images: ['https://www.somamentoria.com/api/social/planos?v=20261008-3'],
   },
 };
 
