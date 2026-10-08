@@ -193,60 +193,45 @@ export default function OnboardingClient({
 
   return (
     <main className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 md:py-9 text-black">
-      <header className="mb-7">
-        <p className="text-xs font-semibold uppercase tracking-widest text-mint-deep">Sua jornada na SOMA</p>
-        <h1 className="mt-2 font-display text-3xl md:text-4xl text-black">Primeiros passos</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-gray-700">
-          Entenda o propósito de cada ferramenta, escolha seu próximo passo e volte sempre que precisar.
-          Você pode revisitar qualquer etapa, mesmo depois de concluí-la.
-        </p>
-      </header>
-
-      <section aria-labelledby="progresso-titulo" className="rounded-2xl border border-mint-border bg-white p-5 sm:p-6 mb-7 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <header className="relative mb-8 overflow-hidden rounded-[28px] bg-[#102A2B] px-6 py-8 text-white sm:px-9 sm:py-10 lg:px-12">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full border-[45px] border-[#FFB366]/20" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 right-16 h-80 w-80 rounded-full bg-[#0D8071]/35 blur-3xl" />
+        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center">
           <div>
-            <h2 id="progresso-titulo" className="text-xl font-semibold text-black">Sua jornada essencial: {percentual}%</h2>
-            <p className="mt-1 text-sm text-gray-700">
-              {concluidas} de {etapas.length} passos essenciais concluídos. As demais ferramentas são opcionais e podem ser usadas no seu ritmo.
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-widest text-[#F9D1A7]">
+              <Sparkles size={14} aria-hidden="true" /> SUA JORNADA SOMA
             </p>
-          </div>
-          <span className="rounded-full bg-mint-light px-3 py-1.5 text-sm font-semibold text-black">
-            {concluidas}/{etapas.length} etapas
-          </span>
-        </div>
-        <div
-          className="mt-4 h-2.5 overflow-hidden rounded-full bg-gray-200"
-          role="progressbar"
-          aria-label="Progresso dos passos essenciais"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percentual}
-          aria-valuetext={`{concluidas} de {etapas.length} etapas concluídas`}
-        >
-          <div className="h-full rounded-full bg-mint-deep transition-all" style={{ width: `{percentual}%` }} />
-        </div>
-        {proxima ? (
-          <div className="mt-5 flex flex-col gap-3 rounded-xl border border-mint bg-mint-light p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-brown">Próximo passo sugerido</p>
-              <p className="mt-1 font-medium text-black">{proxima.titulo}</p>
-              <p className="mt-1 text-sm text-gray-700">{proxima.beneficio}</p>
+            <h1 className="max-w-2xl font-display text-4xl leading-tight text-white sm:text-5xl">Sua evolução começa aqui.</h1>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/85 sm:text-base">
+              Um caminho para se conhecer, planejar seus próximos movimentos e descobrir ferramentas que fazem sentido para você.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a href="#explorar-titulo" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#FFB366] px-5 py-3 text-sm font-semibold text-[#172C2B] transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                Explorar ferramentas <ArrowRight size={17} aria-hidden="true" />
+              </a>
+              <a href="#essenciais-titulo" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                Minha jornada
+              </a>
             </div>
-            <Link href={proxima.href} onClick={() => registrarClique(proxima.key, 'proximo_passo')}
-              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown">
-              {proxima.cta} <ArrowRight size={16} aria-hidden="true" />
-            </Link>
           </div>
-        ) : (
-          <p className="mt-4 text-sm font-medium text-black">
-            Sua base está completa. Explore novas ferramentas abaixo e continue revisitando suas anotações e seu plano.
-          </p>
-        )}
-      </section>
+          <section aria-labelledby="progresso-titulo" className="relative rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/75">Seu progresso</p>
+            <h2 id="progresso-titulo" className="mt-3 text-4xl font-semibold tracking-tight text-white">{percentual}<span className="text-2xl text-[#FFB366]">%</span></h2>
+            <p className="mt-1 text-sm text-white/85">{concluidas} de {etapas.length} etapas essenciais</p>
+            <div role="progressbar" aria-label="Etapas essenciais concluídas" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentual} aria-valuetext={`${concluidas} de ${etapas.length} etapas concluídas`} className="mt-4 h-2 overflow-hidden rounded-full bg-white/20">
+              <div className="h-full rounded-full bg-[#FFB366] transition-[width] motion-reduce:transition-none" style={{ width: `${percentual}%` }} />
+            </div>
+            <p className="mt-4 text-xs leading-5 text-white/80">
+              {proxima ? `Próximo passo: ${proxima.titulo}` : 'Sua base está pronta. Continue explorando no seu ritmo.'}
+            </p>
+            {proxima && <Link href={proxima.href} onClick={() => registrarClique(proxima.key, 'proximo_passo')} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#FFB366] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{proxima.cta} <ArrowRight size={15} aria-hidden="true" /></Link>}
+          </section>
+        </div>
+      </header>
 
       <section aria-labelledby="essenciais-titulo" className="mb-10">
         <div className="mb-4">
-          <h2 id="essenciais-titulo" className="font-display text-2xl text-black">1. Construa sua base</h2>
+          <h2 id="essenciais-titulo" className="font-display text-3xl text-black">1. Construa sua base</h2>
           <p className="mt-1 text-sm leading-6 text-gray-700">
             Estes passos conectam autoconhecimento, objetivos e acompanhamento. Concluído não significa encerrado: você pode atualizar tudo.
           </p>
@@ -255,9 +240,9 @@ export default function OnboardingClient({
           {etapas.map((etapa, i) => {
             const Icon = etapa.icon;
             return (
-              <article key={etapa.key} className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 transition-colors hover:border-mint-border hover:bg-mint-light/20">
+              <article key={etapa.key} className="group rounded-2xl border border-[#E4E8E7] bg-white p-5 shadow-[0_4px_24px_rgba(16,42,43,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0D8071]/40 hover:shadow-[0_12px_36px_rgba(16,42,43,0.08)] motion-reduce:transform-none">
                 <div className="flex items-start gap-3 sm:gap-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mint-light text-black" aria-hidden="true">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4F3F0] text-[#0D8071]" aria-hidden="true">
                     {etapa.feito ? <Check size={18} /> : <span className="text-sm font-semibold">{i + 1}</span>}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -277,7 +262,7 @@ export default function OnboardingClient({
                       </Link>
                     </div>
                   </div>
-                  <Icon size={20} className="hidden shrink-0 text-brown sm:block" aria-hidden="true" />
+                  <Icon size={20} className="hidden shrink-0 text-mint-deep sm:block" aria-hidden="true" />
                 </div>
               </article>
             );
