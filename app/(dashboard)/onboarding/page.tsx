@@ -14,7 +14,7 @@ export default async function OnboardingPage() {
     redirect('/login');
   }
 
-  const [{ data: profile }, { data: quemSouEu }, { data: via }, { data: pdi }, { data: diario }, { data: secoesPdiTotal }] =
+  const [{ data: profile }, { data: quemSouEu }, { data: via }, { data: pdi }, { data: diario }, { data: secoesPdiTotal }, { count: feedback360Rodadas }, { count: cvSimulacoes }, { count: linkedinRascunhos }] =
     await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single<Profile>(),
       supabase.from('quem_sou_eu_respostas').select('id').eq('user_id', user.id),
@@ -22,6 +22,9 @@ export default async function OnboardingPage() {
       supabase.from('pdi_respostas').select('id').eq('user_id', user.id).eq('concluido', true),
       supabase.from('journal_notes').select('id').eq('user_id', user.id),
       supabase.from('pdi_guia_secoes').select('id'),
+      supabase.from('feedback_360_rounds').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('cv_simulacoes').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('linkedin_content_drafts').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
     ]);
 
   return (
@@ -35,6 +38,9 @@ export default async function OnboardingPage() {
         secoesPdi: pdi?.length ?? 0,
         totalSecoesPdi: secoesPdiTotal?.length ?? 20,
         anotacoesDiario: diario?.length ?? 0,
+        feedback360Rodadas: feedback360Rodadas ?? 0,
+        cvSimulacoes: cvSimulacoes ?? 0,
+        linkedinRascunhos: linkedinRascunhos ?? 0,
       }}
     />
   );
