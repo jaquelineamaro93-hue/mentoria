@@ -5,6 +5,7 @@ import { chamarClaudeJson } from "@/lib/ai-json";
 import { classificarContextoPdi } from "@/lib/jev-pdi";
 import { montarPromptGeracaoPDI, type RespostaSecaoPDI } from "@/lib/prompts-pdi";
 import { BLOCOS_QUEM_SOU_EU } from "@/lib/prompts";
+import { consumeIdentifierRateLimit } from "@/lib/security/rate-limit";
 
 const KARINY_MORE_ID = "477ff931-0338-4e10-a307-98e8ead54111";
 
@@ -58,6 +59,19 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ erro: "não autenticado" }, { status: 401 });
+    }
+
+    const aiAllowed = await consumeIdentifierRateLimit({
+      scope: "ai_pdi_plano",
+      identifier: user.id,
+      limit: 20,
+      windowSeconds: 60 * 60,
+    });
+    if (!aiAllowed) {
+      return NextResponse.json(
+        { erro: "Limite temporário atingido. Tente novamente mais tarde." },
+        { status: 429 }
+      );
     }
 
     const body = await req.json();
