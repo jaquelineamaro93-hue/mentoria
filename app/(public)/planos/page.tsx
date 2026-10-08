@@ -48,7 +48,7 @@ export default async function PlanosPage() {
               ].map((item, i) => (
                 <div key={item.name} className="group relative flex min-w-0 flex-col items-center justify-center rounded-2xl border border-white/70 bg-[#F7F7EE] p-2 shadow-[0_18px_40px_rgba(0,0,0,.18)] transition-transform duration-300 hover:-translate-y-2 motion-reduce:transform-none sm:rounded-3xl sm:p-4" style={{ transform: 'rotate(' + item.rotation + ')' }}>
                   <div aria-hidden="true" className="pointer-events-none absolute inset-x-3 bottom-6 h-8 rounded-full opacity-30 blur-xl" style={{ backgroundColor: item.color }} />
-                  <span className="relative block transform-gpu transition-transform duration-500 motion-safe:animate-[soma-mascote-float_4s_ease-in-out_infinite] group-hover:scale-110 motion-reduce:animate-none motion-reduce:transform-none" style={{ animationDelay: i * -0.7 + 's' }}><Mascot index={i} size={125} /></span>
+                  <span className="soma-mascote-animado relative block transform-gpu transition-transform duration-500 group-hover:scale-110 motion-reduce:transform-none" style={{ animation: 'soma-mascote-float 4s ease-in-out infinite', animationDelay: i * -0.7 + 's' }}><Mascot index={i} size={125} /></span>
                   <span className="relative mt-1 text-xs font-semibold text-[#183F37] sm:text-sm">{item.name}</span>
                 </div>
               ))}
