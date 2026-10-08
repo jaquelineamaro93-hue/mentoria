@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { chamarClaudeJson } from '@/lib/ai-json';
 import {
@@ -278,6 +279,20 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
+    const aiAllowed = await consumeIdentifierRateLimit({
+      scope: 'ai_linkedin_content',
+      identifier: user.id,
+      limit: 30,
+      windowSeconds: 60 * 60,
+    });
+
+    if (!aiAllowed) {
+      return NextResponse.json(
+        { error: 'Limite temporário atingido. Tente novamente mais tarde.' },
+        { status: 429 }
+      );
     }
 
     const body = (await request.json()) as Body;
