@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
+import { Mascot } from '@/components/soma/CareerJourney';
 
 export default async function PlanosPage() {
   const supabase = await createClient();
@@ -29,7 +30,35 @@ export default async function PlanosPage() {
           <span>Voltar</span>
         </Link>
 
-        <h1 className="text-3xl sm:text-4xl font-display text-black mb-8 sm:mb-12 text-center">Nossos Planos</h1>
+        <section className="relative mb-10 overflow-hidden rounded-[28px] bg-[#102A2B] px-5 py-9 text-white sm:px-10 sm:py-12 lg:px-14" aria-labelledby="planos-titulo">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-28 h-[420px] w-[420px] rounded-full border-[65px] border-white/[0.04]" />
+          <div className="relative grid items-center gap-7 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="max-w-xl">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#FFCB9C]">SOMA Mentoria | Ferramentas de carreira</p>
+              <h1 id="planos-titulo" className="font-display text-4xl leading-tight sm:text-5xl">Sua carreira merece novas possibilidades</h1>
+              <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base">Explore ferramentas para LinkedIn, currículo, Gupy e desenvolvimento profissional com o apoio da SOMA</p>
+              <a href="#opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FFB366] px-6 py-3 text-sm font-semibold text-[#183F37] transition-colors hover:bg-[#FFD1A2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Conhecer opções de acesso</a>
+            </div>
+            <div className="relative grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4" aria-label="Lume, Norte, Brasa e Íris, mascotes oficiais da SOMA">
+              {[
+                { name: 'Lume', color: '#E9B95F', rotation: '-5deg' },
+                { name: 'Norte', color: '#E79574', rotation: '5deg' },
+                { name: 'Brasa', color: '#8AC6B1', rotation: '4deg' },
+                { name: 'Íris', color: '#B9A3DF', rotation: '-4deg' },
+              ].map((item, i) => (
+                <div key={item.name} className="group relative flex min-w-0 flex-col items-center justify-center rounded-2xl border border-white/70 bg-[#F7F7EE] p-2 shadow-[0_18px_40px_rgba(0,0,0,.18)] transition-transform duration-300 hover:-translate-y-2 motion-reduce:transform-none sm:rounded-3xl sm:p-4" style={{ transform: 'rotate(' + item.rotation + ')' }}>
+                  <div aria-hidden="true" className="pointer-events-none absolute inset-x-3 bottom-6 h-8 rounded-full opacity-30 blur-xl" style={{ backgroundColor: item.color }} />
+                  <span className="relative block transform-gpu transition-transform duration-500 motion-safe:animate-[soma-mascote-float_4s_ease-in-out_infinite] group-hover:scale-110 motion-reduce:animate-none motion-reduce:transform-none" style={{ animationDelay: i * -0.7 + 's' }}><Mascot index={i} size={125} /></span>
+                  <span className="relative mt-1 text-xs font-semibold text-[#183F37] sm:text-sm">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        <div id="opcoes-de-acesso" className="mb-6 text-center sm:mb-9">
+          <h2 className="font-display text-3xl text-[#183F37] sm:text-4xl">Escolha como começar</h2>
+          <p className="mt-2 text-sm text-[#527064]">Encontre o plano que faz sentido para o seu momento</p>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
           {(planos || []).map((plano: PlanoMentoria) => (
