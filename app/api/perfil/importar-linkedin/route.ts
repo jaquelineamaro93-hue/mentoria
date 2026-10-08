@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { PDFParse } from 'pdf-parse';
+import { consumeSecurityRateLimit } from '@/lib/security/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +10,18 @@ export async function POST(request: NextRequest) {
 
     if (!user.user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+
+    const allowed = await consumeSecurityRateLimit({
+      request,
+      scope: 'linkedin_pdf_import',
+      identifier: user.user.id,
+      limit: 10,
+      windowSeconds: 60 * 60,
+    });
+
+    if (!allowed) {
+      return NextResponse.json({ error: 'Muitas importações. Tente mais tarde.' }, { status: 429 });
     }
 
     const formData = await request.formData();
@@ -21,9 +34,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!file.type.includes('pdf')) {
+    if (file.type !== 'application/pdf') {
       return NextResponse.json(
         { error: 'Apenas arquivos PDF são aceitos' },
+        { status: 400 }
+      );
+    }
+
+    if (file.size < 1 || file.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'O PDF deve ter no máximo 10MB.' },
         { status: 400 }
       );
     }
