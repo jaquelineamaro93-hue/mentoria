@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    const aiAllowed = await consumeIdentifierRateLimit({ scope: 'ai_vagas_curriculo', identifier: user.id, limit: 30, windowSeconds: 60 * 60 });
+    if (!aiAllowed) return NextResponse.json({ error: 'Limite temporário atingido. Tente novamente mais tarde.' }, { status: 429 });
     const { perfil_profissional, objetivos, cargos_desejados, vaga_input, empresa, cargo, pontos_fortes, gaps } = await request.json();
     if (!perfil_profissional || !vaga_input) return NextResponse.json({ error: 'Perfil e descrição da vaga são obrigatórios' }, { status: 400 });
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
