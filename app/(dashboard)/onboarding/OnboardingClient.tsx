@@ -194,7 +194,7 @@ export default function OnboardingClient({
   return (
     <main className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 md:py-9 text-black">
       <header className="mb-7">
-        <p className="text-xs font-semibold uppercase tracking-widest text-brown">Sua jornada na SOMA</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-mint-deep">Sua jornada na SOMA</p>
         <h1 className="mt-2 font-display text-3xl md:text-4xl text-black">Primeiros passos</h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-gray-700">
           Entenda o propósito de cada ferramenta, escolha seu próximo passo e volte sempre que precisar.
@@ -202,16 +202,16 @@ export default function OnboardingClient({
         </p>
       </header>
 
-      <section aria-labelledby="progresso-titulo" className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 mb-7">
+      <section aria-labelledby="progresso-titulo" className="rounded-2xl border border-mint-border bg-white p-5 sm:p-6 mb-7 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 id="progresso-titulo" className="font-display text-xl text-black">Sua base está ${percentual}% preparada</h2>
+            <h2 id="progresso-titulo" className="text-xl font-semibold text-black">Sua jornada essencial: {percentual}%</h2>
             <p className="mt-1 text-sm text-gray-700">
-              ${concluidas} de ${etapas.length} passos essenciais concluídos. As demais ferramentas são opcionais e podem ser usadas no seu ritmo.
+              {concluidas} de {etapas.length} passos essenciais concluídos. As demais ferramentas são opcionais e podem ser usadas no seu ritmo.
             </p>
           </div>
           <span className="rounded-full bg-mint-light px-3 py-1.5 text-sm font-semibold text-black">
-            ${concluidas}/${etapas.length} etapas
+            {concluidas}/{etapas.length} etapas
           </span>
         </div>
         <div
@@ -221,19 +221,19 @@ export default function OnboardingClient({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percentual}
-          aria-valuetext={`${concluidas} de ${etapas.length} etapas concluídas`}
+          aria-valuetext={`{concluidas} de {etapas.length} etapas concluídas`}
         >
-          <div className="h-full rounded-full bg-brown transition-all" style={{ width: `${percentual}%` }} />
+          <div className="h-full rounded-full bg-mint-deep transition-all" style={{ width: `{percentual}%` }} />
         </div>
         {proxima ? (
-          <div className="mt-5 flex flex-col gap-3 rounded-xl border border-mint bg-mint-light/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-5 flex flex-col gap-3 rounded-xl border border-mint bg-mint-light p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-brown">Próximo passo sugerido</p>
               <p className="mt-1 font-medium text-black">{proxima.titulo}</p>
               <p className="mt-1 text-sm text-gray-700">{proxima.beneficio}</p>
             </div>
             <Link href={proxima.href} onClick={() => registrarClique(proxima.key, 'proximo_passo')}
-              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-brown px-4 py-2.5 text-sm font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown">
+              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown">
               {proxima.cta} <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
@@ -255,7 +255,7 @@ export default function OnboardingClient({
           {etapas.map((etapa, i) => {
             const Icon = etapa.icon;
             return (
-              <article key={etapa.key} className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
+              <article key={etapa.key} className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 transition-colors hover:border-mint-border hover:bg-mint-light/20">
                 <div className="flex items-start gap-3 sm:gap-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mint-light text-black" aria-hidden="true">
                     {etapa.feito ? <Check size={18} /> : <span className="text-sm font-semibold">{i + 1}</span>}
@@ -272,7 +272,7 @@ export default function OnboardingClient({
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                       <span className="text-xs font-medium text-gray-700">{etapa.progresso}</span>
                       <Link href={etapa.href} onClick={() => registrarClique(etapa.key, 'essenciais')}
-                        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-brown underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown">
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-mint-deep underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown">
                         {etapa.feito ? 'Revisitar' : etapa.cta} <ArrowRight size={15} aria-hidden="true" />
                       </Link>
                     </div>
@@ -296,9 +296,9 @@ export default function OnboardingClient({
           {exploracao.map((item) => {
             const Icon = item.icon;
             return (
-              <article key={item.key} className="flex flex-col rounded-xl border border-gray-200 bg-white p-5">
+              <article key={item.key} className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-mint-border hover:bg-mint-light/20">
                 <div className="flex items-center justify-between gap-3">
-                  <Icon size={21} className="text-brown" aria-hidden="true" />
+                  <Icon size={21} className="text-mint-deep" aria-hidden="true" />
                   {item.progresso && (
                     <span className="text-xs font-medium text-gray-700">{item.progresso}</span>
                   )}
