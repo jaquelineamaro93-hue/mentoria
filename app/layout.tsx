@@ -5,6 +5,17 @@ import TermosGate from '@/components/TermosGate';
 import AcessoGate from '@/components/AcessoGate';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://somamentoria.com'),
+  openGraph: {
+    title: 'SOMA Mentoria | Sua carreira em movimento',
+    description: 'Autoconhecimento, estratégia e ferramentas práticas para sua carreira',
+    url: 'https://somamentoria.com',
+    siteName: 'SOMA Mentoria',
+    locale: 'pt_BR',
+    type: 'website',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'SOMA Mentoria com Lume, Norte, Brasa e Íris' }],
+  },
+  twitter: { card: 'summary_large_image', images: ['/opengraph-image'] },
   title: 'Portal do Mentorado | Mentoria SOMA',
   description: 'Sua jornada de desenvolvimento de carreira na Mentoria SOMA.',
   icons: {
