@@ -11,7 +11,7 @@ const companions = [
   { name: 'Íris', animal: 'Beija-flor', color: '#B9A3DF', dark: '#51406F', score: 1500, chapter: 'Abra novos caminhos', meaning: 'Alquimia para conectar sua história às oportunidades.', quote: 'Sua história tem valor. Agora é hora de fazer o mundo enxergar o que você soma.', mission: 'Explorar oportunidades', href: '/vagas' },
 ];
 
-function Mascot({ index, size = 160 }: { index: number; size?: number }) {
+export function Mascot({ index, size = 160 }: { index: number; size?: number }) {
   const c = companions[index];
   return <svg viewBox="0 0 200 200" width={size} height={size} role="img" aria-label={`${c.name}, ${c.animal} da SOMA`} className="max-w-full drop-shadow-xl">
     <ellipse cx="100" cy="181" rx="52" ry="8" fill={c.dark} opacity=".12" />
