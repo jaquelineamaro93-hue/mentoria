@@ -252,7 +252,7 @@ export default function OnboardingClient({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl">
             <p className="text-xs font-bold uppercase tracking-[.18em] text-[#386657]">A Expedição SOMA acompanha você</p>
-            <h2 className="mt-2 font-display text-2xl text-[#183F37] sm:text-3xl">Quatro companheiros. Uma história: a sua.</h2>
+            <h2 className="mt-2 font-display text-2xl text-[#183F37] sm:text-3xl">Quatro companheiros para acompanhar sua história</h2>
             <p className="mt-2 text-sm leading-6 text-[#52675B]">Conheça Lume, Norte, Brasa e Íris. Eles apresentam cada capítulo da jornada e acompanham suas descobertas. Suas conquistas e Impulsos continuam registrados no Meu Passaporte.</p>
             <Link href="/passaporte" onClick={() => registrarClique('passaporte', 'expedicao')} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#183F37] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#183F37]">Ver minhas conquistas e ranking <ArrowRight size={16} aria-hidden="true" /></Link>
           </div>
