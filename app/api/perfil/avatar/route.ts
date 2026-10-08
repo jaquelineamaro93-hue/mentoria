@@ -1,10 +1,17 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { consumeSecurityRateLimit } from '@/lib/security/rate-limit';
+
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+};
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -13,71 +20,74 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const allowed = await consumeSecurityRateLimit({
+      request,
+      scope: 'avatar_upload',
+      identifier: user.id,
+      limit: 20,
+      windowSeconds: 60 * 60,
+    });
 
-    if (!file) {
+    if (!allowed) {
+      return NextResponse.json({ error: 'Muitos uploads. Tente mais tarde.' }, { status: 429 });
+    }
+
+    const formData = await request.formData();
+    const file = formData.get('file');
+
+    if (!(file instanceof File)) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
     }
 
-    const ext = file.name.split('.').pop() || 'jpg';
-    const path = `avatars/${user.id}/avatar.${ext}`;
+    const ext = MIME_TO_EXT[file.type];
+    if (!ext) {
+      return NextResponse.json(
+        { error: 'Use uma imagem JPG, PNG, WEBP ou GIF.' },
+        { status: 400 }
+      );
+    }
 
+    if (file.size < 1 || file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'A imagem deve ter no máximo 5MB.' }, { status: 400 });
+    }
+
+    const path = `${user.id}/perfil.${ext}`;
     const buffer = await file.arrayBuffer();
 
-    const { error: uploadError, data: uploadData } = await supabase.storage
-      .from('avatars')
+    const { error: uploadError } = await supabase.storage
+      .from('avatar')
       .upload(path, buffer, {
         upsert: true,
         contentType: file.type,
       });
 
     if (uploadError) {
-      console.error('Upload error:', {
-        message: uploadError.message,
-        status: uploadError.status,
-        path,
-        fileSize: buffer.byteLength,
-        contentType: file.type,
-      });
-      return NextResponse.json(
-        { error: `Erro ao fazer upload: ${uploadError.message} (Verifique as permissões de acesso do Storage)` },
-        { status: 500 }
-      );
+      console.error('[AVATAR-UPLOAD] Falha no storage:', uploadError.message);
+      return NextResponse.json({ error: 'Erro ao fazer upload.' }, { status: 500 });
     }
 
-    console.log('Upload successful:', { path, size: buffer.byteLength });
-
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    const { data } = supabase.storage.from('avatar').getPublicUrl(path);
+    const fotoUrl = `${data.publicUrl}?v=${Date.now()}`;
 
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ foto_url: data.publicUrl })
+      .update({ foto_url: fotoUrl })
       .eq('id', user.id);
 
     if (updateError) {
-      console.error('Update error:', {
-        message: updateError.message,
-        userId: user.id,
-        photoUrl: data.publicUrl,
-      });
-      return NextResponse.json(
-        { error: `Erro ao atualizar perfil: ${updateError.message}` },
-        { status: 500 }
-      );
+      console.error('[AVATAR-UPLOAD] Falha ao atualizar perfil:', updateError.message);
+      return NextResponse.json({ error: 'Erro ao atualizar perfil.' }, { status: 500 });
     }
 
-    console.log('Profile updated successfully:', { userId: user.id });
-
-    return NextResponse.json({
-      success: true,
-      foto_url: data.publicUrl,
-    });
-  } catch (error) {
-    console.error('Avatar upload error:', error);
     return NextResponse.json(
-      { error: 'Erro interno ao fazer upload' },
-      { status: 500 }
+      { success: true, foto_url: fotoUrl },
+      { headers: { 'Cache-Control': 'no-store' } }
     );
+  } catch (error) {
+    console.error(
+      '[AVATAR-UPLOAD] Falha inesperada:',
+      error instanceof Error ? error.message : String(error)
+    );
+    return NextResponse.json({ error: 'Erro interno ao fazer upload' }, { status: 500 });
   }
 }
