@@ -46,28 +46,11 @@ export default function OAuthButtons({ trialPlanId }: { trialPlanId?: string | n
       setError(null);
 
       try {
-        const base64Url = response.credential.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split('')
-            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        );
-
-        const decodedToken = JSON.parse(jsonPayload);
-
         const res = await fetch('/api/auth/oauth/google/callback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             token: response.credential,
-            user: {
-              id: decodedToken.sub,
-              email: decodedToken.email,
-              name: decodedToken.name,
-              picture: decodedToken.picture,
-            },
             trialPlanId: trialPlanId || null,
           }),
         });
