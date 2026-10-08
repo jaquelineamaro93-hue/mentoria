@@ -60,8 +60,8 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (novaSenha.length < 6) {
-      setErro('Mínimo 6 caracteres');
+    if (novaSenha.length < 8) {
+      setErro('Mínimo 8 caracteres');
       setCarregando(false);
       return;
     }
