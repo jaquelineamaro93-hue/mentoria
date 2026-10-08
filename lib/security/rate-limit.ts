@@ -53,3 +53,30 @@ export async function consumeSecurityRateLimit(input: {
 
   return data === true;
 }
+
+
+export async function consumeIdentifierRateLimit(input: {
+  scope: string;
+  identifier: string;
+  limit: number;
+  windowSeconds: number;
+}) {
+  const keyHash = hmac(
+    [input.scope, input.identifier.trim().toLowerCase()].join('|')
+  );
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc('consume_security_rate_limit', {
+    p_scope: input.scope,
+    p_key_hash: keyHash,
+    p_limit: input.limit,
+    p_window_seconds: input.windowSeconds,
+  });
+
+  if (error) {
+    console.error('[SECURITY-RATE-LIMIT] Falha ao consultar limite:', error.message);
+    return false;
+  }
+
+  return data === true;
+}
