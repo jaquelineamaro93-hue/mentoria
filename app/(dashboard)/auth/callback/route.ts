@@ -4,9 +4,11 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') || '/reset-password';
-
-  console.log('🔔 Auth Callback - Code:', !!code, 'Next:', next);
+  const rawNext = searchParams.get('next') || '/reset-password';
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//')
+      ? rawNext
+      : '/reset-password';
 
   if (code) {
     try {
@@ -16,16 +18,15 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error('❌ Exchange error:', error);
+        console.error('[AUTH-CALLBACK] Exchange error:', error.message);
         return NextResponse.redirect(
           new URL(`/login?error=exchange_failed`, request.url)
         );
       }
 
-      console.log('✅ Session criada via callback');
       return NextResponse.redirect(new URL(next, request.url));
     } catch (error) {
-      console.error('❌ Callback error:', error);
+      console.error('[AUTH-CALLBACK] Callback error:', error instanceof Error ? error.message : String(error));
       return NextResponse.redirect(
         new URL('/login?error=callback_error', request.url)
       );
