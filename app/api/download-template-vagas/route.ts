@@ -1,9 +1,9 @@
-import * as XLSX from 'xlsx';
+import { gerarCsv } from '@/lib/csv';
 
 export async function GET() {
   const templateData = [
     {
-      'EMPRESA': 'Exemplo: Google',
+      EMPRESA: 'Exemplo: Google',
       'NOME DA VAGA': 'Product Manager',
       'LINK DA VAGA': 'https://example.com/job',
       'HARD SKILL': 'Python, SQL, Analytics',
@@ -11,21 +11,18 @@ export async function GET() {
       'DATA CANDIDATURA': new Date().toISOString().split('T')[0],
       'ONDE VIU A VAGA': 'LinkedIn',
       'ETAPA DO PROCESSO': 'Para Aplicar',
-      'FIT': 'Alto',
+      FIT: 'Alto',
       'OBSERVAÇÃO': 'Empresa de interesse',
     },
   ];
 
-  const worksheet = XLSX.utils.json_to_sheet(templateData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Vagas');
+  const csv = gerarCsv(templateData);
 
-  const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-
-  return new Response(buffer, {
+  return new Response(csv, {
     headers: {
-      'Content-Disposition': 'attachment; filename="Template_Vagas.xlsx"',
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="Template_Vagas.csv"',
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Cache-Control': 'no-store',
     },
   });
 }
