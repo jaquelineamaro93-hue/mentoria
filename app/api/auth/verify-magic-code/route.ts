@@ -4,7 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { consumeSecurityRateLimit, hashSecurityValue } from '@/lib/security/rate-limit';
 
 export async function POST(request: Request) {
-  const { email, code } = await request.json();
+  const { email, code, trialPlanId } = await request.json();
+  const safeTrialPlanId = typeof trialPlanId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trialPlanId) ? trialPlanId : null;
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
   const normalizedCode = typeof code === 'string' ? code.trim() : String(code ?? '').trim();
 
@@ -137,12 +138,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Mantém a intenção de trial após a verificação do e-mail, sem iniciar acesso antes da autenticação.
+    const redirectUrl = new URL('/auth/confirm', process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com');
+    if (safeTrialPlanId) redirectUrl.searchParams.set('trial_plan', safeTrialPlanId);
+
     // Gera um link de login somente depois de consumir o código.
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'magiclink',
       email: profile.email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com'}/auth/confirm`,
+        redirectTo: redirectUrl.toString(),
       },
     });
 
