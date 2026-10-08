@@ -49,8 +49,8 @@ export default function PerfilClient({
           setSalvando(false);
           return;
         }
-        if (novaSenha.length < 6) {
-          setMensagem('A senha deve ter no mínimo 6 caracteres');
+        if (novaSenha.length < 8) {
+          setMensagem('A senha deve ter no mínimo 8 caracteres');
           setSalvando(false);
           return;
         }
@@ -81,8 +81,15 @@ export default function PerfilClient({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setMensagem('Por favor, selecione um arquivo de imagem válido');
+    const tiposPermitidos = new Set([
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+    ]);
+
+    if (!tiposPermitidos.has(file.type)) {
+      setMensagem('Use uma imagem JPG, PNG, WEBP ou GIF.');
       return;
     }
 
@@ -93,8 +100,14 @@ export default function PerfilClient({
 
     setSalvando(true);
     try {
-      const ext = file.name.split('.').pop();
-    if (!perfil) return;
+      const extensaoPorMime: Record<string, string> = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif',
+      };
+      const ext = extensaoPorMime[file.type];
+      if (!perfil) return;
       const path = `${perfil.id}/perfil.${ext}`;
 
       // O bucket se chama "avatar". upsert evita o erro de "já existe"
@@ -169,7 +182,7 @@ export default function PerfilClient({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleUploadFoto}
               className="hidden"
             />
