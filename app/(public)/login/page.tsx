@@ -22,7 +22,7 @@ function traduzirErroCadastro(mensagem: string): string {
     return 'Essa senha é fácil demais de adivinhar. Escolhe uma senha diferente.';
   }
   if (m.includes('password') && m.includes('least')) {
-    return 'A senha precisa ter pelo menos 6 caracteres.';
+    return 'A senha precisa ter pelo menos 8 caracteres.';
   }
   if (m.includes('rate limit') || m.includes('security purposes')) {
     return 'Muitas tentativas seguidas. Espera um minuto e tenta de novo.';
@@ -369,12 +369,12 @@ function LoginPageContent() {
                     <input
                       type={mostrarSenha ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
                       className="input"
                       style={{ paddingRight: 40 }}
-                      placeholder="Mínimo 6 caracteres"
+                      placeholder="Mínimo 8 caracteres"
                     />
                     <button
                       type="button"

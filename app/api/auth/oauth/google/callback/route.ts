@@ -1,173 +1,161 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { iniciarTrialParaUsuario } from '@/lib/trial';
+import { consumeSecurityRateLimit } from '@/lib/security/rate-limit';
+
+type GoogleTokenInfo = {
+  aud?: string;
+  iss?: string;
+  sub?: string;
+  email?: string;
+  email_verified?: string;
+  exp?: string;
+  name?: string;
+  picture?: string;
+};
+
+async function validarGoogleIdToken(token: string): Promise<GoogleTokenInfo | null> {
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    console.error('[OAUTH-GOOGLE] Client ID ausente.');
+    return null;
+  }
+
+  const response = await fetch(
+    `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(token)}`,
+    { cache: 'no-store' }
+  );
+
+  if (!response.ok) return null;
+
+  const payload = (await response.json()) as GoogleTokenInfo;
+  const issuerOk =
+    payload.iss === 'accounts.google.com' ||
+    payload.iss === 'https://accounts.google.com';
+  const exp = Number(payload.exp || 0);
+
+  if (
+    payload.aud !== clientId ||
+    !issuerOk ||
+    payload.email_verified !== 'true' ||
+    !payload.sub ||
+    !payload.email ||
+    !Number.isFinite(exp) ||
+    exp * 1000 <= Date.now()
+  ) {
+    return null;
+  }
+
+  return payload;
+}
 
 export async function POST(request: NextRequest) {
-  try {
-    console.log('[OAUTH-GOOGLE-CALLBACK] Iniciando...');
-    const body = await request.json();
-    const { token, user: googleUser, trialPlanId } = body;
-    console.log('[OAUTH-GOOGLE-CALLBACK] Dados recebidos:', { hasToken: !!token, email: googleUser?.email, id: googleUser?.id });
+  const rateOk = await consumeSecurityRateLimit({
+    request,
+    scope: 'google_oauth_callback',
+    limit: 30,
+    windowSeconds: 15 * 60,
+  });
 
-    if (!token || !googleUser) {
-      console.error('[OAUTH-GOOGLE-CALLBACK] Erro: token ou googleUser faltando');
-      return NextResponse.json(
-        { error: 'Token ou dados do usuário não fornecidos', received: { hasToken: !!token, hasGoogleUser: !!googleUser } },
-        { status: 400 }
-      );
+  if (!rateOk) {
+    return NextResponse.json(
+      { error: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.' },
+      { status: 429 }
+    );
+  }
+
+  try {
+    const body = (await request.json().catch(() => null)) as
+      | { token?: string; trialPlanId?: string | null }
+      | null;
+
+    const token = body?.token?.trim();
+    if (!token) {
+      return NextResponse.json({ error: 'Credencial do Google ausente.' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
-    console.log('[OAUTH-GOOGLE-CALLBACK] Admin client criado');
+    const google = await validarGoogleIdToken(token);
+    if (!google?.email || !google.sub) {
+      return NextResponse.json({ error: 'Credencial do Google inválida.' }, { status: 401 });
+    }
 
-    // Buscar ou criar usuário via OAuth
-    console.log('[OAUTH-GOOGLE-CALLBACK] Buscando oauth_connections...');
-    const { data: existingUser, error: fetchError } = await supabase
-      .from('oauth_connections')
-      .select('user_id')
-      .eq('provider', 'google')
-      .eq('provider_id', googleUser.id)
-      .single();
+    const email = google.email.trim().toLowerCase();
+    const admin = createAdminClient();
 
-    console.log('[OAUTH-GOOGLE-CALLBACK] Resultado da busca:', { found: !!existingUser, error: fetchError?.message });
+    // A identidade só é aceita depois da validação do token no servidor.
+    const { data: existingByEmail } = await admin
+      .from('profiles')
+      .select('id')
+      .ilike('email', email)
+      .maybeSingle();
 
-    let userId: string;
+    let userId = existingByEmail?.id ?? null;
 
-    if (existingUser) {
-      // Usuário já existe, atualizar last_used
-      console.log('[OAUTH-GOOGLE-CALLBACK] Usuário já existe:', existingUser.user_id);
-      userId = existingUser.user_id;
-      await supabase
-        .from('oauth_connections')
-        .update({ last_used: new Date().toISOString() })
-        .eq('provider', 'google')
-        .eq('provider_id', googleUser.id);
-    } else {
-      console.log('[OAUTH-GOOGLE-CALLBACK] Usuário não encontrado, buscando por email...');
-      // Buscar por email
-      const { data: existingByEmail } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', googleUser.email)
-        .single();
+    if (!userId) {
+      const { data: newAuth, error: authError } = await admin.auth.admin.createUser({
+        email,
+        user_metadata: {
+          name: google.name || email.split('@')[0],
+          picture: google.picture || null,
+          oauth_provider: 'google',
+          google_sub: google.sub,
+        },
+        email_confirm: true,
+      });
 
-      if (existingByEmail) {
-        console.log('[OAUTH-GOOGLE-CALLBACK] Usuário encontrado por email:', existingByEmail.id);
-        userId = existingByEmail.id;
-        // Vincular OAuth ao usuário existente
-        const { error: linkError } = await supabase
-          .from('oauth_connections')
-          .insert({
-            user_id: userId,
-            provider: 'google',
-            provider_id: googleUser.id,
-            email: googleUser.email,
-            name: googleUser.name,
-            picture_url: googleUser.picture,
-          });
-        console.log('[OAUTH-GOOGLE-CALLBACK] Link de oauth_connections criado:', { error: linkError?.message });
-      } else {
-        console.log('[OAUTH-GOOGLE-CALLBACK] Usuário não encontrado por email, criando novo...');
-        // Criar novo usuário
-        const { data: newAuth, error: authError } = await supabase.auth.admin.createUser({
-          email: googleUser.email,
-          user_metadata: {
-            name: googleUser.name,
-            picture: googleUser.picture,
-            oauth_provider: 'google',
-          },
-          email_confirm: true,
-        });
-
-        if (authError || !newAuth.user) {
-          console.error('[OAUTH-GOOGLE-CALLBACK] Erro ao criar usuário:', authError?.message);
-          return NextResponse.json(
-            { error: 'Erro ao criar usuário', details: authError?.message },
-            { status: 500 }
-          );
-        }
-
-        console.log('[OAUTH-GOOGLE-CALLBACK] Novo usuário criado:', newAuth.user.id);
-        userId = newAuth.user.id;
-
-        // Vincular OAuth
-        const { error: linkError } = await supabase
-          .from('oauth_connections')
-          .insert({
-            user_id: userId,
-            provider: 'google',
-            provider_id: googleUser.id,
-            email: googleUser.email,
-            name: googleUser.name,
-            picture_url: googleUser.picture,
-          });
-        console.log('[OAUTH-GOOGLE-CALLBACK] Link de oauth_connections criado:', { error: linkError?.message });
+      if (authError || !newAuth.user) {
+        console.error('[OAUTH-GOOGLE] Falha ao criar usuário:', authError?.message);
+        return NextResponse.json({ error: 'Não foi possível concluir o login.' }, { status: 500 });
       }
+
+      userId = newAuth.user.id;
+    }
+
+    const { data: authData, error: authUserError } = await admin.auth.admin.getUserById(userId);
+    const bannedUntil = authData.user?.banned_until
+      ? new Date(authData.user.banned_until).getTime()
+      : 0;
+
+    if (authUserError || bannedUntil > Date.now()) {
+      return NextResponse.json({ error: 'Acesso indisponível.' }, { status: 403 });
     }
 
     let trialStarted = false;
+    const trialPlanId = body?.trialPlanId?.trim();
     if (trialPlanId) {
       const trialResult = await iniciarTrialParaUsuario(
-        supabase,
+        admin,
         userId,
-        String(trialPlanId),
+        trialPlanId,
         'google_oauth'
       );
-
-      if (trialResult.ok) {
-        trialStarted = true;
-      } else {
-        console.warn('[OAUTH-GOOGLE-CALLBACK] Trial não iniciado:', trialResult.error);
-      }
+      trialStarted = trialResult.ok;
     }
 
-    // Gerar session
-    console.log('[OAUTH-GOOGLE-CALLBACK] Gerando magic link...');
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://somamentoria.com';
-    console.log('[OAUTH-GOOGLE-CALLBACK] Site URL:', siteUrl);
-
-    const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
+    const { data: sessionData, error: sessionError } = await admin.auth.admin.generateLink({
       type: 'magiclink',
-      email: googleUser.email,
+      email,
       options: {
         redirectTo: `${siteUrl}/auth/confirm`,
       },
     });
 
-    console.log('[OAUTH-GOOGLE-CALLBACK] Magic link gerado:', { hasData: !!sessionData, error: sessionError?.message });
-
-    if (sessionError || !sessionData) {
-      console.error('[OAUTH-GOOGLE-CALLBACK] Erro ao gerar magic link:', sessionError?.message);
-      return NextResponse.json(
-        { error: 'Erro ao gerar sessão', details: sessionError?.message },
-        { status: 500 }
-      );
+    const actionLink = (sessionData?.properties as { action_link?: string } | undefined)?.action_link;
+    if (sessionError || !actionLink) {
+      console.error('[OAUTH-GOOGLE] Falha ao criar sessão:', sessionError?.message);
+      return NextResponse.json({ error: 'Não foi possível concluir o login.' }, { status: 500 });
     }
 
-    const actionLink = (sessionData.properties as any)?.action_link;
-    console.log('[OAUTH-GOOGLE-CALLBACK] Action link extraído:', { hasLink: !!actionLink });
-
-    if (!actionLink) {
-      console.error('[OAUTH-GOOGLE-CALLBACK] Action link não encontrado em sessionData');
-      return NextResponse.json(
-        { error: 'Erro ao gerar link de login', details: 'action_link não encontrado' },
-        { status: 500 }
-      );
-    }
-
-    console.log('[OAUTH-GOOGLE-CALLBACK] Sucesso! Retornando loginUrl');
-    return NextResponse.json({
-      success: true,
-      loginUrl: actionLink,
-      userId,
-      trialStarted,
-    });
-  } catch (error) {
-    console.error('[OAUTH-GOOGLE-CALLBACK] Erro capturado:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Erro ao processar login com Google', details: errorMessage },
-      { status: 500 }
+      { success: true, loginUrl: actionLink, trialStarted },
+      { headers: { 'Cache-Control': 'no-store' } }
     );
+  } catch (error) {
+    console.error(
+      '[OAUTH-GOOGLE] Falha inesperada:',
+      error instanceof Error ? error.message : String(error)
+    );
+    return NextResponse.json({ error: 'Não foi possível concluir o login.' }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import PublicFeedback360Form, { type PublicFeedback360Data } from './PublicFeedback360Form';
 
 export const dynamic = 'force-dynamic';
@@ -18,8 +18,8 @@ export default async function PublicFeedback360Page({
     return <PublicFeedback360Form token={token} data={null} />;
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc('get_feedback_360_public', {
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc('get_feedback_360_public', {
     p_token: token,
   });
 

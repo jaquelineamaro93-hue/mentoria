@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { GripVertical, X, Zap, Plus, ChevronLeft, ChevronRight, Download, Upload, FileDown } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
-import * as XLSX from 'xlsx';
+import { gerarCsv, parseCsv } from '@/lib/csv';
 
 interface Vaga {
   id: string;
@@ -118,12 +118,16 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       'Origem': vaga.origem || 'organico',
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(dados);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Vagas');
-
-    const fileName = `Minhas_Vagas_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
+    const csv = gerarCsv(dados);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `Minhas_Vagas_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   }
 
   async function handleImportarArquivo(e: React.ChangeEvent<HTMLInputElement>) {
@@ -131,10 +135,17 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
     if (!file) return;
 
     try {
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array' });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(worksheet);
+      if (file.type !== 'text/csv' && !file.name.toLowerCase().endsWith('.csv')) {
+        alert('Por segurança, importe o arquivo em formato CSV.');
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('O arquivo CSV deve ter no máximo 2MB.');
+        return;
+      }
+
+      const rows = parseCsv(await file.text());
 
       // Aceita tanto o template oficial (EMPRESA, NOME DA VAGA...) quanto o
       // arquivo exportado daqui (Empresa, Título da Vaga...), ignorando
@@ -211,7 +222,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
       setMostraImportacao(false);
     } catch (erro) {
       console.error('Erro ao ler arquivo:', erro);
-      alert('Erro ao ler o arquivo. Verifique se é um arquivo XLSX ou CSV válido.');
+      alert('Erro ao ler o arquivo. Verifique se é um CSV válido.');
     }
   }
 
@@ -336,7 +347,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             title="Baixa uma planilha em branco, já com as colunas certas"
           >
             <FileDown size={16} />
-            Baixar Modelo Excel
+            Baixar Modelo CSV
           </a>
           <button
             onClick={() => setMostraImportacao(true)}
@@ -372,7 +383,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
             <div className="p-6 space-y-6">
               <div className="bg-mint-light border-2 border-mint p-4 rounded-lg">
                 <p className="text-sm text-mint font-medium">
-                  💡 <strong>Como usar:</strong> Importe vagas de um arquivo Excel ou CSV (seu próprio ou do template abaixo)
+                  💡 <strong>Como usar:</strong> Importe vagas de um arquivo CSV (seu próprio ou do template abaixo)
                 </p>
               </div>
 
@@ -408,7 +419,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
               <div className="space-y-4">
                 <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                   <p className="text-sm text-green-700">
-                    <strong>✅ Importar seu arquivo:</strong> Selecione um arquivo CSV ou XLSX (exportado daqui ou preenchido manualmente) para importar várias vagas de uma vez.
+                    <strong>✅ Importar seu arquivo:</strong> Selecione um arquivo CSV (exportado daqui ou preenchido manualmente) para importar várias vagas de uma vez.
                   </p>
                 </div>
 
@@ -416,7 +427,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                   <label className="block text-sm font-medium text-black mb-3">Selecione o arquivo para importar:</label>
                   <input
                     type="file"
-                    accept=".csv,.xlsx,.xls"
+                    accept=".csv,text/csv"
                     onChange={handleImportarArquivo}
                     className="w-full px-4 py-3 border border-gray-faint rounded-lg cursor-pointer hover:border-brown-deep transition"
                   />
@@ -428,7 +439,7 @@ export default function KanbanTab({ vagas, onVagaAtualizada }: Props) {
                     className="flex-1 bg-mint-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-mint-deep/90 transition text-center flex items-center justify-center gap-2"
                   >
                     <Download size={18} />
-                    Baixar Template (XLSX)
+                    Baixar Template (CSV)
                   </a>
                   <button
                     onClick={() => setMostraImportacao(false)}

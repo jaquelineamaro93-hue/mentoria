@@ -25,7 +25,7 @@ export async function criarAssinaturaMercadoPago({
     );
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://mentoria-pi-taupe.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://somamentoria.com';
 
   // A assinatura recorrente do Mercado Pago cobra mensalmente até a data
   // final. Calculamos essa data pra ela parar sozinha depois do número de
@@ -82,7 +82,7 @@ export async function criarPagamentoUnicoMercadoPago({
     throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado.');
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://mentoria-pi-taupe.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://somamentoria.com';
   const urlRetorno = backUrl ?? `${appUrl}/dashboard`;
 
   const response = await fetch(`${MP_API}/checkout/preferences`, {
@@ -123,8 +123,9 @@ export async function buscarPagamentoMercadoPago(id: string) {
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!accessToken) throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado.');
 
-  const response = await fetch(`${MP_API}/v1/payments/${id}`, {
+  const response = await fetch(`${MP_API}/v1/payments/${encodeURIComponent(id)}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
+    cache: 'no-store',
   });
 
   if (!response.ok) {
@@ -138,8 +139,9 @@ export async function buscarPreapprovalMercadoPago(id: string) {
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!accessToken) throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado.');
 
-  const response = await fetch(`${MP_API}/preapproval/${id}`, {
+  const response = await fetch(`${MP_API}/preapproval/${encodeURIComponent(id)}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
+    cache: 'no-store',
   });
 
   if (!response.ok) {
@@ -154,6 +156,7 @@ export async function buscarPagamentoAssinaturaMercadoPago(id: string) {
   if (!token) throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado.');
   const response = await fetch(`${MP_API}/authorized_payments/${encodeURIComponent(id)}`, {
     headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
   });
   if (!response.ok) throw new Error(`Erro ao buscar cobrança: ${response.status}`);
   return response.json();

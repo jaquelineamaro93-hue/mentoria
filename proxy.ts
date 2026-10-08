@@ -31,6 +31,21 @@ export async function proxy(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
+  // Bloqueia requisições mutáveis iniciadas por outra origem no navegador.
+  // Webhooks/server-to-server normalmente não enviam Origin e continuam válidos.
+  if (
+    path.startsWith('/api') &&
+    !['GET', 'HEAD', 'OPTIONS'].includes(request.method)
+  ) {
+    const origin = request.headers.get('origin');
+    if (origin && origin !== request.nextUrl.origin) {
+      return NextResponse.json(
+        { error: 'Origem não autorizada.' },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
+  }
+
   // Defesa em profundidade: endpoints administrativos nunca são públicos.
   // Cada rota /api/admin também valida o papel novamente antes de usar service_role.
   if (path.startsWith('/api/admin')) {

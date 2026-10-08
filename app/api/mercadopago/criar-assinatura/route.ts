@@ -2,6 +2,7 @@ import { registrarPedido, vincularCobranca } from '@/lib/mercadopago-orders';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { criarAssinaturaMercadoPago, criarPagamentoUnicoMercadoPago } from '@/lib/mercadopago';
+import { consumeSecurityRateLimit } from '@/lib/security/rate-limit';
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -11,6 +12,21 @@ export async function POST(request: Request) {
 
   if (!user?.email) {
     return NextResponse.json({ error: 'Entre na sua conta antes de pagar.' }, { status: 401 });
+  }
+
+  const allowed = await consumeSecurityRateLimit({
+    request,
+    scope: 'payment_create',
+    identifier: user.id,
+    limit: 10,
+    windowSeconds: 15 * 60,
+  });
+
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Muitas tentativas de pagamento. Aguarde alguns minutos.' },
+      { status: 429 }
+    );
   }
   let body;
   try { body = await request.json(); } catch {

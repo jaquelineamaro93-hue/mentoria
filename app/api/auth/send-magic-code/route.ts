@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { enviarEmail } from '@/lib/sendgrid';
+import { consumeSecurityRateLimit, hashSecurityValue } from '@/lib/security/rate-limit';
 
 const GENERIC_RESPONSE = {
   message: 'Se o email existe e está habilitado, você receberá um código.',
@@ -16,6 +17,29 @@ export async function POST(request: Request) {
   }
 
   try {
+    const [ipAllowed, emailAllowed] = await Promise.all([
+      consumeSecurityRateLimit({
+        request,
+        scope: 'magic_code_send_ip',
+        limit: 12,
+        windowSeconds: 15 * 60,
+      }),
+      consumeSecurityRateLimit({
+        request,
+        scope: 'magic_code_send_email',
+        identifier: normalizedEmail,
+        limit: 5,
+        windowSeconds: 60 * 60,
+      }),
+    ]);
+
+    if (!ipAllowed || !emailAllowed) {
+      return NextResponse.json(GENERIC_RESPONSE, {
+        status: 429,
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+
     const supabaseAdmin = createAdminClient();
 
     const { data: profile } = await supabaseAdmin
@@ -65,7 +89,7 @@ export async function POST(request: Request) {
       .upsert(
         {
           email: normalizedEmail,
-          code,
+          code: hashSecurityValue(`magic-code|${normalizedEmail}|${code}`),
           attempts: 0,
           expires_at: expiresAt.toISOString(),
           created_at: now.toISOString(),

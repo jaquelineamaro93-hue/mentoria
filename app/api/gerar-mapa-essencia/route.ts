@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { chamarClaude } from '@/lib/anthropic';
 import { montarPromptMapaEssencia } from '@/lib/prompts';
@@ -11,6 +12,20 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
+  }
+
+  const aiAllowed = await consumeIdentifierRateLimit({
+    scope: 'ai_mapa_essencia',
+    identifier: user.id,
+    limit: 30,
+    windowSeconds: 60 * 60,
+  });
+
+  if (!aiAllowed) {
+    return NextResponse.json(
+      { error: 'Limite temporário atingido. Tente novamente mais tarde.' },
+      { status: 429 }
+    );
   }
 
   const { data: respostasRaw } = await supabase

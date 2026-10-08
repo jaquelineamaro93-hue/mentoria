@@ -2,7 +2,6 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { CheckCircle2, Loader2, MessageSquareText, ShieldCheck } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import type { Feedback360Closeness, Feedback360Relationship } from '@/lib/types';
 
 export interface PublicFeedback360Data {
@@ -43,7 +42,6 @@ export default function PublicFeedback360Form({
   token: string;
   data: PublicFeedback360Data | null;
 }) {
-  const supabase = createClient();
   const [nome, setNome] = useState('');
   const [cargo, setCargo] = useState('');
   const [contexto, setContexto] = useState('');
@@ -116,25 +114,36 @@ export default function PublicFeedback360Form({
 
     setEnviando(true);
 
-    const { error } = await supabase.rpc('submit_feedback_360_public', {
-      p_token: token,
-      p_nome: nome.trim(),
-      p_cargo_funcao: cargo.trim(),
-      p_empresa_contexto: contexto.trim(),
-      p_relacao: relacao,
-      p_relacao_outro: relacaoOutro.trim(),
-      p_convivencia: convivencia,
-      p_respostas: respostasValidas,
-    });
+    try {
+      const response = await fetch(`/api/public/feedback-360/${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: nome.trim(),
+          cargo_funcao: cargo.trim(),
+          empresa_contexto: contexto.trim(),
+          relacao,
+          relacao_outro: relacaoOutro.trim(),
+          convivencia,
+          respostas: respostasValidas,
+        }),
+      });
 
-    setEnviando(false);
+      if (!response.ok) {
+        setErro(
+          response.status === 429
+            ? 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+            : 'Não foi possível enviar agora. Confira os campos e tente novamente.'
+        );
+        return;
+      }
 
-    if (error) {
-      setErro('Não foi possível enviar agora. Confira os campos e tente novamente.');
-      return;
+      setEnviado(true);
+    } catch {
+      setErro('Não foi possível enviar agora. Tente novamente em instantes.');
+    } finally {
+      setEnviando(false);
     }
-
-    setEnviado(true);
   }
 
   return (

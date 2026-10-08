@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { consumeSecurityRateLimit, hashSecurityValue } from '@/lib/security/rate-limit';
 
 export async function POST(request: Request) {
   const { email, code } = await request.json();
@@ -15,6 +16,29 @@ export async function POST(request: Request) {
   }
 
   try {
+    const [ipAllowed, emailAllowed] = await Promise.all([
+      consumeSecurityRateLimit({
+        request,
+        scope: 'magic_code_verify_ip',
+        limit: 30,
+        windowSeconds: 15 * 60,
+      }),
+      consumeSecurityRateLimit({
+        request,
+        scope: 'magic_code_verify_email',
+        identifier: normalizedEmail,
+        limit: 10,
+        windowSeconds: 15 * 60,
+      }),
+    ]);
+
+    if (!ipAllowed || !emailAllowed) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas. Solicite um novo código mais tarde.' },
+        { status: 429 }
+      );
+    }
+
     const supabase = createAdminClient();
 
     // Busca o código armazenado
@@ -49,8 +73,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const expected = Buffer.from(String(magicCode.code));
-    const received = Buffer.from(normalizedCode);
+    const storedCode = String(magicCode.code);
+    const candidateHash = hashSecurityValue(
+      `magic-code|${normalizedEmail}|${normalizedCode}`
+    );
+
+    // Compatibilidade curta com códigos emitidos antes deste hardening.
+    const candidate = /^\d{6}$/.test(storedCode) ? normalizedCode : candidateHash;
+    const expected = Buffer.from(storedCode);
+    const received = Buffer.from(candidate);
     const valid =
       expected.length === received.length && crypto.timingSafeEqual(expected, received);
 
@@ -95,7 +126,7 @@ export async function POST(request: Request) {
       .from('magic_codes')
       .delete()
       .eq('email', normalizedEmail)
-      .eq('code', normalizedCode)
+      .eq('code', storedCode)
       .select('id')
       .maybeSingle();
 
