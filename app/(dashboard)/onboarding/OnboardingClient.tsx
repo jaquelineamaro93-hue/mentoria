@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Mascot } from '@/components/soma/CareerJourney';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -68,6 +69,24 @@ export default function OnboardingClient({
 }) {
   const router = useRouter();
   const [salvandoAdmin, setSalvandoAdmin] = useState(false);
+  const [mascoteAtivo, setMascoteAtivo] = useState(0);
+  const pontos = profile?.pontos_total ?? 0;
+  const guias = [
+    { nome: 'Lume', frase: 'Comece por suas forças. Você já tem muito para descobrir.', cor: '#E9B95F', etapa: 'Autoconhecimento' },
+    { nome: 'Norte', frase: 'Uma direção clara nasce de um próximo passo possível.', cor: '#E79574', etapa: 'Planejamento' },
+    { nome: 'Brasa', frase: 'Pequenas ações repetidas também constroem grandes mudanças.', cor: '#8AC6B1', etapa: 'Constância' },
+    { nome: 'Íris', frase: 'Sua história pode abrir caminhos que você ainda não imaginou.', cor: '#B9A3DF', etapa: 'Oportunidades' },
+  ];
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const targets = document.querySelectorAll<HTMLElement>('[data-soma-capitulo]');
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio);
+      if (visible.length) setMascoteAtivo(Number((visible[0].target as HTMLElement).dataset.somaCapitulo ?? 0));
+    }, { rootMargin: '-20% 0px -35% 0px', threshold: [0, 0.2, 0.5, 0.8] });
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, []);
   const [onboardingAdmin, setOnboardingAdmin] = useState(progresso.onboardingFeito);
   const totalBlocos = Math.max(1, progresso.totalBlocosQuemSouEu);
   const totalPdi = Math.max(1, progresso.totalSecoesPdi);
@@ -229,6 +248,34 @@ export default function OnboardingClient({
         </div>
       </header>
 
+      <section aria-label="Seus companheiros da Expedição SOMA" className="mb-8 overflow-hidden rounded-[24px] border border-[#DDE6E0] bg-[#F7F7EE] p-4 sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-xl">
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-[#386657]">A Expedição SOMA acompanha você</p>
+            <h2 className="mt-2 font-display text-2xl text-[#183F37] sm:text-3xl">Quatro companheiros. Uma história: a sua.</h2>
+            <p className="mt-2 text-sm leading-6 text-[#52675B]">Conheça Lume, Norte, Brasa e Íris. Eles apresentam cada capítulo da jornada e acompanham suas descobertas. Suas conquistas e Impulsos continuam registrados no Meu Passaporte.</p>
+            <Link href="/passaporte" onClick={() => registrarClique('passaporte', 'expedicao')} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#183F37] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#183F37]">Ver minhas conquistas e ranking <ArrowRight size={16} aria-hidden="true" /></Link>
+          </div>
+          <div className="grid grid-cols-4 gap-2 sm:gap-3" role="group" aria-label="Escolha um companheiro para conhecer sua mensagem">
+            {guias.map((guia, i) => (
+              <button key={guia.nome} type="button" onClick={() => { setMascoteAtivo(i); posthog.capture('onboarding_mascote_selecionado', { mascote: guia.nome }); }} aria-pressed={mascoteAtivo === i}
+                className={`group relative flex min-h-28 min-w-0 flex-col items-center justify-center gap-1 overflow-visible rounded-2xl border p-2 transition-all duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#183F37] motion-reduce:transform-none ${mascoteAtivo === i ? 'border-[#386657] bg-white shadow-lg' : 'border-transparent bg-white/60 hover:border-[#A7C5B2]'}`}>
+                <span aria-hidden="true" className={`pointer-events-none absolute inset-x-3 bottom-7 h-6 rounded-full opacity-30 blur-lg ${mascoteAtivo === i ? 'scale-125' : ''}`} style={{ backgroundColor: guia.cor }} />
+                <span className={`relative block origin-bottom transform-gpu transition-transform duration-500 group-hover:rotate-[-5deg] group-hover:scale-110 motion-reduce:transform-none ${mascoteAtivo === i ? 'motion-safe:animate-[soma-float_3s_ease-in-out_infinite]' : ''}`}><Mascot index={i} size={74} /></span>
+                <span className="relative text-xs font-bold text-[#183F37]">{guia.nome}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-white px-4 py-3" aria-live="polite">
+          <span className="rounded-full px-3 py-1 text-xs font-bold text-[#183F37]" style={{backgroundColor: guias[mascoteAtivo].cor + '55'}}>{guias[mascoteAtivo].nome} · {guias[mascoteAtivo].etapa}</span>
+          <p className="flex-1 text-sm text-[#334B41]">“{guias[mascoteAtivo].frase}”</p>
+          <span className="text-xs font-semibold text-[#386657]">{pontos.toLocaleString('pt-BR')} Impulsos</span>
+        </div>
+        <style jsx>{`@keyframes soma-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(3deg); } } @media (prefers-reduced-motion: reduce) { .motion-safe\\:animate-\\[soma-float_3s_ease-in-out_infinite\\] { animation: none !important; } }`}</style>
+      </section>
+
+      <div data-soma-capitulo="0" aria-hidden="true" className="h-px" />
       <section aria-labelledby="essenciais-titulo" className="mb-10">
         <div className="mb-4">
           <h2 id="essenciais-titulo" className="font-display text-3xl text-black">1. Construa sua base</h2>
@@ -270,6 +317,7 @@ export default function OnboardingClient({
         </div>
       </section>
 
+      <div data-soma-capitulo="3" aria-hidden="true" className="h-px" />
       <section aria-labelledby="explorar-titulo" className="mb-10">
         <div className="mb-4">
           <h2 id="explorar-titulo" className="font-display text-2xl text-black">2. Explore conforme seu objetivo</h2>
