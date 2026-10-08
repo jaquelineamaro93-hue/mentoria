@@ -209,7 +209,7 @@ function LoginPageContent() {
 
         if (res.ok) {
           setLoading(false);
-          router.push(`/magic-login?email=${encodeURIComponent(email)}&sent=1`);
+          router.push(`/magic-login?email=${encodeURIComponent(email)}&sent=1${trialPlanId ? `&trial_plan=${encodeURIComponent(trialPlanId)}` : ''}`);
           return;
         }
       } catch {

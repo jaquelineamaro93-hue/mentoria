@@ -20,6 +20,29 @@ function AuthConfirmContent() {
         }
       };
 
+      // Só ativa trial depois que a sessão foi estabelecida. A rota valida usuário e plano.
+      const concluirTrial = async () => {
+        const planId = new URLSearchParams(window.location.search).get('trial_plan');
+        if (!planId) return true;
+        try {
+          const response = await fetch('/api/trial/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            cache: 'no-store',
+            body: JSON.stringify({ planId, source: 'magic_code' }),
+          });
+          if (response.ok) return true;
+          const result = await response.json().catch(() => ({}));
+          if (response.status === 409 && String(result.error || '').includes('acesso ativo')) return true;
+          setStatus(result.error || 'Não foi possível iniciar o teste. Atualize a página para tentar novamente.');
+          return false;
+        } catch {
+          setStatus('Não foi possível iniciar o teste. Atualize a página para tentar novamente.');
+          return false;
+        }
+      };
+
       // 1. Escuta eventos do Supabase
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!isSubscribed) return;
@@ -32,7 +55,7 @@ function AuthConfirmContent() {
         } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
           console.log('✅ SIGNED_IN com usuário:', session.user.email);
           await registrarLogin();
-          router.push('/dashboard');
+          if (await concluirTrial()) router.push('/dashboard');
         }
       });
 
@@ -46,7 +69,7 @@ function AuthConfirmContent() {
           const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
           if (otpError) { router.push('/login?error=token_invalid'); return; }
           await registrarLogin();
-          router.push('/dashboard');
+          if (await concluirTrial()) router.push('/dashboard');
           return;
         }
       }
@@ -83,7 +106,7 @@ function AuthConfirmContent() {
               router.push('/reset-password');
             } else {
               console.log('➡️ Redirecionando para dashboard');
-              router.push('/dashboard');
+              if (await concluirTrial()) router.push('/dashboard');
             }
             return;
           }

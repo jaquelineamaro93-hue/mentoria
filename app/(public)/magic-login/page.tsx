@@ -8,6 +8,7 @@ function MagicLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get('email')?.trim().toLowerCase() ?? '';
+  const trialPlanId = searchParams.get('trial_plan');
   const codeAlreadySent = searchParams.get('sent') === '1' && Boolean(initialEmail);
 
   const [stage, setStage] = useState<'email' | 'code'>(codeAlreadySent ? 'code' : 'email');
@@ -52,7 +53,7 @@ function MagicLoginContent() {
       const res = await fetch('/api/auth/verify-magic-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code, trialPlanId }),
       });
 
       const data = await res.json();
