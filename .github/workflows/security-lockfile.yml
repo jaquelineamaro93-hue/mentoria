@@ -1,0 +1,31 @@
+name: Security lockfile refresh
+
+on:
+  pull_request:
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/security-lockfile.yml
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Refresh dependency lock
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm audit fix --package-lock-only --ignore-scripts || true
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Upload refreshed lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-package-lock
+          path: package-lock.json
+          retention-days: 1
