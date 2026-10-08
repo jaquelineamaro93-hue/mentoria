@@ -106,6 +106,18 @@ export default function TrialBanner({ pathname }: { pathname: string }) {
     }).catch(() => {});
   }
 
+  const progresso = Math.min(100, Math.max(0, ((state.elapsedDays ?? 0) / Math.max(1, state.trialDays ?? 7)) * 100));
+  const linhaDoTempo = (
+    <div className="mt-3" aria-label={`Progresso do teste gratuito: ${state.elapsedDays ?? 0} de ${state.trialDays ?? 7} dias`}>
+      <div className="mb-1 flex justify-between text-[11px] font-medium text-gray-text">
+        <span>Dia 1 · Boas-vindas</span><span>Dia {state.trialDays ?? 7} · Fim do teste</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+        <div className="h-full rounded-full bg-mint-deep transition-all" style={{ width: `${Math.max(4, progresso)}%` }} />
+      </div>
+    </div>
+  );
+
   if (!state.shouldPrompt) {
     return (
       <div className="mb-5 flex flex-col gap-2 rounded-xl border border-mint/70 bg-mint-light/35 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -116,6 +128,7 @@ export default function TrialBanner({ pathname }: { pathname: string }) {
             Explore o portal no seu ritmo.
           </p>
         </div>
+        {linhaDoTempo}
         <Link
           href={`/checkout?plan=${state.planId}`}
           onClick={() => void registrarClique()}
@@ -150,6 +163,7 @@ export default function TrialBanner({ pathname }: { pathname: string }) {
               : ''}
             . Você continua com acesso até o fim do período, mesmo se decidir depois.
           </p>
+          {linhaDoTempo}
         </div>
 
         <Link

@@ -22,6 +22,32 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
   const [carregando, setCarregando] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
+
+  const [iniciandoTrial, setIniciandoTrial] = useState(false);
+  const trialElegivel = profile?.trial_status === 'not_started' && profile?.status_assinatura !== 'ativo' && !profile?.is_admin;
+  const planosTrial = planos.filter((plano) => plano.trial_enabled && plano.ativo);
+  async function iniciarTrial(planId: string) {
+    if (!trialElegivel || iniciandoTrial) return;
+    setIniciandoTrial(true);
+    setErro(null);
+    try {
+      const response = await fetch('/api/trial/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store',
+        body: JSON.stringify({ planId, source: 'recovery_renovar' }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'Não foi possível iniciar o teste gratuito.');
+      router.replace('/dashboard');
+      router.refresh();
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Não foi possível iniciar o teste gratuito.');
+      setIniciandoTrial(false);
+    }
+  }
+
   async function handleSignOut() {
     posthog.capture('logout_realizado');
     await supabase.auth.signOut();
@@ -92,6 +118,19 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
             forma de pagamento que fazem mais sentido para você.
           </p>
         </div>
+
+
+        {trialElegivel && planosTrial.length > 0 && (
+          <section className="mb-8 rounded-2xl border border-mint bg-mint-light/40 p-5 sm:p-7" aria-label="Boas-vindas ao teste gratuito">
+            <div className="mb-2 flex items-center gap-2 text-mint-deep"><Sparkles size={20} /><strong>Olá! Sua jornada na SOMA começa aqui</strong></div>
+            <h2 className="text-xl font-semibold text-black">Aproveite 7 dias gratuitos para conhecer a plataforma</h2>
+            <p className="mt-2 text-sm leading-6 text-gray-text">Percebemos que sua jornada ainda não foi iniciada. Explore as ferramentas por 7 dias, sem pagamento agora. Ao final, você decide se quer continuar com um plano.</p>
+            <button type="button" disabled={iniciandoTrial} onClick={() => void iniciarTrial(planosTrial[0].id)} className="mt-4 inline-flex items-center justify-center rounded-xl bg-mint-deep px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
+              {iniciandoTrial ? 'Preparando sua jornada...' : 'Ativar meus 7 dias grátis'}
+            </button>
+            <p className="mt-2 text-xs text-gray-text">Nenhuma cobrança automática será iniciada por este botão.</p>
+          </section>
+        )}
 
         {erro && (
           <p className="text-sm text-red-700 bg-red-50 border border-red-300 rounded-md px-4 py-3 mb-6  text-center">
