@@ -110,3 +110,12 @@ select:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* Movimento sutil dos mascotes SOMA nas páginas públicas */
+@keyframes soma-mascote-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .soma-mascote-animado { animation: none !important; }
+}
