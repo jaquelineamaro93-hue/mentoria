@@ -1,44 +1,78 @@
 'use client';
 
-import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import Script from 'next/script';
+import { useEffect, useRef, useState } from 'react';
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: { id: {
+        initialize: (config: {
+          client_id: string;
+          callback: (response: { credential: string }) => void;
+          use_fedcm_for_button: boolean;
+          button_auto_select: boolean;
+        }) => void;
+        renderButton: (element: HTMLElement, options: { theme: string; size: string; text: string }) => void;
+      } };
+    };
+  }
+}
 
 export default function OAuthButtons({ trialPlanId }: { trialPlanId?: string | null }) {
+  const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const pending = useRef(false);
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  async function loginWithGoogle() {
-    if (loading) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const destination = new URL('/auth/confirm', window.location.origin);
-      if (trialPlanId) destination.searchParams.set('trial_plan', trialPlanId);
-      const callback = new URL('/auth/callback', window.location.origin);
-      callback.searchParams.set('next', destination.pathname + destination.search);
-      const { error: authError } = await createClient().auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: callback.toString(),
-          queryParams: { prompt: 'select_account' },
-        },
-      });
-      if (authError) throw authError;
-    } catch {
-      setError('Não foi possível abrir o login com Google. Tente novamente ou entre com seu e-mail.');
-      setLoading(false);
-    }
-  }
+  useEffect(() => {
+    const google = window.google;
+    const button = buttonRef.current;
+    if (!ready || !google || !button || !clientId) return;
+
+    google.accounts.id.initialize({
+      client_id: clientId,
+      // Usa a seleção de conta do navegador em vez da janela legada gsi/transform.
+      use_fedcm_for_button: true,
+      button_auto_select: false,
+      callback: async ({ credential }) => {
+        if (pending.current) return;
+        pending.current = true;
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch('/api/auth/oauth/google/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: credential, trialPlanId: trialPlanId || null }),
+          });
+          const result = await response.json();
+          if (!response.ok || !result.loginUrl) throw new Error(result.error || 'Não foi possível concluir o login com Google.');
+          window.location.assign(result.loginUrl);
+        } catch (failure) {
+          setError(failure instanceof Error ? failure.message : 'Não foi possível entrar. Tente novamente ou use seu e-mail.');
+          pending.current = false;
+          setLoading(false);
+        }
+      },
+    });
+    button.replaceChildren();
+    google.accounts.id.renderButton(button, { theme: 'outline', size: 'large', text: 'signin_with' });
+    return () => { button.replaceChildren(); };
+  }, [ready, clientId, trialPlanId]);
 
   return (
     <div className="space-y-3 my-6">
-      {error && <p role="alert" className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">{error}</p>}
-      <button type="button" onClick={loginWithGoogle} disabled={loading} aria-busy={loading}
-        className="flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep disabled:opacity-60">
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2.1H12v4h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.8 3-4.3 3-7.4Z"/><path fill="#34A853" d="M12 22c2.7 0 5-0.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.2H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H3.1a10 10 0 0 0 0 9l3.3-2.6Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.5 9.5 0 0 0 12 2a10 10 0 0 0-8.9 5.5l3.3 2.6A5.9 5.9 0 0 1 12 5.9Z"/></svg>
-        {loading ? 'Abrindo Google…' : 'Continuar com Google'}
-      </button>
-      <p className="text-center text-sm text-gray-600">Você será direcionada ao Google e voltará ao SOMA.</p>
+      <Script id="google-identity" src="https://accounts.google.com/gsi/client" strategy="afterInteractive"
+        onReady={() => setReady(true)}
+        onError={() => setError('Não foi possível carregar o Google. Atualize a página ou entre com seu e-mail.')} />
+      {(error || !clientId) && <p role="alert" className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">{error || 'Login com Google indisponível. Entre com seu e-mail.'}</p>}
+      {!ready && !error && clientId && <p role="status" className="text-center text-sm text-gray-600">Carregando login com Google…</p>}
+      <div ref={buttonRef} className={`flex justify-center ${loading ? 'pointer-events-none opacity-60' : ''}`} aria-busy={loading} />
+      {loading && <p role="status" className="text-center text-sm text-gray-600">Confirmando seu acesso ao SOMA…</p>}
+      <p className="text-center text-sm text-gray-600">Ou entre com seu e-mail acima.</p>
     </div>
   );
 }
