@@ -25,6 +25,9 @@ export default function FinanceiroClient({
   const [despesasMensais, setDespesasMensais] = useState(despesasMensaisIniciais);
   const [inputDespesas, setInputDespesas] = useState(String(despesasMensaisIniciais || ''));
   const [salvandoDespesas, setSalvandoDespesas] = useState(false);
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroPlano, setFiltroPlano] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
 
   async function handleSignOut() {
     posthog.capture('logout_realizado');
@@ -74,8 +77,15 @@ export default function FinanceiroClient({
     return valorContratado(mentorado) / plano.duracao_meses;
   }
 
-  const ativos = mentorados.filter((m) => m.status_assinatura === 'ativo');
-  const inadimplentes = mentorados.filter((m) => m.status_assinatura === 'inadimplente');
+  const trialAtivo = (m: Profile) => m.trial_status === 'active' && Boolean(m.trial_ends_at) && new Date(m.trial_ends_at!).getTime() > Date.now();
+  const statusVisivel = (m: Profile) => trialAtivo(m) ? 'trial' : m.trial_status === 'expired' && m.status_assinatura !== 'ativo' ? 'trial_encerrado' : m.status_assinatura || 'sem_assinatura';
+  const ativos = mentorados.filter((m) => m.status_assinatura === 'ativo' && !trialAtivo(m));
+  const inadimplentes = mentorados.filter((m) => m.status_assinatura === 'inadimplente' && !trialAtivo(m) && m.trial_status !== 'expired');
+  const mentoradosFiltrados = mentorados.filter((m) =>
+    (!filtroNome || m.nome === filtroNome) &&
+    (!filtroPlano || m.plano_id === filtroPlano) &&
+    (!filtroStatus || statusVisivel(m) === filtroStatus)
+  );
   const gratuitos = mentorados.filter((m) => {
     const plano = m.plano_id ? planoMap.get(m.plano_id) : null;
     return plano && plano.preco_avista === 0;
@@ -128,6 +138,38 @@ export default function FinanceiroClient({
         </button>
         
 
+        <div className="grid gap-3 sm:grid-cols-3 mb-6" aria-label="Filtros dos mentorados">
+          <label className="text-xs text-gray-text">Nome
+            <select value={filtroNome} onChange={(e) => setFiltroNome(e.target.value)} className="mt-1 block w-full rounded-lg border border-gray-faint bg-white p-2.5 text-sm text-black">
+              <option value="">Todos os nomes</option>
+              {[...mentorados].sort((a,b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR')).map(m => <option key={m.id} value={m.nome}>{m.nome || 'Sem nome'}</option>)}
+            </select>
+          </label>
+          <label className="text-xs text-gray-text">Plano
+            <select value={filtroPlano} onChange={(e) => setFiltroPlano(e.target.value)} className="mt-1 block w-full rounded-lg border border-gray-faint bg-white p-2.5 text-sm text-black">
+              <option value="">Todos os planos</option>
+              {planos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+            </select>
+          </label>
+          <label className="text-xs text-gray-text">Status
+            <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)} className="mt-1 block w-full rounded-lg border border-gray-faint bg-white p-2.5 text-sm text-black">
+              <option value="">Todos os status</option>
+              <option value="trial">Teste gratuito ativo</option>
+              <option value="trial_encerrado">Teste encerrado</option>
+              <option value="ativo">Assinatura ativa</option>
+              <option value="inadimplente">Inadimplente</option>
+              <option value="encerrado">Assinatura encerrada</option>
+              <option value="sem_assinatura">Sem assinatura</option>
+            </select>
+          </label>
+          <p className="sm:col-span-3 text-xs text-gray-text">{mentoradosFiltrados.length} de {mentorados.length} mentorados encontrados. Os indicadores financeiros abaixo mostram a base total.</p>
+          <div className="sm:col-span-3 overflow-x-auto rounded-xl border border-gray-faint">
+            <table className="w-full text-sm"><thead><tr className="border-b border-gray-faint text-left"><th className="p-3">Mentorado</th><th className="p-3">Plano</th><th className="p-3">Status</th></tr></thead><tbody>
+              {mentoradosFiltrados.map(m => <tr key={m.id} className="border-b border-gray-faint last:border-0"><td className="p-3">{m.nome}</td><td className="p-3">{m.plano_id ? planoMap.get(m.plano_id)?.nome || 'Plano indisponível' : 'Sem plano'}</td><td className="p-3">{statusVisivel(m) === 'trial' ? 'Teste gratuito ativo' : statusVisivel(m) === 'trial_encerrado' ? 'Teste encerrado' : statusVisivel(m) === 'ativo' ? 'Assinatura ativa' : statusVisivel(m) === 'inadimplente' ? 'Inadimplente' : statusVisivel(m) === 'encerrado' ? 'Assinatura encerrada' : 'Sem assinatura'}</td></tr>)}
+              {mentoradosFiltrados.length === 0 && <tr><td colSpan={3} className="p-5 text-center text-gray-text">Nenhum mentorado encontrado</td></tr>}
+            </tbody></table>
+          </div>
+        </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Panel className="p-5">
             <Wallet size={18} className="text-mint mb-2" />
@@ -148,8 +190,8 @@ export default function FinanceiroClient({
           </Panel>
           <Panel className="p-5">
             <Gift size={18} className="text-mint mb-2" />
-            <p className="font-display text-2xl text-black">{gratuitos.length}</p>
-            <p className="text-xs text-gray-text">Em cortesia/gratuito</p>
+            <p className="font-display text-2xl text-black">{mentorados.filter(trialAtivo).length}</p>
+            <p className="text-xs text-gray-text">Em teste gratuito ativo</p>
           </Panel>
         </div>
 
