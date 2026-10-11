@@ -19,6 +19,9 @@ export default function PerfilClient({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [nome, setNome] = useState(perfil?.nome || '');
+  const [genero, setGenero] = useState(perfil?.genero || '');
+  const [whatsapp, setWhatsapp] = useState(perfil?.whatsapp_numero || '');
+  const [aceitaWhatsapp, setAceitaWhatsapp] = useState(Boolean(perfil?.whatsapp_consentimento_em));
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
   const [mostraSenha, setMostraSenha] = useState(false);
@@ -39,6 +42,15 @@ export default function PerfilClient({
     try {
       const updateData: any = {};
 
+      const digitos = whatsapp.replace(/\D/g, '');
+      if (digitos && !/^(55)?[1-9][0-9]{9,10}$/.test(digitos)) {
+        setMensagem('Informe um WhatsApp válido com DDD.'); setSalvando(false); return;
+      }
+      const numeroNormalizado = digitos ? (digitos.startsWith('55') && digitos.length >= 12 ? digitos : '55' + digitos) : null;
+      updateData.whatsapp_numero = numeroNormalizado;
+      updateData.genero = genero || null;
+      updateData.whatsapp_consentimento_em = aceitaWhatsapp && numeroNormalizado ? (perfil?.whatsapp_numero === numeroNormalizado && perfil?.whatsapp_consentimento_em ? perfil.whatsapp_consentimento_em : new Date().toISOString()) : null;
+      if (numeroNormalizado !== perfil?.whatsapp_numero) updateData.whatsapp_validado_em = null;
       if (nome !== perfil?.nome) {
         updateData.nome = nome;
       }
@@ -64,7 +76,8 @@ export default function PerfilClient({
       }
 
       if (Object.keys(updateData).length > 0) {
-        await supabase.from('profiles').update(updateData).eq('id', perfil?.id);
+        const { error: erroPerfil } = await supabase.from('profiles').update(updateData).eq('id', perfil?.id);
+        if (erroPerfil) throw erroPerfil;
       }
 
       setMensagem('Perfil atualizado com sucesso!');
@@ -213,6 +226,17 @@ export default function PerfilClient({
             />
           </div>
 
+          <div className="mb-6 grid gap-5 sm:grid-cols-2">
+            <div><label className="block text-xs font-medium text-black mb-2">Como prefere ser identificado(a)?</label>
+              <select value={genero} onChange={e => setGenero(e.target.value as typeof genero)} className="w-full px-4 py-3 border border-gray-faint rounded-lg"><option value="">Prefiro não informar</option><option value="feminino">Feminino</option><option value="masculino">Masculino</option></select>
+            </div>
+            <div><label className="block text-xs font-medium text-black mb-2">WhatsApp com DDD</label>
+              <input type="tel" inputMode="tel" autoComplete="tel" placeholder="(11) 99999-9999" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="w-full px-4 py-3 border border-gray-faint rounded-lg" />
+              <p className="mt-1 text-xs text-gray-text">Informe seu número para receber acompanhamento da mentoria.</p>
+            </div>
+          </div>
+          <label className="mb-6 flex items-start gap-2 text-sm text-gray-text"><input type="checkbox" checked={aceitaWhatsapp} onChange={e => setAceitaWhatsapp(e.target.checked)} className="mt-1" /><span>Autorizo a SOMA Mentoria a enviar orientações e acompanhamentos personalizados pelo WhatsApp. Posso retirar essa autorização a qualquer momento nesta página.</span></label>
+          {perfil?.whatsapp_numero && <p className="mb-5 text-xs text-gray-text">Número cadastrado. A confirmação de posse do número ainda depende de validação por mensagem.</p>}
           {/* Senha */}
           <div className="border-t border-gray-faint pt-6">
             <h3 className="font-medium text-black mb-4">Redefinir Senha</h3>
