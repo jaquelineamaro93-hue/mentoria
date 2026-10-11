@@ -8,7 +8,11 @@ export interface Profile {
   email: string;
   tipo_pacote: TipoPacote;
   foto_url: string | null;
-  genero?: 'masculino' | 'feminino' | null;
+  genero?: 'masculino' | 'feminino' | 'nao_binario' | 'outro' | 'prefiro_nao_informar' | null;
+  dados_contato_confirmados_em?: string | null;
+  whatsapp_numero?: string | null;
+  whatsapp_consentimento_em?: string | null;
+  whatsapp_validado_em?: string | null;
   onboarding_concluido: boolean;
   tour_concluido: boolean;
   pontos_total: number;

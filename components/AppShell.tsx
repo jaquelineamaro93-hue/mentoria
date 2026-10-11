@@ -13,6 +13,7 @@ import {
 } from '@/lib/config/portalNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import TrialBanner from '@/components/TrialBanner';
+import ConfirmacaoContatoModal from '@/components/ConfirmacaoContatoModal';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
 import type { Profile } from '@/lib/types';
@@ -88,7 +89,7 @@ function SectionNavigationCards({
   );
 }
 
-function AppShellContent({ children }: { children: React.ReactNode }) {
+function AppShellContent({ children, initialProfile }: { children: React.ReactNode; initialProfile: Profile | null }) {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -185,6 +186,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       </a>
 
       <CollapsibleSidebar />
+      <ConfirmacaoContatoModal profile={initialProfile} />
 
       <div className={styles.workspace} inert={isMobile && isMobileOpen ? true : undefined}>
         <header className={styles.topbar}>
@@ -235,7 +237,7 @@ export default function AppShell({
     <UserProvider initialProfile={initialProfile}>
       <SidebarProvider>
         <Suspense fallback={<div className="min-h-screen bg-white" />}>
-          <AppShellContent>{children}</AppShellContent>
+          <AppShellContent initialProfile={initialProfile}>{children}</AppShellContent>
         </Suspense>
       </SidebarProvider>
     </UserProvider>
