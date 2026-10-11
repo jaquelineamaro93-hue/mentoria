@@ -90,7 +90,8 @@ export async function POST(request: Request) {
 
     // Não contabilizar uma simulação como concluída quando o currículo final
     // não contém as seções essenciais que a própria análise deveria produzir.
-    const cvFinal = String(resultadoJson.curriculo_final_markdown ?? '');
+    const cvFinal = String(resultadoJson.curriculo_final_markdown ?? '').replace(/\\n/g, '\n');
+    resultadoJson.curriculo_final_markdown = cvFinal;
     const secoesObrigatorias = [
       /(?:^|\n)#{1,3}\s*(?:resumo|perfil) profissional\b/im,
       /(?:^|\n)#{1,3}\s*(?:compet[eê]ncias|habilidades)(?:\s+(?:principais|chave|t[eé]cnicas))?\b/im,
@@ -117,7 +118,10 @@ export async function POST(request: Request) {
       } catch { /* Não consumir crédito em caso de falha na correção. */ }
     }
     if (!secoesObrigatorias.every((secao) => secao.test(resultadoJson.curriculo_final_markdown))) {
-      return NextResponse.json({error:'Não foi possível completar todas as seções do currículo. Nenhuma simulação foi registrada ou cobrada.'},{status:503});
+      // Preserve a análise já concluída sem contabilizar uso nem cobrar crédito.
+      // O currículo permanece identificado como rascunho não validado para ATS.
+      resultadoJson.aviso_curriculo = 'A IA gerou a análise, mas o currículo ainda não passou na revisão de estrutura ATS. Este resultado é uma prévia, não foi salvo nem cobrado. Revise antes de usar.';
+      return NextResponse.json({simulacao:{id:'previa-nao-salva',created_at:new Date().toISOString(),resultado_json:resultadoJson,resultado_markdown:resultadoJson.curriculo_final_markdown},previa:true});
     }
 
     if (jaUsouGratis && temCredito) {
