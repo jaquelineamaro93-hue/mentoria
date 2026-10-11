@@ -211,31 +211,29 @@ REGRAS DE FIDELIDADE À FONTE E À VAGA:
 - NÃO acrescente Gainsight, AWS, Azure, Google Cloud, ITIL, ITSM, FinOps, SaaS, IaaS, PaaS, Health Score, CSAT, churn prevention, gestão de renovações, negociação ou gestão de contas se essas atividades/competências não estiverem comprovadas no currículo de origem. Também não extrapole domínio de Salesforce para Salesforce Service Cloud se não houver evidência específica.
 - Para uma vaga de Customer Success com exigências de cloud, priorize somente evidências reais de CX, retenção, NPS, jornadas, liderança, gestão de clientes e projetos. Requisitos cloud não demonstrados devem aparecer apenas nos pontos de atenção e palavras-chave ausentes, NUNCA como competências adquiridas.
 - O diagnóstico de sabotadores deve ser coerente com o currículo que foi enviado, e não deve acusar ausência de uma seção que já existe ou data futura que é passada na data de referência.
-- O resultado final deve seguir o modelo textual de currículo executivo fornecido pelo usuário: cabeçalho simples, um parágrafo de resumo, linha de competências principais com termos separados por vírgulas, experiências em ordem cronológica inversa com cargo/empresa/datas e bullets de impacto, formação, certificações, idiomas e projetos relevantes. Não inclua detalhes sem evidência, não transforme experiências de CRM em gestão de renovações ou contratos sem prova.
+- O resultado final deve seguir a ESTRUTURA DO CURRÍCULO ORIGINAL enviado pelo usuário, sem adicionar seções ausentes. Cabeçalho simples, resumo, experiências em ordem cronológica inversa com cargo/empresa/datas e bullets de impacto, formação, cursos, idiomas e projetos quando presentes. Não inclua detalhes sem evidência, não transforme experiências de CRM em gestão de renovações ou contratos sem prova.
 
 REGRAS OBRIGATÓRIAS DE REESCRITA DO CURRÍCULO FINAL:
 1. Entregue uma nova versão editorial e estratégica, NÃO o mesmo currículo com outra fonte ou layout. Adapte o resumo, as competências e os bullets das experiências aos requisitos demonstrados da vaga, preservando cargos, empresas, datas e fatos do currículo de origem.
-2. A seção "## Competências principais" é OBRIGATÓRIA, com 8 a 14 competências técnicas, ferramentas e capacidades relevantes para a vaga, mas SOMENTE se comprovadas explicitamente no currículo de origem. Separe com vírgulas ou ponto e vírgula em texto simples. Nunca inclua uma palavra-chave apenas para inflar o ATS.
+2. Não crie uma seção independente de competências quando ela não existir no currículo original. Incorpore habilidades comprovadas no resumo e nas experiências, sem inflar palavras-chave ATS.
 3. Os seis sabotadores devem gerar mudanças VISÍVEIS no texto final sempre que corrigíveis com os dados disponíveis. Para cada sabotador, confira se a correção foi incorporada no resumo, competências, experiências, formação ou outra seção pertinente. Quando não houver evidência, não invente e deixe a lacuna nos pontos de atenção.
 4. Para cada palavra-chave da vaga: se houver evidência no currículo de origem, incorpore-a naturalmente em resumo, competências ou experiências; se não houver, mantenha-a APENAS em palavras_chave_ausentes, sem incluí-la no currículo final. O campo palavras_chave_ausentes deve representar lacunas reais NÃO comprovadas, não recomendações de inserção indiscriminada.
 5. Reescreva cada experiência prioritária com verbos de ação, contexto e resultado comprovado. Use métricas do documento original com unidade e período corretos. Não transforme percentuais em pontos percentuais, nem invente causalidade, cargos, datas, empresas, certificações, liderança ou ferramentas.
 6. Priorize as experiências com maior aderência à vaga, mas preserve a cronologia inversa e a identidade real dos cargos. Resuma experiências antigas sem perder informações necessárias à vaga.
-7. Estrutura EXATA do currículo final, seguindo o modelo de referência do usuário, sem inventar novas categorias ou misturar o diagnóstico ao documento, com headings simples:
+7. Preserve a ordem e os nomes das seções existentes no currículo de origem, sem inventar novas categorias ou misturar o diagnóstico ao documento. Estrutura de referência quando essas seções existirem:
 # Nome completo
 Contato em texto simples, sem tabelas ou ícones
 ## Resumo profissional
-Um parágrafo objetivo e específico para a vaga, sem alegações não comprovadas
-## Competências principais
-Lista em texto simples das competências comprovadas e relevantes
+Um parágrafo objetivo e específico para a vaga, incorporando competências comprovadas sem criar seção separada
 ## Experiência profissional
 Cada cargo com empresa e datas, seguido de 3 a 6 bullets concisos para experiências prioritárias
 ## Formação acadêmica
 ## Certificações e cursos
 ## Idiomas
 ## Projetos relevantes (somente quando houver evidência e aderência)
-8. ATS: uma única coluna; nada de tabelas, ícones, foto, barras laterais, colunas, caixas, emojis, gráficos ou links em sintaxe markdown. Cabeçalhos padrão, datas legíveis, texto selecionável. Até aproximadamente 950 palavras ou duas páginas A4, fonte equivalente a 10,5 ou 11 pt.
+8. NÃO inclua a seção 'Competências principais' se ela não existir no original. ATS: uma única coluna; nada de tabelas, ícones, foto, barras laterais, colunas, caixas, emojis, gráficos ou links em sintaxe markdown. Cabeçalhos padrão, datas legíveis, texto selecionável. Até aproximadamente 950 palavras ou duas páginas A4, fonte equivalente a 10,5 ou 11 pt.
 9. O diagnóstico e a carta de apresentação ficam FORA do currículo final. O currículo deve ser utilizável sozinho, sem observações editoriais, campos inventados ou comentários de IA.
-10. Antes de responder, confira: existe "Competências principais"? O resumo foi adaptado? As experiências foram efetivamente reescritas? Os seis sabotadores corrigíveis foram tratados? Nenhuma competência foi inventada? Se não, corrija antes de responder.
+10. Antes de responder, confira: a estrutura original foi preservada? O resumo foi adaptado? As experiências foram efetivamente reescritas? Os seis sabotadores corrigíveis foram tratados? Nenhuma competência foi inventada? Se não, corrija antes de responder.
 
 CURRÍCULO ATUAL:
 ${curriculo}
