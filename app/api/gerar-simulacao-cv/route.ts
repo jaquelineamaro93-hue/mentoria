@@ -14,20 +14,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
   }
 
-  const aiAllowed = await consumeIdentifierRateLimit({
-    scope: 'ai_cv_simular',
-    identifier: user.id,
-    limit: 30,
-    windowSeconds: 60 * 60,
-  });
-
-  if (!aiAllowed) {
-    return NextResponse.json(
-      { error: 'Limite temporário atingido. Tente novamente mais tarde.' },
-      { status: 429 }
-    );
-  }
-
   const body = await request.json();
   const curriculo: string = body.curriculo?.trim();
   const vaga: string = body.vaga?.trim();
@@ -41,9 +27,25 @@ export async function POST(request: Request) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('creditos_simulacao_cv')
+    .select('creditos_simulacao_cv, is_admin')
     .eq('id', user.id)
     .single();
+
+  // A conta de administração autorizada pode testar o simulador sem
+  // consumir a cota mensal nem os créditos destinados aos alunos.
+  // A exceção exige autenticação, e-mail verificado pelo Auth e papel admin.
+  const acessoAdminTeste = profile?.is_admin === true &&
+    user.email?.trim().toLowerCase() === 'jaqueline.amaro93@gmail.com';
+
+  const aiAllowed = await consumeIdentifierRateLimit({
+    scope: acessoAdminTeste ? 'ai_cv_admin_testes_v1' : 'ai_cv_simular',
+    identifier: user.id,
+    limit: acessoAdminTeste ? 300 : 30,
+    windowSeconds: 60 * 60,
+  });
+  if (!aiAllowed) {
+    return NextResponse.json({error:'Limite temporário de proteção atingido. Tente novamente mais tarde.'},{status:429});
+  }
 
   const inicioDoMes = new Date();
   inicioDoMes.setDate(1);
@@ -59,7 +61,7 @@ export async function POST(request: Request) {
   const jaUsouGratis = (usadasEsteMes ?? 0) >= LIMITE_GRATIS_MES;
   const temCredito = (profile?.creditos_simulacao_cv ?? 0) > 0;
 
-  if (jaUsouGratis && !temCredito) {
+  if (!acessoAdminTeste && jaUsouGratis && !temCredito) {
     return NextResponse.json(
       {
         error: 'limite_atingido',
@@ -128,7 +130,7 @@ export async function POST(request: Request) {
       return NextResponse.json({simulacao:{id:'previa-nao-salva',created_at:new Date().toISOString(),resultado_json:resultadoJson,resultado_markdown:resultadoJson.curriculo_final_markdown},previa:true});
     }
 
-    if (jaUsouGratis && temCredito) {
+    if (!acessoAdminTeste && jaUsouGratis && temCredito) {
       await supabase
         .from('profiles')
         .update({ creditos_simulacao_cv: (profile?.creditos_simulacao_cv ?? 1) - 1 })
