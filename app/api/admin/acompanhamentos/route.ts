@@ -108,6 +108,38 @@ export async function POST(request:NextRequest) {
       lideranca:{contexto:'seu crescimento profissional e estratégico',pergunta:'Qual decisão ou responsabilidade você gostaria de assumir com mais autonomia?'},
       geral:{contexto:'seu desenvolvimento profissional',pergunta:'Qual é a principal prioridade da sua carreira nesta semana?'},
     };
+    // Na recolocação, o assunto da pergunta deve partir de evidências do perfil,
+    // e não de uma mensagem idêntica para todas as pessoas.
+    const sinais=(objetivo+' '+momento+' '+anotacao+' '+plano+' '+quemAtual).toLowerCase();
+    const perguntaRecolocacao=(()=>{
+      if(/entrevista|processo seletivo|recrutador|feedback de seleção/.test(sinais))
+        return 'Como têm sido suas entrevistas ou conversas com recrutadores? Qual etapa você gostaria de preparar melhor?';
+      if(/currículo|curriculo|cv|portfólio|portfolio|linkedin|perfil profissional/.test(sinais))
+        return 'Você já conseguiu atualizar seu currículo ou perfil profissional para as oportunidades que procura? O que ainda falta ajustar?';
+      if(/networking|indicaç|contatos|conexões|conexoes/.test(sinais))
+        return 'Você conseguiu conversar com alguém da sua rede sobre as oportunidades que procura? Como foi essa troca?';
+      if(/transição de carreira|transicao de carreira|mudar de área|mudar de area|nova área|nova area/.test(sinais))
+        return 'Quais áreas ou tipos de vaga estão fazendo mais sentido para sua transição neste momento?';
+      if(/remoto|híbrido|hibrido|presencial|localizaç|salário|salario|pretensão salarial/.test(sinais))
+        return 'Quais critérios são indispensáveis para uma oportunidade fazer sentido para você hoje?';
+      if(/candidatur|aplicações|aplicacoes|enviar currículo|enviar curriculo|vagas/.test(sinais))
+        return 'As vagas às quais você tem se candidatado estão alinhadas ao que busca? O que tem observado nas respostas?';
+      // Sem evidência específica, fazer uma pergunta de descoberta, sem fingir personalização.
+      const descobertas=[
+        'Que tipo de oportunidade faria mais sentido para você neste momento, considerando suas prioridades?',
+        'Em qual etapa da sua busca você sente que precisa de mais apoio agora?',
+        'O que você já tentou na sua busca por uma nova oportunidade e gostaria de ajustar?',
+        'Qual seria um avanço concreto na sua busca por trabalho nesta semana?'
+      ];
+      const indice=Array.from(userId).reduce((total,caractere)=>total+caractere.charCodeAt(0),0)%descobertas.length;
+      return descobertas[indice];
+    })();
+    if(tema==='recolocacao') focos.recolocacao={
+      contexto: /transição de carreira|transicao de carreira|mudar de área|mudar de area/.test(sinais)
+        ? 'seu plano de transição de carreira'
+        : 'seu momento de busca por uma oportunidade profissional',
+      pergunta: perguntaRecolocacao
+    };
     const escolhido=focos[tema];
     let insight='',proxima_acao='',mensagem='';
     if(!objetivo&&!momento&&!plano&&!quemAtual&&!acaoAnterior) {
