@@ -295,6 +295,7 @@ export default function AdminClient({
               <BarChart3 size={15} />
               Analytics & testes A/B
             </Link>
+            <Link href="/admin/acompanhamentos" className="flex items-center justify-center gap-2 bg-brown-deep text-white text-sm font-medium px-4 py-2.5 rounded-lg">Acompanhamento Inteligente · WhatsApp</Link>
             <Link
               href="/admin/financeiro"
               className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
