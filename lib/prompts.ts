@@ -186,7 +186,7 @@ export function montarPromptSimuladorCV(curriculo: string, vaga: string): string
 
 ${REGRAS_DE_ESTILO}
 
-Analise o currículo e a vaga desejada abaixo. Faça o raciocínio completo internamente (rejeição silenciosa, otimização ATS, bullets de resultado, resumo profissional, auditoria), mas responda **apenas** com um JSON estrito, sem markdown ao redor, sem texto antes ou depois, no formato exato abaixo.
+Analise o currículo e a vaga desejada abaixo. Faça uma auditoria cruzada entre os requisitos da vaga, as seis falhas identificadas e o currículo REESCRITO, corrigindo o conteúdo e não somente o visual. Faça a análise internamente (rejeição silenciosa, otimização ATS, bullets de resultado, resumo profissional, auditoria), mas responda **apenas** com um JSON estrito, sem markdown ao redor, sem texto antes ou depois, no formato exato abaixo.
 
 {
   "fit_percentual": número de 0 a 100 representando a compatibilidade real entre o currículo e a vaga,
@@ -199,10 +199,34 @@ Analise o currículo e a vaga desejada abaixo. Faça o raciocínio completo inte
     "motivo": por que isso faz um recrutador rejeitar o currículo em segundos,
     "correcao": a versão corrigida ou o que fazer,
   "palavras_chave_ausentes": array com as palavras-chave da vaga que faltam no currículo e deveriam ser incluídas,
-  "curriculo_final_markdown": string em markdown com o currículo final pronto para uso. Deve ser ATS-safe, em uma única coluna, sem tabelas, sem ícones, sem foto, sem caixas, sem barras laterais e sem elementos gráficos. Estruture em ordem: nome; linha de contato; resumo profissional; competências-chave somente quando agregarem valor; experiência profissional da mais recente para a mais antiga; formação; certificações ou idiomas quando relevantes. Use títulos simples, bullets curtos e evidências reais. Priorize as experiências mais recentes e mais aderentes à vaga, resumindo experiências antigas para manter o documento em NO MÁXIMO 2 páginas A4. Não ultrapasse aproximadamente 950 palavras. Não invente resultados, métricas, ferramentas, cargos ou datas. O texto deve ficar legível em fonte de corpo equivalente a 10,5 ou 11 pt,
+  "curriculo_final_markdown": string em markdown com currículo REESCRITO para a vaga e pronto para ATS, seguindo rigorosamente as regras de reescrita e estrutura abaixo,
   "carta_apresentacao_markdown": string em markdown com a carta de apresentação estratégica, no máximo 200 palavras, conectando a experiência da pessoa aos problemas que a vaga revela,
   "perguntas_entrevista": array com 5 perguntas prováveis de entrevista com base na vaga e no perfil da pessoa
 }
+
+REGRAS OBRIGATÓRIAS DE REESCRITA DO CURRÍCULO FINAL:
+1. Entregue uma nova versão editorial e estratégica, NÃO o mesmo currículo com outra fonte ou layout. Adapte o resumo, as competências e os bullets das experiências aos requisitos demonstrados da vaga, preservando cargos, empresas, datas e fatos do currículo de origem.
+2. A seção "## Competências principais" é OBRIGATÓRIA, com 8 a 16 competências técnicas, ferramentas e capacidades relevantes para a vaga, mas SOMENTE se comprovadas no currículo de origem. Separe com vírgulas ou ponto e vírgula em texto simples. Nunca inclua uma palavra-chave apenas para inflar o ATS.
+3. Os seis sabotadores devem gerar mudanças VISÍVEIS no texto final sempre que corrigíveis com os dados disponíveis. Para cada sabotador, confira se a correção foi incorporada no resumo, competências, experiências, formação ou outra seção pertinente. Quando não houver evidência, não invente e deixe a lacuna nos pontos de atenção.
+4. Para cada palavra-chave da vaga: se houver evidência no currículo de origem, incorpore-a naturalmente em resumo, competências ou experiências; se não houver, mantenha-a APENAS em palavras_chave_ausentes, sem incluí-la no currículo final. O campo palavras_chave_ausentes deve representar lacunas reais NÃO comprovadas, não recomendações de inserção indiscriminada.
+5. Reescreva cada experiência prioritária com verbos de ação, contexto e resultado comprovado. Use métricas do documento original com unidade e período corretos. Não transforme percentuais em pontos percentuais, nem invente causalidade, cargos, datas, empresas, certificações, liderança ou ferramentas.
+6. Priorize as experiências com maior aderência à vaga, mas preserve a cronologia inversa e a identidade real dos cargos. Resuma experiências antigas sem perder informações necessárias à vaga.
+7. Estrutura EXATA do currículo final, com headings simples:
+# Nome completo
+Contato em texto simples, sem tabelas ou ícones
+## Resumo profissional
+Um parágrafo objetivo e específico para a vaga, sem alegações não comprovadas
+## Competências principais
+Lista em texto simples das competências comprovadas e relevantes
+## Experiência profissional
+Cada cargo com empresa e datas, seguido de 3 a 6 bullets concisos para experiências prioritárias
+## Formação acadêmica
+## Certificações e cursos
+## Idiomas
+## Projetos relevantes (somente quando houver evidência e aderência)
+8. ATS: uma única coluna; nada de tabelas, ícones, foto, barras laterais, colunas, caixas, emojis, gráficos ou links em sintaxe markdown. Cabeçalhos padrão, datas legíveis, texto selecionável. Até aproximadamente 950 palavras ou duas páginas A4, fonte equivalente a 10,5 ou 11 pt.
+9. O diagnóstico e a carta de apresentação ficam FORA do currículo final. O currículo deve ser utilizável sozinho, sem observações editoriais, campos inventados ou comentários de IA.
+10. Antes de responder, confira: existe "Competências principais"? O resumo foi adaptado? As experiências foram efetivamente reescritas? Os seis sabotadores corrigíveis foram tratados? Nenhuma competência foi inventada? Se não, corrija antes de responder.
 
 CURRÍCULO ATUAL:
 ${curriculo}
