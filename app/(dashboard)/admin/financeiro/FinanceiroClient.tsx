@@ -78,9 +78,9 @@ export default function FinanceiroClient({
   }
 
   const trialAtivo = (m: Profile) => m.trial_status === 'active' && Boolean(m.trial_ends_at) && new Date(m.trial_ends_at!).getTime() > Date.now();
-  const statusVisivel = (m: Profile) => trialAtivo(m) ? 'trial' : m.trial_status === 'expired' && m.status_assinatura !== 'ativo' ? 'trial_encerrado' : m.status_assinatura || 'sem_assinatura';
+  const statusVisivel = (m: Profile) => trialAtivo(m) ? 'trial' : m.trial_status === 'expired' && m.status_assinatura !== 'ativo' ? 'trial_encerrado' : m.status_assinatura === 'trial' ? 'trial' : m.status_assinatura || 'sem_assinatura';
   const ativos = mentorados.filter((m) => m.status_assinatura === 'ativo' && !trialAtivo(m));
-  const inadimplentes = mentorados.filter((m) => m.status_assinatura === 'inadimplente' && !trialAtivo(m) && m.trial_status !== 'expired');
+  const inadimplentes = mentorados.filter((m) => m.status_assinatura === 'inadimplente' && !trialAtivo(m) && m.trial_status !== 'expired' && m.trial_status !== 'not_started');
   const mentoradosFiltrados = mentorados.filter((m) =>
     (!filtroNome || m.nome === filtroNome) &&
     (!filtroPlano || m.plano_id === filtroPlano) &&

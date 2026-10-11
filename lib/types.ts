@@ -22,7 +22,7 @@ export interface Profile {
   trial_plan_id?: string | null;
   trial_prompt_variant?: string | null;
   trial_prompted_at?: string | null;
-  status_assinatura: 'ativo' | 'inadimplente' | 'encerrado';
+  status_assinatura: 'ativo' | 'inadimplente' | 'encerrado' | 'trial';
   origem_assinatura: 'manual' | 'mercadopago';
   proxima_cobranca: string | null;
   observacao_pagamento: string | null;
