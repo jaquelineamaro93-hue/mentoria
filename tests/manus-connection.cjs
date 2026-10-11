@@ -1,0 +1,26 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('typescript');
+const vm = require('node:vm');
+const source = ts.transpileModule(fs.readFileSync('lib/manus.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+let response;
+let calls = [];
+const context = { exports: {}, AbortSignal, fetch: async (url, options) => { calls.push({ url, options }); return response; } };
+vm.runInNewContext(source, context);
+(async () => {
+  response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'iris-id', task_id: 'iris-thread', nickname: 'Íris', about: 'private description' }] }) };
+  const agents = await context.exports.listManusAgents('test-key');
+  assert.equal(agents[0].nickname, 'Íris');
+  assert.equal(agents[0].about, undefined);
+  assert.equal(calls[0].url, 'https://api.manus.ai/v2/agent.list');
+  assert.equal(calls[0].options.headers['x-manus-api-key'], 'test-key');
+  assert.equal(calls[0].options.cache, 'no-store');
+  assert.equal(calls[0].options.redirect, 'error');
+  response = { ok: false };
+  await assert.rejects(context.exports.listManusAgents('test-key'), /autenticar/);
+  response = { ok: true, json: async () => ({ ok: false, data: [] }) };
+  await assert.rejects(context.exports.listManusAgents('test-key'), /inesperada/);
+  response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'wrong' }] }) };
+  await assert.rejects(context.exports.listManusAgents('test-key'), /inválidos/);
+  console.log('Manus connection: 4 scenarios passed (mock API, no external messages).');
+})().catch(error => { console.error(error); process.exitCode = 1; });
