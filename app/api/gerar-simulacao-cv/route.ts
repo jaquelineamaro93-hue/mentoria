@@ -98,9 +98,26 @@ export async function POST(request: Request) {
       /(?:^|\n)#{1,3}\s*forma[cç][aã]o(?: acad[eê]mica)?\b/im,
     ];
     if (!secoesObrigatorias.every((secao) => secao.test(cvFinal))) {
-      return NextResponse.json({
-        error: 'A IA não entregou um currículo completo com resumo, competências, experiências e formação. Nenhuma simulação foi registrada ou cobrada. Tente novamente.',
-      }, { status: 503 });
+      try {
+        const reparo = await chamarClaudeJson<{curriculo_final_markdown:string}>(
+          'Reescreva o currículo abaixo para a vaga, aplicando as correções dos sabotadores. ' +
+          'Preserve fatos, datas, cargos e métricas. Não invente competências. ' +
+          'Use obrigatoriamente os títulos Markdown ## Resumo profissional, ## Competências principais, ' +
+          '## Experiência profissional e ## Formação acadêmica. Responda apenas JSON com a chave curriculo_final_markdown.\\n' +
+          'Currículo original: ' + curriculo.slice(0,15000) + '\\nVaga: ' + vaga.slice(0,9000) +
+          '\\nSabotadores: ' + JSON.stringify(resultadoJson.sabotadores ?? []).slice(0,4000) +
+          '\\nCurrículo a corrigir: ' + cvFinal.slice(0,15000),
+          {maxTokens:5500,descricao:'reparo de currículo ATS',validar:(valor):valor is {curriculo_final_markdown:string}=>
+            !!valor && typeof valor==='object' && typeof (valor as {curriculo_final_markdown?:unknown}).curriculo_final_markdown==='string'}
+        );
+        const corrigido = reparo.curriculo_final_markdown.trim();
+        if (secoesObrigatorias.every((secao) => secao.test(corrigido))) {
+          resultadoJson.curriculo_final_markdown = corrigido;
+        }
+      } catch { /* Não consumir crédito em caso de falha na correção. */ }
+    }
+    if (!secoesObrigatorias.every((secao) => secao.test(resultadoJson.curriculo_final_markdown))) {
+      return NextResponse.json({error:'Não foi possível completar todas as seções do currículo. Nenhuma simulação foi registrada ou cobrada.'},{status:503});
     }
 
     if (jaUsouGratis && temCredito) {
