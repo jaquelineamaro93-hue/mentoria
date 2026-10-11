@@ -229,6 +229,7 @@ export interface PeerFeedback {
 }
 
 export interface CvSimulacaoResultado {
+  aviso_curriculo?: string;
   fit_percentual: number;
   fit_label: string;
   pontos_fortes: string[];
