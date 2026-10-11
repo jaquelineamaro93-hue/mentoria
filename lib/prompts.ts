@@ -186,6 +186,8 @@ export function montarPromptSimuladorCV(curriculo: string, vaga: string): string
 
 ${REGRAS_DE_ESTILO}
 
+DATA DE REFERÊNCIA OBRIGATÓRIA: ${new Date().toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'long',year:'numeric'})}. Use esta data para avaliar cronologia. Jun/2026 é PASSADO se a data de referência for outubro/2026. Não trate datas passadas como futuras nem invente correções cronológicas. Um vínculo iniciado em Jun/2026 e descrito como atual é temporalmente possível em outubro/2026.
+
 Analise o currículo e a vaga desejada abaixo. Faça uma auditoria cruzada entre os requisitos da vaga, as seis falhas identificadas e o currículo REESCRITO, corrigindo o conteúdo e não somente o visual. Faça a análise internamente (rejeição silenciosa, otimização ATS, bullets de resultado, resumo profissional, auditoria), mas responda **apenas** com um JSON estrito, sem markdown ao redor, sem texto antes ou depois, no formato exato abaixo.
 
 {
@@ -204,14 +206,21 @@ Analise o currículo e a vaga desejada abaixo. Faça uma auditoria cruzada entre
   "perguntas_entrevista": array com 5 perguntas prováveis de entrevista com base na vaga e no perfil da pessoa
 }
 
+REGRAS DE FIDELIDADE À FONTE E À VAGA:
+- O currículo original é a ÚNICA fonte de experiências, competências, ferramentas, métricas, datas, formação e certificações. A vaga é referência de ALINHAMENTO, não prova de que o candidato domina uma tecnologia.
+- NÃO acrescente Gainsight, AWS, Azure, Google Cloud, ITIL, ITSM, FinOps, SaaS, IaaS, PaaS, Health Score, CSAT, churn prevention, gestão de renovações, negociação ou gestão de contas se essas atividades/competências não estiverem comprovadas no currículo de origem. Também não extrapole domínio de Salesforce para Salesforce Service Cloud se não houver evidência específica.
+- Para uma vaga de Customer Success com exigências de cloud, priorize somente evidências reais de CX, retenção, NPS, jornadas, liderança, gestão de clientes e projetos. Requisitos cloud não demonstrados devem aparecer apenas nos pontos de atenção e palavras-chave ausentes, NUNCA como competências adquiridas.
+- O diagnóstico de sabotadores deve ser coerente com o currículo que foi enviado, e não deve acusar ausência de uma seção que já existe ou data futura que é passada na data de referência.
+- O resultado final deve seguir o modelo textual de currículo executivo fornecido pelo usuário: cabeçalho simples, um parágrafo de resumo, linha de competências principais com termos separados por vírgulas, experiências em ordem cronológica inversa com cargo/empresa/datas e bullets de impacto, formação, certificações, idiomas e projetos relevantes. Não inclua detalhes sem evidência, não transforme experiências de CRM em gestão de renovações ou contratos sem prova.
+
 REGRAS OBRIGATÓRIAS DE REESCRITA DO CURRÍCULO FINAL:
 1. Entregue uma nova versão editorial e estratégica, NÃO o mesmo currículo com outra fonte ou layout. Adapte o resumo, as competências e os bullets das experiências aos requisitos demonstrados da vaga, preservando cargos, empresas, datas e fatos do currículo de origem.
-2. A seção "## Competências principais" é OBRIGATÓRIA, com 8 a 16 competências técnicas, ferramentas e capacidades relevantes para a vaga, mas SOMENTE se comprovadas no currículo de origem. Separe com vírgulas ou ponto e vírgula em texto simples. Nunca inclua uma palavra-chave apenas para inflar o ATS.
+2. A seção "## Competências principais" é OBRIGATÓRIA, com 8 a 14 competências técnicas, ferramentas e capacidades relevantes para a vaga, mas SOMENTE se comprovadas explicitamente no currículo de origem. Separe com vírgulas ou ponto e vírgula em texto simples. Nunca inclua uma palavra-chave apenas para inflar o ATS.
 3. Os seis sabotadores devem gerar mudanças VISÍVEIS no texto final sempre que corrigíveis com os dados disponíveis. Para cada sabotador, confira se a correção foi incorporada no resumo, competências, experiências, formação ou outra seção pertinente. Quando não houver evidência, não invente e deixe a lacuna nos pontos de atenção.
 4. Para cada palavra-chave da vaga: se houver evidência no currículo de origem, incorpore-a naturalmente em resumo, competências ou experiências; se não houver, mantenha-a APENAS em palavras_chave_ausentes, sem incluí-la no currículo final. O campo palavras_chave_ausentes deve representar lacunas reais NÃO comprovadas, não recomendações de inserção indiscriminada.
 5. Reescreva cada experiência prioritária com verbos de ação, contexto e resultado comprovado. Use métricas do documento original com unidade e período corretos. Não transforme percentuais em pontos percentuais, nem invente causalidade, cargos, datas, empresas, certificações, liderança ou ferramentas.
 6. Priorize as experiências com maior aderência à vaga, mas preserve a cronologia inversa e a identidade real dos cargos. Resuma experiências antigas sem perder informações necessárias à vaga.
-7. Estrutura EXATA do currículo final, com headings simples:
+7. Estrutura EXATA do currículo final, seguindo o modelo de referência do usuário, sem inventar novas categorias ou misturar o diagnóstico ao documento, com headings simples:
 # Nome completo
 Contato em texto simples, sem tabelas ou ícones
 ## Resumo profissional
