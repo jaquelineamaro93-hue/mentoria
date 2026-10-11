@@ -80,7 +80,7 @@ export async function POST(request:NextRequest) {
       anterior?.proxima_acao&&'Ação combinada na semana anterior: '+resumo(anterior.proxima_acao,200),
     ].filter(Boolean) as string[];
     const primeiroNome=String(target.nome||'mentorada').trim().split(' ')[0];
-    const base=diarioAtual?resumo(diarioAtual.anotacoes||diarioAtual.ai_summary,140):
+    const base=diarioAtual && !/[?？]/.test(resumo(diarioAtual.anotacoes,300))?resumo(diarioAtual.anotacoes,140):
       pdiAtual?resumo(pdiAtual.dados,140):
       quemAtual?resumo(quemAtual.resposta,140):objetivo?resumo(objetivo,140):'';
     const acaoAnterior=resumo(anterior?.proxima_acao,160);
@@ -90,13 +90,13 @@ export async function POST(request:NextRequest) {
       proxima_acao='Perguntar qual objetivo profissional é prioridade e qual ação já está em andamento.';
       mensagem=`Oi, ${primeiroNome}! 💜 Quero entender melhor seu momento para te acompanhar de forma útil. Qual objetivo profissional é mais importante para você agora? E o que você já tentou fazer para avançar nele?`;
     } else {
-      insight=fontes.join('\\n')+'\\nObservação: registro existente não comprova execução de ações ou evolução; confirmar diretamente com a mentorada.';
+      insight=fontes.join('\n')+'\nObservação: registro existente não comprova execução de ações ou evolução; confirmar diretamente com a mentorada.';
       proxima_acao=acaoAnterior?
         'Retomar a ação combinada anteriormente e verificar o resultado antes de propor outra.':
         diarioAtual?'Retomar a situação descrita na última anotação e definir um próximo passo viável.':
         pdiAtual?'Retomar a seção do PDI em andamento e transformar a reflexão em uma ação verificável.':
         'Validar o objetivo declarado e definir uma primeira ação concreta com a mentorada.';
-      const referencia=diarioAtual?'Na sua última anotação você trouxe:':
+      const referencia=diarioAtual && base===resumo(diarioAtual.anotacoes,140)?'Na sua última anotação você trouxe:':
         pdiAtual?'No seu PDI você registrou:':
         quemAtual?'Na sua reflexão do Quem Sou Eu você escreveu:':'No seu diagnóstico você registrou este objetivo:';
       mensagem=`Oi, ${primeiroNome}! 💜 ${acaoAnterior?`No acompanhamento anterior, a ação que ficou registrada foi: “${acaoAnterior}”. Você conseguiu avançar? O que facilitou ou dificultou? `:''}${referencia} “${base}”. ${acaoAnterior?'Quero entender como isso se conecta ao que você viveu nesta semana.':'O que mudou desde que você escreveu isso e qual seria um próximo passo possível nesta semana?'} Estou aqui para construir esse passo com você.`;
