@@ -44,20 +44,67 @@ export async function POST(request:NextRequest) {
   const week=String(body.week||'');
   if(!/^\d{4}-\d{2}-\d{2}$/.test(week))return NextResponse.json({error:'Semana inválida'},{status:400});
   if(body.action==='draft') {
-    const [diagnostico,diario,pdi,quem]=await Promise.all([
-      admin.from('diagnostics').select('objetivos').eq('user_id',userId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
-      admin.from('journal_notes').select('id').eq('user_id',userId),
-      admin.from('pdi_respostas').select('id,concluido').eq('user_id',userId),
-      admin.from('quem_sou_eu_respostas').select('id').eq('user_id',userId)
+    // Acompanhamento ancorado nas respostas reais e no histórico, sem presumir progresso.
+    const [diagnostico, diario, pdi, quem, via, historico] = await Promise.all([
+      admin.from('diagnostics').select('objetivos,momento_carreira,habilidades,updated_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+      admin.from('journal_notes').select('anotacoes,ai_summary,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(5),
+      admin.from('pdi_respostas').select('secao,dados,concluido,updated_at').eq('user_id',userId).order('updated_at',{ascending:false}).limit(20),
+      admin.from('quem_sou_eu_respostas').select('bloco,resposta,updated_at').eq('user_id',userId).order('updated_at',{ascending:false}).limit(15),
+      admin.from('via_resultados').select('forcas,analise_ia,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+      admin.from('acompanhamentos_semanais').select('semana_inicio,proxima_acao,mensagem_whatsapp,status').eq('user_id',userId).lt('semana_inicio',week).order('semana_inicio',{ascending:false}).limit(1).maybeSingle(),
     ]);
-    const objetivo=String(diagnostico.data?.objetivos||'Objetivo ainda não preenchido').slice(0,1500);
-    const diarioN=diario.data?.length||0,pdiN=pdi.data?.filter(x=>x.concluido).length||0,quemN=quem.data?.length||0;
-    const progresso=`${quemN} respostas no Quem Sou Eu, ${pdiN} seções do PDI concluídas e ${diarioN} registros no diário (totais acumulados).`;
-    const insight=objetivo==='Objetivo ainda não preenchido'?'Priorizar a definição do objetivo de desenvolvimento antes de propor metas.':'Relacionar o objetivo declarado com uma ação concreta no PDI; as contagens não comprovam evolução qualitativa.';
-    const proxima_acao=objetivo==='Objetivo ainda não preenchido'?'Registrar o objetivo de carreira no diagnóstico.':'Escolher uma ação pequena e mensurável para avançar no objetivo nesta semana.';
-    const primeiroNome=String(target.nome||'').split(' ')[0];
-    const mensagem=`Oi, ${primeiroNome}! 💜 Como você está? Nesta semana, que tal ${proxima_acao.charAt(0).toLowerCase()+proxima_acao.slice(1)} Se quiser, me conte o que já conseguiu fazer e onde precisa de apoio. ✨`;
-    const {data:registro,error}=await admin.from('acompanhamentos_semanais').upsert({user_id:userId,semana_inicio:week,objetivo,progresso,insight,proxima_acao,mensagem_whatsapp:mensagem,status:'rascunho',updated_at:new Date().toISOString()},{onConflict:'user_id,semana_inicio'}).select().single();
+    const erros = [diagnostico.error,diario.error,pdi.error,quem.error,via.error,historico.error].filter(Boolean);
+    if(erros.length) return NextResponse.json({error:'Não foi possível consultar o histórico completo. Nenhum rascunho foi gerado.'},{status:503});
+
+    function resumo(valor: unknown, max=170): string {
+      if(valor==null)return '';
+      const texto=typeof valor==='string'?valor:JSON.stringify(valor);
+      return texto.replace(/\\s+/g,' ').trim().slice(0,max);
+    }
+    const objetivo=resumo(diagnostico.data?.objetivos,400);
+    const momento=resumo(diagnostico.data?.momento_carreira,160);
+    const diarioAtual=(diario.data||[]).find(x=>resumo(x.anotacoes||x.ai_summary).length>15);
+    const pdiAtual=(pdi.data||[]).find(x=>resumo(x.dados).length>20);
+    const quemAtual=(quem.data||[]).find(x=>resumo(x.resposta).length>20);
+    const anterior=historico.data;
+    const fontes=[
+      objetivo&&'Objetivo registrado no diagnóstico: '+objetivo,
+      momento&&'Momento de carreira: '+momento,
+      diarioAtual&&'Última anotação no diário ('+new Date(diarioAtual.created_at).toLocaleDateString('pt-BR')+'): '+resumo(diarioAtual.anotacoes||diarioAtual.ai_summary,400),
+      pdiAtual&&'PDI, seção '+resumo(pdiAtual.secao,60)+' ('+(pdiAtual.concluido?'concluída':'em andamento')+'): '+resumo(pdiAtual.dados,350),
+      quemAtual&&'Quem Sou Eu, bloco '+resumo(quemAtual.bloco,60)+': '+resumo(quemAtual.resposta,350),
+      via.data?.forcas&&'Forças VIA: '+resumo(via.data.forcas,180),
+      anterior?.proxima_acao&&'Ação combinada na semana anterior: '+resumo(anterior.proxima_acao,200),
+    ].filter(Boolean) as string[];
+    const primeiroNome=String(target.nome||'mentorada').trim().split(' ')[0];
+    const base=diarioAtual?resumo(diarioAtual.anotacoes||diarioAtual.ai_summary,140):
+      pdiAtual?resumo(pdiAtual.dados,140):
+      quemAtual?resumo(quemAtual.resposta,140):objetivo?resumo(objetivo,140):'';
+    const acaoAnterior=resumo(anterior?.proxima_acao,160);
+    let insight='',proxima_acao='',mensagem='';
+    if(!base&&!acaoAnterior) {
+      insight='Ainda não há informações qualitativas suficientes para acompanhar esta pessoa individualmente. Não inferir desafios ou evolução.';
+      proxima_acao='Perguntar qual objetivo profissional é prioridade e qual ação já está em andamento.';
+      mensagem=`Oi, ${primeiroNome}! 💜 Quero entender melhor seu momento para te acompanhar de forma útil. Qual objetivo profissional é mais importante para você agora? E o que você já tentou fazer para avançar nele?`;
+    } else {
+      insight=fontes.join('\\n')+'\\nObservação: registro existente não comprova execução de ações ou evolução; confirmar diretamente com a mentorada.';
+      proxima_acao=acaoAnterior?
+        'Retomar a ação combinada anteriormente e verificar o resultado antes de propor outra.':
+        diarioAtual?'Retomar a situação descrita na última anotação e definir um próximo passo viável.':
+        pdiAtual?'Retomar a seção do PDI em andamento e transformar a reflexão em uma ação verificável.':
+        'Validar o objetivo declarado e definir uma primeira ação concreta com a mentorada.';
+      const referencia=diarioAtual?'Na sua última anotação você trouxe:':
+        pdiAtual?'No seu PDI você registrou:':
+        quemAtual?'Na sua reflexão do Quem Sou Eu você escreveu:':'No seu diagnóstico você registrou este objetivo:';
+      mensagem=`Oi, ${primeiroNome}! 💜 ${acaoAnterior?`Na semana passada, a ação que ficou registrada foi: “${acaoAnterior}”. Você conseguiu avançar? O que facilitou ou dificultou? `:''}${referencia} “${base}”. ${acaoAnterior?'Quero entender como isso se conecta ao que você viveu nesta semana.':'O que mudou desde que você escreveu isso e qual seria um próximo passo possível nesta semana?'} Estou aqui para construir esse passo com você.`;
+    }
+    const progresso=`Fontes individuais consultadas: ${fontes.length}. ${diario.data?.length||0} anotações recentes, ${pdi.data?.length||0} seções de PDI, ${quem.data?.length||0} reflexões; histórico anterior ${anterior?'encontrado':'não encontrado'}. Os números não representam avanço.`;
+    // Rascunho sempre exige revisão humana antes de aprovação e envio.
+    const {data:registro,error}=await admin.from('acompanhamentos_semanais').upsert({
+      user_id:userId,semana_inicio:week,objetivo:objetivo||'Não informado',
+      progresso,insight,proxima_acao,mensagem_whatsapp:mensagem.slice(0,2000),
+      status:'rascunho',updated_at:new Date().toISOString()
+    },{onConflict:'user_id,semana_inicio'}).select().single();
     if(error)throw error;
     return NextResponse.json({registro});
   }
