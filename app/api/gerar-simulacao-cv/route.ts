@@ -88,6 +88,21 @@ export async function POST(request: Request) {
       },
     });
 
+    // Não contabilizar uma simulação como concluída quando o currículo final
+    // não contém as seções essenciais que a própria análise deveria produzir.
+    const cvFinal = String(resultadoJson.curriculo_final_markdown ?? '');
+    const secoesObrigatorias = [
+      /(?:^|\\n)#{1,3}\\s*resumo profissional\\b/im,
+      /(?:^|\\n)#{1,3}\\s*compet[eê]ncias (?:principais|chave|t[eé]cnicas)\\b/im,
+      /(?:^|\\n)#{1,3}\\s*experi[eê]ncia profissional\\b/im,
+      /(?:^|\\n)#{1,3}\\s*forma[cç][aã]o(?: acad[eê]mica)?\\b/im,
+    ];
+    if (!secoesObrigatorias.every((secao) => secao.test(cvFinal))) {
+      return NextResponse.json({
+        error: 'A IA não entregou um currículo completo com resumo, competências, experiências e formação. Nenhuma simulação foi registrada ou cobrada. Tente novamente.',
+      }, { status: 503 });
+    }
+
     if (jaUsouGratis && temCredito) {
       await supabase
         .from('profiles')
