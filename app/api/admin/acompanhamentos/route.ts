@@ -118,8 +118,8 @@ Regras obrigatórias:
 1. Identifique um detalhe CONCRETO e distintivo nas respostas desta pessoa, não apenas a categoria geral (como recolocação). Se não houver evidência individual, reconheça explicitamente a falta de dados e faça uma pergunta de descoberta.
 2. Nunca invente conquistas, dificuldades, ações concluídas, entrevistas, empresas, respostas ou evolução. Não confunda perguntas de formulários com respostas da mentorada.
 3. Use o histórico da semana anterior para evitar repetir a mesma pergunta e, quando existir uma ação anterior, pergunte sobre seu resultado sem pressupor que foi cumprida.
-4. Mensagem WhatsApp em português brasileiro, com até 550 caracteres, 2 a 4 parágrafos, saudação 'Oi, ${primeiroNome}! 💜', linguagem acolhedora e profissional, sem travessões, uma pergunta específica e uma próxima ação simples. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
-5. Duas pessoas buscando emprego não devem receber o mesmo roteiro apenas por estarem em recolocação. A pergunta deve ser consequência dos dados individuais. Não use sorteio, rotação de perguntas ou sinônimos cosméticos.
+4. Mensagem WhatsApp em português brasileiro, com até 550 caracteres, 2 a 4 parágrafos, saudação 'Oi, ${primeiroNome} 💜', linguagem acolhedora e profissional, sem travessões, uma pergunta específica e uma próxima ação simples. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
+4a. Nunca use ponto de exclamação (!) em nenhuma parte da mensagem. Evite urgência, apelos comerciais e linguagem de disparo em massa.\n5. Duas pessoas buscando emprego não devem receber o mesmo roteiro apenas por estarem em recolocação. A pergunta deve ser consequência dos dados individuais. Não use sorteio, rotação de perguntas ou sinônimos cosméticos.
 6. Os campos insight e progresso devem distinguir evidências observadas, lacunas e hipóteses. Quantidade de registros não significa progresso.
 7. Não inclua números de telefone, emails ou dados pessoais sensíveis na mensagem.
 Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progresso, insight, proxima_acao, mensagem.`;
@@ -132,7 +132,7 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     } catch {
       return NextResponse.json({error:'Não foi possível analisar o contexto individual com IA. Nenhum rascunho genérico foi criado. Tente novamente.'},{status:503});
     }
-    const mensagem=analise.mensagem.replace(/\\\\n/g,'\\n').trim();
+    const mensagem=analise.mensagem.replace(/\\\\n/g,'\\n').replace(/!/g,'').trim();
     if(!mensagem||mensagem.length>700||!mensagem.includes('?')||!mensagem.includes(primeiroNome))
       return NextResponse.json({error:'A análise retornou uma mensagem fora do padrão. Nenhum rascunho foi criado. Tente novamente.'},{status:503});
     const insight=analise.insight.slice(0,1800);
