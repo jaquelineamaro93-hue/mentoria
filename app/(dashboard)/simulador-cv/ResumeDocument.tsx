@@ -26,8 +26,8 @@ function cloneWithInlineStyles(source: HTMLElement) {
 
   clone.querySelectorAll('h1').forEach((node) => {
     const el = node as HTMLElement;
-    el.style.fontFamily = 'Georgia, Times New Roman, serif';
-    el.style.fontSize = '22pt';
+    el.style.fontFamily = 'Arial, Helvetica, sans-serif';
+    el.style.fontSize = '18pt';
     el.style.lineHeight = '1.08';
     el.style.fontWeight = '700';
     el.style.margin = '0 0 7pt 0';
@@ -36,13 +36,13 @@ function cloneWithInlineStyles(source: HTMLElement) {
 
   clone.querySelectorAll('h2').forEach((node) => {
     const el = node as HTMLElement;
-    el.style.fontFamily = 'Georgia, Times New Roman, serif';
+    el.style.fontFamily = 'Arial, Helvetica, sans-serif';
     el.style.fontSize = '12.5pt';
     el.style.lineHeight = '1.2';
     el.style.fontWeight = '700';
     el.style.margin = '15pt 0 6pt 0';
-    el.style.paddingBottom = '4pt';
-    el.style.borderBottom = '1px solid #d9d9d9';
+    el.style.paddingBottom = '0';
+    el.style.borderBottom = 'none';
     el.style.color = '#171717';
     el.style.breakAfter = 'avoid';
   });
@@ -126,18 +126,18 @@ function documentHtml(body: string, title: string) {
     margin: 0 auto;
   }
   h1 {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 22pt;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18pt;
     line-height: 1.08;
     margin: 0 0 7pt;
   }
   h2 {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 12.5pt;
     line-height: 1.2;
     margin: 15pt 0 6pt;
-    padding-bottom: 4pt;
-    border-bottom: 1px solid #d9d9d9;
+    padding-bottom: 0;
+    border-bottom: none;
     break-after: avoid;
   }
   h3 {
