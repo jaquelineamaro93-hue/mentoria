@@ -89,32 +89,36 @@ export async function POST(request:NextRequest) {
       acaoAnterior && 'Ação do acompanhamento anterior: '+acaoAnterior,
     ].filter(Boolean) as string[];
     const contexto=(objetivo+' '+momento+' '+plano+' '+quemAtual).toLowerCase();
-    const tema=/ampscript|marketing cloud|técnic|arquitetura|automaç/.test(contexto)?'técnico':
-      /recoloca|voltar ao mercado|nova oportunidade|emprego|vaga/.test(contexto)?'recolocação':
-      /lideran|gestão|estratégi/.test(contexto)?'liderança':
-      /autoconfian|medo de errar|inseguran/.test(contexto)?'confiança':'desenvolvimento';
-    const perguntas: Record<string,string>={
-      'técnico':'Qual habilidade técnica você quer praticar primeiro e em qual situação real poderia aplicá-la?',
-      'recolocação':'Qual etapa da sua busca por oportunidades está mais difícil agora: posicionamento, currículo, networking ou entrevistas?',
-      'liderança':'Em qual situação recente você gostaria de ter exercido mais influência ou autonomia?',
-      'confiança':'Em qual situação concreta você gostaria de agir com mais confiança nesta semana?',
-      'desenvolvimento':'Qual é a principal barreira para dar o próximo passo no seu objetivo agora?',
+    const tem=(re:RegExp)=>re.test(contexto);
+    const recolocacao=tem(/recoloca|voltar ao mercado|nova oportunidade|emprego|vaga|entrevista/);
+    const evolucao=tem(/nível pleno|nivel pleno|transição para.*pleno|junior.*pleno|júnior.*pleno/);
+    const tecnico=tem(/ampscript|marketing cloud|arquitetura de dados|automações complexas/);
+    const dados=tem(/interpretar dados|análise de dados|analisar dados|hipóteses|hipoteses/);
+    const comunicacao=tem(/comunicaç|expressar|posicionamento/);
+    const confianca=tem(/autoconfian|medo de errar|inseguran/);
+    const lideranca=tem(/lideran|gestão|estratégi/);
+    const tema=recolocacao?'recolocacao':evolucao?'evolucao':tecnico?'tecnico':dados?'dados':confianca?'confianca':comunicacao?'comunicacao':lideranca?'lideranca':'geral';
+    const focos:Record<string,{contexto:string;pergunta:string}>={
+      recolocacao:{contexto:'sua busca por uma nova oportunidade profissional',pergunta:'O que está mais difícil hoje: encontrar vagas alinhadas, se posicionar ou avançar nas entrevistas?'},
+      evolucao:{contexto:'sua transição para o nível pleno',pergunta:dados?'Para avançar, você prefere começar por análise de dados ou pela definição de prioridades?':'Qual competência você gostaria de desenvolver primeiro para dar esse próximo passo?'},
+      tecnico:{contexto:'seu desenvolvimento técnico',pergunta:'Qual habilidade você gostaria de praticar primeiro em uma situação real de trabalho?'},
+      dados:{contexto:'seu desenvolvimento em análise de dados e tomada de decisões',pergunta:'Em qual situação do seu trabalho você gostaria de aplicar uma análise ou testar uma hipótese?'},
+      confianca:{contexto:'seu objetivo de ganhar mais autoconfiança',pergunta:'Em qual situação concreta você gostaria de agir com mais segurança nesta semana?'},
+      comunicacao:{contexto:'seu desenvolvimento em comunicação e posicionamento',pergunta:'Em qual situação profissional você gostaria de se expressar com mais clareza?'},
+      lideranca:{contexto:'seu crescimento profissional e estratégico',pergunta:'Qual decisão ou responsabilidade você gostaria de assumir com mais autonomia?'},
+      geral:{contexto:'seu desenvolvimento profissional',pergunta:'Qual é a principal prioridade da sua carreira nesta semana?'},
     };
-    const foco=objetivo||momento||plano||quemAtual;
+    const escolhido=focos[tema];
     let insight='',proxima_acao='',mensagem='';
-    if(!foco&&!acaoAnterior) {
-      insight='Ainda não há respostas suficientes para identificar uma prioridade individual. É necessário ouvir a pessoa antes de recomendar ações.';
-      proxima_acao='Identificar uma prioridade profissional com a mentorada.';
-      mensagem='Oi, '+primeiroNome+'! 💜 Quero conhecer melhor seu momento antes de sugerir qualquer ação. Qual é a prioridade da sua carreira agora e o que mais tem dificultado esse caminho?';
+    if(!objetivo&&!momento&&!plano&&!quemAtual&&!acaoAnterior) {
+      insight='Não há contexto suficiente para uma orientação individual. Solicitar a prioridade atual antes de sugerir um plano.';
+      proxima_acao='Confirmar prioridade profissional.';
+      mensagem='Oi, '+primeiroNome+'! 💜 Quero conhecer melhor seu momento para que o acompanhamento faça sentido para você. Qual é sua prioridade profissional agora? ✨';
     } else {
-      insight='Contexto identificado:\n'+fontes.join('\n')+'\nAinda não há comprovação de evolução nesta semana. Validar com a mentorada o que foi efetivamente realizado.';
-      proxima_acao=acaoAnterior?'Verificar a execução da ação combinada anteriormente.':perguntas[tema];
-      const referencia=objetivo?'Vi que seu objetivo é '+objetivo.replace(/[.!?]+$/,'')+'.':
-        momento?'Você registrou que seu momento de carreira é '+momento.replace(/[.!?]+$/,'')+'.':
-        'No seu plano de desenvolvimento aparece '+foco.replace(/[.!?]+$/,'')+'.';
-      const retomada=acaoAnterior?' No último acompanhamento ficou registrada a ação: '+acaoAnterior.replace(/[.!?]+$/,'')+'. Você chegou a colocá-la em prática?':
-        ' '+perguntas[tema];
-      mensagem=('Oi, '+primeiroNome+'! 💜 '+referencia+retomada+' Quero entender seu momento para que nosso próximo passo faça sentido para você.').slice(0,1800);
+      insight='Foco identificado: '+escolhido.contexto+'.\\n'+(acaoAnterior?'Ação registrada anteriormente: '+acaoAnterior+'.\\n':'')+'Próxima conversa: validar a situação atual e definir uma ação concreta. Não há evidência suficiente para afirmar progresso.';
+      proxima_acao=acaoAnterior?'Confirmar se a ação anterior foi realizada e qual foi o resultado.':escolhido.pergunta;
+      const pergunta=acaoAnterior?'Você conseguiu avançar na ação que combinamos no último acompanhamento? O que aconteceu?':escolhido.pergunta;
+      mensagem='Oi, '+primeiroNome+'! 💜\\n\\nQuero retomar '+escolhido.contexto+'.\\n\\n'+pergunta+'\\n\\nSua resposta vai nos ajudar a definir um próximo passo prático. ✨';
     }
     const progresso='Registros consultados: '+(diario.data?.length||0)+' anotações, '+(pdi.data?.length||0)+' seções do PDI e '+(quem.data?.length||0)+' reflexões. '+(anterior?'Existe acompanhamento anterior.':'Primeiro acompanhamento registrado.')+' Quantidade de registros não comprova progresso.';
     // Rascunho sempre exige revisão humana antes de aprovação e envio.
