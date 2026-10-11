@@ -72,7 +72,7 @@ export async function iniciarTrialParaUsuario(
 
     await admin
       .from('profiles')
-      .update({ trial_status: 'expired' })
+      .update({ trial_status: 'expired', status_assinatura: 'encerrado', status_pagamento: 'encerrado' })
       .eq('id', userId)
       .eq('trial_status', 'active');
 
@@ -103,6 +103,8 @@ export async function iniciarTrialParaUsuario(
     .from('profiles')
     .update({
       trial_status: 'active',
+      status_assinatura: 'trial',
+      status_pagamento: 'trial',
       trial_started_at: startedAt.toISOString(),
       trial_ends_at: endsAt.toISOString(),
       trial_converted_at: null,
