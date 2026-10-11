@@ -144,8 +144,8 @@ Regras obrigatórias:
 1. Identifique um detalhe CONCRETO e distintivo nas respostas desta pessoa, não apenas a categoria geral (como recolocação). Se não houver evidência individual, reconheça explicitamente a falta de dados e faça uma pergunta de descoberta.
 2. Nunca invente conquistas, dificuldades, ações concluídas, entrevistas, empresas, respostas ou evolução. Não confunda perguntas de formulários com respostas da mentorada.
 3. Use o histórico da semana anterior para evitar repetir a mesma pergunta e, quando existir uma ação anterior, pergunte sobre seu resultado sem pressupor que foi cumprida.
-4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 410 caracteres, 2 a 3 parágrafos separados por duas quebras de linha, sem saudação, apresentação ou assinatura (o sistema adicionará). Linguagem acolhedora e profissional, sem travessões, uma pergunta específica e uma próxima ação simples. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
-4a. Nunca use ponto de exclamação (!) em nenhuma parte da mensagem. Evite urgência, apelos comerciais e linguagem de disparo em massa.\n5. Duas pessoas buscando emprego não devem receber o mesmo roteiro apenas por estarem em recolocação. A pergunta deve ser consequência dos dados individuais. Não use sorteio, rotação de perguntas ou sinônimos cosméticos.
+4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 520 caracteres, 2 a 3 parágrafos com uma linha em branco entre eles, sem saudação, apresentação ou assinatura (o sistema adicionará). Preserve o tom de mentoria reflexiva: conecte detalhes individuais, explicite hipóteses como hipóteses, proponha uma ação concreta e termine com uma pergunta específica. Linguagem acolhedora, frases naturais e sem travessões nem excesso de pontos finais. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
+4a. Nunca use travessões (— ou –), hífens como separadores de oração nem ponto de exclamação (!) na mensagem. Evite urgência, apelos comerciais e linguagem de disparo em massa.\n5. Duas pessoas buscando emprego não devem receber o mesmo roteiro apenas por estarem em recolocação. A pergunta deve ser consequência dos dados individuais. Não use sorteio, rotação de perguntas ou sinônimos cosméticos.
 6. Os campos insight e progresso devem distinguir evidências observadas, lacunas e hipóteses. Quantidade de registros não significa progresso.
 7. Não inclua números de telefone, emails ou dados pessoais sensíveis na mensagem.
 Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progresso, insight, proxima_acao, mensagem.`;
@@ -161,7 +161,7 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     // A IA pode variar pontuação e saudação. Corrigir apresentação sem
     // descartar uma análise individual válida ou fabricar conteúdo.
     const normalizarQuebras=(texto:string)=>texto.replace(/\\n/g,'\n').replace(/\r\n?/g,'\n');
-    let mensagem=normalizarQuebras(analise.mensagem).replace(/!/g,'').trim();
+    let mensagem=normalizarQuebras(analise.mensagem).replace(/!/g,'').replace(/\s*[—–]\s*/g,', ').trim();
     if(!mensagem || mensagem.length>2000)
       return NextResponse.json({error:'A IA não entregou uma mensagem utilizável. Nenhum rascunho foi criado.'},{status:503});
     // Identidade e apresentação são determinadas no servidor, não improvisadas pela IA.
@@ -173,8 +173,8 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     mensagem=mensagem.replace(/^(?:Aqui é|Eu sou|Sou a)\s+(?:a\s+)?(?:Lume|Norte|Brasa|Íris)[^\n]*\n*/i,'').trim();
     // Se a IA entregar um único bloco, distribuir as frases em parágrafos
     // sem alterar o sentido ou inventar informações.
-    if(!mensagem.includes('\\n\\n') && mensagem.length>200) {
-      const frases=mensagem.match(/[^.!?]+[.!?]+(?:\\s+|$)|[^.!?]+$/g)?.map(f=>f.trim()).filter(Boolean) ?? [];
+    if(!mensagem.includes('\n\n') && mensagem.length>200) {
+      const frases=mensagem.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g)?.map(f=>f.trim()).filter(Boolean) ?? [];
       if(frases.length>=3) {
         const blocos:string[]=[];
         let bloco='';
@@ -183,7 +183,7 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
           bloco+=(bloco?' ':'')+frase;
         }
         if(bloco)blocos.push(bloco);
-        mensagem=blocos.join('\\n\\n');
+        mensagem=blocos.join('\n\n');
       }
     }
     const saudacao='Oi, '+primeiroNome+', tudo bem? 💜';
@@ -194,7 +194,7 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
         : '';
     const assinatura=primeiroContato?'':'\n\n'+mascote.nome+' | SOMA Mentoria';
     mensagem=[saudacao,apresentacao,mensagem].filter(Boolean).join('\n\n')+assinatura;
-    if(mensagem.length>700)return NextResponse.json({error:'A mensagem excedeu o limite após identificar o mascote. Tente gerar novamente.'},{status:503});
+    if(mensagem.length>750)return NextResponse.json({error:'A mensagem excedeu o limite após identificar o mascote. Tente gerar novamente.'},{status:503});
     // Não exigir um sinal '?' literal: perguntas indiretas e pedidos de
     // reflexão também podem ser mensagens válidas para revisão humana.
     mensagem=mensagem.replace(/\n{3,}/g,'\n\n');
@@ -214,7 +214,8 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
   if(body.action==='message') {
     if(!['rascunho','aprovado'].includes(body.status))return NextResponse.json({error:'Status inválido'},{status:400});
     if(body.status==='aprovado'&&(!target.whatsapp_numero||!target.whatsapp_consentimento_em))return NextResponse.json({error:'Contato sem consentimento'},{status:400});
-    const message=String(body.message||'').replace(/\\n/g,'\n').slice(0,2000);
+    const message=String(body.message||'').replace(/\\n/g,'\n').trim();
+    if(!message || message.length>750)return NextResponse.json({error:'A mensagem deve ter no máximo 750 caracteres, incluindo saudação e assinatura.'},{status:400});
     const {data:registro,error}=await admin.from('acompanhamentos_semanais').update({mensagem_whatsapp:message,status:body.status,updated_at:new Date().toISOString()}).eq('user_id',userId).eq('semana_inicio',week).select().single();
     if(error)throw error;
     return NextResponse.json({registro});
