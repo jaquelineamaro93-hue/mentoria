@@ -102,7 +102,11 @@ export async function POST(request: Request) {
       try {
         const reparo = await chamarClaudeJson<{curriculo_final_markdown:string}>(
           'Reescreva o currículo abaixo para a vaga, aplicando as correções dos sabotadores. ' +
-          'Preserve fatos, datas, cargos e métricas. Não invente competências. ' +
+          'Preserve fatos, datas, cargos e métricas. Não invente competências. A vaga não comprova competências do candidato. ' +
+          'Não inclua ferramentas ou experiência sem evidência no currículo original, mesmo se citadas na versão a corrigir. ' +
+          'Use a data atual de referência: ' + new Date().toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) + '. ' +
+          'Adapte concretamente o resumo e os bullets às responsabilidades da vaga usando somente evidências originais. ' +
+          'Competências em texto corrido, separadas por vírgulas, sem ferramentas não comprovadas. ' +
           'Use obrigatoriamente os títulos Markdown ## Resumo profissional, ## Competências principais, ' +
           '## Experiência profissional e ## Formação acadêmica. Responda apenas JSON com a chave curriculo_final_markdown.\\n' +
           'Currículo original: ' + curriculo.slice(0,15000) + '\\nVaga: ' + vaga.slice(0,9000) +
