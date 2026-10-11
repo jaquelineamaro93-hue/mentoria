@@ -241,7 +241,7 @@ export default function ResumeDocument({
         <div>
           <p className="text-sm font-semibold text-black">Currículo pronto para uso</p>
           <p className="text-xs text-gray-text mt-1">
-            Modelo A4, uma coluna, compatível com ATS e pensado para caber em até 2 páginas.
+            Modelo A4, uma coluna e seções legíveis para ATS. Revise as informações antes de enviar: nenhum formato garante aprovação automática.
           </p>
         </div>
 
