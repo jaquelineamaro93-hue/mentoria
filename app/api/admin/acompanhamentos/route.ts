@@ -133,7 +133,7 @@ export async function POST(request:NextRequest) {
   if(body.action==='message') {
     if(!['rascunho','aprovado'].includes(body.status))return NextResponse.json({error:'Status inválido'},{status:400});
     if(body.status==='aprovado'&&(!target.whatsapp_numero||!target.whatsapp_consentimento_em))return NextResponse.json({error:'Contato sem consentimento'},{status:400});
-    const message=String(body.message||'').slice(0,2000);
+    const message=String(body.message||'').replace(/\\\\n/g,'\n').slice(0,2000);
     const {data:registro,error}=await admin.from('acompanhamentos_semanais').update({mensagem_whatsapp:message,status:body.status,updated_at:new Date().toISOString()}).eq('user_id',userId).eq('semana_inicio',week).select().single();
     if(error)throw error;
     return NextResponse.json({registro});
