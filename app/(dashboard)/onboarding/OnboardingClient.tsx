@@ -95,8 +95,8 @@ export default function OnboardingClient({
     {
       key: 'perfil',
       titulo: 'Prepare seu perfil',
-      descricao: 'Confirme seus dados e adicione uma foto para identificar sua conta.',
-      beneficio: 'Seu espaço fica pronto para acompanhar sua evolução.',
+      descricao: 'Confirme seu nome, como prefere ser identificado(a), WhatsApp e autorização opcional para acompanhamento semanal.',
+      beneficio: 'Seu espaço fica pronto e você escolhe se deseja receber acompanhamento no WhatsApp.',
       feito: Boolean(profile?.foto_url && profile?.nome),
       progresso: profile?.foto_url && profile?.nome ? 'Perfil configurado' : 'Foto e nome necessários',
       href: '/perfil', cta: 'Ver meu perfil', icon: Users,
