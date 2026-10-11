@@ -12,6 +12,7 @@ export default function AcompanhamentosClient({mentorados,registros:iniciais}:{m
  const [mensagens,setMensagens]=useState<Record<string,string>>({});
  const [ocupado,setOcupado]=useState<string|null>(null);
  const [aviso,setAviso]=useState('');
+ const [erros,setErros]=useState<Record<string,string>>({});
  const [csv,setCsv]=useState('');
  const [importando,setImportando]=useState(false);
  const semana=new Date(); semana.setDate(semana.getDate()-((semana.getDay()+6)%7));
@@ -26,8 +27,17 @@ export default function AcompanhamentosClient({mentorados,registros:iniciais}:{m
    try {await acao({action:'contact',userId:m.id,phone:numeros[m.id]??m.whatsapp_numero??''});setAviso('Número salvo. O mentorado deve autorizar o envio no próprio perfil.');window.location.reload();}catch(e){setAviso(String(e));}finally{setOcupado(null);}
  }
  async function gerar(m:Mentorado) {
-   setOcupado(m.id);setAviso('');
-   try {const data=await acao({action:'draft',userId:m.id,week:semanaInicio});setRegistros(prev=>[data.registro,...prev.filter(x=>!(x.user_id===m.id&&x.semana_inicio===semanaInicio))]);setAviso('Rascunho criado com dados reais da jornada. Revise antes de enviar.');}catch(e){setAviso(String(e));}finally{setOcupado(null);}
+   const anterior=registros.find(x=>x.user_id===m.id&&x.semana_inicio===semanaInicio);
+   if(anterior?.status==='enviado'){setErros(p=>({...p,[m.id]:'Este acompanhamento já foi enviado e não pode ser substituído.'}));return;}
+   if(anterior?.status==='aprovado'&&!window.confirm('Este resumo está aprovado. Deseja gerar outro e voltar ao status de rascunho?'))return;
+   setOcupado(m.id);setAviso('');setErros(p=>({...p,[m.id]:''}));
+   try {
+     const data=await acao({action:'draft',userId:m.id,week:semanaInicio,regenerate:true});
+     setRegistros(prev=>[data.registro,...prev.filter(x=>!(x.user_id===m.id&&x.semana_inicio===semanaInicio))]);
+     setMensagens(prev=>{const novo={...prev};delete novo[m.id];return novo;});
+     setAviso('Análise atualizada com os dados disponíveis. Revise a mensagem antes de aprovar.');
+   }catch(e){setErros(p=>({...p,[m.id]:e instanceof Error?e.message:'Falha ao gerar resumo'}));}
+   finally{setOcupado(null);}
  }
  async function salvarMensagem(m:Mentorado,r:Registro,status:string) {
    setOcupado(m.id);setAviso('');
@@ -53,9 +63,10 @@ export default function AcompanhamentosClient({mentorados,registros:iniciais}:{m
    <div className="space-y-4">{filtrados.map(m=>{const r=registros.find(x=>x.user_id===m.id&&x.semana_inicio===semanaInicio);const liberado=!!m.whatsapp_numero&&!!m.whatsapp_consentimento_em;
      return <section key={m.id} className="rounded-xl border border-gray-faint bg-white p-5">
        <div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="font-semibold">{m.nome||m.email}</h3><p className="text-xs text-gray-text">{m.email} · {m.genero||'Gênero não informado'}</p></div><span className="text-xs text-gray-text">{liberado?'Contato autorizado':m.whatsapp_numero?'Aguardando consentimento':'Sem número'}</span></div>
-       <div className="mt-3 flex flex-wrap gap-2"><input type="tel" placeholder="55 + DDD + número" value={numeros[m.id]??m.whatsapp_numero??''} onChange={e=>setNumeros(p=>({...p,[m.id]:e.target.value}))} className="min-w-44 flex-1 rounded-lg border border-gray-faint p-2 text-sm"/><button onClick={()=>salvarNumero(m)} disabled={ocupado===m.id} className="rounded-lg border border-gray-faint px-3 py-2 text-sm">Salvar número</button><button onClick={()=>gerar(m)} disabled={ocupado===m.id} className="rounded-lg bg-brown-deep px-3 py-2 text-sm text-white">Gerar resumo semanal</button></div>
+       <div className="mt-3 flex flex-wrap gap-2"><input type="tel" placeholder="55 + DDD + número" value={numeros[m.id]??m.whatsapp_numero??''} onChange={e=>setNumeros(p=>({...p,[m.id]:e.target.value}))} className="min-w-44 flex-1 rounded-lg border border-gray-faint p-2 text-sm"/><button onClick={()=>salvarNumero(m)} disabled={ocupado===m.id} className="rounded-lg border border-gray-faint px-3 py-2 text-sm">Salvar número</button><button onClick={()=>gerar(m)} disabled={ocupado===m.id} className="rounded-lg bg-brown-deep px-3 py-2 text-sm text-white">{r?'Refazer análise e mensagem':'Gerar resumo semanal'}</button></div>
+       {erros[m.id]&&<p role="alert" className="mt-2 text-sm text-red-700">{erros[m.id]}</p>}
        <p className="mt-2 text-xs text-gray-text">Validação de cadastro: <Link className="underline" href="/perfil">/perfil</Link> (enviar este caminho para a pessoa logada). {m.whatsapp_validado_em?'Número verificado':'Número ainda não verificado'}</p>
-       {r&&<div className="mt-4 space-y-2 border-t border-gray-faint pt-4 text-sm"><p><strong>Objetivo:</strong> {r.objetivo||'Não declarado'}</p><p><strong>Progresso:</strong> {r.progresso||'Sem evidências'}</p><p><strong>Insight:</strong> {r.insight||'Sem análise'}</p><p><strong>Próxima ação:</strong> {r.proxima_acao||'Não definida'}</p><textarea rows={4} value={mensagens[m.id]??r.mensagem_whatsapp??''} onChange={e=>setMensagens(p=>({...p,[m.id]:e.target.value}))} className="w-full rounded-lg border border-gray-faint p-3"/><div className="flex flex-wrap gap-2"><button disabled={ocupado===m.id} onClick={()=>salvarMensagem(m,r,'rascunho')} className="rounded-lg border border-gray-faint px-3 py-2">Salvar rascunho</button><button disabled={ocupado===m.id||!liberado} onClick={()=>salvarMensagem(m,r,'aprovado')} className="rounded-lg bg-brown-deep px-3 py-2 text-white disabled:opacity-50">Aprovar para o agente</button><span className="self-center text-xs text-gray-text">Status: {r.status}</span></div></div>}
+       {r&&<div className="mt-4 space-y-2 border-t border-gray-faint pt-4 text-sm"><p><strong>Objetivo:</strong> {r.objetivo||'Não declarado'}</p><p><strong>Progresso:</strong> {r.progresso||'Sem evidências'}</p><div><strong>Insight:</strong> <p className="mt-1 whitespace-pre-line text-gray-text">{(r.insight||'Sem análise').replace(/\\\\n/g,'\n')}</p></div><p><strong>Próxima ação:</strong> {r.proxima_acao||'Não definida'}</p><textarea rows={4} value={mensagens[m.id]??r.mensagem_whatsapp??''} onChange={e=>setMensagens(p=>({...p,[m.id]:e.target.value}))} className="w-full rounded-lg border border-gray-faint p-3"/><div className="flex flex-wrap gap-2"><button disabled={ocupado===m.id} onClick={()=>salvarMensagem(m,r,'rascunho')} className="rounded-lg border border-gray-faint px-3 py-2">Salvar rascunho</button><button disabled={ocupado===m.id||!liberado} onClick={()=>salvarMensagem(m,r,'aprovado')} className="rounded-lg bg-brown-deep px-3 py-2 text-white disabled:opacity-50">Aprovar para o agente</button><span className="self-center text-xs text-gray-text">Status: {r.status}</span></div></div>}
      </section>})}</div>
  </main>;
 }
