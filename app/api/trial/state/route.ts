@@ -51,7 +51,7 @@ export async function GET() {
   if (profile.trial_status === 'active' && fim <= agora) {
     await admin
       .from('profiles')
-      .update({ trial_status: 'expired' })
+      .update({ trial_status: 'expired', status_assinatura: 'encerrado', status_pagamento: 'encerrado' })
       .eq('id', user.id)
       .eq('trial_status', 'active');
 
