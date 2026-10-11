@@ -183,7 +183,7 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
           bloco+=(bloco?' ':'')+frase;
         }
         if(bloco)blocos.push(bloco);
-        mensagem=blocos.join('\\n\\n');
+        mensagem=blocos.join('\n\n');
       }
     }
     const saudacao='Oi, '+primeiroNome+', tudo bem? 💜';
