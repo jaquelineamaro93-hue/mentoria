@@ -270,6 +270,7 @@ export default function AdminClient({
 
     return true;
   });
+  const aguardandoLiberacao = linhas.filter(l => !l.profile.plano_id && l.profile.trial_status !== 'active' && l.profile.status_assinatura !== 'ativo');
   const usuariosFiltrados = usuarios.filter((u) => {
     if (filtroUsuarios === "admin" && !u.is_admin) return false;
     if (filtroUsuarios === "geral" && u.is_admin) return false;
@@ -283,6 +284,21 @@ export default function AdminClient({
 
   return (
     <>
+        {aguardandoLiberacao.length > 0 && (
+          <section className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-semibold text-amber-950">Cadastros aguardando liberação ({aguardandoLiberacao.length})</h2>
+                <p className="mt-1 text-sm text-amber-900">Contas criadas sem plano ou trial ativo. O cadastro não significa pagamento em atraso.</p>
+              </div>
+              <Link href="/admin/gerenciar-planos" className="rounded-lg bg-brown-deep px-4 py-2 text-sm font-medium text-white">Gerenciar acessos</Link>
+            </div>
+            <div className="mt-3 space-y-1 text-sm text-amber-950">
+              {aguardandoLiberacao.slice(0,12).map(l => <p key={l.profile.id}>{l.profile.nome || 'Sem nome'} · {l.profile.email}</p>)}
+              {aguardandoLiberacao.length > 12 && <p>Mais {aguardandoLiberacao.length - 12} cadastro(s) na lista de mentorados.</p>}
+            </div>
+          </section>
+        )}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
           <div>
             
