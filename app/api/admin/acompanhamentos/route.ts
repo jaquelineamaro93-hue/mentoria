@@ -45,6 +45,9 @@ export async function POST(request:NextRequest) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(week))return NextResponse.json({error:'Semana inválida'},{status:400});
   if(body.action==='draft') {
     // Acompanhamento ancorado nas respostas reais e no histórico, sem presumir progresso.
+    const {data:existente,error:erroExistente}=await admin.from('acompanhamentos_semanais').select('status').eq('user_id',userId).eq('semana_inicio',week).maybeSingle();
+    if(erroExistente)throw erroExistente;
+    if(existente?.status==='aprovado'||existente?.status==='enviado')return NextResponse.json({error:'Este acompanhamento já foi aprovado ou enviado. Não é permitido sobrescrevê-lo automaticamente.'},{status:409});
     const [diagnostico, diario, pdi, quem, via, historico] = await Promise.all([
       admin.from('diagnostics').select('objetivos,momento_carreira,habilidades,updated_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
       admin.from('journal_notes').select('anotacoes,ai_summary,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(5),
@@ -96,7 +99,7 @@ export async function POST(request:NextRequest) {
       const referencia=diarioAtual?'Na sua última anotação você trouxe:':
         pdiAtual?'No seu PDI você registrou:':
         quemAtual?'Na sua reflexão do Quem Sou Eu você escreveu:':'No seu diagnóstico você registrou este objetivo:';
-      mensagem=`Oi, ${primeiroNome}! 💜 ${acaoAnterior?`Na semana passada, a ação que ficou registrada foi: “${acaoAnterior}”. Você conseguiu avançar? O que facilitou ou dificultou? `:''}${referencia} “${base}”. ${acaoAnterior?'Quero entender como isso se conecta ao que você viveu nesta semana.':'O que mudou desde que você escreveu isso e qual seria um próximo passo possível nesta semana?'} Estou aqui para construir esse passo com você.`;
+      mensagem=`Oi, ${primeiroNome}! 💜 ${acaoAnterior?`No acompanhamento anterior, a ação que ficou registrada foi: “${acaoAnterior}”. Você conseguiu avançar? O que facilitou ou dificultou? `:''}${referencia} “${base}”. ${acaoAnterior?'Quero entender como isso se conecta ao que você viveu nesta semana.':'O que mudou desde que você escreveu isso e qual seria um próximo passo possível nesta semana?'} Estou aqui para construir esse passo com você.`;
     }
     const progresso=`Fontes individuais consultadas: ${fontes.length}. ${diario.data?.length||0} anotações recentes, ${pdi.data?.length||0} seções de PDI, ${quem.data?.length||0} reflexões; histórico anterior ${anterior?'encontrado':'não encontrado'}. Os números não representam avanço.`;
     // Rascunho sempre exige revisão humana antes de aprovação e envio.
