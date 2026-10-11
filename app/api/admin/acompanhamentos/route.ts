@@ -96,7 +96,7 @@ export async function POST(request:NextRequest) {
     const anterior=historico.data;
     const mascote=mascotePorPontos(Number(target.pontos_total ?? 0));
     const primeiroContato=!anterior;
-    const mascoteAnterior=anterior?.mensagem_whatsapp?.match(/(?:Lume|Norte|Brasa|Íris) \| SOMA Mentoria/)?.[0]?.split(' | ')[0];
+    const mascoteAnterior=anterior?.mensagem_whatsapp?.match(/(?:Lume|Norte|Brasa|Íris)(?= \| SOMA Mentoria|, assistente virtual da SOMA Mentoria)/)?.[0];
     const novoMascote=!!mascoteAnterior && mascoteAnterior!==mascote.nome;
     const acaoAnterior=resumo(anterior?.proxima_acao,180);
     const primeiroNome=String(target.nome||'mentorada').trim().split(' ')[0];
