@@ -90,6 +90,36 @@ export async function POST(request: Request) {
       },
     });
 
+    // A análise de compatibilidade não substitui a entrega do currículo.
+    // Gere a versão adaptada em uma chamada dedicada, fundamentada na fonte.
+    try {
+      const versaoAdaptada = await chamarClaudeJson<{curriculo_final_markdown:string}>(
+        'Você é especialista em reescrita de currículos ATS. Entregue APENAS JSON com a chave curriculo_final_markdown.\\n' +
+        'Reescreva efetivamente o currículo original para a vaga abaixo. O currículo original é a única fonte de fatos. ' +
+        'NÃO copie o texto inteiro mudando só o formato. Refaça o resumo profissional, selecione 8 a 14 competências comprovadas, ' +
+        'reescreva bullets relevantes com resultados existentes e destaque a aderência real à vaga. ' +
+        'Preserve nome, contatos, empresas, cargos, datas, formação, métricas e projetos reais. ' +
+        'NÃO invente ferramentas, gestão de contratos, renovação, SaaS, Cloud, Gainsight, AWS, Azure, CSAT ou experiência não comprovada. ' +
+        'Não transfira palavras-chave ausentes para o currículo. Não declare experiência em Customer Success puro ' +
+        'quando a evidência for de CRM/CX, mas valorize competências transferíveis. ' +
+        'Data de referência: ' + new Date().toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) + '. ' +
+        'Formato obrigatório: # Nome; linha de contato; ## Resumo profissional; ## Competências principais; ' +
+        '## Experiência profissional; ## Formação acadêmica; ## Certificações e cursos; ## Idiomas; ' +
+        '## Projetos relevantes (se existir). Uma coluna, sem tabelas ou ícones. ' +
+        'Não acrescente comentários editoriais no currículo.\\n' +
+        'CURRÍCULO ORIGINAL:\\n' + curriculo.slice(0,18000) +
+        '\\nVAGA:\\n' + vaga.slice(0,11000) +
+        '\\nLACUNAS REAIS IDENTIFICADAS (não inventar):\\n' + JSON.stringify(resultadoJson.pontos_atencao ?? []).slice(0,3500) +
+        '\\nSABOTADORES A CORRIGIR SE HOUVER EVIDÊNCIA:\\n' + JSON.stringify(resultadoJson.sabotadores ?? []).slice(0,5500),
+        {maxTokens:7000,descricao:'currículo ATS adaptado à vaga',validar:(valor):valor is {curriculo_final_markdown:string}=>
+          !!valor && typeof valor==='object' && typeof (valor as {curriculo_final_markdown?:unknown}).curriculo_final_markdown==='string' &&
+          (valor as {curriculo_final_markdown:string}).curriculo_final_markdown.length>350}
+      );
+      resultadoJson.curriculo_final_markdown = versaoAdaptada.curriculo_final_markdown;
+    } catch {
+      // A etapa de validação abaixo ainda poderá reparar a versão inicial.
+    }
+
     // Não contabilizar uma simulação como concluída quando o currículo final
     // não contém as seções essenciais que a própria análise deveria produzir.
     const cvFinal = String(resultadoJson.curriculo_final_markdown ?? '').replace(/\\n/g, '\n');
