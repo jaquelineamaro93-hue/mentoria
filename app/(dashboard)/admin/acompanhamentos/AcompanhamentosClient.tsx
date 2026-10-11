@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import CueConnection from './CueConnection';
 
 type Mentorado = {id:string;nome:string;email:string;genero:string|null;whatsapp_numero:string|null;whatsapp_consentimento_em:string|null;whatsapp_validado_em:string|null;trial_status:string|null;last_activity_at:string|null;onboarding_concluido:boolean};
 type Registro = {id:string;user_id:string;semana_inicio:string;objetivo:string|null;progresso:string|null;insight:string|null;proxima_acao:string|null;mensagem_whatsapp:string|null;status:string};
@@ -58,6 +59,7 @@ export default function AcompanhamentosClient({mentorados,registros:iniciais}:{m
    <Link href="/admin" className="text-sm text-gray-text hover:underline">← Administração</Link>
    <h1 className="mt-4 font-display text-3xl text-black">Acompanhamento Inteligente</h1>
    <p className="mt-2 text-sm text-gray-text">Contatos, consentimento e acompanhamento semanal por mentorado. Rascunhos precisam de revisão humana. O envio pelo agente Manus ainda depende de integração autorizada.</p>
+   <CueConnection />
    <div className="my-6 grid gap-3 sm:grid-cols-3">{[{t:'Mentorados',v:mentorados.length},{t:'Com WhatsApp',v:mentorados.filter(m=>m.whatsapp_numero).length},{t:'Autorizaram mensagens',v:mentorados.filter(m=>m.whatsapp_consentimento_em).length}].map(x=><div key={x.t} className="rounded-xl border border-gray-faint bg-white p-4"><p className="text-2xl font-semibold">{x.v}</p><p className="text-xs text-gray-text">{x.t}</p></div>)}</div>
    <section className="mb-6 rounded-xl border border-gray-faint bg-white p-5">
     <h2 className="font-semibold">Importar WhatsApps existentes</h2><p className="mt-1 text-xs text-gray-text">Cole uma linha por pessoa no formato email;whatsapp. Exemplo: pessoa@exemplo.com;11999999999. A importação NÃO autoriza disparos.</p>
