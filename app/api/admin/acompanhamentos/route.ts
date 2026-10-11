@@ -118,7 +118,7 @@ export async function POST(request:NextRequest) {
       insight='Foco identificado: '+escolhido.contexto+'.\\n'+(acaoAnterior?'Ação registrada anteriormente: '+acaoAnterior+'.\\n':'')+'Próxima conversa: validar a situação atual e definir uma ação concreta. Não há evidência suficiente para afirmar progresso.';
       proxima_acao=acaoAnterior?'Confirmar se a ação anterior foi realizada e qual foi o resultado.':escolhido.pergunta;
       const pergunta=acaoAnterior?'Você conseguiu avançar na ação que combinamos no último acompanhamento? O que aconteceu?':escolhido.pergunta;
-      mensagem='Oi, '+primeiroNome+'! 💜\\n\\nQuero retomar '+escolhido.contexto+'.\\n\\n'+pergunta+'\\n\\nSua resposta vai nos ajudar a definir um próximo passo prático. ✨';
+      mensagem='Oi, '+primeiroNome+'! 💜\n\nQuero retomar '+escolhido.contexto+'.\n\n'+pergunta+'\n\nSua resposta vai nos ajudar a definir um próximo passo prático. ✨';
     }
     const progresso='Registros consultados: '+(diario.data?.length||0)+' anotações, '+(pdi.data?.length||0)+' seções do PDI e '+(quem.data?.length||0)+' reflexões. '+(anterior?'Existe acompanhamento anterior.':'Primeiro acompanhamento registrado.')+' Quantidade de registros não comprova progresso.';
     // Rascunho sempre exige revisão humana antes de aprovação e envio.
@@ -133,7 +133,7 @@ export async function POST(request:NextRequest) {
   if(body.action==='message') {
     if(!['rascunho','aprovado'].includes(body.status))return NextResponse.json({error:'Status inválido'},{status:400});
     if(body.status==='aprovado'&&(!target.whatsapp_numero||!target.whatsapp_consentimento_em))return NextResponse.json({error:'Contato sem consentimento'},{status:400});
-    const message=String(body.message||'').replace(/\\\\n/g,'\n').slice(0,2000);
+    const message=String(body.message||'').replace(/\\n/g,'\n').slice(0,2000);
     const {data:registro,error}=await admin.from('acompanhamentos_semanais').update({mensagem_whatsapp:message,status:body.status,updated_at:new Date().toISOString()}).eq('user_id',userId).eq('semana_inicio',week).select().single();
     if(error)throw error;
     return NextResponse.json({registro});
