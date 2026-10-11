@@ -51,6 +51,7 @@ export default function SimuladorCVClient({
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
   const [aba, setAba] = useState<Aba>('compatibilidade');
 
+  const acessoAdminTeste = profile?.is_admin === true && profile.email?.trim().toLowerCase() === 'jaqueline.amaro93@gmail.com';
   const restantesGratis = Math.max(0, LIMITE_GRATIS_MES - usadas);
 
   async function analisar() {
@@ -78,9 +79,9 @@ export default function SimuladorCVClient({
       setResultado(data.simulacao);
       if (!data.previa) setHistorico((prev) => [data.simulacao, ...prev]);
       setAba('compatibilidade');
-      if (!data.previa && usadas >= LIMITE_GRATIS_MES) {
+      if (!acessoAdminTeste && !data.previa && usadas >= LIMITE_GRATIS_MES) {
         setCreditos((c) => Math.max(0, c - 1));
-      } else if (!data.previa) {
+      } else if (!acessoAdminTeste && !data.previa) {
         setUsadas((u) => u + 1);
       }
       if (!data.previa) posthog.capture('simulacao_cv_gerada');
@@ -143,17 +144,17 @@ export default function SimuladorCVClient({
         </div>
 
         <div className="flex items-center gap-2 mb-6">
-          <span className="text-xs px-3 py-1.5 rounded-full bg-mint-light border border-mint text-mint">
+          {acessoAdminTeste ? <span className="text-xs px-3 py-1.5 rounded-full bg-mint-light border border-mint text-mint">Modo administração: simulações de teste sem cobrança</span> : <span className="text-xs px-3 py-1.5 rounded-full bg-mint-light border border-mint text-mint">
             {restantesGratis > 0
               ? `${restantesGratis} simulação${restantesGratis > 1 ? 'ões' : ''} grátis restante${restantesGratis > 1 ? 's' : ''} este mês`
               : 'Simulações grátis deste mês esgotadas'}
-          </span>
-          {creditos > 0 && (
+          </span>}
+          {!acessoAdminTeste && creditos > 0 && (
             <span className="text-xs px-3 py-1.5 rounded-full bg-[#f1e6d6] border border-brown/30 text-brown">
               {creditos} crédito{creditos > 1 ? 's' : ''} extra
             </span>
           )}
-          {restantesGratis === 0 && creditos === 0 && (
+          {!acessoAdminTeste && restantesGratis === 0 && creditos === 0 && (
             <button
               onClick={comprarSimulacaoExtra}
               disabled={comprando}
@@ -245,7 +246,7 @@ export default function SimuladorCVClient({
 
         <button
           onClick={analisar}
-          disabled={gerando || !curriculo.trim() || !vaga.trim() || (limiteAtingido && creditos === 0)}
+          disabled={gerando || !curriculo.trim() || !vaga.trim() || (!acessoAdminTeste && limiteAtingido && creditos === 0)}
           className="flex items-center gap-2 bg-mint-deep hover:opacity-90 disabled:opacity-50 text-white text-sm font-medium px-6 py-3 rounded-full transition-colors mb-10"
         >
           {gerando ? (
