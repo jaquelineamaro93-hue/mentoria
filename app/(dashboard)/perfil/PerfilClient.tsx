@@ -50,7 +50,6 @@ export default function PerfilClient({
       updateData.whatsapp_numero = numeroNormalizado;
       updateData.genero = genero || null;
       updateData.whatsapp_consentimento_em = aceitaWhatsapp && numeroNormalizado ? (perfil?.whatsapp_numero === numeroNormalizado && perfil?.whatsapp_consentimento_em ? perfil.whatsapp_consentimento_em : new Date().toISOString()) : null;
-      if (numeroNormalizado !== perfil?.whatsapp_numero) updateData.whatsapp_validado_em = null;
       if (nome !== perfil?.nome) {
         updateData.nome = nome;
       }
