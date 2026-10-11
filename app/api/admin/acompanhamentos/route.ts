@@ -144,7 +144,7 @@ Regras obrigatórias:
 1. Identifique um detalhe CONCRETO e distintivo nas respostas desta pessoa, não apenas a categoria geral (como recolocação). Se não houver evidência individual, reconheça explicitamente a falta de dados e faça uma pergunta de descoberta.
 2. Nunca invente conquistas, dificuldades, ações concluídas, entrevistas, empresas, respostas ou evolução. Não confunda perguntas de formulários com respostas da mentorada.
 3. Use o histórico da semana anterior para evitar repetir a mesma pergunta e, quando existir uma ação anterior, pergunte sobre seu resultado sem pressupor que foi cumprida.
-4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 410 caracteres, 1 a 2 parágrafos, sem saudação, apresentação ou assinatura (o sistema adicionará). Linguagem acolhedora e profissional, sem travessões, uma pergunta específica e uma próxima ação simples. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
+4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 410 caracteres, 2 a 3 parágrafos separados por duas quebras de linha, sem saudação, apresentação ou assinatura (o sistema adicionará). Linguagem acolhedora e profissional, sem travessões, uma pergunta específica e uma próxima ação simples. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
 4a. Nunca use ponto de exclamação (!) em nenhuma parte da mensagem. Evite urgência, apelos comerciais e linguagem de disparo em massa.\n5. Duas pessoas buscando emprego não devem receber o mesmo roteiro apenas por estarem em recolocação. A pergunta deve ser consequência dos dados individuais. Não use sorteio, rotação de perguntas ou sinônimos cosméticos.
 6. Os campos insight e progresso devem distinguir evidências observadas, lacunas e hipóteses. Quantidade de registros não significa progresso.
 7. Não inclua números de telefone, emails ou dados pessoais sensíveis na mensagem.
@@ -165,8 +165,27 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     if(!mensagem || mensagem.length>2000)
       return NextResponse.json({error:'A IA não entregou uma mensagem utilizável. Nenhum rascunho foi criado.'},{status:503});
     // Identidade e apresentação são determinadas no servidor, não improvisadas pela IA.
-    mensagem=mensagem.replace(/^Oi[,! ]+[^\n]{1,55}(?:\n+|$)/i,'').trim();
+    // Remover SOMENTE a saudação que a IA eventualmente repete, mesmo
+    // quando ela continua o conteúdo na mesma linha: "Oi Ana. Li seu relato...".
+    const escaparRegex=(valor:string)=>valor.replace(/[^\\p{L}\\p{N}]/gu, '\\$&');
+    const nomeSeguro=escaparRegex(primeiroNome);
+    mensagem=mensagem.replace(new RegExp('^\\s*Oi[,! ]+\\s*'+nomeSeguro+'\\s*(?:[,!.?]|\\s*\\n)+\\s*','i'),'').trim();
     mensagem=mensagem.replace(/^(?:Aqui é|Eu sou|Sou a)\s+(?:a\s+)?(?:Lume|Norte|Brasa|Íris)[^\n]*\n*/i,'').trim();
+    // Se a IA entregar um único bloco, distribuir as frases em parágrafos
+    // sem alterar o sentido ou inventar informações.
+    if(!mensagem.includes('\\n\\n') && mensagem.length>200) {
+      const frases=mensagem.match(/[^.!?]+[.!?]+(?:\\s+|$)|[^.!?]+$/g)?.map(f=>f.trim()).filter(Boolean) ?? [];
+      if(frases.length>=3) {
+        const blocos:string[]=[];
+        let bloco='';
+        for(const frase of frases) {
+          if(bloco && bloco.length+frase.length>175) {blocos.push(bloco);bloco='';}
+          bloco+=(bloco?' ':'')+frase;
+        }
+        if(bloco)blocos.push(bloco);
+        mensagem=blocos.join('\\n\\n');
+      }
+    }
     const saudacao='Oi, '+primeiroNome+', tudo bem? 💜';
     const apresentacao=primeiroContato
       ? 'Aqui é '+mascote.nome+', assistente virtual da SOMA Mentoria. Estou aqui para acompanhar sua jornada.'
