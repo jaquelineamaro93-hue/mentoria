@@ -92,10 +92,10 @@ export async function POST(request: Request) {
     // não contém as seções essenciais que a própria análise deveria produzir.
     const cvFinal = String(resultadoJson.curriculo_final_markdown ?? '');
     const secoesObrigatorias = [
-      /(?:^|\\n)#{1,3}\\s*resumo profissional\\b/im,
-      /(?:^|\\n)#{1,3}\\s*compet[eê]ncias (?:principais|chave|t[eé]cnicas)\\b/im,
-      /(?:^|\\n)#{1,3}\\s*experi[eê]ncia profissional\\b/im,
-      /(?:^|\\n)#{1,3}\\s*forma[cç][aã]o(?: acad[eê]mica)?\\b/im,
+      /(?:^|\n)#{1,3}\s*(?:resumo|perfil) profissional\b/im,
+      /(?:^|\n)#{1,3}\s*(?:compet[eê]ncias|habilidades)(?:\s+(?:principais|chave|t[eé]cnicas))?\b/im,
+      /(?:^|\n)#{1,3}\s*experi[eê]ncias? profissionais?\b/im,
+      /(?:^|\n)#{1,3}\s*forma[cç][aã]o(?: acad[eê]mica)?\b/im,
     ];
     if (!secoesObrigatorias.every((secao) => secao.test(cvFinal))) {
       return NextResponse.json({
