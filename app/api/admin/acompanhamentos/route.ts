@@ -97,8 +97,19 @@ export async function POST(request:NextRequest) {
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({error:'IA não configurada. Não foi gerada uma mensagem genérica.'},{status:503});
     }
-    const permitido=await consumeIdentifierRateLimit({scope:'admin_acompanhamento_ia',identifier:user.id,limit:25,windowSeconds:3600});
-    if(!permitido)return NextResponse.json({error:'Limite de análises atingido. Tente novamente mais tarde.'},{status:429});
+    // Limite por mentorado para evitar reprocessamento em loop sem bloquear
+    // a administradora que precisa acompanhar toda a turma.
+    const limiteMentorado=await consumeIdentifierRateLimit({
+      scope:'admin_acompanhamento_ia_mentorado_v2',identifier:user.id+':'+userId,
+      limit:6,windowSeconds:3600
+    });
+    if(!limiteMentorado)return NextResponse.json({error:'Este mentorado já teve várias análises nesta hora. Aguarde antes de gerar novamente para esta pessoa.'},{status:429});
+    // Proteção global adicional, com capacidade adequada a uma turma.
+    const limiteAdmin=await consumeIdentifierRateLimit({
+      scope:'admin_acompanhamento_ia_global_v2',identifier:user.id,
+      limit:150,windowSeconds:3600
+    });
+    if(!limiteAdmin)return NextResponse.json({error:'Limite de análises da administração atingido nesta hora. Tente novamente mais tarde.'},{status:429});
     const contextoIndividual={
       objetivo_declarado:objetivo||null,
       momento_profissional:momento||null,
