@@ -36,6 +36,7 @@ export default async function AdminPage() {
     redirect('/dashboard');
   }
 
+  const admin = createAdminClient();
   const [
     { data: perfis },
     { data: diagnosticos },
@@ -45,9 +46,9 @@ export default async function AdminPage() {
     { data: via },
     { data: secoesPdiTotal },
   ] = await Promise.all([
-    supabase
+    admin
       .from('profiles')
-      .select('*, is_admin:is_admin')
+      .select('*')
       .eq('is_admin', false)
       .order('nome'),
     supabase.from('diagnostics').select('user_id'),
@@ -62,7 +63,6 @@ export default async function AdminPage() {
   // exposto pelo client normal). Usamos isso pra avisar a admin ANTES da
   // mentorada travar tentando entrar, já que o envio de e-mail de
   // confirmação já mostrou ser instável.
-  const admin = createAdminClient();
   const emailsConfirmados = new Map<string, boolean>();
   try {
     const { data: authData } = await admin.auth.admin.listUsers({ perPage: 200 });
