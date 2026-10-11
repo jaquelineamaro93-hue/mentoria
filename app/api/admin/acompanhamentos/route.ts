@@ -167,7 +167,7 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     // Identidade e apresentação são determinadas no servidor, não improvisadas pela IA.
     // Remover SOMENTE a saudação que a IA eventualmente repete, mesmo
     // quando ela continua o conteúdo na mesma linha: "Oi Ana. Li seu relato...".
-    const escaparRegex=(valor:string)=>valor.replace(/[.*+?^${()|[\]\\]/g,'\\    mensagem=mensagem.replace(/^Oi[,! ]+[^\n]{1,55}(?:\n+|$)/i,'').trim();');
+    const escaparRegex=(valor:string)=>valor.replace(/[^\\p{L}\\p{N}]/gu, '\\$&');
     const nomeSeguro=escaparRegex(primeiroNome);
     mensagem=mensagem.replace(new RegExp('^\\s*Oi[,! ]+\\s*'+nomeSeguro+'\\s*(?:[,!.?]|\\s*\\n)+\\s*','i'),'').trim();
     mensagem=mensagem.replace(/^Oi[,! ]+[^\\n]{1,55}(?:\\n+|$)/i,'').trim();
