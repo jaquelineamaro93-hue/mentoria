@@ -132,9 +132,18 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     } catch {
       return NextResponse.json({error:'Não foi possível analisar o contexto individual com IA. Nenhum rascunho genérico foi criado. Tente novamente.'},{status:503});
     }
-    const mensagem=analise.mensagem.replace(/\\\\n/g,'\\n').replace(/!/g,'').trim();
-    if(!mensagem||mensagem.length>700||!mensagem.includes('?')||!mensagem.includes(primeiroNome))
-      return NextResponse.json({error:'A análise retornou uma mensagem fora do padrão. Nenhum rascunho foi criado. Tente novamente.'},{status:503});
+    // A IA pode variar pontuação e saudação. Corrigir apresentação sem
+    // descartar uma análise individual válida ou fabricar conteúdo.
+    const normalizarQuebras=(texto:string)=>texto.replace(/\\n/g,'\n').replace(/\r\n?/g,'\n');
+    let mensagem=normalizarQuebras(analise.mensagem).replace(/!/g,'').trim();
+    if(!mensagem || mensagem.length>2000)
+      return NextResponse.json({error:'A IA não entregou uma mensagem utilizável. Nenhum rascunho foi criado.'},{status:503});
+    // A saudação pode variar, mas a identidade da destinatária não.
+    if(!mensagem.toLocaleLowerCase('pt-BR').includes(primeiroNome.toLocaleLowerCase('pt-BR')))
+      mensagem='Oi, '+primeiroNome+' 💜\n\n'+mensagem;
+    // Não exigir um sinal '?' literal: perguntas indiretas e pedidos de
+    // reflexão também podem ser mensagens válidas para revisão humana.
+    mensagem=mensagem.replace(/\n{3,}/g,'\n\n');
     const insight=analise.insight.slice(0,1800);
     const proxima_acao=analise.proxima_acao.slice(0,600);
     const progresso=analise.progresso.slice(0,1200);
