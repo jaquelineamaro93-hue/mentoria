@@ -227,7 +227,7 @@ export default function PerfilClient({
 
           <div className="mb-6 grid gap-5 sm:grid-cols-2">
             <div><label className="block text-xs font-medium text-black mb-2">Como prefere ser identificado(a)?</label>
-              <select value={genero} onChange={e => setGenero(e.target.value as typeof genero)} className="w-full px-4 py-3 border border-gray-faint rounded-lg"><option value="">Prefiro não informar</option><option value="feminino">Feminino</option><option value="masculino">Masculino</option></select>
+              <select value={genero} onChange={e => setGenero(e.target.value as typeof genero)} className="w-full px-4 py-3 border border-gray-faint rounded-lg"><option value="">Prefiro não informar</option><option value="feminino">Feminino</option><option value="masculino">Masculino</option><option value="nao_binario">Não binário</option><option value="outro">Outra identidade</option><option value="prefiro_nao_informar">Prefiro não informar</option></select>
             </div>
             <div><label className="block text-xs font-medium text-black mb-2">WhatsApp com DDD</label>
               <input type="tel" inputMode="tel" autoComplete="tel" placeholder="(11) 99999-9999" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="w-full px-4 py-3 border border-gray-faint rounded-lg" />
