@@ -33,6 +33,8 @@ export default function GerenciarPlanosClient({
   const [mostrarFormPlano, setMostrarFormPlano] = useState(false);
   const [criandoPlano, setCriandoPlano] = useState(false);
   const [buscaMentorado, setBuscaMentorado] = useState('');
+  const [filtroPlano, setFiltroPlano] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
   const [trialEdicao, setTrialEdicao] = useState<
     Record<string, { enabled: boolean; days: number; label: string }>
   >({});
@@ -48,7 +50,11 @@ export default function GerenciarPlanosClient({
 
   const planoMap = new Map(planos.map((p) => [p.id, p]));
   const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
+  const trialAtivo = (m: Profile) => m.trial_status === 'active' && Boolean(m.trial_ends_at) && new Date(m.trial_ends_at!).getTime() > Date.now();
+  const statusVisivel = (m: Profile) => trialAtivo(m) ? 'trial' : m.trial_status === 'expired' && m.status_assinatura !== 'ativo' ? 'trial_encerrado' : m.status_assinatura;
   const mentoradosFiltrados = mentorados.filter((m) => {
+    if (filtroPlano && m.plano_id !== filtroPlano) return false;
+    if (filtroStatus && statusVisivel(m) !== filtroStatus) return false;
     if (!termoMentorado) return true;
     return (
       m.nome?.toLocaleLowerCase('pt-BR').includes(termoMentorado) ||
@@ -418,6 +424,15 @@ export default function GerenciarPlanosClient({
         </p>
       </div>
 
+      <div className="mb-4 flex flex-wrap gap-3">
+        <label className="text-xs text-gray-text">Plano
+          <select value={filtroPlano} onChange={e => setFiltroPlano(e.target.value)} className="mt-1 block rounded-lg border border-gray-faint bg-white p-2 text-sm"><option value="">Todos os planos</option>{planos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}</select>
+        </label>
+        <label className="text-xs text-gray-text">Status
+          <select value={filtroStatus} onChange={e => setFiltroStatus(e.target.value)} className="mt-1 block rounded-lg border border-gray-faint bg-white p-2 text-sm"><option value="">Todos os status</option><option value="trial">Teste gratuito ativo</option><option value="trial_encerrado">Teste encerrado</option><option value="ativo">Assinatura ativa</option><option value="inadimplente">Inadimplente</option><option value="encerrado">Encerrado</option></select>
+        </label>
+        <span className="self-end text-xs text-gray-text">{mentoradosFiltrados.length} de {mentorados.length} mentorados</span>
+      </div>
       <div className="overflow-x-auto border border-gray-faint rounded-2xl">
         <table className="w-full text-sm">
           <thead>
@@ -492,10 +507,10 @@ export default function GerenciarPlanosClient({
                     </select>
                   </td>
                   <td className="py-3 px-4 text-gray-text whitespace-nowrap">
-                    {formatarMoeda(valorContratado(mentorado, planoAtual, emEdicao))}
+                    {trialAtivo(mentorado) ? 'Grátis (trial)' : formatarMoeda(valorContratado(mentorado, planoAtual, emEdicao))}
                   </td>
                   <td className="py-3 px-4">
-                    <select
+                    {trialAtivo(mentorado) ? <span className="inline-block whitespace-nowrap rounded-full bg-green-50 px-2 py-1 text-xs text-green-800">Teste gratuito ativo</span> : <select
                       value={emEdicao?.status_pagamento || mentorado.status_assinatura || 'ativo'}
                       onChange={(e) => handleChange(mentorado.id, 'status_pagamento', e.target.value)}
                       className="text-xs border border-gray-faint rounded px-2 py-1 w-28"
@@ -503,7 +518,7 @@ export default function GerenciarPlanosClient({
                       <option value="ativo">Ativo</option>
                       <option value="inadimplente">Inadimplente</option>
                       <option value="encerrado">Encerrado</option>
-                    </select>
+                    </select>}
                   </td>
                   <td className="py-3 px-4">
                     <input
