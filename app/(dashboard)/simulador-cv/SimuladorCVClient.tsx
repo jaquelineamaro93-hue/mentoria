@@ -76,14 +76,14 @@ export default function SimuladorCVClient({
       if (!res.ok) throw new Error(data.error);
 
       setResultado(data.simulacao);
-      setHistorico((prev) => [data.simulacao, ...prev]);
+      if (!data.previa) setHistorico((prev) => [data.simulacao, ...prev]);
       setAba('compatibilidade');
-      if (usadas >= LIMITE_GRATIS_MES) {
+      if (!data.previa && usadas >= LIMITE_GRATIS_MES) {
         setCreditos((c) => Math.max(0, c - 1));
-      } else {
+      } else if (!data.previa) {
         setUsadas((u) => u + 1);
       }
-      posthog.capture('simulacao_cv_gerada');
+      if (!data.previa) posthog.capture('simulacao_cv_gerada');
     } catch (e) {
       setErro(e instanceof Error ? e.message : 'Não foi possível gerar a análise agora.');
     }
@@ -106,6 +106,8 @@ export default function SimuladorCVClient({
   }
 
   const r = resultado?.resultado_json;
+
+  const avisoCurriculo = typeof r?.aviso_curriculo === 'string' ? r.aviso_curriculo : null;
 
   const corFit = !r
     ? 'text-gray-text'
@@ -188,6 +190,8 @@ export default function SimuladorCVClient({
             ))}
           </div>
         )}
+
+        {avisoCurriculo && <p role="alert" className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{avisoCurriculo}</p>}
 
         <div className="grid lg:grid-cols-2 gap-4 mb-6">
           <label className="flex flex-col gap-1.5">
