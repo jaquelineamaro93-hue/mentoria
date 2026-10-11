@@ -90,20 +90,20 @@ export async function POST(request: Request) {
       },
     });
 
-    // A análise de compatibilidade não substitui a entrega do currículo.
+    // A análise de compatibilidade não substitui a entrega do currículo. A estrutura do original prevalece sobre sugestões de seções adicionais.
     // Gere a versão adaptada em uma chamada dedicada, fundamentada na fonte.
     try {
       const versaoAdaptada = await chamarClaudeJson<{curriculo_final_markdown:string}>(
         'Você é especialista em reescrita de currículos ATS. Entregue APENAS JSON com a chave curriculo_final_markdown.\\n' +
         'Reescreva efetivamente o currículo original para a vaga abaixo. O currículo original é a única fonte de fatos. ' +
-        'NÃO copie o texto inteiro mudando só o formato. Refaça o resumo profissional, selecione 8 a 14 competências comprovadas, ' +
+        'NÃO copie o texto inteiro mudando só o formato. Refaça o resumo profissional, incorpore competências comprovadas no resumo e nas experiências, ' +
         'reescreva bullets relevantes com resultados existentes e destaque a aderência real à vaga. ' +
         'Preserve nome, contatos, empresas, cargos, datas, formação, métricas e projetos reais. ' +
         'NÃO invente ferramentas, gestão de contratos, renovação, SaaS, Cloud, Gainsight, AWS, Azure, CSAT ou experiência não comprovada. ' +
         'Não transfira palavras-chave ausentes para o currículo. Não declare experiência em Customer Success puro ' +
         'quando a evidência for de CRM/CX, mas valorize competências transferíveis. ' +
         'Data de referência: ' + new Date().toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) + '. ' +
-        'Formato obrigatório: # Nome; linha de contato; ## Resumo profissional; ## Competências principais; ' +
+        'Formato: nome, contato e as seções que existem no original, na mesma ordem; ' +
         '## Experiência profissional; ## Formação acadêmica; ## Certificações e cursos; ## Idiomas; ' +
         '## Projetos relevantes (se existir). Uma coluna, sem tabelas ou ícones. ' +
         'Não acrescente comentários editoriais no currículo.\\n' +
@@ -126,7 +126,6 @@ export async function POST(request: Request) {
     resultadoJson.curriculo_final_markdown = cvFinal;
     const secoesObrigatorias = [
       /(?:^|\n)#{1,3}\s*(?:resumo|perfil) profissional\b/im,
-      /(?:^|\n)#{1,3}\s*(?:compet[eê]ncias|habilidades)(?:\s+(?:principais|chave|t[eé]cnicas))?\b/im,
       /(?:^|\n)#{1,3}\s*experi[eê]ncias? profissionais?\b/im,
       /(?:^|\n)#{1,3}\s*forma[cç][aã]o(?: acad[eê]mica)?\b/im,
     ];
@@ -138,8 +137,8 @@ export async function POST(request: Request) {
           'Não inclua ferramentas ou experiência sem evidência no currículo original, mesmo se citadas na versão a corrigir. ' +
           'Use a data atual de referência: ' + new Date().toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) + '. ' +
           'Adapte concretamente o resumo e os bullets às responsabilidades da vaga usando somente evidências originais. ' +
-          'Competências em texto corrido, separadas por vírgulas, sem ferramentas não comprovadas. ' +
-          'Use obrigatoriamente os títulos Markdown ## Resumo profissional, ## Competências principais, ' +
+          'Não crie seção de competências se não existir no original. Integre habilidades comprovadas ao resumo e às experiências. ' +
+          'Preserve os títulos das seções do currículo original. Use Markdown simples para ' +
           '## Experiência profissional e ## Formação acadêmica. Responda apenas JSON com a chave curriculo_final_markdown.\\n' +
           'Currículo original: ' + curriculo.slice(0,15000) + '\\nVaga: ' + vaga.slice(0,9000) +
           '\\nSabotadores: ' + JSON.stringify(resultadoJson.sabotadores ?? []).slice(0,4000) +
