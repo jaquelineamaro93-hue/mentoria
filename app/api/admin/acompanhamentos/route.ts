@@ -170,7 +170,6 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     const escaparRegex=(valor:string)=>valor.replace(/[^\\p{L}\\p{N}]/gu, '\\$&');
     const nomeSeguro=escaparRegex(primeiroNome);
     mensagem=mensagem.replace(new RegExp('^\\s*Oi[,! ]+\\s*'+nomeSeguro+'\\s*(?:[,!.?]|\\s*\\n)+\\s*','i'),'').trim();
-    mensagem=mensagem.replace(/^Oi[,! ]+[^\\n]{1,55}(?:\\n+|$)/i,'').trim();
     mensagem=mensagem.replace(/^(?:Aqui é|Eu sou|Sou a)\s+(?:a\s+)?(?:Lume|Norte|Brasa|Íris)[^\n]*\n*/i,'').trim();
     // Se a IA entregar um único bloco, distribuir as frases em parágrafos
     // sem alterar o sentido ou inventar informações.
