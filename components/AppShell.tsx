@@ -14,6 +14,7 @@ import {
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import TrialBanner from '@/components/TrialBanner';
 import ConfirmacaoContatoModal from '@/components/ConfirmacaoContatoModal';
+import EntrevistaInicialModal from '@/components/EntrevistaInicialModal';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
 import type { Profile } from '@/lib/types';
@@ -187,6 +188,7 @@ function AppShellContent({ children, initialProfile }: { children: React.ReactNo
 
       <CollapsibleSidebar />
       <ConfirmacaoContatoModal profile={initialProfile} />
+      <EntrevistaInicialModal profile={initialProfile} />
 
       <div className={styles.workspace} inert={isMobile && isMobileOpen ? true : undefined}>
         <header className={styles.topbar}>
