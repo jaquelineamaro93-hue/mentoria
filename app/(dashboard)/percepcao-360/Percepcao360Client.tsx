@@ -772,6 +772,14 @@ export default function Percepcao360Client({
                     </a>
                   </div>
 
+                  <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-[#E9D38D] bg-[#FFF2C7] px-4 py-3 text-[#563A25]" role="note">
+                    <Link2 size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+                    <p className="text-sm leading-relaxed">
+                      <strong>Um link por mentorado e por rodada de avaliação, não por respondente.</strong>
+                      {' '}Compartilhe o mesmo link com várias pessoas. Cada resposta será registrada individualmente.
+                    </p>
+                  </div>
+
                   <p className="mt-3 text-xs leading-5 text-gray-text">
                     Este link é exclusivo desta rodada. Respostas recebidas por ele entram na mesma contagem
                     acima e ficam vinculadas ao mentorado correto automaticamente.
