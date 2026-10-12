@@ -65,15 +65,17 @@ export async function POST(request:NextRequest) {
     if(erroExistente)throw erroExistente;
     if(existente?.status==='enviado')return NextResponse.json({error:'Mensagem já enviada: preserve o histórico e gere um novo acompanhamento na próxima semana.'},{status:409});
     if(existente?.status==='aprovado' && body.regenerate!==true)return NextResponse.json({error:'Confirme a regeneração do acompanhamento aprovado.'},{status:409});
-    const [diagnostico, diario, pdi, quem, via, historico] = await Promise.all([
+    const [diagnostico, diario, pdi, quem, via, historico, entrevista, respostasWhatsapp] = await Promise.all([
       admin.from('diagnostics').select('objetivos,momento_carreira,habilidades,updated_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
       admin.from('journal_notes').select('anotacoes,ai_summary,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(5),
       admin.from('pdi_respostas').select('secao,dados,concluido,updated_at').eq('user_id',userId).order('updated_at',{ascending:false}).limit(20),
       admin.from('quem_sou_eu_respostas').select('bloco,resposta,updated_at').eq('user_id',userId).order('updated_at',{ascending:false}).limit(15),
       admin.from('via_resultados').select('forcas,analise_ia,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
       admin.from('acompanhamentos_semanais').select('semana_inicio,proxima_acao,mensagem_whatsapp,status').eq('user_id',userId).lt('semana_inicio',week).eq('status','enviado').order('semana_inicio',{ascending:false}).limit(1).maybeSingle(),
+      admin.from('entrevistas_iniciais').select('momento_profissional,objetivo_principal,maior_desafio,prioridade_90_dias,apoio_esperado,comunicacao_preferida').eq('user_id',userId).maybeSingle(),
+      admin.from('whatsapp_respostas_mentoria').select('conteudo,recebido_em').eq('user_id',userId).order('recebido_em',{ascending:false}).limit(5),
     ]);
-    const erros = [diagnostico.error,diario.error,pdi.error,quem.error,via.error,historico.error].filter(Boolean);
+    const erros = [diagnostico.error,diario.error,pdi.error,quem.error,via.error,historico.error,entrevista.error,respostasWhatsapp.error].filter(Boolean);
     if(erros.length) return NextResponse.json({error:'Não foi possível consultar o histórico completo. Nenhum rascunho foi gerado.'},{status:503});
 
     function resumo(valor: unknown, max=240): string {
@@ -125,6 +127,8 @@ export async function POST(request:NextRequest) {
     });
     if(!limiteAdmin)return NextResponse.json({error:'Limite de análises da administração atingido nesta hora. Tente novamente mais tarde.'},{status:429});
     const contextoIndividual={
+      entrevista_inicial:entrevista.data||null,
+      respostas_recebidas_whatsapp:(respostasWhatsapp.data||[]).map(x=>({data:x.recebido_em,resposta:resumo(x.conteudo,500)})),
       objetivo_declarado:objetivo||null,
       momento_profissional:momento||null,
       diario:(diario.data||[]).map(x=>({data:x.created_at,anotacao:relato(x.anotacoes)||null,analise_previa:resumo(x.ai_summary,400)||null})).filter(x=>x.anotacao||x.analise_previa),
@@ -141,7 +145,7 @@ Nome para saudação: ${JSON.stringify(primeiroNome)}.
 Dados de acompanhamento (JSON): ${JSON.stringify(contextoIndividual).slice(0,16000)}
 
 Regras obrigatórias:
-1. Identifique um detalhe CONCRETO e distintivo nas respostas desta pessoa, não apenas a categoria geral (como recolocação). Se não houver evidência individual, reconheça explicitamente a falta de dados e faça uma pergunta de descoberta.
+1. Priorize a entrevista inicial de objetivos e as respostas recentes de WhatsApp quando existirem, sem presumir que uma resposta seja uma ação concluída. Identifique um detalhe CONCRETO e distintivo nas respostas desta pessoa, não apenas a categoria geral (como recolocação). Se não houver evidência individual, reconheça explicitamente a falta de dados e faça uma pergunta de descoberta.
 2. Nunca invente conquistas, dificuldades, ações concluídas, entrevistas, empresas, respostas ou evolução. Não confunda perguntas de formulários com respostas da mentorada.
 3. Use o histórico da semana anterior para evitar repetir a mesma pergunta e, quando existir uma ação anterior, pergunte sobre seu resultado sem pressupor que foi cumprida.
 4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 520 caracteres, 2 a 3 parágrafos com uma linha em branco entre eles, sem saudação, apresentação ou assinatura (o sistema adicionará). Preserve o tom de mentoria reflexiva: conecte detalhes individuais, explicite hipóteses como hipóteses, proponha uma ação concreta e termine com uma pergunta específica. Linguagem acolhedora, frases naturais e sem travessões nem excesso de pontos finais. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
