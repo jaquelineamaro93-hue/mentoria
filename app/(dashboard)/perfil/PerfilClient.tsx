@@ -18,6 +18,7 @@ export default function PerfilClient({
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [fotoUrl, setFotoUrl] = useState(perfil?.foto_url || '');
   const [nome, setNome] = useState(perfil?.nome || '');
   const [genero, setGenero] = useState(perfil?.genero || '');
   const [whatsapp, setWhatsapp] = useState(perfil?.whatsapp_numero || '');
@@ -135,7 +136,9 @@ export default function PerfilClient({
         // O caminho é sempre o mesmo, então sem o sufixo o navegador
         // continuaria mostrando a foto antiga do cache.
         const urlComVersao = `${data.publicUrl}?v=${Date.now()}`;
-        await supabase.from('profiles').update({ foto_url: urlComVersao }).eq('id', perfil.id);
+        const { error: saveError } = await supabase.from('profiles').update({ foto_url: urlComVersao }).eq('id', perfil.id);
+        if (saveError) throw saveError;
+        setFotoUrl(urlComVersao);
         setMensagem('Foto atualizada com sucesso!');
         router.refresh();
       }
@@ -181,7 +184,7 @@ export default function PerfilClient({
           <h2 className="font-display text-xl text-black mb-4">Foto de Perfil</h2>
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-mint-deep flex items-center justify-center text-white text-3xl font-display">
-              {perfil?.nome?.[0]?.toUpperCase() || 'U'}
+              {fotoUrl ? <img src={fotoUrl} alt="Foto de perfil" className="w-full h-full rounded-full object-cover" referrerPolicy="no-referrer" /> : (perfil?.nome?.[0]?.toUpperCase() || 'U')}
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}
