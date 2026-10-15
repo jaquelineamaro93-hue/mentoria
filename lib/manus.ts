@@ -1,5 +1,5 @@
 /** Consulta somente leitura de agentes Manus/Cue. Nunca importar no cliente. */
-export type ManusAgent = { id: string; task_id: string; nickname: string };
+export type ManusAgent = { id: string; task_id: string | null; nickname: string };
 export type ManusConnectionIssue =
   | 'invalid_credential' | 'permission_denied' | 'rate_limited'
   | 'service_unavailable' | 'network_error' | 'timeout' | 'invalid_response';
@@ -56,12 +56,45 @@ export async function listManusAgents(apiKey: string): Promise<ManusAgent[]> {
     throw new ManusConnectionError('invalid_response', 'Resposta inesperada do Manus. A consulta não retornou a lista de agentes.');
   }
 
-  return body.data.map((agent: unknown) => {
-    if (!agent || typeof agent !== 'object' || !('id' in agent) || typeof agent.id !== 'string' ||
-        !('task_id' in agent) || typeof agent.task_id !== 'string' ||
-        !('nickname' in agent) || typeof agent.nickname !== 'string') {
-      throw new ManusConnectionError('invalid_response', 'Dados de agente inválidos na resposta da API Manus.');
+  // A listagem é SOMENTE para verificar identidade dos agentes. Para ela,
+  // o ID não pode faltar; task_id e nickname são metadados opcionais.
+  // Alguns agentes padrão/legados podem omitir esses campos mesmo com HTTP 200.
+  const agentes: ManusAgent[] = [];
+  let registrosSemId = 0;
+
+  for (const registro of body.data as unknown[]) {
+    if (!registro || typeof registro !== 'object') {
+      registrosSemId += 1;
+      continue;
     }
-    return { id: agent.id, task_id: agent.task_id, nickname: agent.nickname };
-  });
+    const agente = registro as Record<string, unknown>;
+    const id = typeof agente.id === 'string' ? agente.id.trim() : '';
+    if (!id) {
+      registrosSemId += 1;
+      continue;
+    }
+    const nickname = typeof agente.nickname === 'string' && agente.nickname.trim()
+      ? agente.nickname.trim()
+      : typeof agente.name === 'string' && agente.name.trim()
+        ? agente.name.trim()
+        : 'Agente sem nome';
+    const task_id = typeof agente.task_id === 'string' && agente.task_id.trim()
+      ? agente.task_id.trim()
+      : null;
+    agentes.push({ id, task_id, nickname });
+  }
+
+  // Não confirmar um vínculo com um agente quando o payload não possui IDs.
+  // O erro não inclui a resposta ou qualquer dado sensível.
+  if (body.data.length > 0 && agentes.length === 0) {
+    throw new ManusConnectionError(
+      'invalid_response',
+      'A API Manus respondeu, mas nenhum agente veio com ID válido. Confira o formato retornado pelo endpoint agent.list.'
+    );
+  }
+  if (registrosSemId > 0) {
+    console.warn('[Manus] agent.list ignorou registros sem ID:', registrosSemId);
+  }
+
+  return agentes;
 }
