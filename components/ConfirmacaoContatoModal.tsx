@@ -93,7 +93,7 @@ export default function ConfirmacaoContatoModal({ profile }: { profile: Profile 
           <div>
             <label htmlFor="contato-whats" className="block text-sm font-medium text-black mb-1">Seu WhatsApp com DDD</label>
             <input id="contato-whats" type="tel" autoComplete="tel" inputMode="tel" placeholder="(11) 99999-9999" value={whatsapp} onChange={e=>setWhatsapp(e.target.value)} className="w-full rounded-xl border border-gray-faint px-4 py-3 text-sm" />
-            <p className="mt-1 text-xs text-gray-text">O número será cadastrado, mas ainda não será considerado verificado por mensagem.</p>
+            <p className="mt-1 text-xs text-gray-text">Ao confirmar seus dados e autorizar mensagens, seu contato ficará liberado para acompanhamento individual. Nenhuma mensagem será enviada automaticamente.</p>
           </div>
           <div>
             <label htmlFor="contato-genero" className="block text-sm font-medium text-black mb-1">Como você se identifica?</label>
