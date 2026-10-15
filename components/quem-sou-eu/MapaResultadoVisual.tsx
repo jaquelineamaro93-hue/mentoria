@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -17,7 +17,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Panel } from '@/components/Panel';
-import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
+import { extrairMapaInterpretativo, limparMetadadosMapa, assinaturaRespostas } from '@/lib/mapa-interpretativo';
 import { posthog } from '@/lib/posthog';
 import type { BussolaPosicionamento, MapaEssencia } from '@/lib/types';
 
@@ -63,24 +63,6 @@ function normalizarMarkdown(markdown: string) {
     .replace(/[┌┐└┘├┤┬┴┼│─═╔╗╚╝║]/g, ' ');
 }
 
-function resumo(texto: string, limite = 180) {
-  const limpo = limparTexto(texto);
-  if (limpo.length <= limite) return limpo;
-  return limpo.slice(0, limite).trim() + '…';
-}
-
-function insights(textos: Array<string | undefined>, limite = 4) {
-  const itens = textos
-    .flatMap((texto) =>
-      limparTexto(texto)
-        .split(/\n|(?<=[.!?])\s+/)
-        .map((item) => item.replace(/^[-•*]\s*/, '').trim())
-    )
-    .filter((item) => item.length > 12);
-
-  return [...new Set(itens)].slice(0, limite);
-}
-
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, '&amp;')
@@ -101,102 +83,34 @@ export default function MapaResultadoVisual({
 }: Props) {
   const [tab, setTab] = useState<Tab>('visual');
 
-  const fluxo = useMemo(
-    () => [
-      { titulo: 'Essência', texto: resumo(respostas.valores_crencas || '') },
-      {
-        titulo: 'Potência',
-        texto: resumo(
-          [respostas.momentos_potencia, respostas.conhecimentos_habilidades]
-            .filter(Boolean)
-            .join(' ')
-        ),
-      },
-      { titulo: 'Resiliência', texto: resumo(respostas.feridas_forca || '') },
-      {
-        titulo: 'Direção',
-        texto: resumo(
-          [respostas.chamados_esquecidos, respostas.contribuicao, respostas.paixoes]
-            .filter(Boolean)
-            .join(' ')
-        ),
-      },
-      {
-        titulo: 'Presença',
-        texto: resumo(
-          [respostas.presenca_atual, respostas.ciclos_energia].filter(Boolean).join(' ')
-        ),
-      },
-    ],
-    [respostas]
-  );
+  // Os cards consomem o sentido interpretado pela IA, nunca recortes literais do formulário.
+  // Se o resultado salvo for antigo, não exibimos conteúdo pessoal desorganizado como insight.
+  const leitura = extrairMapaInterpretativo(mapa.conteudo_markdown);
+  const desatualizado = !!leitura && leitura.fonte_hash !== assinaturaRespostas(respostas);
 
-  const swot = useMemo(
-    () => [
-      {
-        titulo: 'Forças',
-        descricao: 'O que já sustenta você',
-        itens: insights([
-          respostas.momentos_potencia,
-          respostas.feridas_forca,
-          respostas.conhecimentos_habilidades,
-        ]),
-        classe: 'border-emerald-200 bg-emerald-50/70',
-      },
-      {
-        titulo: 'Pontos de atenção',
-        descricao: 'O que pede cuidado e gestão',
-        itens: insights([
-          respostas.ciclos_energia,
-          respostas.presenca_atual,
-          respostas.valores_crencas,
-        ]),
-        classe: 'border-amber-200 bg-amber-50/70',
-      },
-      {
-        titulo: 'Oportunidades',
-        descricao: 'O que pode ganhar mais espaço',
-        itens: insights([
-          respostas.chamados_esquecidos,
-          respostas.contribuicao,
-          respostas.paixoes,
-        ]),
-        classe: 'border-sky-200 bg-sky-50/70',
-      },
-      {
-        titulo: 'Alertas',
-        descricao: 'O que pode limitar seu movimento',
-        itens: insights([
-          respostas.valores_crencas,
-          respostas.ciclos_energia,
-          respostas.presenca_atual,
-        ]),
-        classe: 'border-rose-200 bg-rose-50/70',
-      },
-    ],
-    [respostas]
-  );
+  const fluxo = [
+    { titulo: 'Essência', texto: leitura?.fluxo.essencia ?? '' },
+    { titulo: 'Potência', texto: leitura?.fluxo.potencia ?? '' },
+    { titulo: 'Resiliência', texto: leitura?.fluxo.resiliencia ?? '' },
+    { titulo: 'Direção', texto: leitura?.fluxo.direcao ?? '' },
+    { titulo: 'Presença', texto: leitura?.fluxo.presenca ?? '' },
+  ];
 
-  const mental = useMemo(
-    () => [
-      { titulo: 'Essência', subtitulo: 'Valores e crenças', texto: resumo(respostas.valores_crencas || '', 145) },
-      { titulo: 'Potência', subtitulo: 'Onde você cresce', texto: resumo(respostas.momentos_potencia || '', 145) },
-      { titulo: 'Resiliência', subtitulo: 'O que virou força', texto: resumo(respostas.feridas_forca || '', 145) },
-      { titulo: 'Energia', subtitulo: 'Seu ritmo', texto: resumo(respostas.ciclos_energia || '', 145) },
-      {
-        titulo: 'Direção',
-        subtitulo: 'Chamados e contribuição',
-        texto: resumo(
-          [respostas.chamados_esquecidos, respostas.contribuicao, respostas.paixoes]
-            .filter(Boolean)
-            .join(' '),
-          145
-        ),
-      },
-      { titulo: 'Presença', subtitulo: 'Quem você é hoje', texto: resumo(respostas.presenca_atual || '', 145) },
-    ],
-    [respostas]
-  );
+  const swot = [
+    { titulo: 'Forças', descricao: 'O que já sustenta você', itens: leitura?.swot.forcas ?? [], classe: 'border-emerald-200 bg-emerald-50/70' },
+    { titulo: 'Pontos de atenção', descricao: 'O que pede cuidado e gestão', itens: leitura?.swot.pontos_atencao ?? [], classe: 'border-amber-200 bg-amber-50/70' },
+    { titulo: 'Oportunidades', descricao: 'O que pode ganhar mais espaço', itens: leitura?.swot.oportunidades ?? [], classe: 'border-sky-200 bg-sky-50/70' },
+    { titulo: 'Alertas', descricao: 'O que pode limitar seu movimento', itens: leitura?.swot.alertas ?? [], classe: 'border-rose-200 bg-rose-50/70' },
+  ];
+
+  const mental = [
+    { titulo: 'Essência', subtitulo: 'Valores e crenças', texto: leitura?.mental.essencia ?? '' },
+    { titulo: 'Potência', subtitulo: 'Onde você cresce', texto: leitura?.mental.potencia ?? '' },
+    { titulo: 'Resiliência', subtitulo: 'O que virou força', texto: leitura?.mental.resiliencia ?? '' },
+    { titulo: 'Energia', subtitulo: 'Seu ritmo', texto: leitura?.mental.energia ?? '' },
+    { titulo: 'Direção', subtitulo: 'Chamados e contribuição', texto: leitura?.mental.direcao ?? '' },
+    { titulo: 'Presença', subtitulo: 'Quem você é hoje', texto: leitura?.mental.presenca ?? '' },
+  ];
 
   function exportarPdf() {
     const flowHtml = fluxo
@@ -224,15 +138,6 @@ export default function MapaResultadoVisual({
           '</ul></div>'
       )
       .join('');
-
-    const respostasHtml = BLOCOS_QUEM_SOU_EU.map(
-      (item) =>
-        '<div class="answer"><h3>' +
-        escapeHtml(item.titulo) +
-        '</h3><p>' +
-        escapeHtml(limparTexto(respostas[item.codigo] || 'Não respondido.')) +
-        '</p></div>'
-    ).join('');
 
     const bussolaItens = bussola
       ? [
@@ -278,9 +183,7 @@ export default function MapaResultadoVisual({
       swotHtml +
       '</div></section>' +
       bussolaHtml +
-      '<section><h2>Respostas que formaram o mapa</h2><div class="answers">' +
-      respostasHtml +
-      '</div></section></body></html>';
+      '</body></html>';
 
     popup.document.open();
     popup.document.write(html);
@@ -296,6 +199,25 @@ export default function MapaResultadoVisual({
     { id: 'mental', label: 'Mapa mental', icon: Brain },
     { id: 'completo', label: 'Resultado completo', icon: FileText },
   ];
+
+  if (!leitura) {
+    return (
+      <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <p className="font-semibold text-black">Sua nova leitura interpretativa</p>
+          <p className="mt-2 text-sm leading-6 text-gray-text">
+            A síntese anterior foi preservada no histórico. Estamos transformando suas respostas em insights claros,
+            sem reproduzir relatos pessoais nos cards.
+          </p>
+        </div>
+        <button type="button" onClick={onGerarMapa} disabled={gerandoMapa}
+          className="shrink-0 inline-flex min-h-11 items-center gap-2 rounded-lg bg-mint-deep px-5 py-3 text-sm font-medium text-white disabled:opacity-50">
+          {gerandoMapa ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+          {gerandoMapa ? 'Interpretando respostas...' : 'Atualizar minha leitura'}
+        </button>
+      </Panel>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -327,6 +249,12 @@ export default function MapaResultadoVisual({
           </button>
         </div>
       </div>
+
+      {desatualizado && (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-gray-700">
+          Suas respostas foram alteradas desde a última interpretação. Use “Atualizar síntese” para renovar os insights.
+        </p>
+      )}
 
       <div className="border-b border-gray-faint overflow-x-auto" role="tablist" aria-label="Leituras do Mapa Quem Sou Eu">
         <div className="flex gap-2 sm:gap-5 min-w-max">
@@ -473,12 +401,7 @@ export default function MapaResultadoVisual({
                 Temas que aparecem ligados ao seu momento atual e à sua contribuição.
               </p>
               <p className="text-sm text-black leading-6">
-                {resumo(
-                  [respostas.presenca_atual, respostas.contribuicao, respostas.ciclos_energia]
-                    .filter(Boolean)
-                    .join(' '),
-                  320
-                ) || 'Ainda não há informação suficiente para priorizar.'}
+                {leitura?.prioridades.agora || 'Ainda não há informação suficiente para priorizar.'}
               </p>
             </div>
             <div className="rounded-2xl border border-gray-faint bg-white p-5">
@@ -487,12 +410,7 @@ export default function MapaResultadoVisual({
                 Temas valiosos, mas que não precisam virar ação imediata.
               </p>
               <p className="text-sm text-black leading-6">
-                {resumo(
-                  [respostas.chamados_esquecidos, respostas.paixoes]
-                    .filter(Boolean)
-                    .join(' '),
-                  320
-                ) || 'Nenhum tema secundário identificado ainda.'}
+                {leitura?.prioridades.depois || 'Nenhum tema secundário identificado ainda.'}
               </p>
             </div>
           </div>
@@ -538,7 +456,7 @@ export default function MapaResultadoVisual({
 
           <div className="prose prose-sm max-w-none prose-headings:font-display prose-headings:text-black prose-p:text-black prose-p:leading-7 prose-li:text-black prose-li:leading-6 prose-strong:text-black prose-code:font-sans prose-code:text-black prose-code:bg-transparent prose-code:p-0 prose-pre:bg-transparent prose-pre:text-black prose-pre:border prose-pre:border-gray-faint prose-pre:rounded-xl prose-pre:whitespace-pre-wrap">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {normalizarMarkdown(mapa.conteudo_markdown)}
+              {normalizarMarkdown(limparMetadadosMapa(mapa.conteudo_markdown))}
             </ReactMarkdown>
           </div>
         </Panel>

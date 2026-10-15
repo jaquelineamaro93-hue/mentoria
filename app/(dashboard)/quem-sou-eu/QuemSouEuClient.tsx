@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Compass, Sparkles, Loader2, Check } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
+import { extrairMapaInterpretativo } from '@/lib/mapa-interpretativo';
 import MapaResultadoVisual from '@/components/quem-sou-eu/MapaResultadoVisual';
 import type {
   BussolaPosicionamento,
@@ -124,6 +125,19 @@ export default function QuemSouEuClient({
     }
     setGerandoMapa(false);
   }
+
+  // Migra a visualização legada sob demanda para uma leitura interpretativa.
+  // Faz apenas uma tentativa automática por montagem, e nunca altera os nove relatos.
+  const atualizacaoAutomaticaTentada = useRef(false);
+  useEffect(() => {
+    if (!atualizacaoAutomaticaTentada.current && todosRespondidos && mapa &&
+        !extrairMapaInterpretativo(mapa.conteudo_markdown)) {
+      atualizacaoAutomaticaTentada.current = true;
+      void gerarMapa();
+    }
+    // A chamada usa os registros já salvos no servidor. Falhas exigem novo clique consciente.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapa?.id, todosRespondidos]);
 
   async function gerarBussola() {
     setGerandoBussola(true);
