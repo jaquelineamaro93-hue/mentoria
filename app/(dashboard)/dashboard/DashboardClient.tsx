@@ -307,6 +307,7 @@ export default function DashboardClient({
           </div>
         </div>
 
+        {!entrevista && <>
         <section aria-labelledby="discover-tools" className="mb-8 rounded-2xl border border-mint-deep/20 bg-white p-5 sm:p-6">
           <p className="text-xs uppercase tracking-widest text-mint-deep">Da reflexão à oportunidade</p>
           <h2 id="discover-tools" className="mt-2 font-display text-2xl text-lotus-brown">O que você quer destravar hoje?</h2>
@@ -361,6 +362,8 @@ export default function DashboardClient({
             </Link>
           </Panel>
         </section>
+
+        </>}
 
         {/* Feedbacks da Mentora */}
         {feedbacks.length > 0 && (
