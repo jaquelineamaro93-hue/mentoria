@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
-import { chamarClaude } from '@/lib/anthropic';
-import { montarPromptMapaEssencia } from '@/lib/prompts';
+import { chamarClaudeJson } from '@/lib/ai-json';
+import { BLOCOS_QUEM_SOU_EU, montarPromptMapaInterpretativo } from '@/lib/prompts';
+import {
+  assinaturaRespostas, serializarMapaInterpretativo,
+  validarAnaliseMapa, type AnaliseMapaIA,
+} from '@/lib/mapa-interpretativo';
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -33,7 +37,7 @@ export async function POST(request: Request) {
     .select('bloco, resposta')
     .eq('user_id', user.id);
 
-  if (!respostasRaw || respostasRaw.length < 9) {
+  if (!respostasRaw || BLOCOS_QUEM_SOU_EU.some(bloco => !respostasRaw.find(resposta => resposta.bloco === bloco.codigo && typeof resposta.resposta === 'string' && resposta.resposta.trim().length > 0))) {
     return NextResponse.json(
       { error: 'Responda todos os 9 blocos antes de gerar o mapa.' },
       { status: 400 }
@@ -46,8 +50,17 @@ export async function POST(request: Request) {
   }
 
   try {
-    const prompt = montarPromptMapaEssencia(respostas);
-    const conteudo = await chamarClaude(prompt);
+    const prompt = montarPromptMapaInterpretativo(respostas);
+    const interpretacao = await chamarClaudeJson<AnaliseMapaIA>(prompt, {
+      maxTokens: 4500,
+      descricao: 'interpretação do Mapa Quem Sou Eu',
+      validar: validarAnaliseMapa,
+    });
+    const conteudo = serializarMapaInterpretativo({
+      ...interpretacao,
+      versao: 1,
+      fonte_hash: assinaturaRespostas(respostas),
+    });
 
     const { data: mapa, error } = await supabase
       .from('mapa_essencia')
