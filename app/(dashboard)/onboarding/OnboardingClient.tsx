@@ -63,9 +63,11 @@ const outrasFerramentas = [
 export default function OnboardingClient({
   profile,
   progresso,
+  entrevista,
 }: {
   profile: Profile | null;
   progresso: Progresso;
+  entrevista: {momento_profissional:string;objetivo_principal:string;maior_desafio:string;prioridade_90_dias:string;apoio_esperado:string}|null;
 }) {
   const router = useRouter();
   const [salvandoAdmin, setSalvandoAdmin] = useState(false);
@@ -191,6 +193,27 @@ export default function OnboardingClient({
     },
   ];
 
+  const momento = entrevista?.momento_profissional ?? '';
+  const recolocacao = ['recolocacao', 'transicao'].includes(momento);
+  const crescimento = ['crescimento', 'lideranca'].includes(momento);
+  const nomeTrilha = recolocacao ? 'Recolocação e transição' : crescimento ? 'Crescimento e liderança' : momento === 'empreendedorismo' ? 'Projeto e posicionamento' : 'Descoberta profissional';
+  const caminho = [
+    { titulo: 'Mapa Quem Sou Eu', descricao: 'Reconheça sua história, valores e competências antes de definir os próximos movimentos.', href: '/quem-sou-eu', feito: progresso.blocosQuemSouEu >= totalBlocos },
+    { titulo: 'Diagnóstico de forças', descricao: 'Identifique suas forças e como elas aparecem no seu trabalho.', href: '/exercicios', feito: progresso.fezVia },
+    ...(recolocacao ? [
+      { titulo: 'Currículo e posicionamento', descricao: 'Traduza suas experiências para as oportunidades que procura.', href: '/carreira?etapa=cv', feito: progresso.cvSimulacoes > 0 },
+      { titulo: 'LinkedIn e oportunidades', descricao: 'Revise sua apresentação e encontre vagas coerentes com seu objetivo.', href: '/linkedin', feito: false },
+      { titulo: 'Entrevistas', descricao: 'Pratique suas histórias e exemplos para processos seletivos.', href: '/carreira?etapa=entrevista', feito: false },
+    ] : crescimento ? [
+      { titulo: 'Percepção e contexto', descricao: 'Compare sua percepção com feedbacks e entenda o cenário na empresa.', href: '/percepcao-360', feito: progresso.feedback360Rodadas > 0 },
+      { titulo: 'Plano de desenvolvimento', descricao: 'Transforme seu objetivo em ações e conversas possíveis.', href: '/meu-pdi', feito: progresso.secoesPdi >= totalPdi },
+      { titulo: 'Liderança e próximos 90 dias', descricao: 'Planeje comportamentos, entregas e relações que deseja fortalecer.', href: '/primeiros-90-dias', feito: false },
+    ] : [
+      { titulo: 'Percepção 360', descricao: 'Descubra como suas forças aparecem para outras pessoas.', href: '/percepcao-360', feito: progresso.feedback360Rodadas > 0 },
+      { titulo: 'Meu plano', descricao: 'Escolha um objetivo e transforme-o em pequenas ações.', href: '/meu-pdi', feito: progresso.secoesPdi >= totalPdi },
+    ]),
+  ];
+  const proximoGuiado = caminho.find(etapa => !etapa.feito);
   const concluidas = etapas.filter((etapa) => etapa.feito).length;
   const percentual = Math.round((concluidas / etapas.length) * 100);
   const proxima = etapas.find((etapa) => !etapa.feito);
@@ -212,6 +235,19 @@ export default function OnboardingClient({
 
   return (
     <main className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 md:py-9 text-black">
+      {entrevista && <section aria-label="Trilha personalizada a partir da entrevista" className="mb-7 rounded-2xl border border-[#DDE6E0] bg-white p-5 sm:p-7">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#386657]">Sua entrevista virou um caminho</p>
+        <h2 className="mt-2 font-display text-2xl text-[#183F37]">Sua trilha: {nomeTrilha}</h2>
+        <p className="mt-3 text-sm leading-6 text-gray-700">Você contou que deseja {entrevista.objetivo_principal.trim().replace(/[.!?]+$/, '')}. Vamos usar esse objetivo como referência, começando por quem você é e pelas forças que já tem.</p>
+        <p className="mt-2 text-sm leading-6 text-gray-700"><strong>Seu desafio:</strong> {entrevista.maior_desafio}</p>
+        <p className="mt-2 text-sm leading-6 text-gray-700"><strong>Nos próximos 90 dias:</strong> {entrevista.prioridade_90_dias}</p>
+        <div className="mt-5 space-y-3">{caminho.map((etapa, indice) => <div key={etapa.href} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 p-4">
+          <div className="flex min-w-0 flex-1 gap-3"><span className="font-semibold text-[#386657]">{indice + 1}.</span><div><p className="font-semibold text-[#183F37]">{etapa.titulo} {etapa.feito ? '✓' : ''}</p><p className="mt-1 text-sm text-gray-600">{etapa.descricao}</p></div></div>
+          <Link href={etapa.href} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#386657] px-3 py-2 text-sm font-semibold text-[#183F37] hover:bg-[#F7F7EE]">{etapa.feito ? 'Revisitar' : 'Começar'} <ArrowRight size={15} /></Link>
+        </div>)}</div>
+        {proximoGuiado && <Link href={proximoGuiado.href} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#183F37] px-5 py-3 text-sm font-semibold text-white">Continuar minha jornada: {proximoGuiado.titulo} <ArrowRight size={16} /></Link>}
+        <p className="mt-4 text-xs text-gray-600">As outras ferramentas continuam disponíveis. Você não perde o que já preencheu.</p>
+      </section>}
       <header className="relative mb-8 overflow-hidden rounded-[28px] bg-[#102A2B] px-6 py-8 text-white sm:px-9 sm:py-10 lg:px-12">
         <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full border-[45px] border-[#FFB366]/20" />
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 right-16 h-80 w-80 rounded-full bg-[#0D8071]/35 blur-3xl" />
