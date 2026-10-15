@@ -42,7 +42,13 @@ export async function POST(request:NextRequest) {
       if(!email||!phone)continue;
       const {data:target}=await admin.from('profiles').select('id,whatsapp_numero').eq('email',email).eq('is_admin',false).maybeSingle();
       if(!target)continue;
-      const {error}=await admin.from('profiles').update({whatsapp_numero:phone,whatsapp_validado_em:target.whatsapp_numero===phone?undefined:null}).eq('id',target.id);
+      // Não sobrescrever consentimento/validação quando o número não mudou.
+      if(target.whatsapp_numero===phone) { updated++; continue; }
+      const {error}=await admin.from('profiles').update({
+        whatsapp_numero:phone,
+        whatsapp_validado_em:null,
+        whatsapp_consentimento_em:null,
+      }).eq('id',target.id);
       if(!error)updated++;
     }
     return NextResponse.json({updated});
@@ -54,9 +60,18 @@ export async function POST(request:NextRequest) {
   if(body.action==='contact') {
     const phone=normalizar(String(body.phone||''));
     if(body.phone&&!phone)return NextResponse.json({error:'WhatsApp inválido'},{status:400});
-    const {error}=await admin.from('profiles').update({whatsapp_numero:phone,whatsapp_validado_em:null,whatsapp_consentimento_em:null}).eq('id',userId);
+    if(target.whatsapp_numero===phone) {
+      // Salvar novamente o mesmo número nunca deve revogar consentimento.
+      return NextResponse.json({ok:true,changed:false});
+    }
+    // Ao trocar efetivamente o número, exigir consentimento para o novo destino.
+    const {error}=await admin.from('profiles').update({
+      whatsapp_numero:phone,
+      whatsapp_validado_em:null,
+      whatsapp_consentimento_em:null,
+    }).eq('id',userId);
     if(error)throw error;
-    return NextResponse.json({ok:true});
+    return NextResponse.json({ok:true,changed:true});
   }
   const week=String(body.week||'');
   if(!/^\d{4}-\d{2}-\d{2}$/.test(week))return NextResponse.json({error:'Semana inválida'},{status:400});
