@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { listManusAgents } from '@/lib/manus';
+import { listManusAgents, ManusConnectionError } from '@/lib/manus';
 
 export const runtime = 'nodejs';
 const headers = { 'Cache-Control': 'private, no-store' };
@@ -17,13 +17,28 @@ export async function GET() {
     const agents = await listManusAgents(apiKey);
     const selected = agentId ? agents.find(agent => agent.id === agentId) : undefined;
     return NextResponse.json({
-      status: selected ? 'connected' : 'select_agent',
-      message: selected ? `Conexão verificada com ${selected.nickname}. Envios automáticos desativados.` : 'Credencial validada. Falta configurar o identificador da Íris.',
+      status: selected ? 'connected' : agentId ? 'agent_not_found' : 'select_agent',
+      message: selected
+        ? `Conexão verificada com ${selected.nickname}. Envios automáticos desativados.`
+        : agentId
+          ? 'Credencial validada, mas o ID configurado em MANUS_AGENT_ID não aparece nesta conta Manus.'
+          : 'Credencial Manus validada. Configure MANUS_AGENT_ID com o ID exato da Íris para concluir a conexão.',
       agents: agents.map(agent => ({ id: agent.id, name: agent.nickname })),
       selectedAgent: selected ? { id: selected.id, name: selected.nickname } : null,
       automaticSending: false,
     }, { headers });
-  } catch {
-    return NextResponse.json({ error: 'Não foi possível verificar a conexão. Confira a credencial e tente novamente.' }, { status: 502, headers });
+  } catch (error) {
+    if (error instanceof ManusConnectionError) {
+      return NextResponse.json({
+        status: error.issue,
+        error: error.message,
+        automaticSending: false,
+      }, { status: 502, headers });
+    }
+    return NextResponse.json({
+      status: 'unknown_failure',
+      error: 'Não foi possível verificar a conexão com a API Manus no momento.',
+      automaticSending: false,
+    }, { status: 502, headers });
   }
 }
