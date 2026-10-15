@@ -235,19 +235,6 @@ export default function OnboardingClient({
 
   return (
     <main className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 md:py-9 text-black">
-      {entrevista && <section aria-label="Trilha personalizada a partir da entrevista" className="mb-7 rounded-2xl border border-[#DDE6E0] bg-white p-5 sm:p-7">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#386657]">Sua entrevista virou um caminho</p>
-        <h2 className="mt-2 font-display text-2xl text-[#183F37]">Sua trilha: {nomeTrilha}</h2>
-        <p className="mt-3 text-sm leading-6 text-gray-700">Você contou que deseja {entrevista.objetivo_principal.trim().replace(/[.!?]+$/, '')}. Vamos usar esse objetivo como referência, começando por quem você é e pelas forças que já tem.</p>
-        <p className="mt-2 text-sm leading-6 text-gray-700"><strong>Seu desafio:</strong> {entrevista.maior_desafio}</p>
-        <p className="mt-2 text-sm leading-6 text-gray-700"><strong>Nos próximos 90 dias:</strong> {entrevista.prioridade_90_dias}</p>
-        <div className="mt-5 space-y-3">{caminho.map((etapa, indice) => <div key={etapa.href} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 p-4">
-          <div className="flex min-w-0 flex-1 gap-3"><span className="font-semibold text-[#386657]">{indice + 1}.</span><div><p className="font-semibold text-[#183F37]">{etapa.titulo} {etapa.feito ? '✓' : ''}</p><p className="mt-1 text-sm text-gray-600">{etapa.descricao}</p></div></div>
-          <Link href={etapa.href} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#386657] px-3 py-2 text-sm font-semibold text-[#183F37] hover:bg-[#F7F7EE]">{etapa.feito ? 'Revisitar' : 'Começar'} <ArrowRight size={15} /></Link>
-        </div>)}</div>
-        {proximoGuiado && <Link href={proximoGuiado.href} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#183F37] px-5 py-3 text-sm font-semibold text-white">Continuar minha jornada: {proximoGuiado.titulo} <ArrowRight size={16} /></Link>}
-        <p className="mt-4 text-xs text-gray-600">As outras ferramentas continuam disponíveis. Você não perde o que já preencheu.</p>
-      </section>}
       <header className="relative mb-8 overflow-hidden rounded-[28px] bg-[#102A2B] px-6 py-8 text-white sm:px-9 sm:py-10 lg:px-12">
         <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full border-[45px] border-[#FFB366]/20" />
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 right-16 h-80 w-80 rounded-full bg-[#0D8071]/35 blur-3xl" />
@@ -311,17 +298,16 @@ export default function OnboardingClient({
         <style jsx>{`@keyframes soma-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(3deg); } } @media (prefers-reduced-motion: reduce) { .motion-safe\\:animate-\\[soma-float_3s_ease-in-out_infinite\\] { animation: none !important; } }`}</style>
       </section>
 
-      {!entrevista && <>
       <div data-soma-capitulo="0" aria-hidden="true" className="h-px" />
       <section aria-labelledby="essenciais-titulo" className="mb-10">
         <div className="mb-4">
-          <h2 id="essenciais-titulo" className="font-display text-3xl text-black">1. Construa sua base</h2>
+          <h2 id="essenciais-titulo" className="font-display text-3xl text-black">{entrevista ? `1. A partir de agora: ${nomeTrilha}` : '1. Construa sua base'}</h2>
           <p className="mt-1 text-sm leading-6 text-gray-700">
-            Estes passos conectam autoconhecimento, objetivos e acompanhamento. Concluído não significa encerrado: você pode atualizar tudo.
+            {entrevista ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos seguir passo a passo, sem perder o que já fez.` : 'Estes passos conectam autoconhecimento, objetivos e acompanhamento. Concluído não significa encerrado: você pode atualizar tudo.'}
           </p>
         </div>
         <div className="grid gap-3">
-          {etapas.map((etapa, i) => {
+          {(entrevista ? caminho.map((passo,i)=>({key:`trilha-${i}`,titulo:passo.titulo,descricao:passo.descricao,beneficio: i < 2 ? 'Sua base para as próximas escolhas' : 'Conectar o aprendizado ao seu objetivo',feito:passo.feito,progresso:passo.feito ? 'Etapa concluída' : 'Próxima etapa da sua jornada',href:passo.href,cta:'Começar',icon:Compass})) : etapas).map((etapa, i) => {
             const Icon = etapa.icon;
             return (
               <article key={etapa.key} className="group rounded-2xl border border-[#E4E8E7] bg-white p-5 shadow-[0_4px_24px_rgba(16,42,43,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0D8071]/40 hover:shadow-[0_12px_36px_rgba(16,42,43,0.08)] motion-reduce:transform-none">
@@ -413,8 +399,6 @@ export default function OnboardingClient({
           </div>
         </details>
       </section>
-
-      </>}
 
       {profile?.is_admin && (
         <section aria-label="Configurações administrativas de onboarding" className="rounded-xl border border-amber-300 bg-amber-50 p-5">
