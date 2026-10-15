@@ -14,8 +14,9 @@ export default async function OnboardingPage() {
     redirect('/login');
   }
 
-  const [{ data: profile }, { data: quemSouEu }, { data: via }, { data: pdi }, { data: diario }, { data: secoesPdiTotal }, { count: feedback360Rodadas }, { count: cvSimulacoes }, { count: linkedinRascunhos }] =
+  const [{ data: entrevista }, { data: profile }, { data: quemSouEu }, { data: via }, { data: pdi }, { data: diario }, { data: secoesPdiTotal }, { count: feedback360Rodadas }, { count: cvSimulacoes }, { count: linkedinRascunhos }] =
     await Promise.all([
+      supabase.from('entrevistas_iniciais').select('momento_profissional,objetivo_principal,maior_desafio,prioridade_90_dias,apoio_esperado').eq('user_id',user.id).maybeSingle(),
       supabase.from('profiles').select('*').eq('id', user.id).single<Profile>(),
       supabase.from('quem_sou_eu_respostas').select('id').eq('user_id', user.id),
       supabase.from('via_resultados').select('id').eq('user_id', user.id),
@@ -30,6 +31,7 @@ export default async function OnboardingPage() {
   return (
     <OnboardingClient
       profile={profile}
+      entrevista={entrevista}
       progresso={{
         onboardingFeito: !!profile?.onboarding_concluido,
         blocosQuemSouEu: quemSouEu?.length ?? 0,

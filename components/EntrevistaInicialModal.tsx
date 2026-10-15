@@ -25,7 +25,7 @@ export default function EntrevistaInicialModal({profile}:{profile:Profile|null})
  const [respostas,setRespostas]=useState<Respostas>(inicial);
  const [salvando,setSalvando]=useState(false);
  const [erro,setErro]=useState('');
- const elegivel=Boolean(profile&&!profile.is_admin&&profile.dados_contato_confirmados_em&&
+ const elegivel=Boolean(profile&&(profile.is_admin || profile.dados_contato_confirmados_em)&&
   (profile.trial_status==='active'||profile.trial_status==='converted'||profile.status_assinatura==='ativo'||profile.status_assinatura==='trial')&&!pathname.startsWith('/admin'));
  useEffect(()=>{
   if(!elegivel||!profile){setEstado('carregando');return;}
@@ -61,7 +61,7 @@ export default function EntrevistaInicialModal({profile}:{profile:Profile|null})
    objetivo_principal:respostas.objetivo_principal.trim(),maior_desafio:respostas.maior_desafio.trim(),
    prioridade_90_dias:respostas.prioridade_90_dias.trim(),apoio_esperado:respostas.apoio_esperado.trim()});
   if(error){setErro('Não foi possível salvar a entrevista. Tente novamente.');setSalvando(false);return;}
-  setEstado('concluido');router.refresh();
+  setEstado('concluido');router.push('/onboarding');router.refresh();
  }
  return <div className="fixed inset-0 z-[1001] flex items-center justify-center bg-black/65 px-4 py-6" role="presentation">
   <section role="dialog" aria-modal="true" aria-labelledby="entrevista-inicial-titulo" className="w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl bg-white p-6 sm:p-8 shadow-2xl">

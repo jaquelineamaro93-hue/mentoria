@@ -63,9 +63,11 @@ const outrasFerramentas = [
 export default function OnboardingClient({
   profile,
   progresso,
+  entrevista,
 }: {
   profile: Profile | null;
   progresso: Progresso;
+  entrevista: {momento_profissional:string;objetivo_principal:string;maior_desafio:string;prioridade_90_dias:string;apoio_esperado:string}|null;
 }) {
   const router = useRouter();
   const [salvandoAdmin, setSalvandoAdmin] = useState(false);
@@ -191,6 +193,27 @@ export default function OnboardingClient({
     },
   ];
 
+  const momento = entrevista?.momento_profissional ?? '';
+  const recolocacao = ['recolocacao', 'transicao'].includes(momento);
+  const crescimento = ['crescimento', 'lideranca'].includes(momento);
+  const nomeTrilha = recolocacao ? 'Recolocação e transição' : crescimento ? 'Crescimento e liderança' : momento === 'empreendedorismo' ? 'Projeto e posicionamento' : 'Descoberta profissional';
+  const caminho = [
+    { titulo: 'Mapa Quem Sou Eu', descricao: 'Reconheça sua história, valores e competências antes de definir os próximos movimentos.', href: '/quem-sou-eu', feito: progresso.blocosQuemSouEu >= totalBlocos },
+    { titulo: 'Diagnóstico de forças', descricao: 'Identifique suas forças e como elas aparecem no seu trabalho.', href: '/exercicios', feito: progresso.fezVia },
+    ...(recolocacao ? [
+      { titulo: 'Currículo e posicionamento', descricao: 'Traduza suas experiências para as oportunidades que procura.', href: '/carreira?etapa=cv', feito: progresso.cvSimulacoes > 0 },
+      { titulo: 'LinkedIn e oportunidades', descricao: 'Revise sua apresentação e encontre vagas coerentes com seu objetivo.', href: '/linkedin', feito: false },
+      { titulo: 'Entrevistas', descricao: 'Pratique suas histórias e exemplos para processos seletivos.', href: '/carreira?etapa=entrevista', feito: false },
+    ] : crescimento ? [
+      { titulo: 'Percepção e contexto', descricao: 'Compare sua percepção com feedbacks e entenda o cenário na empresa.', href: '/percepcao-360', feito: progresso.feedback360Rodadas > 0 },
+      { titulo: 'Plano de desenvolvimento', descricao: 'Transforme seu objetivo em ações e conversas possíveis.', href: '/meu-pdi', feito: progresso.secoesPdi >= totalPdi },
+      { titulo: 'Liderança e próximos 90 dias', descricao: 'Planeje comportamentos, entregas e relações que deseja fortalecer.', href: '/primeiros-90-dias', feito: false },
+    ] : [
+      { titulo: 'Percepção 360', descricao: 'Descubra como suas forças aparecem para outras pessoas.', href: '/percepcao-360', feito: progresso.feedback360Rodadas > 0 },
+      { titulo: 'Meu plano', descricao: 'Escolha um objetivo e transforme-o em pequenas ações.', href: '/meu-pdi', feito: progresso.secoesPdi >= totalPdi },
+    ]),
+  ];
+  const proximoGuiado = caminho.find(etapa => !etapa.feito);
   const concluidas = etapas.filter((etapa) => etapa.feito).length;
   const percentual = Math.round((concluidas / etapas.length) * 100);
   const proxima = etapas.find((etapa) => !etapa.feito);
@@ -278,13 +301,13 @@ export default function OnboardingClient({
       <div data-soma-capitulo="0" aria-hidden="true" className="h-px" />
       <section aria-labelledby="essenciais-titulo" className="mb-10">
         <div className="mb-4">
-          <h2 id="essenciais-titulo" className="font-display text-3xl text-black">1. Construa sua base</h2>
+          <h2 id="essenciais-titulo" className="font-display text-3xl text-black">{entrevista ? `1. A partir de agora: ${nomeTrilha}` : '1. Construa sua base'}</h2>
           <p className="mt-1 text-sm leading-6 text-gray-700">
-            Estes passos conectam autoconhecimento, objetivos e acompanhamento. Concluído não significa encerrado: você pode atualizar tudo.
+            {entrevista ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos seguir passo a passo, sem perder o que já fez.` : 'Estes passos conectam autoconhecimento, objetivos e acompanhamento. Concluído não significa encerrado: você pode atualizar tudo.'}
           </p>
         </div>
         <div className="grid gap-3">
-          {etapas.map((etapa, i) => {
+          {(entrevista ? caminho.map((passo,i)=>({key:`trilha-${i}`,titulo:passo.titulo,descricao:passo.descricao,beneficio: i < 2 ? 'Sua base para as próximas escolhas' : 'Conectar o aprendizado ao seu objetivo',feito:passo.feito,progresso:passo.feito ? 'Etapa concluída' : 'Próxima etapa da sua jornada',href:passo.href,cta:'Começar',icon:Compass})) : etapas).map((etapa, i) => {
             const Icon = etapa.icon;
             return (
               <article key={etapa.key} className="group rounded-2xl border border-[#E4E8E7] bg-white p-5 shadow-[0_4px_24px_rgba(16,42,43,0.035)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0D8071]/40 hover:shadow-[0_12px_36px_rgba(16,42,43,0.08)] motion-reduce:transform-none">
