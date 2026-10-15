@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const source = ts.transpileModule(fs.readFileSync('lib/manus.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
 let response;
 let calls = [];
-const context = { exports: {}, AbortSignal, fetch: async (url, options) => { calls.push({ url, options }); return response; } };
+const context = { exports: {}, AbortSignal, console: { warn() {} }, fetch: async (url, options) => { calls.push({ url, options }); return response; } };
 vm.runInNewContext(source, context);
 (async () => {
   response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'iris-id', task_id: 'iris-thread', nickname: 'Íris', about: 'private description' }] }) };
@@ -26,7 +26,26 @@ vm.runInNewContext(source, context);
   await assert.rejects(context.exports.listManusAgents('test-key'), /indisponível/);
   response = { ok: true, json: async () => ({ ok: false, data: [] }) };
   await assert.rejects(context.exports.listManusAgents('test-key'), /inesperada/);
-  response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'wrong' }] }) };
-  await assert.rejects(context.exports.listManusAgents('test-key'), /inválidos/);
-  console.log('Manus connection: 7 scenarios passed (mock API, no external messages).');
+  response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'iris-id' }] }) };
+  const withoutOptional = await context.exports.listManusAgents('test-key');
+  assert.equal(withoutOptional[0].id, 'iris-id');
+  assert.equal(withoutOptional[0].nickname, 'Agente sem nome');
+  assert.equal(withoutOptional[0].task_id, null);
+
+  response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'iris-id', nickname: 'Íris', task_id: null }, { id: null }, null] }) };
+  const mixed = await context.exports.listManusAgents('test-key');
+  assert.equal(mixed.length, 1);
+  assert.equal(mixed[0].nickname, 'Íris');
+
+  response = { ok: true, json: async () => ({ ok: true, data: [{ id: 'iris-id', name: 'Agente Cue' }] }) };
+  const nameFallback = await context.exports.listManusAgents('test-key');
+  assert.equal(nameFallback[0].nickname, 'Agente Cue');
+
+  response = { ok: true, json: async () => ({ ok: true, data: [] }) };
+  const empty = await context.exports.listManusAgents('test-key');
+  assert.equal(empty.length, 0);
+
+  response = { ok: true, json: async () => ({ ok: true, data: [{ task_id: 'main-thread', nickname: 'Sem identificação' }] }) };
+  await assert.rejects(context.exports.listManusAgents('test-key'), /nenhum agente veio com ID válido/);
+  console.log('Manus connection: 11 scenarios passed (mock API, no external messages).');
 })().catch(error => { console.error(error); process.exitCode = 1; });
