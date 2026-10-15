@@ -198,7 +198,19 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
         : '';
     const assinatura=primeiroContato?'':'\n\n'+mascote.nome+' | SOMA Mentoria';
     mensagem=[saudacao,apresentacao,mensagem].filter(Boolean).join('\n\n')+assinatura;
-    if(mensagem.length>750)return NextResponse.json({error:'A mensagem excedeu o limite após identificar o mascote. Tente gerar novamente.'},{status:503});
+    // Preserve the mascot introduction and signature while fitting the WhatsApp draft limit.
+    // Never consume another AI request merely because fixed text exceeded the limit.
+    if (mensagem.length > 750) {
+      const partesFixas = [saudacao, apresentacao].filter(Boolean).join('\\n\\n');
+      const prefixo = partesFixas ? partesFixas + '\\n\\n' : '';
+      const espacoCorpo = 750 - prefixo.length - assinatura.length;
+      if (espacoCorpo < 80) return NextResponse.json({error:'Não foi possível montar uma mensagem dentro do limite.'},{status:503});
+      const corpo = normalizarQuebras(analise.mensagem).replace(/!/g,'').replace(/\\s*[—–]\\s*/g,', ').trim();
+      const corte = corpo.slice(0, espacoCorpo);
+      const limiteFrase = Math.max(corte.lastIndexOf('. '), corte.lastIndexOf('? '), corte.lastIndexOf('! '));
+      const corpoFinal = limiteFrase > espacoCorpo * 0.55 ? corte.slice(0, limiteFrase + 1).trim() : corte.slice(0, corte.lastIndexOf(' ') > espacoCorpo * 0.7 ? corte.lastIndexOf(' ') : espacoCorpo).trim();
+      mensagem = prefixo + corpoFinal + assinatura;
+    }
     // Não exigir um sinal '?' literal: perguntas indiretas e pedidos de
     // reflexão também podem ser mensagens válidas para revisão humana.
     mensagem=mensagem.replace(/\n{3,}/g,'\n\n');
