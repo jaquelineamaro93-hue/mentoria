@@ -28,6 +28,8 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single<Profile>();
 
+  const { data: entrevista } = await supabase.from('entrevistas_iniciais').select('momento_profissional,objetivo_principal,maior_desafio,prioridade_90_dias').eq('user_id',user.id).maybeSingle();
+
   let diagnostic: Diagnostic | null = null;
   try {
     const { data } = await supabase
@@ -142,6 +144,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       profile={profile}
+      entrevista={entrevista}
       diagnostic={diagnostic}
       quemSouRespostasCompletas={quemSouRespostasCompletas}
       totalBlocosQuemSouEu={BLOCOS_QUEM_SOU_EU.length}
