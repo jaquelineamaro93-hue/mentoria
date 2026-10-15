@@ -170,10 +170,21 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
       return NextResponse.json({error:'A IA não entregou uma mensagem utilizável. Nenhum rascunho foi criado.'},{status:503});
     // A apresentação é controlada pelo servidor. A IA entrega apenas o conteúdo.
     // Aceita saudação com ou sem vírgula e com frase de cortesia adicional.
-    const nomeSeguro=primeiroNome.replace(/[^\\p{L}\\p{N}]/gu,'\\$&');
-    mensagem=mensagem.replace(new RegExp('^\\s*(?:Oi|Olá|Ola)\\s*,?\\s*'+nomeSeguro+'\\s*[,!.?]*\\s*(?:tudo bem\\s*[?.!]*)?\\s*','iu'),'').trim();
-    mensagem=mensagem.replace(/^(?:(?:Aqui é|Eu sou|Sou o|Sou a|Meu nome é)\\s+(?:o\\s+|a\\s+)?(?:Lume|Norte|Brasa|Íris)[^\\n]*\\n*\\s*)+/iu,'').trim();
-    mensagem=mensagem.replace(/\\bCual\\b/giu,'Qual');
+    // Evitar regex construída com nome do usuário: nomes e acentos não são padrões.
+    const linhas=mensagem.split('\n');
+    const primeira=linhas[0]?.trim() ?? '';
+    const normalizarNome=(valor:string)=>valor.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
+    const nomePrimeiraLinha=normalizarNome(primeira);
+    const nomePessoa=normalizarNome(primeiroNome);
+    if ((nomePrimeiraLinha.startsWith('oi '+nomePessoa) || nomePrimeiraLinha.startsWith('oi, '+nomePessoa) ||
+         nomePrimeiraLinha.startsWith('ola '+nomePessoa) || nomePrimeiraLinha.startsWith('ola, '+nomePessoa)) &&
+        (primeira.length <= primeiroNome.length+32)) {
+      linhas.shift();
+      mensagem=linhas.join('\n').trim();
+    }
+    // Retirar apresentação repetida apenas no início, sem mexer no conteúdo do acompanhamento.
+    mensagem=mensagem.replace(/^(?:Aqui é|Eu sou|Sou o|Sou a|Meu nome é)\s+(?:(?:o|a)\s+)?(?:Lume|Norte|Brasa|Íris)[^\n]*(?:\n|$)/iu,'').trim();
+    mensagem=mensagem.replace(/\bCual\b/giu,'Qual');
     // Se a IA entregar um único bloco, distribuir as frases em parágrafos
     // sem alterar o sentido ou inventar informações.
     if(!mensagem.includes('\n\n') && mensagem.length>200) {
