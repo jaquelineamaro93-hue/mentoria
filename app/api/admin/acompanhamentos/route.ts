@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { chamarClaudeJson } from '@/lib/ai-json';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
+import { limparAberturaDaIA } from '@/lib/whatsapp-abertura';
 
 export const maxDuration = 120;
 
@@ -148,7 +149,7 @@ Regras obrigatórias:
 1. Priorize a entrevista inicial de objetivos e as respostas recentes de WhatsApp quando existirem, sem presumir que uma resposta seja uma ação concluída. Identifique um detalhe CONCRETO e distintivo nas respostas desta pessoa, não apenas a categoria geral (como recolocação). Se não houver evidência individual, reconheça explicitamente a falta de dados e faça uma pergunta de descoberta.
 2. Nunca invente conquistas, dificuldades, ações concluídas, entrevistas, empresas, respostas ou evolução. Não confunda perguntas de formulários com respostas da mentorada.
 3. Use o histórico da semana anterior para evitar repetir a mesma pergunta e, quando existir uma ação anterior, pergunte sobre seu resultado sem pressupor que foi cumprida.
-4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 520 caracteres, 2 a 3 parágrafos com uma linha em branco entre eles, sem saudação, apresentação ou assinatura (o sistema adicionará). Preserve o tom de mentoria reflexiva: conecte detalhes individuais, explicite hipóteses como hipóteses, proponha uma ação concreta e termine com uma pergunta específica. Linguagem acolhedora, frases naturais e sem travessões nem excesso de pontos finais. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
+4. Escreva APENAS o corpo da mensagem WhatsApp em português brasileiro, com até 520 caracteres, 2 a 3 parágrafos com uma linha em branco entre eles. NÃO escreva 'Oi', 'Olá', 'tudo bem?', 'Sou o Lume', 'Aqui é Lume' ou qualquer apresentação, nem quando estiverem na mesma linha do conteúdo. O sistema adicionará saudação, apresentação e assinatura. Preserve o tom de mentoria reflexiva: conecte detalhes individuais, explicite hipóteses como hipóteses, proponha uma ação concreta e termine com uma pergunta específica. Linguagem acolhedora, frases naturais e sem travessões nem excesso de pontos finais. Sem fórmulas como 'Sua resposta vai nos ajudar a definir um próximo passo prático'.
 4a. Nunca use travessões (— ou –), hífens como separadores de oração nem ponto de exclamação (!) na mensagem. Evite urgência, apelos comerciais e linguagem de disparo em massa.\n5. Duas pessoas buscando emprego não devem receber o mesmo roteiro apenas por estarem em recolocação. A pergunta deve ser consequência dos dados individuais. Não use sorteio, rotação de perguntas ou sinônimos cosméticos.
 6. Os campos insight e progresso devem distinguir evidências observadas, lacunas e hipóteses. Quantidade de registros não significa progresso.
 7. Não inclua números de telefone, emails ou dados pessoais sensíveis na mensagem.
@@ -162,29 +163,12 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     } catch {
       return NextResponse.json({error:'Não foi possível analisar o contexto individual com IA. Nenhum rascunho genérico foi criado. Tente novamente.'},{status:503});
     }
-    // A IA pode variar pontuação e saudação. Corrigir apresentação sem
-    // descartar uma análise individual válida ou fabricar conteúdo.
-    const normalizarQuebras=(texto:string)=>texto.replace(/\\n/g,'\n').replace(/\r\n?/g,'\n');
-    let mensagem=normalizarQuebras(analise.mensagem).replace(/!/g,'').replace(/\s*[—–]\s*/g,', ').trim();
+    // O servidor monta a saudação e apresenta o mascote uma única vez.
+    // A IA pode enviar "Oi Fábio, tudo bem? Sou o Lume..." na MESMA linha.
+    // Remover esses trechos antes de acrescentar a apresentação oficial.
+    let mensagem=limparAberturaDaIA(analise.mensagem, primeiroNome);
     if(!mensagem || mensagem.length>2000)
-      return NextResponse.json({error:'A IA não entregou uma mensagem utilizável. Nenhum rascunho foi criado.'},{status:503});
-    // A apresentação é controlada pelo servidor. A IA entrega apenas o conteúdo.
-    // Aceita saudação com ou sem vírgula e com frase de cortesia adicional.
-    // Evitar regex construída com nome do usuário: nomes e acentos não são padrões.
-    const linhas=mensagem.split('\n');
-    const primeira=linhas[0]?.trim() ?? '';
-    const normalizarNome=(valor:string)=>valor.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
-    const nomePrimeiraLinha=normalizarNome(primeira);
-    const nomePessoa=normalizarNome(primeiroNome);
-    if ((nomePrimeiraLinha.startsWith('oi '+nomePessoa) || nomePrimeiraLinha.startsWith('oi, '+nomePessoa) ||
-         nomePrimeiraLinha.startsWith('ola '+nomePessoa) || nomePrimeiraLinha.startsWith('ola, '+nomePessoa)) &&
-        (primeira.length <= primeiroNome.length+32)) {
-      linhas.shift();
-      mensagem=linhas.join('\n').trim();
-    }
-    // Retirar apresentação repetida apenas no início, sem mexer no conteúdo do acompanhamento.
-    mensagem=mensagem.replace(/^(?:Aqui é|Eu sou|Sou o|Sou a|Meu nome é)\s+(?:(?:o|a)\s+)?(?:Lume|Norte|Brasa|Íris)[^\n]*(?:\n|$)/iu,'').trim();
-    mensagem=mensagem.replace(/\bCual\b/giu,'Qual');
+      return NextResponse.json({error:'A IA não entregou um conteúdo individual utilizável. O rascunho anterior foi preservado.'},{status:503});
     // Se a IA entregar um único bloco, distribuir as frases em parágrafos
     // sem alterar o sentido ou inventar informações.
     if(!mensagem.includes('\n\n') && mensagem.length>200) {
