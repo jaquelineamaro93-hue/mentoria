@@ -311,6 +311,7 @@ export default function OnboardingClient({
         <style jsx>{`@keyframes soma-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(3deg); } } @media (prefers-reduced-motion: reduce) { .motion-safe\\:animate-\\[soma-float_3s_ease-in-out_infinite\\] { animation: none !important; } }`}</style>
       </section>
 
+      {!entrevista && <>
       <div data-soma-capitulo="0" aria-hidden="true" className="h-px" />
       <section aria-labelledby="essenciais-titulo" className="mb-10">
         <div className="mb-4">
@@ -412,6 +413,8 @@ export default function OnboardingClient({
           </div>
         </details>
       </section>
+
+      </>}
 
       {profile?.is_admin && (
         <section aria-label="Configurações administrativas de onboarding" className="rounded-xl border border-amber-300 bg-amber-50 p-5">
