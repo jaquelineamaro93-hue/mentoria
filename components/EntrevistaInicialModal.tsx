@@ -25,7 +25,7 @@ export default function EntrevistaInicialModal({profile}:{profile:Profile|null})
  const [respostas,setRespostas]=useState<Respostas>(inicial);
  const [salvando,setSalvando]=useState(false);
  const [erro,setErro]=useState('');
- const elegivel=Boolean(profile&&!profile.is_admin&&profile.dados_contato_confirmados_em&&
+ const elegivel=Boolean(profile&&(profile.is_admin || profile.dados_contato_confirmados_em)&&
   (profile.trial_status==='active'||profile.trial_status==='converted'||profile.status_assinatura==='ativo'||profile.status_assinatura==='trial')&&!pathname.startsWith('/admin'));
  useEffect(()=>{
   if(!elegivel||!profile){setEstado('carregando');return;}
