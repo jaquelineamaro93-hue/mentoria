@@ -262,16 +262,6 @@ export default function DashboardClient({
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
-      {entrevista && <section aria-label="Orientação personalizada da sua entrevista" className="mb-7 rounded-2xl border border-[#DDE6E0] bg-white p-5 sm:p-7">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#386657]">Sua jornada, a partir da sua entrevista</p>
-        <h2 className="mt-2 font-display text-2xl text-[#183F37]">Seu caminho: {trilha}</h2>
-        <p className="mt-3 text-sm leading-6 text-gray-700">Você contou que quer {entrevista.objetivo_principal.replace(/[.!?]+$/, '')}. Seu principal desafio hoje é: {entrevista.maior_desafio}</p>
-        <p className="mt-2 text-sm leading-6 text-gray-700">Vamos começar pela sua história e pelas suas forças, antes de avançar para as ferramentas mais adequadas ao seu objetivo.</p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link href={quemSouRespostasCompletas >= totalBlocosQuemSouEu ? '/exercicios' : '/quem-sou-eu'} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#183F37] px-5 py-3 text-sm font-semibold text-white">{quemSouRespostasCompletas >= totalBlocosQuemSouEu ? 'Continuar para o diagnóstico' : 'Começar pelo Mapa Quem Sou Eu'} <Target size={16}/></Link>
-          <Link href="/onboarding" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#386657] px-5 py-3 text-sm font-semibold text-[#183F37]">Ver minha trilha completa <ExternalLink size={16}/></Link>
-        </div>
-      </section>}
       {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (
@@ -307,18 +297,21 @@ export default function DashboardClient({
           </div>
         </div>
 
-        {!entrevista && <>
         <section aria-labelledby="discover-tools" className="mb-8 rounded-2xl border border-mint-deep/20 bg-white p-5 sm:p-6">
-          <p className="text-xs uppercase tracking-widest text-mint-deep">Da reflexão à oportunidade</p>
-          <h2 id="discover-tools" className="mt-2 font-display text-2xl text-lotus-brown">O que você quer destravar hoje?</h2>
-          <p className="mt-2 text-sm text-gray-700">Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.</p>
+          <p className="text-xs uppercase tracking-widest text-mint-deep">{entrevista ? 'Seu próximo capítulo' : 'Da reflexão à oportunidade'}</p>
+          <h2 id="discover-tools" className="mt-2 font-display text-2xl text-lotus-brown">{entrevista ? 'A partir de agora, seu caminho ganha direção' : 'O que você quer destravar hoje?'}</h2>
+          <p className="mt-2 text-sm text-gray-700">{entrevista ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos começar por suas forças e sua história, respeitando seu ritmo.` : 'Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.'}</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {[
+            {(entrevista ? [
+              { href: '/quem-sou-eu', title: 'Conhecer minha história', description: 'Comece pelo Mapa Quem Sou Eu para reconhecer seus valores, experiências e forças.', action: 'Continuar meu mapa' },
+              { href: '/exercicios', title: 'Reconhecer minhas forças', description: 'Use o diagnóstico para identificar suas forças e como elas aparecem no trabalho.', action: 'Fazer meu diagnóstico' },
+              { href: '/onboarding', title: 'Ver meu caminho', description: 'Acompanhe as próximas etapas de acordo com o objetivo que compartilhou na entrevista.', action: 'Abrir minha jornada' },
+            ] : [
               { href: '/gupy', title: 'Passar pela triagem', description: 'Entenda como apresentar sua experiência para Gupy e outros sistemas de seleção.', action: 'Explorar Gupy & ATS' },
               { href: '/linkedin', title: 'Ser encontrada no LinkedIn', description: 'Trabalhe seu posicionamento para comunicar o valor que você entrega.', action: 'Revisar meu posicionamento' },
               { href: '/entrevista', title: 'Chegar preparada à entrevista', description: 'Pratique suas respostas e organize exemplos da sua trajetória.', action: 'Preparar minha entrevista' },
               { href: '/network', title: 'Ampliar minhas oportunidades', description: 'Organize contatos e transforme conexões em próximos passos concretos.', action: 'Construir minha rede' },
-            ].map((item) => (
+            ]).map((item) => (
               <Link key={item.href} href={item.href} className="flex flex-col rounded-xl border border-gray-faint p-4 transition-colors hover:border-mint-deep hover:bg-mint-deep/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep">
                 <h3 className="font-semibold text-lotus-brown">{item.title}</h3>
                 <p className="mt-2 flex-1 text-sm leading-6 text-gray-700">{item.description}</p>
@@ -363,7 +356,6 @@ export default function DashboardClient({
           </Panel>
         </section>
 
-        </>}
 
         {/* Feedbacks da Mentora */}
         {feedbacks.length > 0 && (
