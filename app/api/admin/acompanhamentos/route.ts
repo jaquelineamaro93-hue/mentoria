@@ -168,13 +168,12 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     let mensagem=normalizarQuebras(analise.mensagem).replace(/!/g,'').replace(/\s*[—–]\s*/g,', ').trim();
     if(!mensagem || mensagem.length>2000)
       return NextResponse.json({error:'A IA não entregou uma mensagem utilizável. Nenhum rascunho foi criado.'},{status:503});
-    // Identidade e apresentação são determinadas no servidor, não improvisadas pela IA.
-    // Remover SOMENTE a saudação que a IA eventualmente repete, mesmo
-    // quando ela continua o conteúdo na mesma linha: "Oi Ana. Li seu relato...".
-    const escaparRegex=(valor:string)=>valor.replace(/[^\\p{L}\\p{N}]/gu, '\\$&');
-    const nomeSeguro=escaparRegex(primeiroNome);
-    mensagem=mensagem.replace(new RegExp('^\\s*Oi[,! ]+\\s*'+nomeSeguro+'\\s*(?:[,!.?]|\\s*\\n)+\\s*','i'),'').trim();
-    mensagem=mensagem.replace(/^(?:Aqui é|Eu sou|Sou a)\s+(?:a\s+)?(?:Lume|Norte|Brasa|Íris)[^\n]*\n*/i,'').trim();
+    // A apresentação é controlada pelo servidor. A IA entrega apenas o conteúdo.
+    // Aceita saudação com ou sem vírgula e com frase de cortesia adicional.
+    const nomeSeguro=primeiroNome.replace(/[^\\p{L}\\p{N}]/gu,'\\$&');
+    mensagem=mensagem.replace(new RegExp('^\\s*(?:Oi|Olá|Ola)\\s*,?\\s*'+nomeSeguro+'\\s*[,!.?]*\\s*(?:tudo bem\\s*[?.!]*)?\\s*','iu'),'').trim();
+    mensagem=mensagem.replace(/^(?:(?:Aqui é|Eu sou|Sou o|Sou a|Meu nome é)\\s+(?:o\\s+|a\\s+)?(?:Lume|Norte|Brasa|Íris)[^\\n]*\\n*\\s*)+/iu,'').trim();
+    mensagem=mensagem.replace(/\\bCual\\b/giu,'Qual');
     // Se a IA entregar um único bloco, distribuir as frases em parágrafos
     // sem alterar o sentido ou inventar informações.
     if(!mensagem.includes('\n\n') && mensagem.length>200) {
@@ -201,11 +200,11 @@ Responda SOMENTE JSON válido, sem markdown, com cinco strings: objetivo, progre
     // Preserve the mascot introduction and signature while fitting the WhatsApp draft limit.
     // Never consume another AI request merely because fixed text exceeded the limit.
     if (mensagem.length > 750) {
-      const partesFixas = [saudacao, apresentacao].filter(Boolean).join('\\n\\n');
-      const prefixo = partesFixas ? partesFixas + '\\n\\n' : '';
+      const partesFixas = [saudacao, apresentacao].filter(Boolean).join('\n\n');
+      const prefixo = partesFixas ? partesFixas + '\n\n' : '';
       const espacoCorpo = 750 - prefixo.length - assinatura.length;
       if (espacoCorpo < 80) return NextResponse.json({error:'Não foi possível montar uma mensagem dentro do limite.'},{status:503});
-      const corpo = normalizarQuebras(analise.mensagem).replace(/!/g,'').replace(/\\s*[—–]\\s*/g,', ').trim();
+      const corpo = mensagem.slice(prefixo.length, mensagem.length - assinatura.length).trim();
       const corte = corpo.slice(0, espacoCorpo);
       const limiteFrase = Math.max(corte.lastIndexOf('. '), corte.lastIndexOf('? '), corte.lastIndexOf('! '));
       const corpoFinal = limiteFrase > espacoCorpo * 0.55 ? corte.slice(0, limiteFrase + 1).trim() : corte.slice(0, corte.lastIndexOf(' ') > espacoCorpo * 0.7 ? corte.lastIndexOf(' ') : espacoCorpo).trim();
