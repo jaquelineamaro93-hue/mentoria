@@ -42,6 +42,7 @@ import TourPortal from '@/components/TourPortal';
 
 interface Props {
   profile: Profile | null;
+  entrevista: {momento_profissional:string;objetivo_principal:string;maior_desafio:string;prioridade_90_dias:string}|null;
   diagnostic: Diagnostic | null;
   quemSouRespostasCompletas: number;
   totalBlocosQuemSouEu: number;
@@ -80,6 +81,7 @@ function StatusBadge({ status }: { status: FaseStatus }) {
 
 export default function DashboardClient({
   profile,
+  entrevista,
   diagnostic,
   quemSouRespostasCompletas,
   totalBlocosQuemSouEu,
@@ -104,6 +106,7 @@ export default function DashboardClient({
   }
 
   const primeiroNome = profile?.nome?.split(' ')[0] ?? 'Mentorada';
+  const trilha = entrevista ? (['recolocacao','transicao'].includes(entrevista.momento_profissional) ? 'Recolocação e transição' : ['crescimento','lideranca'].includes(entrevista.momento_profissional) ? 'Crescimento e liderança' : 'Descoberta e posicionamento') : null;
 
   // ---- Diagnóstico dos sinais disponíveis usando as fontes atuais do portal ----
   const quemSouCompleto =
@@ -259,6 +262,16 @@ export default function DashboardClient({
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
+      {entrevista && <section aria-label="Orientação personalizada da sua entrevista" className="mb-7 rounded-2xl border border-[#DDE6E0] bg-white p-5 sm:p-7">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#386657]">Sua jornada, a partir da sua entrevista</p>
+        <h2 className="mt-2 font-display text-2xl text-[#183F37]">Seu caminho: {trilha}</h2>
+        <p className="mt-3 text-sm leading-6 text-gray-700">Você contou que quer {entrevista.objetivo_principal.replace(/[.!?]+$/, '')}. Seu principal desafio hoje é: {entrevista.maior_desafio}</p>
+        <p className="mt-2 text-sm leading-6 text-gray-700">Vamos começar pela sua história e pelas suas forças, antes de avançar para as ferramentas mais adequadas ao seu objetivo.</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link href={quemSouRespostasCompletas >= totalBlocosQuemSouEu ? '/exercicios' : '/quem-sou-eu'} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#183F37] px-5 py-3 text-sm font-semibold text-white">{quemSouRespostasCompletas >= totalBlocosQuemSouEu ? 'Continuar para o diagnóstico' : 'Começar pelo Mapa Quem Sou Eu'} <Target size={16}/></Link>
+          <Link href="/onboarding" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#386657] px-5 py-3 text-sm font-semibold text-[#183F37]">Ver minha trilha completa <ExternalLink size={16}/></Link>
+        </div>
+      </section>}
       {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (
