@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Loader2, PauseCircle, PlayCircle, History, Bot } from 'lucide-react';
+import TopSendImportador from './TopSendImportador';
 
-type Mensagem={id:string;tipo:'recebida'|'enviada'|'acionada';texto:string;data:string;status?:string;origem?:'whatsapp_business_importado'|'meta_cloud_api'|'topsend_automacao'|'topsend_retorno'};
+type Mensagem={id:string;tipo:'recebida'|'enviada'|'acionada';texto:string;data:string;status?:string;origem?:'whatsapp_business_importado'|'topsend_importado'|'meta_cloud_api'|'topsend_automacao'|'topsend_retorno'};
 type Passo={id:string;acao:string;insight:string|null;situacao:string;criado_em:string};
 type Turno={id:string;status:string;criado_em:string;erro_resumido:string|null;origem_id?:string;resposta_gerada?:string|null;insight?:string|null;proximo_passo?:string|null};
 type Historico={
@@ -14,7 +15,7 @@ type Historico={
   mensagens:Mensagem[];passos:Passo[];turnos:Turno[];
 };
 
-export default function IrisHistorico({userId,whatsappNumero}:{userId:string;whatsappNumero?:string|null}) {
+export default function IrisHistorico({userId,nome,whatsappNumero}:{userId:string;nome:string;whatsappNumero?:string|null}) {
   const [aberto,setAberto]=useState(false);
   const [dados,setDados]=useState<Historico|null>(null);
   const [carregando,setCarregando]=useState(false);
@@ -82,6 +83,7 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
             {dados.estado?.pausado?'Retomar acompanhamento':'Pausar acompanhamento'}
           </button>}
         </div>
+        <TopSendImportador userId={userId} nome={nome} onImported={carregar}/>
         {dados.turnos.some(t=>t.origem_id?.startsWith('manual-rascunho-iris-')&&t.resposta_gerada)&&
           <div>
             <p className="mb-2 text-sm font-semibold text-black">Próxima mensagem para enviar</p>
@@ -131,10 +133,12 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
             {dados.mensagens.slice(0,25).map(m=><div key={m.id} className="rounded-lg border border-gray-faint bg-white p-3">
               <p className="text-[11px] font-medium text-gray-text">{m.origem==='whatsapp_business_importado'
                 ? (m.tipo==='recebida'?'Mentorado (WhatsApp Business)':'Lume (WhatsApp Business)')
+                : m.origem==='topsend_importado'
+                    ? (m.tipo==='recebida'?'Mentorado (TopSend, importado)':'Íris (TopSend, importado)')
                 : m.origem==='topsend_retorno'?'Mentorado (TopSend)'
                 : m.origem==='topsend_automacao'?'TopSend (automação acionada)'
                 : (m.tipo==='recebida'?'Mentorado':'Íris (WhatsApp)')} · {horario(m.data)}
-                {m.origem==='whatsapp_business_importado'?' · histórico importado':''}
+                {['whatsapp_business_importado','topsend_importado'].includes(m.origem??'')?' · histórico importado manualmente':''}
                 {m.status?' · '+m.status:''}</p>
               <p className="mt-1 whitespace-pre-wrap break-words text-sm text-black">{m.texto}</p>
             </div>)}
