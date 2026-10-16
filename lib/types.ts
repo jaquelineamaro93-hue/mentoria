@@ -12,6 +12,7 @@ export interface Profile {
   dados_contato_confirmados_em?: string | null;
   whatsapp_numero?: string | null;
   whatsapp_consentimento_em?: string | null;
+  iris_ia_consentimento_em?: string | null;
   whatsapp_validado_em?: string | null;
   onboarding_concluido: boolean;
   tour_concluido: boolean;
