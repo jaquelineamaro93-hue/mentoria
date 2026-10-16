@@ -29,7 +29,7 @@ export async function GET(request:NextRequest) {
 }
 
 type Mensagem={id?:string;from?:string;type?:string;text?:{body?:string};button?:{text?:string};interactive?:{button_reply?:{title?:string};list_reply?:{title?:string}};timestamp?:string};
-type Alteracao={field?:string;value?:{metadata?:{phone_number_id?:string};messages?:Mensagem[]}};
+type Alteracao={field?:string;value?:{metadata?:{phone_number_id?:string};messages?:Mensagem[];statuses?:Array<{id?:string;status?:string;timestamp?:string}>}};
 type Envelope={object?:string;entry?:Array<{changes?:Alteracao[]}>};
 
 export async function POST(request:NextRequest) {
@@ -48,6 +48,15 @@ export async function POST(request:NextRequest) {
  let temTurnoPendente=false;
  for(const entrada of payload.entry||[])for(const alteracao of entrada.changes||[]){
   if(alteracao.field!=='messages'||alteracao.value?.metadata?.phone_number_id!==phoneId)continue;
+  for(const situacao of alteracao.value?.statuses||[]) {
+    if(!situacao.id || !['sent','delivered','read','failed'].includes(situacao.status||''))continue;
+    const status = situacao.status === 'sent' ? 'enviado' :
+      situacao.status === 'delivered' ? 'entregue' : situacao.status === 'read' ? 'lido' : 'falhou';
+    const {error:erroStatus}=await admin.from('iris_mensagens_enviadas').update({
+      status_entrega:status,status_atualizado_em:new Date().toISOString(),
+    }).eq('meta_message_id',situacao.id);
+    if(erroStatus)return new NextResponse('Falha ao registrar status Meta',{status:503});
+  }
   for(const mensagem of alteracao.value?.messages||[]){
    if(!mensagem.id||!mensagem.from)continue;
    const conteudo=mensagem.type==='text'?mensagem.text?.body:
