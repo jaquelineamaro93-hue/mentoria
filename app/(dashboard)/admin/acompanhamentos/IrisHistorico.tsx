@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Loader2, PauseCircle, PlayCircle, History, Bot } from 'lucide-react';
 
-type Mensagem={id:string;tipo:'recebida'|'enviada';texto:string;data:string;status?:string;origem?:'whatsapp_business_importado'|'meta_cloud_api'};
+type Mensagem={id:string;tipo:'recebida'|'enviada'|'acionada';texto:string;data:string;status?:string;origem?:'whatsapp_business_importado'|'meta_cloud_api'|'topsend_automacao'|'topsend_retorno'};
 type Passo={id:string;acao:string;insight:string|null;situacao:string;criado_em:string};
 type Turno={id:string;status:string;criado_em:string;erro_resumido:string|null;origem_id?:string;resposta_gerada?:string|null;insight?:string|null;proximo_passo?:string|null};
 type Historico={
   consentimentoIA:boolean;contatoAutorizado:boolean;canalPronto:boolean;automacaoAtiva:boolean;
+  topsendPronto:boolean;topsendRetornoPronto:boolean;
+  topsendDespachos:{id:string;turno_id:string;status:string;criado_em:string}[];
   estado:{pausado:boolean;proximo_passo:string|null;ultimo_envio_em:string|null}|null;
   mensagens:Mensagem[];passos:Passo[];turnos:Turno[];
 };
@@ -18,6 +20,7 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
   const [carregando,setCarregando]=useState(false);
   const [erro,setErro]=useState('');
   const [copiado,setCopiado]=useState<string|null>(null);
+  const [disparando,setDisparando]=useState<string|null>(null);
   const horario=(valor:string)=>new Date(valor).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
   async function carregar() {
     setCarregando(true);setErro('');
@@ -28,6 +31,22 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
       setDados(json);
     }catch(e){setErro(e instanceof Error?e.message:'Falha ao carregar histórico');}
     finally{setCarregando(false);}
+  }
+  async function dispararTopSend(turnoId:string) {
+    if(!dados?.topsendPronto)return;
+    const confirmado=window.confirm('Acionar agora a automação TopSend para esta mensagem? A entrega ainda dependerá da TopSend.');
+    if(!confirmado)return;
+    setDisparando(turnoId);setErro('');
+    try {
+      const response=await fetch('/api/admin/topsend/disparar',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({turnoId,userId}),
+      });
+      const body=await response.json();
+      if(!response.ok)throw new Error(body.error||'Não foi possível acionar a TopSend.');
+      await carregar();
+    }catch(e){setErro(e instanceof Error?e.message:'Falha ao disparar');}
+    finally{setDisparando(null);}
   }
   async function alternarPausa() {
     if(!dados)return;
@@ -55,6 +74,8 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
           <span className="inline-flex items-center gap-1"><Bot size={14}/>
             {!dados.consentimentoIA?'IA não autorizada pela pessoa':!dados.canalPronto?'Canal oficial de WhatsApp pendente':!dados.automacaoAtiva?'Automação desativada':dados.estado?.pausado?'Automação pausada':'Automação liberada'}
           </span>
+          {dados.topsendPronto&&!dados.topsendRetornoPronto&&
+            <p className="w-full text-xs text-amber-800">TopSend envia pelo gatilho, mas o retorno de mensagens ainda exige configurar o webhook de entrada da SOMA.</p>}
           {dados.consentimentoIA&&<button type="button" disabled={carregando} onClick={alternarPausa}
             className="inline-flex items-center gap-1 rounded-lg border border-gray-faint px-3 py-2 disabled:opacity-50">
             {dados.estado?.pausado?<PlayCircle size={14}/>:<PauseCircle size={14}/>}
@@ -75,6 +96,15 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
                   }} className="mt-3 rounded-lg border border-gray-faint px-3 py-2 text-xs text-black">
                     {copiado===t.id?'Mensagem copiada':'Copiar mensagem'}
                   </button>
+                  {dados.topsendPronto && !dados.topsendDespachos.some(d=>d.turno_id===t.id) &&
+                    <button type="button" disabled={disparando===t.id||carregando}
+                      onClick={()=>void dispararTopSend(t.id)}
+                      className="ml-2 mt-3 rounded-lg bg-black px-3 py-2 text-xs text-white disabled:opacity-50">
+                      {disparando===t.id?'Acionando...':'Enviar pela TopSend'}
+                    </button>}
+                  {dados.topsendDespachos.filter(d=>d.turno_id===t.id).map(d=>
+                    <p key={d.id} className="mt-2 text-xs text-gray-text">TopSend: {d.status==='acionado'?'Gatilho acionado, aguardando confirmação de entrega':d.status==='incerto'?'Resultado incerto, conferir no painel TopSend':'Disparo reservado'}</p>
+                  )}
                   {whatsappNumero && /^55[1-9][0-9]{9,10}$/.test(whatsappNumero) && t.resposta_gerada &&
                     <a href={'https://wa.me/'+whatsappNumero+'?text='+encodeURIComponent(t.resposta_gerada)}
                       target="_blank" rel="noopener noreferrer"
@@ -101,6 +131,8 @@ export default function IrisHistorico({userId,whatsappNumero}:{userId:string;wha
             {dados.mensagens.slice(0,25).map(m=><div key={m.id} className="rounded-lg border border-gray-faint bg-white p-3">
               <p className="text-[11px] font-medium text-gray-text">{m.origem==='whatsapp_business_importado'
                 ? (m.tipo==='recebida'?'Mentorado (WhatsApp Business)':'Lume (WhatsApp Business)')
+                : m.origem==='topsend_retorno'?'Mentorado (TopSend)'
+                : m.origem==='topsend_automacao'?'TopSend (automação acionada)'
                 : (m.tipo==='recebida'?'Mentorado':'Íris (WhatsApp)')} · {horario(m.data)}
                 {m.origem==='whatsapp_business_importado'?' · histórico importado':''}
                 {m.status?' · '+m.status:''}</p>
