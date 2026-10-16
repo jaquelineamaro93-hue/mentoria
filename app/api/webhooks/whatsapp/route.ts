@@ -1,6 +1,10 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { irisAutomacaoConfigurada } from '@/lib/iris-integracoes';
+import { processarFilaIris } from '@/lib/iris-automacao';
+
+export const maxDuration = 120;
 
 export const runtime = 'nodejs';
 
@@ -25,7 +29,7 @@ export async function GET(request:NextRequest) {
 }
 
 type Mensagem={id?:string;from?:string;type?:string;text?:{body?:string};button?:{text?:string};interactive?:{button_reply?:{title?:string};list_reply?:{title?:string}};timestamp?:string};
-type Alteracao={field?:string;value?:{metadata?:{phone_number_id?:string};messages?:Mensagem[]}};
+type Alteracao={field?:string;value?:{metadata?:{phone_number_id?:string};messages?:Mensagem[];statuses?:Array<{id?:string;status?:string;timestamp?:string}>}};
 type Envelope={object?:string;entry?:Array<{changes?:Alteracao[]}>};
 
 export async function POST(request:NextRequest) {
@@ -41,8 +45,24 @@ export async function POST(request:NextRequest) {
  try{payload=JSON.parse(bruto) as Envelope;}catch{return new NextResponse('JSON inválido',{status:400});}
  if(payload.object!=='whatsapp_business_account')return NextResponse.json({ok:true});
  const admin=createAdminClient();
+ let temTurnoPendente=false;
  for(const entrada of payload.entry||[])for(const alteracao of entrada.changes||[]){
   if(alteracao.field!=='messages'||alteracao.value?.metadata?.phone_number_id!==phoneId)continue;
+  for(const situacao of alteracao.value?.statuses||[]) {
+    if(!situacao.id || !['sent','delivered','read','failed'].includes(situacao.status||''))continue;
+    const status = situacao.status === 'sent' ? 'enviado' :
+      situacao.status === 'delivered' ? 'entregue' : situacao.status === 'read' ? 'lido' : 'falhou';
+    const {data:atual,error:erroConsulta}=await admin.from('iris_mensagens_enviadas')
+      .select('status_entrega').eq('meta_message_id',situacao.id).maybeSingle();
+    if(erroConsulta)return new NextResponse('Falha ao consultar status Meta',{status:503});
+    if(!atual)continue;
+    const ordem:Record<string,number>={aceito:0,enviado:1,entregue:2,lido:3,falhou:4};
+    if((ordem[status]??0)<(ordem[atual.status_entrega]??0))continue;
+    const {error:erroStatus}=await admin.from('iris_mensagens_enviadas').update({
+      status_entrega:status,status_atualizado_em:new Date().toISOString(),
+    }).eq('meta_message_id',situacao.id).eq('status_entrega',atual.status_entrega);
+    if(erroStatus)return new NextResponse('Falha ao registrar status Meta',{status:503});
+  }
   for(const mensagem of alteracao.value?.messages||[]){
    if(!mensagem.id||!mensagem.from)continue;
    const conteudo=mensagem.type==='text'?mensagem.text?.body:
@@ -51,7 +71,7 @@ export async function POST(request:NextRequest) {
    if(!conteudo||conteudo.length>10000)continue; // anexos não são baixados
    const numero=telefone(mensagem.from);
    const {data:perfis,error:erroPerfis}=await admin.from('profiles')
-    .select('id').eq('whatsapp_numero',numero).not('whatsapp_consentimento_em','is',null)
+    .select('id,iris_ia_consentimento_em').eq('whatsapp_numero',numero).not('whatsapp_consentimento_em','is',null)
     .limit(2);
    if(erroPerfis)return new NextResponse('Falha ao identificar contato',{status:503});
    if(perfis?.length!==1)continue; // não vincular número desconhecido ou ambíguo
@@ -62,7 +82,37 @@ export async function POST(request:NextRequest) {
     tipo:mensagem.type||'text',conteudo:conteudo.slice(0,10000),recebido_em:recebidoEm
    },{onConflict:'meta_message_id',ignoreDuplicates:true});
    if(error)return new NextResponse('Falha ao registrar resposta',{status:503});
+
+   const respostaCurta=conteudo.trim().toLocaleUpperCase('pt-BR');
+   if(['PARAR','PARE','SAIR','STOP','CANCELAR'].includes(respostaCurta)) {
+     // Descadastramento imediato, sem IA. Outros disparos conferem consentimento
+     // novamente antes de enviar.
+     await admin.from('profiles').update({
+       whatsapp_consentimento_em:null, iris_ia_consentimento_em:null,
+     }).eq('id',perfis[0].id);
+     await admin.from('iris_estado').upsert({
+       user_id:perfis[0].id,pausado:true,updated_at:new Date().toISOString(),
+     },{onConflict:'user_id'});
+     await admin.from('iris_turnos').update({status:'cancelado',erro_resumido:'Contato solicitou parar.'})
+       .eq('user_id',perfis[0].id).in('status',['fila','aguardando_agente','pronto']);
+     continue;
+   }
+
+   if(!perfis[0].iris_ia_consentimento_em || !irisAutomacaoConfigurada())continue;
+   const {data:estado}=await admin.from('iris_estado').select('pausado')
+      .eq('user_id',perfis[0].id).maybeSingle();
+   if(estado?.pausado)continue;
+   // Agrupar mensagens consecutivas enquanto a conversa ainda aguarda turno.
+   const {data:emFila}=await admin.from('iris_turnos').select('id')
+      .eq('user_id',perfis[0].id).eq('status','fila').limit(1);
+   if(emFila?.length){temTurnoPendente=true;continue;}
+   const {error:erroFila}=await admin.from('iris_turnos').insert({
+      user_id:perfis[0].id,origem_id:mensagem.id,origem_tipo:'whatsapp',status:'fila'
+   });
+   if(erroFila && erroFila.code!=='23505')return new NextResponse('Falha ao enfileirar acompanhamento',{status:503});
+   temTurnoPendente=true;
   }
  }
+ if(temTurnoPendente) after(async()=>{await processarFilaIris();});
  return NextResponse.json({ok:true});
 }

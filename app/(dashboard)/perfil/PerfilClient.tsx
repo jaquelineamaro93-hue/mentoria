@@ -22,6 +22,7 @@ export default function PerfilClient({
   const [genero, setGenero] = useState(perfil?.genero || '');
   const [whatsapp, setWhatsapp] = useState(perfil?.whatsapp_numero || '');
   const [aceitaWhatsapp, setAceitaWhatsapp] = useState(Boolean(perfil?.whatsapp_consentimento_em));
+  const [aceitaIrisIA, setAceitaIrisIA] = useState(Boolean(perfil?.iris_ia_consentimento_em));
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
   const [mostraSenha, setMostraSenha] = useState(false);
@@ -50,6 +51,9 @@ export default function PerfilClient({
       updateData.whatsapp_numero = numeroNormalizado;
       updateData.genero = genero || null;
       updateData.whatsapp_consentimento_em = aceitaWhatsapp && numeroNormalizado ? (perfil?.whatsapp_numero === numeroNormalizado && perfil?.whatsapp_consentimento_em ? perfil.whatsapp_consentimento_em : new Date().toISOString()) : null;
+      updateData.iris_ia_consentimento_em = aceitaIrisIA && aceitaWhatsapp && numeroNormalizado
+        ? (perfil?.whatsapp_numero === numeroNormalizado && perfil?.iris_ia_consentimento_em
+          ? perfil.iris_ia_consentimento_em : new Date().toISOString()) : null;
       if (nome !== perfil?.nome) {
         updateData.nome = nome;
       }
@@ -234,8 +238,12 @@ export default function PerfilClient({
               <p className="mt-1 text-xs text-gray-text">Informe seu número para receber acompanhamento da mentoria.</p>
             </div>
           </div>
-          <label className="mb-6 flex items-start gap-2 text-sm text-gray-text"><input type="checkbox" checked={aceitaWhatsapp} onChange={e => setAceitaWhatsapp(e.target.checked)} className="mt-1" /><span>Autorizo a SOMA Mentoria a enviar orientações e acompanhamentos personalizados pelo WhatsApp. Posso retirar essa autorização a qualquer momento nesta página.</span></label>
-          {perfil?.whatsapp_numero && <p className="mb-5 text-xs text-gray-text">Número cadastrado. A confirmação de posse do número ainda depende de validação por mensagem.</p>}
+          <label className="mb-3 flex items-start gap-2 text-sm text-gray-text"><input type="checkbox" checked={aceitaWhatsapp} onChange={e => {setAceitaWhatsapp(e.target.checked);if(!e.target.checked)setAceitaIrisIA(false);}} className="mt-1" /><span>Autorizo a SOMA Mentoria a enviar orientações e acompanhamentos personalizados pelo WhatsApp. Posso retirar essa autorização a qualquer momento nesta página.</span></label>
+          <label className="mb-6 flex items-start gap-2 rounded-lg border border-gray-faint p-3 text-sm text-black">
+            <input type="checkbox" checked={aceitaIrisIA} disabled={!aceitaWhatsapp} onChange={e => setAceitaIrisIA(e.target.checked)} className="mt-1" />
+            <span><strong>Acompanhamento com a Íris (IA)</strong>. Autorizo que minhas respostas de WhatsApp e informações mínimas sobre objetivos e próximos passos sejam processadas pelo serviço externo de IA Manus/Cue para gerar orientações e acompanhar minha evolução. Posso desativar aqui ou escrever PARAR no WhatsApp. A ativação do canal oficial depende da disponibilidade da integração.</span>
+          </label>
+          {perfil?.whatsapp_numero && <p className="mb-5 text-xs text-gray-text">{aceitaWhatsapp ? 'Contato autorizado para mensagens da SOMA.' : 'WhatsApp cadastrado. A autorização de mensagens está desativada.'}</p>}
           {/* Senha */}
           <div className="border-t border-gray-faint pt-6">
             <h3 className="font-medium text-black mb-4">Redefinir Senha</h3>

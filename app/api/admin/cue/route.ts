@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { listManusAgents, ManusConnectionError } from '@/lib/manus';
+import { irisAutomacaoConfigurada, whatsappCanalConfigurado } from '@/lib/iris-integracoes';
 
 export const runtime = 'nodejs';
 const headers = { 'Cache-Control': 'private, no-store' };
@@ -25,7 +26,10 @@ export async function GET() {
           : 'Credencial Manus validada. Configure MANUS_AGENT_ID com o ID exato da Íris para concluir a conexão.',
       agents: agents.map(agent => ({ id: agent.id, name: agent.nickname })),
       selectedAgent: selected ? { id: selected.id, name: selected.nickname } : null,
-      automaticSending: false,
+      automaticSending: irisAutomacaoConfigurada(),
+      whatsappReady: whatsappCanalConfigurado(),
+      weeklyTemplateReady: Boolean(process.env.WHATSAPP_TEMPLATE_NAME),
+      iaConsentRequired: true,
     }, { headers });
   } catch (error) {
     if (error instanceof ManusConnectionError) {
