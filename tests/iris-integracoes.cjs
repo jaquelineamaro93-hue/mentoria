@@ -36,6 +36,7 @@ const client = context.exports;
   answer={ok:true,json:async()=>({ok:true})};
   await client.enviarParaIris('fake-test-key','iris-task','Somente um exemplo');
   assert.equal(JSON.parse(requests.at(-1).options.body).task_id,'iris-task');
+  assert.equal(JSON.parse(requests.at(-1).options.body).message.content[0].text,'Somente um exemplo');
   answer={ok:true,json:async()=>({ok:true,messages:[
     {type:'assistant_message',timestamp:Date.now(),assistant_message:{content:JSON.stringify({
       marcador:'SOMA_abcd',mensagem:'Qual ação você gostaria de experimentar esta semana?',
