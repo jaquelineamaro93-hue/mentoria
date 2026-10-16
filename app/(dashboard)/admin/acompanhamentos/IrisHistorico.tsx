@@ -12,7 +12,7 @@ type Historico={
   mensagens:Mensagem[];passos:Passo[];turnos:Turno[];
 };
 
-export default function IrisHistorico({userId}:{userId:string}) {
+export default function IrisHistorico({userId,whatsappNumero}:{userId:string;whatsappNumero?:string|null}) {
   const [aberto,setAberto]=useState(false);
   const [dados,setDados]=useState<Historico|null>(null);
   const [carregando,setCarregando]=useState(false);
@@ -75,6 +75,12 @@ export default function IrisHistorico({userId}:{userId:string}) {
                   }} className="mt-3 rounded-lg border border-gray-faint px-3 py-2 text-xs text-black">
                     {copiado===t.id?'Mensagem copiada':'Copiar mensagem'}
                   </button>
+                  {whatsappNumero && /^55[1-9][0-9]{9,10}$/.test(whatsappNumero) && t.resposta_gerada &&
+                    <a href={'https://wa.me/'+whatsappNumero+'?text='+encodeURIComponent(t.resposta_gerada)}
+                      target="_blank" rel="noopener noreferrer"
+                      className="ml-3 inline-flex items-center text-xs text-gray-text underline underline-offset-2">
+                      Abrir no WhatsApp
+                    </a>}
                 </div>
               )}
             </div>
