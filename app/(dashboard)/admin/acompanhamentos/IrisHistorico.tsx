@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Loader2, PauseCircle, PlayCircle, History, Bot } from 'lucide-react';
 
-type Mensagem={id:string;tipo:'recebida'|'enviada';texto:string;data:string};
+type Mensagem={id:string;tipo:'recebida'|'enviada';texto:string;data:string;status?:string};
 type Passo={id:string;acao:string;insight:string|null;situacao:string;criado_em:string};
 type Turno={id:string;status:string;criado_em:string;erro_resumido:string|null};
 type Historico={
@@ -74,7 +74,7 @@ export default function IrisHistorico({userId}:{userId:string}) {
           {!dados.mensagens.length?<p className="text-xs text-gray-text">Nenhuma interação vinculada ao histórico.</p>:
           <div className="max-h-80 space-y-2 overflow-y-auto rounded-lg bg-gray-50 p-3">
             {dados.mensagens.slice(0,25).map(m=><div key={m.id} className="rounded-lg border border-gray-faint bg-white p-3">
-              <p className="text-[11px] font-medium text-gray-text">{m.tipo==='recebida'?'Mentorado':'Íris (enviada)'} · {horario(m.data)}</p>
+              <p className="text-[11px] font-medium text-gray-text">{m.tipo==='recebida'?'Mentorado':'Íris (WhatsApp)'} · {horario(m.data)}{m.status?' · '+m.status:''}</p>
               <p className="mt-1 whitespace-pre-wrap break-words text-sm text-black">{m.texto}</p>
             </div>)}
           </div>}
