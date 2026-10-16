@@ -52,9 +52,15 @@ export async function POST(request:NextRequest) {
     if(!situacao.id || !['sent','delivered','read','failed'].includes(situacao.status||''))continue;
     const status = situacao.status === 'sent' ? 'enviado' :
       situacao.status === 'delivered' ? 'entregue' : situacao.status === 'read' ? 'lido' : 'falhou';
+    const {data:atual,error:erroConsulta}=await admin.from('iris_mensagens_enviadas')
+      .select('status_entrega').eq('meta_message_id',situacao.id).maybeSingle();
+    if(erroConsulta)return new NextResponse('Falha ao consultar status Meta',{status:503});
+    if(!atual)continue;
+    const ordem:Record<string,number>={aceito:0,enviado:1,entregue:2,lido:3,falhou:4};
+    if((ordem[status]??0)<(ordem[atual.status_entrega]??0))continue;
     const {error:erroStatus}=await admin.from('iris_mensagens_enviadas').update({
       status_entrega:status,status_atualizado_em:new Date().toISOString(),
-    }).eq('meta_message_id',situacao.id);
+    }).eq('meta_message_id',situacao.id).eq('status_entrega',atual.status_entrega);
     if(erroStatus)return new NextResponse('Falha ao registrar status Meta',{status:503});
   }
   for(const mensagem of alteracao.value?.messages||[]){
