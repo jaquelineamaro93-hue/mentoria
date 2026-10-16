@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       .eq('user_id',userId).order('recebido_em',{ascending:false}).limit(35),
     db.from('iris_mensagens_enviadas').select('id,conteudo,enviado_em,meta_message_id,tipo,status_entrega')
       .eq('user_id',userId).order('enviado_em',{ascending:false}).limit(35),
-    db.from('iris_mensagens_importadas').select('id,direcao,conteudo,ocorrido_em,registrado_por')
+    db.from('iris_mensagens_importadas').select('id,direcao,conteudo,ocorrido_em,canal,registrado_por')
       .eq('user_id',userId).order('ocorrido_em',{ascending:false}).limit(60),
     db.from('topsend_eventos_recebidos').select('id,conteudo,recebido_em')
       .eq('user_id',userId).order('recebido_em',{ascending:false}).limit(35),
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       texto:x.conteudo, data:x.enviado_em,status:x.status_entrega,origem:'meta_cloud_api'})),
     ...(importadas.data??[]).map(x=>({
       id:'importada-'+x.id, tipo:x.direcao==='entrada'?'recebida':'enviada',
-      texto:x.conteudo, data:x.ocorrido_em,origem:'whatsapp_business_importado',
+      texto:x.conteudo, data:x.ocorrido_em,origem:x.canal==='topsend'?'topsend_importado':'whatsapp_business_importado',
     })),
     ...(topsendRecebidas.data??[]).map(x=>({
       id:'topsend-entrada-'+x.id,tipo:'recebida',
