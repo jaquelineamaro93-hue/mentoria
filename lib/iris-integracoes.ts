@@ -63,7 +63,7 @@ export async function enviarParaIris(apiKey: string, taskId: string, prompt: str
   const res = await fetch('https://api.manus.ai/v2/task.sendMessage', {
     method: 'POST', headers: mansHeaders(apiKey), redirect: 'error', cache: 'no-store',
     signal: AbortSignal.timeout(18000), body: JSON.stringify({
-      task_id: taskId, message: { content: prompt },
+      task_id: taskId, message: { content: [{ type: 'text', text: prompt, visibility: 'visible' }] },
     }),
   });
   if (!res.ok) throw new Error('Íris indisponível no Manus ao iniciar análise.');
