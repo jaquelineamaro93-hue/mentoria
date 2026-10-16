@@ -77,13 +77,21 @@ export async function POST(request:NextRequest) {
   let evolucaoRegistrada=false;
   if(novas>0 && (insight||proximoPasso)) {
     const ultimoEm=linhas.reduce((m,x)=>Date.parse(x.ocorrido_em)>Date.parse(m)?x.ocorrido_em:m,linhas[0].ocorrido_em);
-    // Preserve pause and already-known values when the form omits either field.
+    const {data:estado,error:erroEstado}=await db.from('iris_estado')
+      .select('ultima_interacao_em').eq('user_id',input.userId).maybeSingle();
+    if(erroEstado)return NextResponse.json({error:'Mensagens salvas, mas a evolução não pôde ser consultada.',registradas:novas},{status:503,headers});
+    // Nunca perder o status pausado nem retroceder a última interação do aluno.
+    const ultima=estado?.ultima_interacao_em && Date.parse(estado.ultima_interacao_em)>Date.parse(ultimoEm)?
+      estado.ultima_interacao_em:ultimoEm;
     const update:Record<string,unknown>={
-      user_id:input.userId,ultima_interacao_em:ultimoEm,updated_at:new Date().toISOString(),
+      ultima_interacao_em:ultima,updated_at:new Date().toISOString(),
     };
     if(insight)update.insight_atual=insight;
     if(proximoPasso)update.proximo_passo=proximoPasso;
-    const {error:stateError}=await db.from('iris_estado').upsert(update,{onConflict:'user_id'});
+    const operacao=estado
+      ? db.from('iris_estado').update(update).eq('user_id',input.userId)
+      : db.from('iris_estado').insert({user_id:input.userId,...update});
+    const {error:stateError}=await operacao;
     if(stateError)return NextResponse.json({error:'Mensagens salvas, mas falhou a atualização do acompanhamento. Confira o histórico antes de tentar novamente.',registradas:novas},{status:503,headers});
     if(proximoPasso) {
       const {error:stepError}=await db.from('iris_proximos_passos').insert({
