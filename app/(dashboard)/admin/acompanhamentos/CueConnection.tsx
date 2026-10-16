@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-type Connection = { message: string; agents?: { id: string; name: string }[]; selectedAgent?: {id:string;name:string}|null; whatsappReady?:boolean; automaticSending?:boolean; weeklyTemplateReady?:boolean; iaConsentRequired?:boolean };
+type Connection = { message: string; agents?: { id: string; name: string }[]; selectedAgent?: {id:string;name:string}|null; whatsappReady?:boolean; automaticSending?:boolean; weeklyTemplateReady?:boolean; iaConsentRequired?:boolean; topsendReady?:boolean; topsendInboundReady?:boolean };
 export default function CueConnection() {
   const [result, setResult] = useState<Connection | null>(null);
   const [busy, setBusy] = useState(false);
@@ -23,7 +23,9 @@ export default function CueConnection() {
     {result && <div role="status" className="mt-3 space-y-2 text-sm">
       <p>{result.message}</p>
       {result.selectedAgent && <p className="text-xs text-gray-text">Agente SOMA: {result.selectedAgent.name}</p>}
-      {!result.whatsappReady && <p className="text-amber-800">Aguardando conexão com a API oficial do WhatsApp para conversar automaticamente. A credencial Manus sozinha não habilita envios.</p>}
+      {!result.whatsappReady && <p className="text-amber-800">Aguardando configurar o webhook de automação TopSend ou a API Meta. A credencial Manus sozinha não habilita envios.</p>}
+      {result.topsendReady && <p className="text-gray-text">TopSend: webhook de automação configurado. Um disparo HTTP confirma somente o início do fluxo, não a entrega ao contato.</p>}
+      {result.topsendReady && !result.topsendInboundReady && <p className="text-amber-800">Retorno das respostas: aguarda gatilho de mensagem recebida da TopSend com chamada HTTP para a SOMA.</p>}
       {result.whatsappReady && !result.automaticSending && <p className="text-gray-text">Canal disponível. Automação desligada por configuração.</p>}
       {result.automaticSending && <p className="text-gray-text">Automação habilitada somente para contatos com consentimento específico de IA.</p>}
       {!result.weeklyTemplateReady && <p className="text-xs text-gray-text">Convites semanais exigem um template aprovado no WhatsApp Business.</p>}
