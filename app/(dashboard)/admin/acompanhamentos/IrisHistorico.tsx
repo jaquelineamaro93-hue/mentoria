@@ -3,20 +3,21 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Loader2, PauseCircle, PlayCircle, History, Bot } from 'lucide-react';
 
-type Mensagem={id:string;tipo:'recebida'|'enviada';texto:string;data:string;status?:string};
+type Mensagem={id:string;tipo:'recebida'|'enviada';texto:string;data:string;status?:string;origem?:'whatsapp_business_importado'|'meta_cloud_api'};
 type Passo={id:string;acao:string;insight:string|null;situacao:string;criado_em:string};
-type Turno={id:string;status:string;criado_em:string;erro_resumido:string|null};
+type Turno={id:string;status:string;criado_em:string;erro_resumido:string|null;origem_id?:string;resposta_gerada?:string|null;insight?:string|null;proximo_passo?:string|null};
 type Historico={
   consentimentoIA:boolean;contatoAutorizado:boolean;canalPronto:boolean;automacaoAtiva:boolean;
   estado:{pausado:boolean;proximo_passo:string|null;ultimo_envio_em:string|null}|null;
   mensagens:Mensagem[];passos:Passo[];turnos:Turno[];
 };
 
-export default function IrisHistorico({userId}:{userId:string}) {
+export default function IrisHistorico({userId,whatsappNumero}:{userId:string;whatsappNumero?:string|null}) {
   const [aberto,setAberto]=useState(false);
   const [dados,setDados]=useState<Historico|null>(null);
   const [carregando,setCarregando]=useState(false);
   const [erro,setErro]=useState('');
+  const [copiado,setCopiado]=useState<string|null>(null);
   const horario=(valor:string)=>new Date(valor).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
   async function carregar() {
     setCarregando(true);setErro('');
@@ -60,6 +61,30 @@ export default function IrisHistorico({userId}:{userId:string}) {
             {dados.estado?.pausado?'Retomar acompanhamento':'Pausar acompanhamento'}
           </button>}
         </div>
+        {dados.turnos.some(t=>t.origem_id?.startsWith('manual-rascunho-iris-')&&t.resposta_gerada)&&
+          <div>
+            <p className="mb-2 text-sm font-semibold text-black">Próxima mensagem para enviar</p>
+            <div className="space-y-3">
+              {dados.turnos.filter(t=>t.origem_id?.startsWith('manual-rascunho-iris-')&&t.resposta_gerada).map(t=>
+                <div key={t.id} className="rounded-lg border border-gray-faint bg-white p-3">
+                  <p className="mb-2 text-xs text-gray-text">Rascunho preparado a partir da conversa importada. Ainda não enviado.</p>
+                  <p className="whitespace-pre-wrap text-sm leading-6 text-black">{t.resposta_gerada}</p>
+                  <button type="button" onClick={()=>{
+                    if(!t.resposta_gerada)return;
+                    navigator.clipboard.writeText(t.resposta_gerada).then(()=>setCopiado(t.id)).catch(()=>setErro('Não foi possível copiar a mensagem.'));
+                  }} className="mt-3 rounded-lg border border-gray-faint px-3 py-2 text-xs text-black">
+                    {copiado===t.id?'Mensagem copiada':'Copiar mensagem'}
+                  </button>
+                  {whatsappNumero && /^55[1-9][0-9]{9,10}$/.test(whatsappNumero) && t.resposta_gerada &&
+                    <a href={'https://wa.me/'+whatsappNumero+'?text='+encodeURIComponent(t.resposta_gerada)}
+                      target="_blank" rel="noopener noreferrer"
+                      className="ml-3 inline-flex items-center text-xs text-gray-text underline underline-offset-2">
+                      Abrir no WhatsApp
+                    </a>}
+                </div>
+              )}
+            </div>
+          </div>}
         <div>
           <p className="mb-2 text-sm font-semibold text-black">Próximos passos registrados</p>
           {!dados.passos.length?<p className="text-xs text-gray-text">Nenhum próximo passo gerado pela Íris ainda.</p>:
@@ -74,12 +99,16 @@ export default function IrisHistorico({userId}:{userId:string}) {
           {!dados.mensagens.length?<p className="text-xs text-gray-text">Nenhuma interação vinculada ao histórico.</p>:
           <div className="max-h-80 space-y-2 overflow-y-auto rounded-lg bg-gray-50 p-3">
             {dados.mensagens.slice(0,25).map(m=><div key={m.id} className="rounded-lg border border-gray-faint bg-white p-3">
-              <p className="text-[11px] font-medium text-gray-text">{m.tipo==='recebida'?'Mentorado':'Íris (WhatsApp)'} · {horario(m.data)}{m.status?' · '+m.status:''}</p>
+              <p className="text-[11px] font-medium text-gray-text">{m.origem==='whatsapp_business_importado'
+                ? (m.tipo==='recebida'?'Mentorado (WhatsApp Business)':'Lume (WhatsApp Business)')
+                : (m.tipo==='recebida'?'Mentorado':'Íris (WhatsApp)')} · {horario(m.data)}
+                {m.origem==='whatsapp_business_importado'?' · histórico importado':''}
+                {m.status?' · '+m.status:''}</p>
               <p className="mt-1 whitespace-pre-wrap break-words text-sm text-black">{m.texto}</p>
             </div>)}
           </div>}
         </div>
-        {dados.turnos.some(t=>t.status==='revisao')&&
+        {dados.turnos.some(t=>t.status==='revisao'&&!t.origem_id?.startsWith('manual-rascunho-iris-'))&&
           <p className="text-xs text-amber-800">Existe um turno que precisa de revisão humana. Não foi reenviado automaticamente.</p>}
       </>}
     </div>}

@@ -19,28 +19,34 @@ export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get('userId') || '';
   if (!idValido(userId)) return NextResponse.json({error:'ID inválido'},{status:400,headers});
   const db = createAdminClient();
-  const [recebidas, enviadas, passos, turnos, estado, perfil] = await Promise.all([
+  const [recebidas, enviadas, importadas, passos, turnos, estado, perfil] = await Promise.all([
     db.from('whatsapp_respostas_mentoria').select('id,conteudo,recebido_em,meta_message_id')
       .eq('user_id',userId).order('recebido_em',{ascending:false}).limit(35),
     db.from('iris_mensagens_enviadas').select('id,conteudo,enviado_em,meta_message_id,tipo,status_entrega')
       .eq('user_id',userId).order('enviado_em',{ascending:false}).limit(35),
+    db.from('iris_mensagens_importadas').select('id,direcao,conteudo,ocorrido_em,registrado_por')
+      .eq('user_id',userId).order('ocorrido_em',{ascending:false}).limit(60),
     db.from('iris_proximos_passos').select('id,acao,insight,situacao,criado_em')
       .eq('user_id',userId).order('criado_em',{ascending:false}).limit(15),
-    db.from('iris_turnos').select('id,origem_tipo,status,criado_em,erro_resumido')
+    db.from('iris_turnos').select('id,origem_tipo,origem_id,status,criado_em,erro_resumido,resposta_gerada,insight,proximo_passo')
       .eq('user_id',userId).order('criado_em',{ascending:false}).limit(25),
     db.from('iris_estado').select('pausado,objetivo_atual,proximo_passo,ultimo_envio_em,ultima_interacao_em')
       .eq('user_id',userId).maybeSingle(),
     db.from('profiles').select('iris_ia_consentimento_em,whatsapp_consentimento_em,whatsapp_numero')
       .eq('id',userId).maybeSingle(),
   ]);
-  if ([recebidas.error,enviadas.error,passos.error,turnos.error,estado.error,perfil.error].some(Boolean)) {
+  if ([recebidas.error,enviadas.error,importadas.error,passos.error,turnos.error,estado.error,perfil.error].some(Boolean)) {
     return NextResponse.json({error:'Histórico temporariamente indisponível'},{status:503,headers});
   }
   const mensagens = [
     ...(recebidas.data??[]).map(x=>({id:'entrada-'+x.id, tipo:'recebida',
       texto:x.conteudo, data:x.recebido_em})),
     ...(enviadas.data??[]).map(x=>({id:'saida-'+x.id, tipo:'enviada',
-      texto:x.conteudo, data:x.enviado_em,status:x.status_entrega})),
+      texto:x.conteudo, data:x.enviado_em,status:x.status_entrega,origem:'meta_cloud_api'})),
+    ...(importadas.data??[]).map(x=>({
+      id:'importada-'+x.id, tipo:x.direcao==='entrada'?'recebida':'enviada',
+      texto:x.conteudo, data:x.ocorrido_em,origem:'whatsapp_business_importado',
+    })),
   ].sort((a,b)=>new Date(b.data).getTime()-new Date(a.data).getTime()).slice(0,60);
   return NextResponse.json({
     consentimentoIA:!!perfil.data?.iris_ia_consentimento_em,
