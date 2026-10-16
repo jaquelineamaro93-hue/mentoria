@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const [recebidas, enviadas, passos, turnos, estado, perfil] = await Promise.all([
     db.from('whatsapp_respostas_mentoria').select('id,conteudo,recebido_em,meta_message_id')
       .eq('user_id',userId).order('recebido_em',{ascending:false}).limit(35),
-    db.from('iris_mensagens_enviadas').select('id,conteudo,enviado_em,meta_message_id,tipo')
+    db.from('iris_mensagens_enviadas').select('id,conteudo,enviado_em,meta_message_id,tipo,status_entrega')
       .eq('user_id',userId).order('enviado_em',{ascending:false}).limit(35),
     db.from('iris_proximos_passos').select('id,acao,insight,situacao,criado_em')
       .eq('user_id',userId).order('criado_em',{ascending:false}).limit(15),
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     ...(recebidas.data??[]).map(x=>({id:'entrada-'+x.id, tipo:'recebida',
       texto:x.conteudo, data:x.recebido_em})),
     ...(enviadas.data??[]).map(x=>({id:'saida-'+x.id, tipo:'enviada',
-      texto:x.conteudo, data:x.enviado_em})),
+      texto:x.conteudo, data:x.enviado_em,status:x.status_entrega})),
   ].sort((a,b)=>new Date(b.data).getTime()-new Date(a.data).getTime()).slice(0,60);
   return NextResponse.json({
     consentimentoIA:!!perfil.data?.iris_ia_consentimento_em,
