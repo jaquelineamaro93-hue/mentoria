@@ -25,7 +25,7 @@ async function acessoPermitido(admin: ReturnType<typeof createAdminClient>, user
     !!perfil.whatsapp_numero && !!perfil.whatsapp_consentimento_em &&
     !!perfil.iris_ia_consentimento_em && !estado?.pausado &&
     (perfil.status_assinatura === 'ativo' ||
-      perfil.trial_status === 'active' || perfil.trial_status === 'converted');
+      perfil.trial_status === 'active');
   return { perfil, estado, permitido };
 }
 
@@ -42,10 +42,16 @@ async function registrarEnvio(admin: ReturnType<typeof createAdminClient>, turno
   });
   if (error) throw new Error('Envio confirmado, mas o histórico não foi salvo. Revisão manual necessária.');
   const agora = new Date().toISOString();
-  const { error: stateError } = await admin.from('iris_estado').upsert({
-    user_id: turno.user_id, ultimo_envio_em: agora, ultima_interacao_em: agora,
-    proximo_passo: turno.proximo_passo, insight_atual: turno.insight, updated_at: agora,
-  }, { onConflict: 'user_id' });
+  // Um convite de template não pode apagar o insight ou a ação anterior.
+  const estadoUpdate: Record<string, unknown> = {
+    user_id: turno.user_id, ultimo_envio_em: agora, ultima_interacao_em: agora, updated_at: agora,
+  };
+  if (tipo === 'texto') {
+    estadoUpdate.proximo_passo = turno.proximo_passo;
+    estadoUpdate.insight_atual = turno.insight;
+  }
+  const { error: stateError } = await admin.from('iris_estado').upsert(
+    estadoUpdate, { onConflict: 'user_id' });
   if (stateError) throw new Error('Histórico de mensagens salvo, mas não foi possível atualizar a jornada.');
   if (turno.proximo_passo?.trim()) {
     const { error: stepError } = await admin.from('iris_proximos_passos').insert({
