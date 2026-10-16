@@ -19,6 +19,7 @@ export default function ConfirmacaoContatoModal({ profile }: { profile: Profile 
   const [whatsapp, setWhatsapp] = useState(profile?.whatsapp_numero || '');
   const [genero, setGenero] = useState(profile?.genero || '');
   const [aceita, setAceita] = useState(Boolean(profile?.whatsapp_consentimento_em));
+  const [aceitaIrisIA, setAceitaIrisIA] = useState(Boolean(profile?.iris_ia_consentimento_em));
   const [emailConfirmado, setEmailConfirmado] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
@@ -30,6 +31,7 @@ export default function ConfirmacaoContatoModal({ profile }: { profile: Profile 
     setWhatsapp(profile?.whatsapp_numero || '');
     setGenero(profile?.genero || '');
     setAceita(Boolean(profile?.whatsapp_consentimento_em));
+    setAceitaIrisIA(Boolean(profile?.iris_ia_consentimento_em));
     setEmail(profile?.email || '');
     setEmailConfirmado(false);
     setConcluido(false);
@@ -68,6 +70,9 @@ export default function ConfirmacaoContatoModal({ profile }: { profile: Profile 
         whatsapp_numero: normalizado,
         genero,
         whatsapp_consentimento_em: aceita ? (profile.whatsapp_consentimento_em && profile.whatsapp_numero === normalizado ? profile.whatsapp_consentimento_em : new Date().toISOString()) : null,
+        iris_ia_consentimento_em: aceita && aceitaIrisIA
+          ? (profile.iris_ia_consentimento_em && profile.whatsapp_numero === normalizado
+            ? profile.iris_ia_consentimento_em : new Date().toISOString()) : null,
         dados_contato_confirmados_em: new Date().toISOString(),
       }).eq('id', profile.id);
       if (error) throw error;
@@ -104,8 +109,12 @@ export default function ConfirmacaoContatoModal({ profile }: { profile: Profile 
             <p className="mt-1 text-xs text-gray-text">Você pode escolher não informar. Não usamos essa resposta para limitar oportunidades.</p>
           </div>
           <label className="flex items-start gap-3 rounded-xl bg-[#f7f5f2] p-3 text-sm text-black">
-            <input type="checkbox" checked={aceita} onChange={e=>setAceita(e.target.checked)} className="mt-1" />
+            <input type="checkbox" checked={aceita} onChange={e=>{setAceita(e.target.checked);if(!e.target.checked)setAceitaIrisIA(false);}} className="mt-1" />
             <span>Quero receber mensagens individuais de acompanhamento da SOMA pelo WhatsApp. Posso cancelar essa autorização no meu perfil a qualquer momento.</span>
+          </label>
+          <label className="flex items-start gap-3 rounded-xl border border-gray-faint p-3 text-sm text-black">
+            <input type="checkbox" checked={aceitaIrisIA} disabled={!aceita} onChange={e=>setAceitaIrisIA(e.target.checked)} className="mt-1" />
+            <span>Quero o acompanhamento automático da Íris (IA). Autorizo que meus relatos e objetivos de mentoria sejam analisados pelo serviço Manus/Cue para conversas personalizadas e registro de próximos passos. Posso revogar no perfil ou escrever PARAR no WhatsApp.</span>
           </label>
         </div>
         {erro && <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{erro}</p>}
