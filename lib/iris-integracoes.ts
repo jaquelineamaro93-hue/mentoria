@@ -1,5 +1,6 @@
 /** Servidor somente. Nenhuma credencial ou mensagem é exposta para o navegador. */
 import { parseJsonDaIA } from './ai-json';
+import { topsendConfigurado } from './topsend';
 
 type ManusAgentDetail = { ok?: boolean; agent?: { id?: string; task_id?: string } };
 type ManusMessages = { ok?: boolean; messages?: Array<{
@@ -102,9 +103,12 @@ export async function consultarRespostaIris(apiKey: string, taskId: string, marc
   return null;
 }
 
-export function whatsappCanalConfigurado() {
+export function whatsappMetaConfigurado() {
   return Boolean(process.env.WHATSAPP_ACCESS_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID &&
     process.env.WHATSAPP_APP_SECRET && process.env.WHATSAPP_VERIFY_TOKEN);
+}
+export function whatsappCanalConfigurado() {
+  return whatsappMetaConfigurado() || topsendConfigurado();
 }
 
 export function irisAutomacaoConfigurada() {
