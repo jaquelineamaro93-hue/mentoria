@@ -33,7 +33,7 @@ function convertido(d:string,h:string):string|null {
   if(!round.startsWith(pad(dia)+'/'+pad(mes)+'/'+ano))return null;
   return dt.toISOString();
 }
-function interpretar(texto:string,nome:string,autorSimples:'entrada'|'saida',dataSimples:string):Analise{
+export function interpretarHistoricoTopSend(texto:string,nome:string,autorSimples:'entrada'|'saida',dataSimples:string):Analise{
   const linhas=texto.replace(/\r/g,'').split('\n');
   const mensagens:Registro[]=[];
   const desconhecidos=new Set<string>();
@@ -59,8 +59,11 @@ function interpretar(texto:string,nome:string,autorSimples:'entrada'|'saida',dat
     const simplificado=linha.match(/^(M|MENTORADO|MENTORADA|I|ÍRIS|IRIS)\s*:\s*(.*)$/i);
     if(simplificado){
       if(!dataSimples){erro='Informe a data e hora para mensagens sem horário no texto.';break;}
-      const ocorridoEm=new Date(dataSimples+'-03:00').toISOString();
-      mensagens.push({direcao:remetente(simplificado[1],nome)??autorSimples,conteudo:simplificado[2],ocorridoEm});
+      const horario=new Date(dataSimples+'-03:00');
+      if(!Number.isFinite(horario.getTime())){erro='Data e hora inválidas.';break;}
+      const ocorridoEm=horario.toISOString();
+      const direcao=/^(I|IRIS|ÍRIS)$/i.test(simplificado[1])?'saida':'entrada';
+      mensagens.push({direcao,conteudo:simplificado[2],ocorridoEm});
       primeiro=false;
       continue;
     }
@@ -92,7 +95,7 @@ export default function TopSendImportador({userId,nome,onImported}:{
   const [ocupado,setOcupado]=useState(false);
   const [aviso,setAviso]=useState('');
   const [erro,setErro]=useState('');
-  const analise=useMemo(()=>interpretar(texto,nome,autor,data),[texto,nome,autor,data]);
+  const analise=useMemo(()=>interpretarHistoricoTopSend(texto,nome,autor,data),[texto,nome,autor,data]);
   async function salvar(){
     setErro('');setAviso('');
     if(analise.erro||analise.desconhecidos.length||!analise.mensagens.length){
