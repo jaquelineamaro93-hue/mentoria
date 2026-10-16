@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { irisAutomacaoConfigurada, whatsappCanalConfigurado } from '@/lib/iris-integracoes';
+import { topsendConfigurado,topsendRetornoConfigurado } from '@/lib/topsend';
 
 export const runtime = 'nodejs';
 const headers = { 'Cache-Control': 'private, no-store' };
@@ -19,13 +20,17 @@ export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get('userId') || '';
   if (!idValido(userId)) return NextResponse.json({error:'ID inválido'},{status:400,headers});
   const db = createAdminClient();
-  const [recebidas, enviadas, importadas, passos, turnos, estado, perfil] = await Promise.all([
+  const [recebidas, enviadas, importadas, topsendRecebidas, topsendDespachos, passos, turnos, estado, perfil] = await Promise.all([
     db.from('whatsapp_respostas_mentoria').select('id,conteudo,recebido_em,meta_message_id')
       .eq('user_id',userId).order('recebido_em',{ascending:false}).limit(35),
     db.from('iris_mensagens_enviadas').select('id,conteudo,enviado_em,meta_message_id,tipo,status_entrega')
       .eq('user_id',userId).order('enviado_em',{ascending:false}).limit(35),
     db.from('iris_mensagens_importadas').select('id,direcao,conteudo,ocorrido_em,registrado_por')
       .eq('user_id',userId).order('ocorrido_em',{ascending:false}).limit(60),
+    db.from('topsend_eventos_recebidos').select('id,conteudo,recebido_em')
+      .eq('user_id',userId).order('recebido_em',{ascending:false}).limit(35),
+    db.from('topsend_despachos').select('id,turno_id,mensagem,status,acionado_em,criado_em')
+      .eq('user_id',userId).order('criado_em',{ascending:false}).limit(35),
     db.from('iris_proximos_passos').select('id,acao,insight,situacao,criado_em')
       .eq('user_id',userId).order('criado_em',{ascending:false}).limit(15),
     db.from('iris_turnos').select('id,origem_tipo,origem_id,status,criado_em,erro_resumido,resposta_gerada,insight,proximo_passo')
@@ -35,7 +40,7 @@ export async function GET(request: NextRequest) {
     db.from('profiles').select('iris_ia_consentimento_em,whatsapp_consentimento_em,whatsapp_numero')
       .eq('id',userId).maybeSingle(),
   ]);
-  if ([recebidas.error,enviadas.error,importadas.error,passos.error,turnos.error,estado.error,perfil.error].some(Boolean)) {
+  if ([recebidas.error,enviadas.error,importadas.error,topsendRecebidas.error,topsendDespachos.error,passos.error,turnos.error,estado.error,perfil.error].some(Boolean)) {
     return NextResponse.json({error:'Histórico temporariamente indisponível'},{status:503,headers});
   }
   const mensagens = [
@@ -47,13 +52,23 @@ export async function GET(request: NextRequest) {
       id:'importada-'+x.id, tipo:x.direcao==='entrada'?'recebida':'enviada',
       texto:x.conteudo, data:x.ocorrido_em,origem:'whatsapp_business_importado',
     })),
+    ...(topsendRecebidas.data??[]).map(x=>({
+      id:'topsend-entrada-'+x.id,tipo:'recebida',
+      texto:x.conteudo,data:x.recebido_em,origem:'topsend_retorno',
+    })),
+    ...(topsendDespachos.data??[]).filter(x=>x.status==='acionado').map(x=>({
+      id:'topsend-saida-'+x.id,tipo:'acionada',
+      texto:x.mensagem,data:x.acionado_em||x.criado_em,origem:'topsend_automacao',
+      status:'gatilho acionado · entrega não confirmada',
+    })),
   ].sort((a,b)=>new Date(b.data).getTime()-new Date(a.data).getTime()).slice(0,60);
   return NextResponse.json({
     consentimentoIA:!!perfil.data?.iris_ia_consentimento_em,
     contatoAutorizado:!!perfil.data?.whatsapp_numero&&!!perfil.data?.whatsapp_consentimento_em,
     canalPronto:whatsappCanalConfigurado(),automacaoAtiva:irisAutomacaoConfigurada(),
+    topsendPronto:topsendConfigurado(),topsendRetornoPronto:topsendRetornoConfigurado(),
     estado:estado.data??null,
-    mensagens,passos:passos.data??[],turnos:turnos.data??[],
+    mensagens,passos:passos.data??[],turnos:turnos.data??[],topsendDespachos:topsendDespachos.data??[],
   },{headers});
 }
 

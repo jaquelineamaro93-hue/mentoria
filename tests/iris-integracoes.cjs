@@ -11,8 +11,9 @@ const env = {};
 const context = {
   exports: {}, process: {env}, URL, AbortSignal, console,
   require: (path) => {
-    assert.equal(path, './ai-json');
-    return { parseJsonDaIA: JSON.parse };
+    if(path === './ai-json') return { parseJsonDaIA: JSON.parse };
+    if(path === './topsend') return { topsendConfigurado: () => false };
+    assert.fail('Unexpected dependency: '+path);
   },
   fetch: async (url, options) => {
     requests.push({url:String(url), options});

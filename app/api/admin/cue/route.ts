@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { listManusAgents, ManusConnectionError } from '@/lib/manus';
 import { irisAutomacaoConfigurada, whatsappCanalConfigurado } from '@/lib/iris-integracoes';
+import { topsendConfigurado,topsendRetornoConfigurado } from '@/lib/topsend';
 
 export const runtime = 'nodejs';
 const headers = { 'Cache-Control': 'private, no-store' };
@@ -20,7 +21,7 @@ export async function GET() {
     return NextResponse.json({
       status: selected ? 'connected' : agentId ? 'agent_not_found' : 'select_agent',
       message: selected
-        ? `Conexão verificada com ${selected.nickname}. Envios automáticos desativados.`
+        ? `Conexão verificada com ${selected.nickname}. O canal de envio é configurado separadamente.`
         : agentId
           ? 'Credencial validada, mas o ID configurado em MANUS_AGENT_ID não aparece nesta conta Manus.'
           : 'Credencial Manus validada. Configure MANUS_AGENT_ID com o ID exato da Íris para concluir a conexão.',
@@ -28,6 +29,8 @@ export async function GET() {
       selectedAgent: selected ? { id: selected.id, name: selected.nickname } : null,
       automaticSending: irisAutomacaoConfigurada(),
       whatsappReady: whatsappCanalConfigurado(),
+      topsendReady: topsendConfigurado(),
+      topsendInboundReady: topsendRetornoConfigurado(),
       weeklyTemplateReady: Boolean(process.env.WHATSAPP_TEMPLATE_NAME),
       iaConsentRequired: true,
     }, { headers });
