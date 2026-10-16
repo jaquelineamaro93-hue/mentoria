@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { dispararTurnoTopSend, topsendConfigurado } from '@/lib/topsend';
 import {
   anonimizarContextoIris, consultarRespostaIris, enviarParaIris, enviarWhatsAppTemplate,
   enviarWhatsAppTexto, instrucoesDaIris, irisAutomacaoConfigurada, obterTarefaDaIris,
@@ -66,9 +67,22 @@ async function registrarEnvio(admin: ReturnType<typeof createAdminClient>, turno
 async function iniciarIris(admin: ReturnType<typeof createAdminClient>, turno: Turno, estado: { objetivo_atual?: string | null; proximo_passo?: string | null } | null) {
   const apiKey = process.env.MANUS_API_KEY!;
   const agentId = process.env.MANUS_AGENT_ID!;
-  const { data: mensagens } = await admin.from('whatsapp_respostas_mentoria')
-    .select('conteudo,recebido_em').eq('user_id', turno.user_id).order('recebido_em', { ascending: false }).limit(4);
-  const ultimas = (mensagens ?? []).slice().reverse().map(m => m.conteudo);
+  const [meta,topSend,historico] = await Promise.all([
+    admin.from('whatsapp_respostas_mentoria')
+      .select('conteudo,recebido_em').eq('user_id',turno.user_id).order('recebido_em',{ascending:false}).limit(5),
+    admin.from('topsend_eventos_recebidos')
+      .select('conteudo,recebido_em').eq('user_id',turno.user_id).order('recebido_em',{ascending:false}).limit(5),
+    admin.from('iris_mensagens_importadas')
+      .select('conteudo,ocorrido_em').eq('user_id',turno.user_id).eq('direcao','entrada')
+      .order('ocorrido_em',{ascending:false}).limit(5),
+  ]);
+  if(meta.error||topSend.error||historico.error)
+    throw new Error('Não foi possível consultar o histórico de respostas.');
+  const ultimas=[
+    ...(meta.data??[]).map(m=>({conteudo:m.conteudo,data:m.recebido_em})),
+    ...(topSend.data??[]).map(m=>({conteudo:m.conteudo,data:m.recebido_em})),
+    ...(historico.data??[]).map(m=>({conteudo:m.conteudo,data:m.ocorrido_em})),
+  ].sort((a,b)=>Date.parse(a.data)-Date.parse(b.data)).slice(-4).map(m=>m.conteudo);
   if (ultimas.some(riscoAlto)) {
     await atualizarTurno(admin, turno.id, { status: 'revisao', erro_resumido: 'Relato sensível. Acompanhamento humano necessário.' });
     return;
@@ -131,6 +145,10 @@ async function consultarEEnviar(admin: ReturnType<typeof createAdminClient>, tur
   }
 
   if (turno.status !== 'pronto') return turno.status;
+  if (topsendConfigurado()) {
+    const result=await dispararTurnoTopSend(admin,turno);
+    return result.status; // Trigger accepted; WhatsApp delivery remains unverified.
+  }
   const { perfil, permitido } = await acessoPermitido(admin, turno.user_id);
   if (!permitido || !perfil?.whatsapp_numero) {
     await atualizarTurno(admin, turno.id, { status: 'cancelado', erro_resumido: 'Consentimento ou elegibilidade ausente.' });
@@ -171,7 +189,7 @@ async function consultarEEnviar(admin: ReturnType<typeof createAdminClient>, tur
  * O job corre em pós-resposta do webhook e também no cron de recuperação.
  */
 export async function processarFilaIris() {
-  if (!irisAutomacaoConfigurada()) return { ativo: false, motivo: 'Aguardando credenciais da Meta e habilitação.' };
+  if (!irisAutomacaoConfigurada()) return { ativo: false, motivo: 'Aguardando canal de WhatsApp (TopSend ou Meta) e habilitação.' };
   const admin = createAdminClient();
   const { data: pendentes, error } = await admin.from('iris_turnos').select('*')
     .in('status', ['aguardando_agente','pronto','enviando']).order('criado_em').limit(1);
