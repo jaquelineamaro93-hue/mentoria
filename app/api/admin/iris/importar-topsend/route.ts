@@ -25,7 +25,7 @@ export async function POST(request:NextRequest) {
   try{input=JSON.parse(raw) as Entrada;}catch{
     return NextResponse.json({error:'Dados inválidos'},{status:400,headers});
   }
-  if(typeof input.userId!=='string'||!uuid(input.userId))
+  if(!input||typeof input!=='object'||typeof input.userId!=='string'||!uuid(input.userId))
     return NextResponse.json({error:'Mentorado inválido'},{status:400,headers});
   if(!Array.isArray(input.mensagens)||input.mensagens.length<1||input.mensagens.length>50)
     return NextResponse.json({error:'Envie de 1 a 50 mensagens por importação'},{status:400,headers});
