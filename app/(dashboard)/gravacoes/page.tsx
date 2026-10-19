@@ -22,7 +22,8 @@ export default async function GravacoesPage() {
   const { data: gravacoes } = await supabase
     .from('recordings')
     .select('*')
-    .order('data_encontro', { ascending: false })
+    .order('data_encontro', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
     .returns<Recording[]>();
 
   return <GravacoesClient profile={profile} gravacoes={gravacoes ?? []} />;
