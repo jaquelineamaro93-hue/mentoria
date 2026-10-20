@@ -309,11 +309,11 @@ export default function DashboardClient({
           </div>
         </div>
 
-        <section aria-labelledby="discover-tools" className="mb-8 rounded-2xl border border-mint-deep/20 bg-white p-5 sm:p-6">
+        <section aria-labelledby="discover-tools" className="mb-5 rounded-2xl border border-mint-deep/20 bg-white p-4 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-mint-deep">{entrevista ? 'Seu próximo capítulo' : 'Da reflexão à oportunidade'}</p>
-          <h2 id="discover-tools" className="mt-2 font-display text-2xl text-lotus-brown">{entrevista ? 'A partir de agora, seu caminho ganha direção' : 'O que você quer destravar hoje?'}</h2>
-          <p className="mt-2 text-sm text-gray-700">{entrevista ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos começar por suas forças e sua história, respeitando seu ritmo.` : 'Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.'}</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <h2 id="discover-tools" className="mt-1 font-display text-xl leading-snug text-lotus-brown sm:text-2xl">{entrevista ? 'A partir de agora, seu caminho ganha direção' : 'O que você quer destravar hoje?'}</h2>
+          <p className="mt-1 text-sm leading-5 text-gray-700">{entrevista ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos começar por suas forças e sua história, respeitando seu ritmo.` : 'Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.'}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             {(entrevista ? [
               { href: '/quem-sou-eu', title: 'Conhecer minha história', description: 'Comece pelo Mapa Quem Sou Eu para reconhecer seus valores, experiências e forças.', action: 'Continuar meu mapa' },
               { href: '/exercicios', title: 'Reconhecer minhas forças', description: 'Use o diagnóstico para identificar suas forças e como elas aparecem no trabalho.', action: 'Fazer meu diagnóstico' },
@@ -324,14 +324,42 @@ export default function DashboardClient({
               { href: '/entrevista', title: 'Chegar preparada à entrevista', description: 'Pratique suas respostas e organize exemplos da sua trajetória.', action: 'Preparar minha entrevista' },
               { href: '/network', title: 'Ampliar minhas oportunidades', description: 'Organize contatos e transforme conexões em próximos passos concretos.', action: 'Construir minha rede' },
             ]).map((item) => (
-              <Link key={item.href} href={item.href} className="flex flex-col rounded-xl border border-gray-faint p-4 transition-colors hover:border-mint-deep hover:bg-mint-deep/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep">
+              <Link key={item.href} href={item.href} className="flex flex-col rounded-xl border border-gray-faint p-3 transition-colors hover:border-mint-deep hover:bg-mint-deep/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep">
                 <h3 className="font-semibold text-lotus-brown">{item.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-6 text-gray-700">{item.description}</p>
-                <span className="mt-4 text-sm font-semibold text-mint-deep">{item.action} →</span>
+                <p className="mt-1 flex-1 text-xs leading-4 text-gray-700">{item.description}</p>
+                <span className="mt-2 text-xs font-semibold text-mint-deep">{item.action} →</span>
               </Link>
             ))}
           </div>
         </section>
+
+        {/* Sessão Individual logo após o próximo capítulo */}
+        <section className="mb-6">
+          <Eyebrow>Sessão Individual com Mentora</Eyebrow>
+          <a
+            href="https://calendar.app.google/x5fpXiMY7PVp59TL6"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Panel className="p-4 sm:p-5 hover:border-lotus-brown/40 transition-colors group border-gray-faint">
+              <div className="flex items-start gap-3">
+                <Calendar className="text-lotus-brown mb-2 shrink-0" size={22} strokeWidth={1.5} />
+                <div>
+                  <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
+                    Agendar Sessão Individual
+                  </p>
+                  <p className="text-sm leading-5 text-gray-text">
+                    Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
+                  </p>
+                  <div className="flex items-center gap-1 mt-1 text-xs text-lotus-brown group-hover:gap-2 transition-all">
+                    Agendar agora <ExternalLink size={14} />
+                  </div>
+                </div>
+              </div>
+            </Panel>
+          </a>
+        </section>
+
 
         {/* Timeline dos 90 dias */}
         <section className="mb-8">
@@ -634,35 +662,6 @@ export default function DashboardClient({
             </a>
           </Panel>
         </section>
-
-        {/* Atalhos */}
-        {/* Sessão Individual */}
-        <section className="mb-10">
-          <Eyebrow>Sessão Individual com Mentora</Eyebrow>
-          <a
-            href="https://calendar.app.google/x5fpXiMY7PVp59TL6"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Panel className="p-6 hover:border-lotus-brown/40 transition-colors group border-gray-faint">
-              <div className="flex items-start gap-4">
-                <Calendar className="text-lotus-brown mb-2 shrink-0" size={24} strokeWidth={1.5} />
-                <div>
-                  <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
-                    Agendar Sessão Individual
-                  </p>
-                  <p className="text-sm text-gray-text">
-                    Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
-                  </p>
-                  <div className="flex items-center gap-1 mt-2 text-xs text-lotus-brown group-hover:gap-2 transition-all">
-                    Agendar agora <ExternalLink size={14} />
-                  </div>
-                </div>
-              </div>
-            </Panel>
-          </a>
-        </section>
-
 
         <section className="mb-10">
           <Eyebrow>Continue sua jornada</Eyebrow>
