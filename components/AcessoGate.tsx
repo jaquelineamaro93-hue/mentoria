@@ -45,6 +45,17 @@ export default function AcessoGate() {
         return;
       }
 
+      const { data: pausa } = await supabase
+        .from('mentoria_pausas').select('id').eq('user_id',user.id)
+        .eq('status','ativa').limit(1).maybeSingle();
+      if (pausa) {
+        if (!['/meu-plano','/termos','/perfil','/renovar'].includes(pathname)) {
+          router.push('/meu-plano');
+        }
+        setChecando(false);
+        return;
+      }
+
       const trialAtivo =
         perfil.trial_status === 'active' &&
         !!perfil.trial_ends_at &&

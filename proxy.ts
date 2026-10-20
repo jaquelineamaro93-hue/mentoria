@@ -70,6 +70,39 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Uma pausa voluntária interrompe a participação, não a consulta dos
+  // termos, plano e privacidade. Também impede escrita por rotas internas.
+  if (user && !path.startsWith('/api/admin')) {
+    const {data:identidade}=await supabase.from('profiles')
+      .select('is_admin,status_assinatura').eq('id',user.id).maybeSingle();
+    if(!identidade?.is_admin && identidade?.status_assinatura==='ativo') {
+      const {data:pausa}=await supabase.from('mentoria_pausas')
+        .select('id').eq('user_id',user.id).eq('status','ativa').limit(1).maybeSingle();
+      if(pausa){
+        if(path.startsWith('/api')) {
+          const liberada=path.startsWith('/api/mentoria/pausa') ||
+            path.startsWith('/api/auth/') || path.startsWith('/api/product-events') ||
+            path.startsWith('/api/trial/') || path.startsWith('/api/termos/');
+          if(!liberada && !['GET','HEAD','OPTIONS'].includes(request.method))
+            return NextResponse.json({error:'Sua mentoria está pausada. Retome no Meu Plano para continuar.'},
+              {status:423,headers:{'Cache-Control':'no-store'}});
+        }else{
+          const permitida=path==='/meu-plano'||path.startsWith('/meu-plano/') ||
+            path==='/termos'||path.startsWith('/termos/') ||
+            path==='/perfil'||path.startsWith('/perfil/') ||
+            path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/login') ||
+            path.startsWith('/checkout');
+          if(!permitida){
+            const destino=request.nextUrl.clone();
+            destino.pathname='/meu-plano';
+            destino.search='';
+            return NextResponse.redirect(destino);
+          }
+        }
+      }
+    }
+  }
+
   const rotaLiberada =
     path.startsWith('/login') ||
     path.startsWith('/checkout') ||

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { executarLembretes } from '@/lib/lembretes';
+import { executarPausasProgramadas } from '@/lib/pausas-notificacoes';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -7,6 +8,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
   }
 
+  const pausa = await executarPausasProgramadas();
   const resultado = await executarLembretes();
-  return NextResponse.json(resultado);
+  return NextResponse.json({...resultado,pausa},{headers:{'Cache-Control':'no-store'}});
 }

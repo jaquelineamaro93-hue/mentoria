@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
 import { Calendar, Users, Video, FileText, Clock } from 'lucide-react';
 import type { Profile, PlanoMentoria } from '@/lib/types';
+import PausaMentoriaCard from './PausaMentoriaCard';
 
 export default function MeuPlanoClient({
   profile,
@@ -40,7 +41,7 @@ export default function MeuPlanoClient({
 
   return (
     <>
-      
+      <PausaMentoriaCard />
 
       <div className="bg-white border border-gray-faint rounded-2xl p-6 mb-8">
         <div className="grid grid-cols-2 gap-4 mb-6">
