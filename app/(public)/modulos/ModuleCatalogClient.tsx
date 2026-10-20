@@ -17,13 +17,18 @@ export default function ModuleCatalogClient({modules,authenticated}:{
 }){
  const [working,setWorking]=useState<string|null>(null);
  const [error,setError]=useState<string|null>(null);
+ const [acceptedTerms,setAcceptedTerms]=useState(false);
  async function subscribe(slug:string){
   if(!authenticated){window.location.assign('/login');return;}
+  if(!acceptedTerms){
+   setError('Leia e aceite as condições da assinatura mensal antes de prosseguir.');
+   return;
+  }
   setWorking(slug);setError(null);
   try{
    const response=await fetch('/api/modulos/assinar',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({slug}),
+    body:JSON.stringify({slug,acceptTerms:true}),
    });
    const data=await response.json();
    if(!response.ok)throw Error(data.error??'Não foi possível abrir o pagamento.');
@@ -68,6 +73,18 @@ export default function ModuleCatalogClient({modules,authenticated}:{
    </div>
   </header>
   {error&&<p role="alert" className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</p>}
+  <div className="mb-6 rounded-xl border border-gray-faint bg-white p-4">
+    <label className="flex items-start gap-3 text-sm leading-6 text-black">
+      <input type="checkbox" checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}
+       className="mt-1.5 h-4 w-4 accent-[#315a48]"/>
+      <span>Li e aceito as <Link href="/modulos/condicoes" target="_blank"
+       className="font-medium text-mint-deep underline underline-offset-4">
+        condições da assinatura modular
+       </Link>, incluindo cobrança mensal recorrente pelo Mercado Pago, renovação
+       enquanto a assinatura estiver ativa e possibilidade de cancelamento individual.
+       Esta confirmação é exigida apenas para iniciar uma nova assinatura paga.</span>
+    </label>
+  </div>
   <section aria-label="Módulos disponíveis" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
    {modules.map(m=><article key={m.slug} className="flex flex-col rounded-2xl border border-gray-faint bg-white p-5">
      <div className="flex items-start justify-between gap-3">
