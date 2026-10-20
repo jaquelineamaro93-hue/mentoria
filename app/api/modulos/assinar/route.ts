@@ -15,8 +15,11 @@ export async function POST(request:NextRequest){
  });
  if(!allowed)return NextResponse.json({error:'Muitas tentativas. Aguarde alguns minutos.'},{status:429,headers:noStore});
 
- let input:{slug?:unknown};
+ let input:{slug?:unknown;acceptTerms?:unknown};
  try{input=await request.json();}catch{return NextResponse.json({error:'Dados inválidos.'},{status:400,headers:noStore});}
+ if(input?.acceptTerms!==true)return NextResponse.json({
+  error:'Confirme as condições da assinatura modular antes de continuar.'
+ },{status:422,headers:noStore});
  const slug=typeof input?.slug==='string'?input.slug.trim():'';
  if(!/^[a-z][a-z0-9-]{2,63}$/.test(slug))
   return NextResponse.json({error:'Módulo inválido.'},{status:400,headers:noStore});
@@ -47,7 +50,8 @@ export async function POST(request:NextRequest){
 
  const amount=Number(modulo.monthly_price);
  const {data:order,error:createError}=await admin.from('soma_module_orders')
-  .insert({user_id:user.id,module_slug:slug,amount,currency:'BRL',status:'PENDING'})
+  .insert({user_id:user.id,module_slug:slug,amount,currency:'BRL',status:'PENDING',
+   terms_version:'modular-1.0',terms_accepted_at:new Date().toISOString()})
   .select('id').single();
  if(createError||!order)return NextResponse.json({error:'Não foi possível reservar sua assinatura.'},{status:503,headers:noStore});
 
