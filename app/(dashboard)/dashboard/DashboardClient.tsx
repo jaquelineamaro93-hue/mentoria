@@ -190,13 +190,6 @@ export default function DashboardClient({
     ? '/meu-pdi'
     : '/diario';
 
-  const tarefasImediatas = [
-    { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
-    { label: 'Diagnóstico & Perfil (diagnóstico + VIA)', done: diagnosticoCompleto, href: '/exercicios' },
-    { label: 'Posicionamento · Mapa Quem Sou Eu', done: bussolaCompleto, href: '/quem-sou-eu' },
-    { label: 'Plano de desenvolvimento (PDI)', done: pdiCompleto, href: '/meu-pdi' },
-  ];
-  const tarefasPendentes = tarefasImediatas.filter((tarefa) => !tarefa.done);
   // ---- Passaporte de conquistas (apenas o que dá para verificar com os dados carregados) ----
   const sinaisDisponiveis: Record<string, boolean> = {
     quem_sou_eu_completo: quemSouCompleto,
@@ -601,12 +594,8 @@ export default function DashboardClient({
           </div>
         </section>
 
-        {/* SEÇÃO 3: Ações imediatas */}
-        <section className="mb-10">
-          <Eyebrow>
-            <Flame size={13} strokeWidth={1.5} /> Ações imediatas
-          </Eyebrow>
-
+        {/* Alerta pontual de encontro, sem repetir o checklist do capítulo e das fases */}
+        <section className="mb-6">
           {votacaoAtiva && (
             <Panel className="p-5 mb-3 flex items-center justify-between gap-4 border-lotus-coral/40 bg-lotus-coral/10">
               <div className="flex items-center gap-3">
@@ -622,26 +611,6 @@ export default function DashboardClient({
             </Panel>
           )}
 
-          <p className="mb-2 text-xs text-gray-text">
-            {tarefasImediatas.length - tarefasPendentes.length} de {tarefasImediatas.length} etapas concluídas. Confira abaixo apenas o que falta.
-          </p>
-          {tarefasPendentes.length > 0 ? (
-            <Panel className="divide-y divide-line border-gray-faint">
-              {tarefasPendentes.map((tarefa) => (
-                <Link key={tarefa.label} href={tarefa.href}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white transition-colors">
-                  <Circle size={17} strokeWidth={1.5} className="shrink-0 text-gray-text" />
-                  <span className="flex-1 text-sm text-black">{tarefa.label}</span>
-                  <span className="text-xs font-medium text-mint-deep">Continuar →</span>
-                </Link>
-              ))}
-            </Panel>
-          ) : (
-            <Panel className="flex items-center gap-2 border-gray-faint p-4">
-              <CheckCircle2 size={17} className="shrink-0 text-mint-deep" />
-              <p className="text-sm text-gray-text">Você concluiu todas as etapas principais deste ciclo.</p>
-            </Panel>
-          )}
         </section>
 
         {/* Materiais, em um atalho compacto sem repetir as ferramentas do portal */}
