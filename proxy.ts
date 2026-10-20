@@ -141,7 +141,7 @@ export async function proxy(request: NextRequest) {
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at')
+      .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at, plano_id, data_fim_acesso')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -156,33 +156,44 @@ export async function proxy(request: NextRequest) {
         !!profile.trial_ends_at &&
         new Date(profile.trial_ends_at).getTime() <= Date.now());
 
-    const precisaPagar =
-      profile &&
-      !profile.is_admin &&
-      !trialAtivo &&
-      ((trialExpirado && profile.status_assinatura !== 'ativo') ||
-        profile.status_assinatura === 'encerrado' ||
-        (profile.status_assinatura === 'inadimplente' &&
-          profile.origem_assinatura === 'mercadopago'));
+    const hoje=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
+    const mentoriaAtiva=!!(profile?.is_admin ||
+      (profile?.plano_id&&profile.status_assinatura==='ativo'&&
+       (!profile.data_fim_acesso||profile.data_fim_acesso>=hoje)));
 
-    // Uma assinatura por módulo não depende de renovação do plano completo.
-    // A consulta é protegida por auth.uid() no banco.
+    // Usuário somente de módulos não deve receber as vantagens de Mentoria
+    // (agendamentos, gravações de grupos, encontros e área de mentorados).
+    // Conta Free/Trial mantém o fluxo legado de 7 dias.
     let temModulo=false;
-    if(precisaPagar){
+    if(profile && !mentoriaAtiva && !trialAtivo){
       const {data,error}=await supabase.rpc('soma_has_paid_module');
       temModulo=!error&&data===true;
     }
-    if (precisaPagar && !temModulo) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/renovar';
-      return NextResponse.redirect(url);
+
+    const somenteMentoria=[
+      '/gravacoes','/votar-encontro','/sessao-extra',
+      '/feedback-pares','/minha-trilha',
+    ].some(rota=>path===rota||path.startsWith(rota+'/'));
+
+    const historicoMentoriaExpirado=!!profile && !profile.is_admin &&
+      !!profile.plano_id && !mentoriaAtiva && !trialAtivo;
+
+    if(!mentoriaAtiva&&!trialAtivo&&(path==='/dashboard'||somenteMentoria)){
+      const destino=request.nextUrl.clone();
+      destino.pathname=historicoMentoriaExpirado&&!temModulo?'/renovar':'/modulos';
+      destino.search='';
+      return NextResponse.redirect(destino);
     }
-    if(temModulo && path==='/dashboard'){
-      // A vitrine modular é o início do assinante independente. Não exibe
-      // agenda de mentoria, encontros e materiais exclusivos no Dashboard VIP.
-      const url=request.nextUrl.clone();
-      url.pathname='/modulos';url.search='';
-      return NextResponse.redirect(url);
+
+    const precisaRenovarPlano=profile&&!mentoriaAtiva&&!trialAtivo &&
+      ((trialExpirado && !temModulo) ||
+        (profile.status_assinatura==='encerrado'&&!temModulo) ||
+        (profile.status_assinatura==='inadimplente'&&
+         profile.origem_assinatura==='mercadopago'&&!temModulo));
+    if(precisaRenovarPlano){
+      const destino=request.nextUrl.clone();
+      destino.pathname='/renovar';destino.search='';
+      return NextResponse.redirect(destino);
     }
   }
 
