@@ -4,9 +4,10 @@ import { useCallback,useEffect,useMemo,useState } from 'react';
 import Link from 'next/link';
 import { Flame,CheckCircle2,CalendarDays,Target,Loader2,ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { Mascot } from '@/components/soma/CareerJourney';
 
 type Tipo='ingles'|'curriculo'|'linkedin'|'networking'|'candidatura'|'entrevista'|'pdi'|'aprendizado'|'reflexao';
-type Checkin={dia:string;tipo:Tipo;evidencia:string;criado_em:string};
+type Checkin={dia:string;tipo:Tipo;evidencia:string;criado_em:string;origem:'manual'|'soma';fonte:string|null};
 const TIPOS:Record<Tipo,{nome:string;acao:string;href:string}>={
   ingles:{nome:'Praticar inglês',acao:'O que praticou hoje e em qual situação pretende usar?',href:'/diario'},
   curriculo:{nome:'Melhorar o currículo',acao:'Que conquista ou informação melhorou no currículo?',href:'/carreira?etapa=cv'},
@@ -49,6 +50,7 @@ function sequencias(lista:Checkin[],hoje:string):{atual:number;recorde:number;di
 export default function OfensivaCarreira({userId}:{userId:string}){
   const supabase=useMemo(()=>createClient(),[]);
   const [acoes,setAcoes]=useState<Checkin[]>([]);
+  const [automaticasHoje,setAutomaticasHoje]=useState(0);
   const [carregando,setCarregando]=useState(true);
   const [salvando,setSalvando]=useState(false);
   const [tipo,setTipo]=useState<Tipo>('ingles');
@@ -58,11 +60,17 @@ export default function OfensivaCarreira({userId}:{userId:string}){
   const hoje=diaSaoPaulo();
   const [ativa,setAtiva]=useState(false);
   const carregar=useCallback(async()=>{
-    const {data,error}=await supabase.from('carreira_checkins')
-      .select('dia,tipo,evidencia,criado_em').eq('user_id',userId)
-      .order('dia',{ascending:false}).limit(365);
-    if(error)setErro('Não foi possível carregar sua ofensiva agora.');
-    else setAcoes((data??[]) as Checkin[]);
+    const [checkins,registros]=await Promise.all([
+      supabase.from('carreira_checkins')
+        .select('dia,tipo,evidencia,criado_em,origem,fonte').eq('user_id',userId)
+        .order('dia',{ascending:false}).limit(365),
+      supabase.from('carreira_atividades_reconhecidas')
+        .select('referencia_id',{count:'exact',head:true})
+        .eq('user_id',userId).eq('dia',diaSaoPaulo()),
+    ]);
+    if(checkins.error)setErro('Não foi possível carregar sua ofensiva agora.');
+    else setAcoes((checkins.data??[]) as Checkin[]);
+    if(!registros.error)setAutomaticasHoje(registros.count??0);
     setCarregando(false);
   },[userId,supabase]);
   useEffect(()=>{void carregar();},[carregar]);
@@ -99,11 +107,19 @@ export default function OfensivaCarreira({userId}:{userId:string}){
         </p>
         <h2 className="font-display text-2xl text-black">Um pequeno passo por dia</h2>
         <p className="mt-2 max-w-xl text-sm leading-6 text-gray-text">
-          Inglês, currículo, entrevistas ou networking. Registre uma ação real e mantenha sua carreira em movimento.
-          Sem comparação com a trajetória dos outros.
+          Conclua uma atividade na SOMA ou registre algo que fez fora dela, como praticar inglês ou fazer networking.
+          Sua constância conta, sem comparação com a trajetória dos outros.
         </p>
       </div>
-      <span className="rounded-full bg-[#ECF5ED] px-3 py-1 text-xs font-medium text-[#295946]">+5 Impulsos por dia</span>
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="hidden text-right sm:block">
+          <p className="text-xs font-semibold text-[#2F674E]">Brasa</p>
+          <p className="max-w-[150px] text-xs leading-5 text-gray-text">Seu guia da constância</p>
+        </div>
+        <div className="flex h-[78px] w-[78px] shrink-0 items-center justify-center rounded-2xl bg-[#E6F3EC]" aria-label="Brasa, capivara mascote da constância na SOMA">
+          <Mascot index={2} size={72}/>
+        </div>
+      </div>
     </div>
     <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
       <div className="rounded-xl bg-[#F3F7F3] p-3"><Flame size={19} className="mb-2 text-[#37684E]" aria-hidden="true"/>
@@ -114,13 +130,31 @@ export default function OfensivaCarreira({userId}:{userId:string}){
         <p className="text-2xl font-semibold text-black">{recorde}</p><p className="text-xs text-gray-text">Melhor sequência</p></div>
     </div>
     <p className="mt-3 text-xs leading-5 text-gray-text">
-      Meta sugerida: cuidar da carreira em três dias por semana. Sua sequência diária é um incentivo, não uma obrigação.
-      Se perder um dia, seus Impulsos e conquistas continuam com você.
+      Meta sugerida: três dias por semana. Cada dia com uma ação concluída ou registrada vale 5 Impulsos.
+      Se perder um dia, os pontos e as conquistas já obtidos permanecem com você.
     </p>
+    <div className="mt-4 rounded-xl border border-[#DCE9E0] bg-[#F7FAF7] px-4 py-3">
+      <p className="flex items-center gap-2 text-sm font-semibold text-[#285C44]">
+        <CheckCircle2 size={17}/> As atividades dentro da SOMA também contam
+      </p>
+      <p className="mt-1 text-xs leading-5 text-gray-text">
+        Diário de Bordo, etapas ou ações do PDI, Simulador de CV e análise SOAR são reconhecidos
+        quando concluídos. Abrir uma página não gera pontos, e várias atividades no mesmo dia
+        não acumulam bônus extras.
+      </p>
+      {automaticasHoje>0 && <p className="mt-2 text-xs font-medium text-[#285C44]">
+        {automaticasHoje} {automaticasHoje===1?'atividade concluída':'atividades concluídas'} hoje na SOMA.
+      </p>}
+    </div>
     {!carregando && jaRegistrou ?
       <div className="mt-5 rounded-xl border border-[#C9E0CF] bg-[#F4FAF5] p-4">
-        <p className="flex items-center gap-2 text-sm font-medium text-[#295946]"><CheckCircle2 size={17}/> Ação de hoje concluída</p>
-        {atualData&&<p className="mt-1 text-sm text-gray-text">{TIPOS[atualData.tipo]?.nome??'Ação registrada'}: {atualData.evidencia}</p>}
+        <p className="flex items-center gap-2 text-sm font-medium text-[#295946]"><CheckCircle2 size={17}/> Seu avanço de hoje já está registrado</p>
+        {atualData&&<>
+          <p className="mt-1 text-xs font-semibold text-[#386657]">
+            {atualData.origem==='soma'?'Validada automaticamente pela SOMA':'Registrada por você'}
+          </p>
+          <p className="mt-1 text-sm text-gray-text">{TIPOS[atualData.tipo]?.nome??'Ação registrada'}: {atualData.evidencia}</p>
+        </>}
       </div>
     :<div className="mt-5">
       {!ativa?
