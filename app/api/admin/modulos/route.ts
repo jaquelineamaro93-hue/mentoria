@@ -14,14 +14,14 @@ export async function PATCH(request:NextRequest){
    typeof input.enforceAccess!=='boolean'||typeof input.purchasable!=='boolean')
   return NextResponse.json({error:'Configuração inválida.'},{status:400,headers});
  const price=input.monthlyPrice===null||input.monthlyPrice===''?null:Number(input.monthlyPrice);
- if(price!==null && (!Number.isFinite(price)||price<5||price>10000||Math.round(price*100)!==price*100))
+ if(price!==null && (!Number.isFinite(price)||price<5||price>10000||Math.abs(Math.round(price*100)-price*100)>1e-6))
   return NextResponse.json({error:'Preço deve ser de R$ 5,00 a R$ 10.000,00 com até duas casas decimais.'},{status:400,headers});
  if(input.purchasable && (!input.enforceAccess||price===null))
   return NextResponse.json({error:'Para cobrar, informe o preço e ative o controle de acesso.'},{status:422,headers});
 
  const admin=createAdminClient();
  const {data,error}=await admin.from('soma_modules').update({
-  monthly_price:price,enforce_access:input.enforceAccess,
+  monthly_price:price===null?null:Math.round(price*100)/100,enforce_access:input.enforceAccess,
   purchasable:input.purchasable,updated_at:new Date().toISOString(),
  }).eq('slug',input.slug).eq('enabled',true)
   .select('slug,title,monthly_price,enforce_access,purchasable').maybeSingle();
