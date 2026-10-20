@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import PostHogInit from '@/components/PostHogInit';
-import TermosGate from '@/components/TermosGate';
 import AcessoGate from '@/components/AcessoGate';
 
 export const metadata: Metadata = {
@@ -43,7 +42,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-black">
         <PostHogInit />
         <AcessoGate />
-        <TermosGate />
         {children}
       </body>
     </html>

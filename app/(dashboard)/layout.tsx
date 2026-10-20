@@ -1,4 +1,5 @@
 import AppShell from '@/components/AppShell';
+import TermosGate from '@/components/TermosGate';
 import { createClient } from '@/lib/supabase/server';
 import type { Profile } from '@/lib/types';
 
@@ -24,5 +25,10 @@ export default async function DashboardLayout({
     initialProfile = data ?? null;
   }
 
-  return <AppShell initialProfile={initialProfile}>{children}</AppShell>;
+  return (
+    <AppShell initialProfile={initialProfile}>
+      <TermosGate />
+      {children}
+    </AppShell>
+  );
 }
