@@ -13,6 +13,7 @@ import {
 } from '@/lib/config/portalNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import TrialBanner from '@/components/TrialBanner';
+import InspecaoBanner from '@/components/InspecaoBanner';
 import ConfirmacaoContatoModal from '@/components/ConfirmacaoContatoModal';
 import EntrevistaInicialModal from '@/components/EntrevistaInicialModal';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
@@ -218,6 +219,7 @@ function AppShellContent({ children, initialProfile }: { children: React.ReactNo
 
         <main ref={main} id="portal-content" tabIndex={-1} className={styles.main}>
           <div className={styles.pageContent}>
+            <InspecaoBanner />
             {!pathname.startsWith('/admin') && <TrialBanner pathname={pathname} />}
             <SectionNavigationCards pathname={pathname} currentSearch={currentSearch} />
             {children}

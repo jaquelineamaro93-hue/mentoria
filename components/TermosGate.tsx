@@ -38,6 +38,12 @@ export default function TermosGate() {
     if (rotaSemModal) return;
 
     async function checar() {
+      // Não exige aceite de termos em nome de terceiros durante inspeção.
+      // O token do retorno é validado no servidor.
+      try {
+        const resposta=await fetch('/api/inspecao/status',{cache:'no-store'});
+        if(resposta.ok && (await resposta.json()).ativo)return;
+      }catch {/* validação regular permanece em caso de falha da consulta */}
       const {data:{user},error:erroAuth}=await supabase.auth.getUser();
       if(cancelado || erroAuth || !user)return;
 

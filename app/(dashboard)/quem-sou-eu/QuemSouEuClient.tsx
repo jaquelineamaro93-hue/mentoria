@@ -47,7 +47,7 @@ export default function QuemSouEuClient({
     primeiroNaoRespondido === -1 ? BLOCOS_QUEM_SOU_EU.length - 1 : primeiroNaoRespondido
   );
   const [blocosSalvos, setBlocosSalvos] = useState<Set<string>>(
-    new Set(respostasIniciais.map((r) => r.bloco))
+    new Set(respostasIniciais.filter((r) => r.resposta?.trim()).map((r) => r.bloco))
   );
   const [salvando, setSalvando] = useState(false);
   const [gerandoMapa, setGerandoMapa] = useState(false);
@@ -93,13 +93,20 @@ export default function QuemSouEuClient({
     }
 
     setBlocosSalvos((prev) => new Set(prev).add(bloco.codigo));
+    // O próximo acesso ao Dashboard precisa refletir imediatamente os blocos salvos.
+    router.refresh();
     posthog.capture('quem_sou_eu_bloco_salvo', { bloco: bloco.codigo });
     return true;
   }
 
   async function irParaBloco(indice: number) {
     if (indice === passo) return;
-    await salvarBlocoAtual();
+    // Não perde edições ao trocar de bloco quando a gravação falhar.
+    const texto = respostas[bloco.codigo]?.trim();
+    if (texto && !blocosSalvos.has(bloco.codigo)) {
+      const salvou = await salvarBlocoAtual();
+      if (!salvou) return;
+    }
     setPasso(indice);
   }
 
@@ -214,9 +221,18 @@ export default function QuemSouEuClient({
 
             <textarea
               value={respostas[bloco.codigo] ?? ''}
-              onChange={(e) =>
-                setRespostas((prev) => ({ ...prev, [bloco.codigo]: e.target.value }))
-              }
+              onChange={(e) => {
+                const valor = e.target.value;
+                setRespostas((prev) => ({ ...prev, [bloco.codigo]: valor }));
+                // Se o mentorado editar uma resposta já salva, ela volta a ficar pendente
+                // até a gravação bem-sucedida no Supabase.
+                setBlocosSalvos((prev) => {
+                  if (!prev.has(bloco.codigo)) return prev;
+                  const atualizados = new Set(prev);
+                  atualizados.delete(bloco.codigo);
+                  return atualizados;
+                });
+              }}
               rows={7}
               placeholder="Escreva com calma, sem se preocupar em organizar. Deixe fluir."
               className="w-full bg-white border border-gray-faint rounded-lg px-4 py-3 text-sm text-black focus:border-mint-deep resize-none"
@@ -224,7 +240,7 @@ export default function QuemSouEuClient({
 
             <div className="flex items-center justify-between mt-5">
               <button
-                onClick={() => setPasso(Math.max(0, passo - 1))}
+                onClick={() => void irParaBloco(Math.max(0, passo - 1))}
                 disabled={passo === 0}
                 className="flex items-center gap-1.5 text-sm text-gray-text hover:text-orange disabled:opacity-40 transition-colors"
               >
@@ -243,11 +259,11 @@ export default function QuemSouEuClient({
               ) : (
                 <button
                   onClick={salvarBlocoAtual}
-                  disabled={salvando || !respostas[bloco.codigo]?.trim()}
+                  disabled={salvando || blocosSalvos.has(bloco.codigo) || !respostas[bloco.codigo]?.trim()}
                   className="flex items-center gap-2 bg-brown hover:bg-brown-deep disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
                 >
                   {salvando ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
-                  Salvar último bloco
+                  {blocosSalvos.has(bloco.codigo) ? 'Último bloco salvo' : 'Salvar último bloco'}
                 </button>
               )}
             </div>
