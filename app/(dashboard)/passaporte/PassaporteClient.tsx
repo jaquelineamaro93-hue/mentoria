@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Check, Lock, Loader2, Award, ShoppingBag, Zap, ScanSearch,
+import { useEffect, useState } from 'react';
+import { Check, Lock, Loader2, Award, ShoppingBag, Zap, Flame, ScanSearch,
   ChartNoAxesColumnIncreasing, Sparkles, Compass, ClipboardList, Target, Users,
   Rocket, NotebookPen, BookOpenCheck, Handshake, Dumbbell, BriefcaseBusiness,
   MessagesSquare, Star, Sprout, type LucideIcon } from 'lucide-react';
@@ -33,7 +33,7 @@ const ICONES_CONQUISTA: Record<string,LucideIcon>={
   sprout:Sprout,
 };
 
-type Tab = 'conquistas' | 'loja' | 'ranking';
+type Tab = 'conquistas' | 'loja' | 'ranking' | 'ofensiva';
 
 interface Props {
   profile: Profile | null;
@@ -54,6 +54,19 @@ export default function PassaporteClient({
 }: Props) {
   const supabase = createClient();
   const [tab, setTab] = useState<Tab>('conquistas');
+  useEffect(() => {
+    const atual = new URLSearchParams(window.location.search).get('aba');
+    if (atual === 'ofensiva' || atual === 'ranking' || atual === 'loja' || atual === 'conquistas') {
+      setTab(atual);
+    }
+  }, []);
+  function selecionarAba(nova:Tab) {
+    setTab(nova);
+    const url = new URL(window.location.href);
+    if (nova === 'conquistas') url.searchParams.delete('aba');
+    else url.searchParams.set('aba',nova);
+    window.history.replaceState(window.history.state,'',url.pathname+url.search+url.hash);
+  }
   const [resgatando, setResgatando] = useState<string | null>(null);
   const [resgatados, setResgatados] = useState<string[]>(resgatesIniciais);
   const [erroResgate, setErroResgate] = useState<string | null>(null);
@@ -95,16 +108,15 @@ export default function PassaporteClient({
           </p>
           <h1 className="font-display text-3xl text-black mb-8">Meu mapa de carreira</h1>
 
-          <OfensivaCarreira userId={userId}/>
-
-          <div role="tablist" aria-label="Áreas do Passaporte" className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-[#DDE6E0] bg-white p-2 sm:grid-cols-3">
+          <div role="tablist" aria-label="Áreas do Passaporte" className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-[#DDE6E0] bg-white p-2 grid-cols-2 sm:grid-cols-4">
             {([
               { id: 'conquistas', label: 'Conquistas', description: 'Sua jornada e próximas missões', Icon: Award },
               { id: 'loja', label: 'Loja de recompensas', description: 'Troque seus Impulsos', Icon: ShoppingBag },
+              { id: 'ofensiva', label: 'Ofensiva de carreira', description: 'Ações e constância', Icon: Flame },
               { id: 'ranking', label: 'Ranking da comunidade', description: 'Celebre a evolução do grupo', Icon: Zap },
             ] as const).map(({ id, label, description, Icon }, index, tabs) => (
               <button key={id} id={`passaporte-tab-${id}`} type="button" role="tab" aria-selected={tab === id} aria-controls={`passaporte-panel-${id}`} tabIndex={tab === id ? 0 : -1}
-                onClick={() => setTab(id)}
+                onClick={() => selecionarAba(id)}
                 onKeyDown={(event) => {
                   let next = index;
                   if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
@@ -113,7 +125,7 @@ export default function PassaporteClient({
                   else if (event.key === 'End') next = tabs.length - 1;
                   else return;
                   event.preventDefault();
-                  setTab(tabs[next].id);
+                  selecionarAba(tabs[next].id);
                   document.getElementById(`passaporte-tab-${tabs[next].id}`)?.focus();
                 }}
                 className={`flex min-h-[72px] items-center gap-3 rounded-xl px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#183F37] focus-visible:ring-offset-2 ${tab === id ? 'bg-[#183F37] text-white shadow-sm' : 'text-[#334B41] hover:bg-[#EEF5EF]'}`}>
@@ -121,8 +133,9 @@ export default function PassaporteClient({
               </button>
             ))}
           </div>
-          {(['conquistas', 'loja', 'ranking'] as const).filter(id => id !== tab).map(id => <div key={id} hidden id={`passaporte-panel-${id}`} role="tabpanel" aria-labelledby={`passaporte-tab-${id}`} />)}
+          {(['conquistas', 'ofensiva', 'loja', 'ranking'] as const).filter(id => id !== tab).map(id => <div key={id} hidden id={`passaporte-panel-${id}`} role="tabpanel" aria-labelledby={`passaporte-tab-${id}`} />)}
           <div id={`passaporte-panel-${tab}`} role="tabpanel" aria-labelledby={`passaporte-tab-${tab}`} tabIndex={0} className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#386657]">
+          {tab === 'ofensiva' && <OfensivaCarreira userId={userId}/>}
           {tab === 'conquistas' && <CareerJourney points={pontos} earned={conquistas.filter(item => idsDesbloqueadas.has(item.id)).length} total={conquistas.length} />}
 
           {tab === 'conquistas' && (
