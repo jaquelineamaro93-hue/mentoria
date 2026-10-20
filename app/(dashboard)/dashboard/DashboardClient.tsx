@@ -594,24 +594,20 @@ export default function DashboardClient({
           </div>
         </section>
 
-        {/* Alerta pontual de encontro, sem repetir o checklist do capítulo e das fases */}
-        <section className="mb-6">
-          {votacaoAtiva && (
-            <Panel className="p-5 mb-3 flex items-center justify-between gap-4 border-lotus-coral/40 bg-lotus-coral/10">
+        {/* Alerta de encontro aparece apenas quando há votação ativa. */}
+        {votacaoAtiva && (
+          <section className="mb-6">
+            <Panel className="flex items-center justify-between gap-4 border-lotus-coral/40 bg-lotus-coral/10 p-4">
               <div className="flex items-center gap-3">
-                <MapPin size={18} strokeWidth={1.5} className="text-lotus-brown shrink-0" />
+                <MapPin size={18} strokeWidth={1.5} className="shrink-0 text-lotus-brown" />
                 <p className="text-sm text-lotus-brown">Há uma votação de encontro em aberto para você.</p>
               </div>
-              <Link
-                href="/votar-encontro"
-                className="shrink-0 text-sm font-medium bg-lotus-brown hover:bg-lotus-brown/90 text-white px-4 py-2 rounded-lg transition-colors"
-              >
+              <Link href="/votar-encontro" className="shrink-0 rounded-lg bg-lotus-brown px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lotus-brown/90">
                 Votar agora
               </Link>
             </Panel>
-          )}
-
-        </section>
+          </section>
+        )}
 
         {/* Materiais, em um atalho compacto sem repetir as ferramentas do portal */}
         <section className="mb-6">
