@@ -101,7 +101,12 @@ export default function QuemSouEuClient({
 
   async function irParaBloco(indice: number) {
     if (indice === passo) return;
-    await salvarBlocoAtual();
+    // Não perde edições ao trocar de bloco quando a gravação falhar.
+    const texto = respostas[bloco.codigo]?.trim();
+    if (texto && !blocosSalvos.has(bloco.codigo)) {
+      const salvou = await salvarBlocoAtual();
+      if (!salvou) return;
+    }
     setPasso(indice);
   }
 
@@ -235,7 +240,7 @@ export default function QuemSouEuClient({
 
             <div className="flex items-center justify-between mt-5">
               <button
-                onClick={() => setPasso(Math.max(0, passo - 1))}
+                onClick={() => void irParaBloco(Math.max(0, passo - 1))}
                 disabled={passo === 0}
                 className="flex items-center gap-1.5 text-sm text-gray-text hover:text-orange disabled:opacity-40 transition-colors"
               >
