@@ -190,6 +190,13 @@ export default function DashboardClient({
     ? '/meu-pdi'
     : '/diario';
 
+  const tarefasImediatas = [
+    { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
+    { label: 'Diagnóstico & Perfil (diagnóstico + VIA)', done: diagnosticoCompleto, href: '/exercicios' },
+    { label: 'Posicionamento · Mapa Quem Sou Eu', done: bussolaCompleto, href: '/quem-sou-eu' },
+    { label: 'Plano de desenvolvimento (PDI)', done: pdiCompleto, href: '/meu-pdi' },
+  ];
+  const tarefasPendentes = tarefasImediatas.filter((tarefa) => !tarefa.done);
   // ---- Passaporte de conquistas (apenas o que dá para verificar com os dados carregados) ----
   const sinaisDisponiveis: Record<string, boolean> = {
     quem_sou_eu_completo: quemSouCompleto,
@@ -615,81 +622,45 @@ export default function DashboardClient({
             </Panel>
           )}
 
-          <Panel className="divide-y divide-line border-gray-faint">
-            {[
-              { label: 'Mapa Quem Sou Eu', done: quemSouCompleto, href: '/quem-sou-eu' },
-              { label: 'Diagnóstico & Perfil (diagnóstico + VIA)', done: diagnosticoCompleto, href: '/exercicios' },
-              { label: 'Posicionamento · Mapa Quem Sou Eu', done: bussolaCompleto, href: '/quem-sou-eu' },
-              { label: 'Plano de desenvolvimento (PDI)', done: pdiCompleto, href: '/meu-pdi' },
-            ].map((tarefa) => (
-              <Link
-                key={tarefa.label}
-                href={tarefa.href}
-                className="flex items-center gap-3 px-5 py-3.5 hover:bg-white transition-colors"
-              >
-                {tarefa.done ? (
-                  <CheckCircle2 size={17} strokeWidth={1.5} className="text-lotus-brown shrink-0" />
-                ) : (
-                  <Circle size={17} strokeWidth={1.5} className="text-gray-text shrink-0" />
-                )}
-                <span className={`text-sm ${tarefa.done ? 'text-gray-text line-through' : 'text-black'}`}>
-                  {tarefa.label}
-                </span>
-              </Link>
-            ))}
-          </Panel>
+          <p className="mb-2 text-xs text-gray-text">
+            {tarefasImediatas.length - tarefasPendentes.length} de {tarefasImediatas.length} etapas concluídas. Confira abaixo apenas o que falta.
+          </p>
+          {tarefasPendentes.length > 0 ? (
+            <Panel className="divide-y divide-line border-gray-faint">
+              {tarefasPendentes.map((tarefa) => (
+                <Link key={tarefa.label} href={tarefa.href}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-white transition-colors">
+                  <Circle size={17} strokeWidth={1.5} className="shrink-0 text-gray-text" />
+                  <span className="flex-1 text-sm text-black">{tarefa.label}</span>
+                  <span className="text-xs font-medium text-mint-deep">Continuar →</span>
+                </Link>
+              ))}
+            </Panel>
+          ) : (
+            <Panel className="flex items-center gap-2 border-gray-faint p-4">
+              <CheckCircle2 size={17} className="shrink-0 text-mint-deep" />
+              <p className="text-sm text-gray-text">Você concluiu todas as etapas principais deste ciclo.</p>
+            </Panel>
+          )}
         </section>
 
-        {/* Trilha de aprendizado / Drive Hub */}
-        <section className="mb-10">
-          <Eyebrow>
-            <FolderOpen size={13} strokeWidth={1.5} /> Trilha de aprendizado
-          </Eyebrow>
-          <Panel className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-gray-faint">
-            <div>
-              <p className="text-black mb-1">Materiais da Mentoria SOMA</p>
-              <p className="text-sm text-gray-text">
-                Todo o conteúdo, gravações e templates do programa, centralizados em um só lugar.
-              </p>
+        {/* Materiais, em um atalho compacto sem repetir as ferramentas do portal */}
+        <section className="mb-6">
+          <Panel className="flex flex-col gap-3 border-gray-faint p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-start gap-3">
+              <FolderOpen size={18} strokeWidth={1.5} className="mt-0.5 shrink-0 text-lotus-brown" />
+              <div>
+                <p className="text-sm font-medium text-black">Materiais da Mentoria SOMA</p>
+                <p className="text-xs leading-5 text-gray-text">Gravações, conteúdos e templates para acompanhar sua jornada.</p>
+              </div>
             </div>
-            <a
-              href={DRIVE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 flex items-center gap-2 bg-lotus-brown hover:bg-lotus-brown/90 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
-            >
-              Abrir Drive <ExternalLink size={14} strokeWidth={1.5} />
+            <a href={DRIVE_URL} target="_blank" rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg border border-lotus-brown/30 px-3 py-2 text-xs font-medium text-lotus-brown transition-colors hover:bg-lotus-brown hover:text-white sm:self-center">
+              Abrir Drive <ExternalLink size={13} strokeWidth={1.5} />
             </a>
           </Panel>
         </section>
 
-        <section className="mb-10">
-          <Eyebrow>Continue sua jornada</Eyebrow>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Link href="/exercicios">
-              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors group border-gray-faint">
-                <Compass className="text-lotus-brown mb-3" size={22} strokeWidth={1.5} />
-                <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors">
-                  Diagnóstico & Perfil
-                </p>
-                <p className="text-sm text-gray-text">
-                  Registre seu momento de carreira, VIA e acompanhe a evolução do seu perfil.
-                </p>
-              </Panel>
-            </Link>
-            <Link href="/diario">
-              <Panel className="p-6 h-full hover:border-lotus-brown/40 transition-colors group border-gray-faint">
-                <NotebookPen className="text-lotus-brown mb-3" size={22} strokeWidth={1.5} />
-                <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors">
-                  Diário de Bordo
-                </p>
-                <p className="text-sm text-gray-text">
-                  Registre aprendizados e sacadas dos seus encontros.
-                </p>
-              </Panel>
-            </Link>
-          </div>
-        </section>
     </>
   );
 }
