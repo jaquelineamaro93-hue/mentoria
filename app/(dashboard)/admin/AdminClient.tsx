@@ -143,7 +143,7 @@ export default function AdminClient({
 
   async function entrarComoUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
-      `Você vai sair da sua conta admin e entrar como ${nome}. Sua sessão de admin vai ser substituída, para voltar a ser você mesma, saia e faça login de novo com seu e-mail. Confirma?`
+      `Deseja inspecionar a SOMA como ${nome}? Um botão "Voltar ao backoffice" ficará disponível em todas as páginas durante 2 horas. Alterações feitas nessa conta podem afetar dados reais. Continuar?`
     );
     if (!confirmado) return;
 
@@ -166,8 +166,9 @@ export default function AdminClient({
       if (error) throw error;
 
       posthog.capture('admin_entrou_como_usuario', { usuario_alvo: userId });
-      router.push('/dashboard');
-      router.refresh();
+      // Uma navegação completa limpa a identidade anterior da memória do
+      // browser Supabase, para que cookies e contexto da sessão coincidam.
+      window.location.assign('/dashboard');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Não foi possível entrar como esse usuário.');
       setEntrandoComoId(null);
@@ -237,23 +238,24 @@ export default function AdminClient({
     router.refresh();
   }
 
-  const total = linhas.length;
+  const linhasDeMentorados = linhas.filter((l) => !l.profile.is_admin);
+  const total = linhasDeMentorados.length;
   const agora = Date.now();
   const diasDesdeAtividade = (data: string | null | undefined) =>
     data ? Math.max(0, Math.floor((agora - new Date(data).getTime()) / 86400000)) : null;
 
-  const ativos7dias = linhas.filter((l) => {
+  const ativos7dias = linhasDeMentorados.filter((l) => {
     const dias = diasDesdeAtividade(l.profile.last_activity_at);
     return dias !== null && dias <= 7;
   }).length;
 
-  const inativos7dias = linhas.filter((l) => {
+  const inativos7dias = linhasDeMentorados.filter((l) => {
     const dias = diasDesdeAtividade(l.profile.last_activity_at);
     return dias !== null && dias > 7;
   }).length;
 
-  const semAcessoNunca = linhas.filter((l) => !l.profile.last_activity_at).length;
-  const emailsNaoConfirmados = linhas.filter((l) => !l.emailConfirmado);
+  const semAcessoNunca = linhasDeMentorados.filter((l) => !l.profile.last_activity_at).length;
+  const emailsNaoConfirmados = linhasDeMentorados.filter((l) => !l.emailConfirmado);
   const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
   const linhasFiltradas = linhas.filter((l) => {
     const combinaBusca =
@@ -270,7 +272,7 @@ export default function AdminClient({
 
     return true;
   });
-  const aguardandoLiberacao = linhas.filter(l => !l.profile.plano_id && l.profile.trial_status !== 'active' && l.profile.status_assinatura !== 'ativo');
+  const aguardandoLiberacao = linhasDeMentorados.filter(l => !l.profile.plano_id && l.profile.trial_status !== 'active' && l.profile.status_assinatura !== 'ativo');
   const usuariosFiltrados = usuarios.filter((u) => {
     if (filtroUsuarios === "admin" && !u.is_admin) return false;
     if (filtroUsuarios === "geral" && u.is_admin) return false;
@@ -438,7 +440,8 @@ export default function AdminClient({
               </select>
             </div>
             <p className="mt-1.5 text-xs text-gray-text">
-              {linhasFiltradas.length} de {linhas.length} mentorados
+              {linhasFiltradas.filter((l) => !l.profile.is_admin).length} de {linhasDeMentorados.length} mentorados
+              {linhasFiltradas.some((l) => l.profile.is_admin) ? ' + conta de teste' : ''}
             </p>
           </div>
 
@@ -483,7 +486,9 @@ export default function AdminClient({
                 {linhasFiltradas.map((l) => (
                   <tr key={l.profile.id} className="border-b border-gray-faint last:border-0 bg-white">
                     <td className="px-4 py-3">
-                      <p className="text-black">{l.profile.nome}</p>
+                      <p className="text-black">{l.profile.nome}
+                        {l.profile.is_admin && <span className="ml-2 rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] text-amber-800">Conta de teste · admin</span>}
+                      </p>
                       <p className="text-xs text-gray-text">{l.profile.email}</p>
                     </td>
                     <td className="px-4 py-3 text-gray-text capitalize">
@@ -565,7 +570,7 @@ export default function AdminClient({
                         ) : (
                           <LogIn size={12} />
                         )}
-                        Entrar como
+                        Inspecionar
                       </button>
                     </td>
                   </tr>
@@ -573,7 +578,7 @@ export default function AdminClient({
                 {linhasFiltradas.length === 0 && (
                   <tr>
                     <td colSpan={11} className="px-4 py-8 text-center text-sm text-gray-text bg-white">
-                      Nenhum mentorado encontrado para “{buscaMentorado}”.
+                      Nenhum mentorado ou conta de teste encontrado para “{buscaMentorado}”.
                     </td>
                   </tr>
                 )}
