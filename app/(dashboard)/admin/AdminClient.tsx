@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical, Search, BarChart3 } from 'lucide-react';
@@ -58,6 +58,13 @@ export default function AdminClient({
       setUsuariosCarregando(false);
     }
   }
+
+  useEffect(() => {
+    // Carrega a lista real de usuários ao abrir o backoffice, sem exigir
+    // um clique adicional em Recarregar para localizar contas de teste.
+    void carregarUsuarios();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function toggleAdmin(userId: string, currentAdmin: boolean) {
     try {
