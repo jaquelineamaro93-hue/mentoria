@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Lock, Loader2, Award, ShoppingBag, Zap } from 'lucide-react';
+import { Check, Lock, Loader2, Award, ShoppingBag, Zap, ScanSearch,
+  ChartNoAxesColumnIncreasing, Sparkles, Compass, ClipboardList, Target, Users,
+  Rocket, NotebookPen, BookOpenCheck, Handshake, Dumbbell, BriefcaseBusiness,
+  MessagesSquare, Star, Sprout, type LucideIcon } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
@@ -10,6 +13,25 @@ import CareerJourney from '@/components/soma/CareerJourney';
 import RankingComunidade from './components/RankingComunidade';
 import OfensivaCarreira from './components/OfensivaCarreira';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
+
+const ICONES_CONQUISTA: Record<string,LucideIcon>={
+  'scan-search':ScanSearch,
+  'chart-no-axes-column-increasing':ChartNoAxesColumnIncreasing,
+  sparkles:Sparkles,
+  compass:Compass,
+  'clipboard-list':ClipboardList,
+  target:Target,
+  users:Users,
+  rocket:Rocket,
+  'notebook-pen':NotebookPen,
+  'book-open-check':BookOpenCheck,
+  handshake:Handshake,
+  dumbbell:Dumbbell,
+  'briefcase-business':BriefcaseBusiness,
+  'messages-square':MessagesSquare,
+  star:Star,
+  sprout:Sprout,
+};
 
 type Tab = 'conquistas' | 'loja' | 'ranking';
 
@@ -111,8 +133,9 @@ export default function PassaporteClient({
                   {conquistas.map((c) => {
                     const desbloqueada = idsDesbloqueadas.has(c.id);
                     const achievement = SOMA_ACHIEVEMENTS.find(item => item.id === c.codigo);
+                    const Icone=achievement?.icone ? ICONES_CONQUISTA[achievement.icone] ?? Award : Award;
                     return <article key={c.id} className={`relative overflow-hidden rounded-2xl border p-5 ${desbloqueada ? 'border-[#B6D7C5] bg-[#EEF7F1]' : 'border-gray-faint bg-white'}`}>
-                      <div className="flex items-center justify-between"><span className={`flex h-11 w-11 items-center justify-center rounded-xl text-xl ${desbloqueada ? 'bg-white' : 'bg-[#F4F3EE]'}`}>{achievement?.emoji ?? '✦'}</span><span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold ${desbloqueada ? 'bg-[#D6EBDC] text-[#24533C]' : 'bg-gray-100 text-gray-text'}`}>{desbloqueada ? <Check size={12}/> : <Lock size={11}/>} {desbloqueada ? 'Na sua história' : 'Próxima conquista'}</span></div>
+                      <div className="flex items-center justify-between"><span className={`flex h-11 w-11 items-center justify-center rounded-xl ${desbloqueada ? 'bg-white text-[#24533C]' : 'bg-[#F4F3EE] text-[#527064]'}`}><Icone size={23} strokeWidth={1.8} aria-hidden="true"/></span><span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold ${desbloqueada ? 'bg-[#D6EBDC] text-[#24533C]' : 'bg-gray-100 text-gray-text'}`}>{desbloqueada ? <Check size={12}/> : <Lock size={11}/>} {desbloqueada ? 'Na sua história' : 'Próxima conquista'}</span></div>
                       <h3 className="mt-4 text-sm font-semibold text-black">{c.titulo}</h3>
                       <p className="mt-2 text-xs leading-5 text-gray-text">{achievement?.descricao ?? (desbloqueada ? 'Um passo real que você já deu na sua carreira.' : 'Complete esta ação no portal para avançar na sua jornada.')}</p>
                       <p className="mt-4 text-xs font-bold text-[#386657]">+{c.pontos} Impulsos · {desbloqueada ? 'Conquistados' : 'Esperando seu próximo passo'}</p>
@@ -137,7 +160,8 @@ export default function PassaporteClient({
                     {SOMA_ACHIEVEMENTS.filter(item => item.pilar === pilar).map(item => {
                       const linked = conquistas.find(c => c.codigo === item.id);
                       const earned = !!linked && idsDesbloqueadas.has(linked.id);
-                      return <li key={item.id} className="flex gap-3 py-4"><span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F5EF] text-lg">{item.emoji}</span><div><h4 className="text-sm font-semibold text-[#273F34]">{item.nome}</h4><p className="mt-1 text-sm leading-5 text-[#52675B]">{item.descricao}</p>{earned && <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#24533C]"><Check size={12} aria-hidden="true"/>Conquista registrada</span>}</div></li>;
+                      const Icone = ICONES_CONQUISTA[item.icone] ?? Award;
+                      return <li key={item.id} className="flex gap-3 py-4"><span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F5EF] text-[#386657]"><Icone size={20} strokeWidth={1.8} aria-hidden="true"/></span><div><h4 className="text-sm font-semibold text-[#273F34]">{item.nome}</h4><p className="mt-1 text-sm leading-5 text-[#52675B]">{item.descricao}</p>{earned && <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#24533C]"><Check size={12} aria-hidden="true"/>Conquista registrada</span>}</div></li>;
                     })}
                     </ul>
                   </article>;
