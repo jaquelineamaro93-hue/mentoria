@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-const ROTAS_LIBERADAS = ['/login', '/renovar', '/magic-login', '/reset-password'];
+const ROTAS_LIBERADAS = ['/login', '/renovar', '/magic-login', '/reset-password', '/modulos'];
 
 export default function AcessoGate() {
   const supabase = createClient();
@@ -76,8 +76,13 @@ export default function AcessoGate() {
           perfil.status_pagamento === 'encerrado' ||
           passouDoPrazo)
       ) {
-        router.push('/renovar');
-        return;
+        const {data:modular,error}=await supabase.rpc('soma_has_paid_module');
+        if(error||modular!==true){
+          router.push('/renovar');
+          return;
+        }
+        // Direitos modulares continuam válidos mesmo após término do plano
+        // de Mentoria. Rotas específicas são protegidas no proxy.ts.
       }
 
       setChecando(false);

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { buscarPreapprovalMercadoPago, buscarPagamentoMercadoPago, buscarPagamentoAssinaturaMercadoPago } from '@/lib/mercadopago';
 import { verificarAssinaturaWebhook } from '@/lib/mercadopago-webhook-security';
+import { findModuleOrder,findModuleOrderByKnownPayment,syncModulePayment,syncModulePreapproval } from '@/lib/modules/payment';
 
 export async function POST(request: Request) {
   let body;
@@ -20,6 +21,11 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
     if (tipo === 'subscription_preapproval' || tipo === 'preapproval') {
       const subscription = await buscarPreapprovalMercadoPago(id);
+      const modulo=await findModuleOrder(subscription.external_reference);
+      if(modulo){
+        const status=await syncModulePreapproval(modulo,subscription);
+        return NextResponse.json({ok:true,scope:'module',resultado:status});
+      }
       const { data: pedido, error } = await admin.from('mp_pedidos').select('id, mp_resource_id')
         .eq('id', subscription.external_reference).eq('forma_pagamento', 'recorrente').maybeSingle();
       if (error) throw error;
@@ -38,12 +44,38 @@ export async function POST(request: Request) {
       paymentId = String(charge.payment.id);
       const subscription = await buscarPreapprovalMercadoPago(String(charge.preapproval_id));
       subscriptionReference = subscription.external_reference;
+      const modulo=await findModuleOrder(subscriptionReference);
+      if(modulo){
+        // Exige o tripé: cobrança MP -> preapproval MP -> pedido SOMA.
+        if(String(subscription.id)!==String(charge.preapproval_id)||
+          String(charge.payment.id)!==String(paymentId))
+          throw new Error('Cobrança de assinatura modular divergente.');
+        const payment=await buscarPagamentoMercadoPago(paymentId);
+        if(String(payment.id)!==paymentId)throw new Error('Pagamento divergente.');
+        const status=await syncModulePayment(modulo,String(subscription.id),payment);
+        return NextResponse.json({ok:true,scope:'module',resultado:status});
+      }
       const { data: pedido, error } = await admin.from('mp_pedidos').select('mp_resource_id')
         .eq('id', subscriptionReference).maybeSingle();
       if (error || !pedido || pedido.mp_resource_id !== String(subscription.id)) throw new Error('Assinatura divergente.');
     } else if (tipo !== 'payment') return NextResponse.json({ ignorado: true });
     const payment = await buscarPagamentoMercadoPago(paymentId);
     if (String(payment.id) !== paymentId) throw new Error('Pagamento divergente.');
+    if(tipo==='payment'){
+      // Atualizações de um pagamento modular JÁ associado a uma preapproval
+      // (ex.: estorno, chargeback, falha). Primeiro pagamento sem vínculo é
+      // processado pelo evento subscription_authorized_payment.
+      const moduloPorEvento=await findModuleOrderByKnownPayment(paymentId);
+      if(moduloPorEvento){
+        const status=await syncModulePayment(moduloPorEvento,
+          String(moduloPorEvento.provider_subscription_id),payment);
+        return NextResponse.json({ok:true,scope:'module',resultado:status});
+      }
+      const moduloSemProva=await findModuleOrder(payment.external_reference);
+      if(moduloSemProva){
+        return NextResponse.json({ok:true,scope:'module',resultado:'aguardando_vinculo_preapproval'});
+      }
+    }
     if (subscriptionReference && payment.external_reference && payment.external_reference !== subscriptionReference) throw new Error('Referência divergente.');
     const reference = subscriptionReference || payment.external_reference;
     if (!reference) return NextResponse.json({ ignorado: true });

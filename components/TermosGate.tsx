@@ -48,12 +48,12 @@ export default function TermosGate() {
       if(cancelado || erroAuth || !user)return;
 
       const {data:perfil,error:erroPerfil}=await supabase.from('profiles')
-        .select('nome,email,is_admin,status_assinatura,data_fim_acesso')
+        .select('nome,email,is_admin,status_assinatura,data_fim_acesso,plano_id')
         .eq('id',user.id).maybeSingle();
 
       // Exclui visitantes, trial, admins, planos vencidos e inativos.
       if(cancelado || erroPerfil || !perfil || perfil.is_admin ||
-         perfil.status_assinatura!=='ativo')return;
+         !perfil.plano_id || perfil.status_assinatura!=='ativo')return;
       if(perfil.data_fim_acesso) {
         const vencimento=new Date(perfil.data_fim_acesso+'T23:59:59-03:00');
         if(!Number.isFinite(vencimento.getTime()) ||

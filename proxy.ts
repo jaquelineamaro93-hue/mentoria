@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { moduleForRequest } from '@/lib/modules/routes';
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -91,7 +92,7 @@ export async function proxy(request: NextRequest) {
             path==='/termos'||path.startsWith('/termos/') ||
             path==='/perfil'||path.startsWith('/perfil/') ||
             path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/login') ||
-            path.startsWith('/checkout');
+            path.startsWith('/checkout') || path.startsWith('/modulos');
           if(!permitida){
             const destino=request.nextUrl.clone();
             destino.pathname='/meu-plano';
@@ -103,10 +104,35 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Autorização modular efetiva no servidor (JWT Supabase, nunca permissões
+  // vindas de props, localStorage ou query strings). Gate desativado por
+  // módulo durante a migração mantém o comportamento atual da SOMA.
+  if(user){
+    const modulo=moduleForRequest(path,request.nextUrl.searchParams);
+    if(modulo){
+      const {data:permitido,error:permissaoErro}=await supabase.rpc(
+        'soma_has_module',{p_slug:modulo}
+      );
+      if(permissaoErro||permitido!==true){
+        if(path.startsWith('/api/')){
+          return NextResponse.json(
+            {error:'Este recurso exige assinatura do módulo '+modulo+'.',modulo},
+            {status:403,headers:{'Cache-Control':'private, no-store'}}
+          );
+        }
+        const checkout=request.nextUrl.clone();
+        checkout.pathname='/modulos';
+        checkout.searchParams.set('modulo',modulo);
+        return NextResponse.redirect(checkout);
+      }
+    }
+  }
+
   const rotaLiberada =
     path.startsWith('/login') ||
     path.startsWith('/checkout') ||
     path === '/planos' ||
+    path === '/modulos' ||
     path === '/reset-password' ||
     path === '/renovar' ||
     path.startsWith('/api') ||
@@ -115,7 +141,7 @@ export async function proxy(request: NextRequest) {
   if (user && !rotaLiberada) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at')
+      .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at, plano_id, data_fim_acesso')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -130,19 +156,45 @@ export async function proxy(request: NextRequest) {
         !!profile.trial_ends_at &&
         new Date(profile.trial_ends_at).getTime() <= Date.now());
 
-    const precisaPagar =
-      profile &&
-      !profile.is_admin &&
-      !trialAtivo &&
-      ((trialExpirado && profile.status_assinatura !== 'ativo') ||
-        profile.status_assinatura === 'encerrado' ||
-        (profile.status_assinatura === 'inadimplente' &&
-          profile.origem_assinatura === 'mercadopago'));
+    const hoje=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
+    const mentoriaAtiva=!!(profile?.is_admin ||
+      (profile?.plano_id&&profile.status_assinatura==='ativo'&&
+       (!profile.data_fim_acesso||profile.data_fim_acesso>=hoje)));
 
-    if (precisaPagar) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/renovar';
-      return NextResponse.redirect(url);
+    // Usuário somente de módulos não deve receber as vantagens de Mentoria
+    // (agendamentos, gravações de grupos, encontros e área de mentorados).
+    // Conta Free/Trial mantém o fluxo legado de 7 dias.
+    let temModulo=false;
+    if(profile && !mentoriaAtiva && !trialAtivo){
+      const {data,error}=await supabase.rpc('soma_has_paid_module');
+      temModulo=!error&&data===true;
+    }
+
+    const somenteMentoria=[
+      '/gravacoes','/votar-encontro','/sessao-extra',
+      '/feedback-pares','/minha-trilha','/diario',
+      '/feedbacks','/passaporte','/onboarding',
+    ].some(rota=>path===rota||path.startsWith(rota+'/'));
+
+    const historicoMentoriaExpirado=!!profile && !profile.is_admin &&
+      !!profile.plano_id && !mentoriaAtiva && !trialAtivo;
+
+    if(!mentoriaAtiva&&!trialAtivo&&(path==='/dashboard'||somenteMentoria)){
+      const destino=request.nextUrl.clone();
+      destino.pathname=historicoMentoriaExpirado&&!temModulo?'/renovar':'/modulos';
+      destino.search='';
+      return NextResponse.redirect(destino);
+    }
+
+    const precisaRenovarPlano=profile&&!mentoriaAtiva&&!trialAtivo &&
+      ((trialExpirado && !temModulo) ||
+        (profile.status_assinatura==='encerrado'&&!temModulo) ||
+        (profile.status_assinatura==='inadimplente'&&
+         profile.origem_assinatura==='mercadopago'&&!temModulo));
+    if(precisaRenovarPlano){
+      const destino=request.nextUrl.clone();
+      destino.pathname='/renovar';destino.search='';
+      return NextResponse.redirect(destino);
     }
   }
 
