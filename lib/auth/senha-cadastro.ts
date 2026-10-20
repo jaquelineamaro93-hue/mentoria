@@ -26,20 +26,25 @@ export function traduzirErroCadastro(mensagem: string): string {
   if (m.includes('invalid') && m.includes('email')) {
     return 'O endereço de e-mail não parece válido. Confira a digitação.';
   }
-  // A mensagem "should contain at least one character of each" contém
-  // "at least": verificar a composição ANTES de mostrar o erro de tamanho.
-  if (m.includes('password') && (
+  const faltaComposicao = m.includes('password') && (
     m.includes('should contain') ||
     m.includes('at least one character of each') ||
     m.includes('required characters') ||
     m.includes('missing characters')
-  )) {
-    return 'Use uma senha com letra maiúscula, letra minúscula, número e símbolo, além de no mínimo 8 caracteres.';
-  }
-  if (m.includes('password') && (
+  );
+  const senhaFraca = m.includes('password') && (
     m.includes('weak') || m.includes('easy to guess') ||
     m.includes('leaked') || m.includes('pwned')
-  )) {
+  );
+  if (faltaComposicao && senhaFraca) {
+    return 'Além de letra maiúscula, minúscula, número e símbolo, escolha uma senha diferente das mais comuns ou fáceis de adivinhar.';
+  }
+  // A mensagem "should contain at least one character of each" contém
+  // "at least": verificar a composição ANTES de mostrar o erro de tamanho.
+  if (faltaComposicao) {
+    return 'Use uma senha com letra maiúscula, letra minúscula, número e símbolo, além de no mínimo 8 caracteres.';
+  }
+  if (senhaFraca) {
     return 'Essa senha é muito comum ou fácil de adivinhar. Escolha outra, mais difícil de prever, sem reutilizar uma senha antiga.';
   }
   const tamanho = m.match(/password[^.]*at least (\d+) characters?/);
