@@ -263,12 +263,22 @@ export default function AdminClient({
 
   const semAcessoNunca = linhasDeMentorados.filter((l) => !l.profile.last_activity_at).length;
   const emailsNaoConfirmados = linhasDeMentorados.filter((l) => !l.emailConfirmado);
-  const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
+  const normalizarPesquisa = (valor: string) => valor
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR').trim();
+  const combinaNomeOuEmail = (nome: string | null | undefined, email: string | null | undefined, busca: string) => {
+    const consulta = normalizarPesquisa(busca);
+    if (!consulta) return true;
+    const palavras = normalizarPesquisa(nome ?? '').split(/\s+/);
+    const endereco = normalizarPesquisa(email ?? '');
+    if (endereco.includes(consulta)) return true;
+    return consulta.split(/\s+/).every((fragmento) =>
+      palavras.some((palavra) => palavra.startsWith(fragmento))
+    );
+  };
+  const termoMentorado = buscaMentorado.trim();
   const linhasFiltradas = linhas.filter((l) => {
-    const combinaBusca =
-      !termoMentorado ||
-      l.profile.nome?.toLocaleLowerCase('pt-BR').includes(termoMentorado) ||
-      l.profile.email?.toLocaleLowerCase('pt-BR').includes(termoMentorado);
+    const combinaBusca = combinaNomeOuEmail(l.profile.nome, l.profile.email, termoMentorado);
 
     if (!combinaBusca) return false;
 
@@ -283,10 +293,7 @@ export default function AdminClient({
   const usuariosFiltrados = usuarios.filter((u) => {
     if (filtroUsuarios === "admin" && !u.is_admin) return false;
     if (filtroUsuarios === "geral" && u.is_admin) return false;
-    if (buscaUsuario.trim()) {
-      const termo = buscaUsuario.trim().toLowerCase();
-      if (!(u.nome?.toLowerCase().includes(termo) || u.email?.toLowerCase().includes(termo))) return false;
-    }
+    if (!combinaNomeOuEmail(u.nome, u.email, buscaUsuario)) return false;
     return true;
   });
 
