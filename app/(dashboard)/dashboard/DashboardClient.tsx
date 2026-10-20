@@ -262,7 +262,7 @@ export default function DashboardClient({
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
-      <Link href="/passaporte" className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-[#CCE2D3] bg-[#F3FAF4] px-5 py-4 transition hover:border-[#85B899]">
+      <Link href="/passaporte?aba=ofensiva" className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-[#CCE2D3] bg-[#F3FAF4] px-5 py-4 transition hover:border-[#85B899]">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E1EFE3] text-[#295946]">
             <Flame size={22} aria-hidden="true"/>
