@@ -12,6 +12,8 @@ export default function TermosGate() {
   const [termo, setTermo] = useState<TermoVersao | null>(null);
   const [precisaAceitar, setPrecisaAceitar] = useState(false);
   const [marcado, setMarcado] = useState(false);
+  const [podeAdiar, setPodeAdiar] = useState(false);
+  const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [nomeMentoranda, setNomeMentoranda] = useState('');
   const [emailMentoranda, setEmailMentoranda] = useState('');
@@ -50,6 +52,9 @@ export default function TermosGate() {
         .maybeSingle();
 
       if (!aceite) {
+        const {data:anteriores}=await supabase.from('termos_aceites')
+          .select('id').eq('user_id',user.id).limit(1);
+        setPodeAdiar(!!anteriores?.length);
         setTermo(ultimoTermo);
         setPrecisaAceitar(true);
       }
@@ -61,20 +66,18 @@ export default function TermosGate() {
   async function aceitar() {
     if (!termo) return;
     setEnviando(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    await supabase.from('termos_aceites').insert({
-      user_id: user.id,
-      termo_id: termo.id,
-    });
-
-    posthog.capture('termo_aceito', { versao: termo.versao });
-    setEnviando(false);
-    setPrecisaAceitar(false);
+    setErro('');
+    try {
+      const {data:{user}}=await supabase.auth.getUser();
+      if(!user)throw new Error('É necessário entrar na SOMA para aceitar o termo.');
+      const {error}=await supabase.from('termos_aceites').insert({
+        user_id:user.id,termo_id:termo.id,
+      });
+      if(error && error.code!=='23505')throw new Error('Não foi possível registrar o aceite. Tente novamente.');
+      posthog.capture('termo_aceito',{versao:termo.versao});
+      setPrecisaAceitar(false);
+    }catch(e){setErro(e instanceof Error?e.message:'Falha ao salvar o aceite.');}
+    finally{setEnviando(false);}
   }
 
   if (!precisaAceitar || !termo) return null;
@@ -118,6 +121,7 @@ export default function TermosGate() {
               Li e concordo com os termos acima.
             </span>
           </label>
+          {erro && <p role="alert" className="mb-3 text-sm text-red-700">{erro}</p>}
           <button
             onClick={aceitar}
             disabled={!marcado || enviando}
@@ -125,6 +129,13 @@ export default function TermosGate() {
           >
             {enviando ? 'Salvando...' : 'Aceitar e continuar'}
           </button>
+          {podeAdiar && (
+            <button type="button" onClick={()=>setPrecisaAceitar(false)} disabled={enviando}
+              className="mt-3 w-full rounded-full border border-gray-faint px-5 py-2.5 text-sm text-gray-text">
+              Agora não. Continuar sob os termos anteriores
+            </button>
+          )}
+          {podeAdiar && <p className="mt-2 text-xs text-gray-text">Sua participação atual não depende de aceitar a nova modalidade de pausa. Para utilizá-la, você poderá aceitar os termos atualizados em Meu Plano.</p>}
         </div>
       </div>
     </div>
