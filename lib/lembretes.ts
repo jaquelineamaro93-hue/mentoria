@@ -55,8 +55,24 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
     .select('id, nome, email, last_login_at, last_activity_at, onboarding_concluido, tipo_pacote, status_assinatura')
     .eq('is_admin', false);
 
-  const perfisAtivos = (perfis ?? []).filter((perfil) => perfil.status_assinatura === 'ativo');
-  resultado.base.ativosConsiderados = perfisAtivos.length;
+  const {data:pausas,error:pausaError}=await supabase.from('mentoria_pausas')
+    .select('user_id,status,atualizado_em')
+    .or('status.eq.ativa,atualizado_em.gte.'+
+      new Date(Date.now()-7*86400000).toISOString()+')');
+  if(pausaError){
+    // Nunca enviar lembretes durante a pausa se não for possível
+    // confirmar os estados: falhar de forma conservadora.
+    resultado.erros.push('Não foi possível validar as pausas. Lembretes suspensos nesta execução.');
+    return resultado;
+  }
+  const usuariosPausados=new Set((pausas??[]).filter(p=>p.status==='ativa').map(p=>p.user_id));
+  const retomadosRecentes=new Set((pausas??[]).filter(p=>
+    p.status==='finalizada'&&Date.parse(p.atualizado_em)>Date.now()-7*86400000
+  ).map(p=>p.user_id));
+  const perfisAtivos=(perfis??[]).filter(perfil=>
+    perfil.status_assinatura==='ativo' &&
+    !usuariosPausados.has(perfil.id)&&!retomadosRecentes.has(perfil.id));
+  resultado.base.ativosConsiderados=perfisAtivos.length;
 
   for (const perfil of perfisAtivos) {
     const ultimaAtividade = perfil.last_activity_at ?? perfil.last_login_at;
@@ -88,11 +104,12 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
 
       if (podeReenviar) {
         try {
-          await enviarEmail({
+          const envio=await enviarEmail({
             para: perfil.email,
-            assunto: 'Sentimos sua falta na Mentoria SOMA',
+            assunto: 'Sua carreira continua no seu ritmo, dentro da SOMA',
             html: templateInatividade(perfil.nome),
           });
+          if(!envio)throw new Error('Envio rejeitado pelo provedor');
           await supabase.from('emails_enviados').insert({ user_id: perfil.id, tipo: 'inatividade' });
           resultado.inatividade++;
         } catch (e) {
