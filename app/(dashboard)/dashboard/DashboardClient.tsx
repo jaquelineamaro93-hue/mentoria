@@ -333,33 +333,62 @@ export default function DashboardClient({
           </div>
         </section>
 
-        {/* Sessão Individual logo após o próximo capítulo */}
-        <section className="mb-6">
-          <Eyebrow>Sessão Individual com Mentora</Eyebrow>
-          <a
-            href="https://calendar.app.google/x5fpXiMY7PVp59TL6"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Panel className="p-4 sm:p-5 hover:border-lotus-brown/40 transition-colors group border-gray-faint">
-              <div className="flex items-start gap-3">
-                <Calendar className="text-lotus-brown mb-2 shrink-0" size={22} strokeWidth={1.5} />
-                <div>
-                  <p className="text-black mb-1 group-hover:text-lotus-brown transition-colors font-medium">
-                    Agendar Sessão Individual
-                  </p>
-                  <p className="text-sm leading-5 text-gray-text">
-                    Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
-                  </p>
-                  <div className="flex items-center gap-1 mt-1 text-xs text-lotus-brown group-hover:gap-2 transition-all">
-                    Agendar agora <ExternalLink size={14} />
+        {/* Canais de acompanhamento, juntos logo após o próximo capítulo */}
+        <section className="mb-6" aria-labelledby="apoio-carreira">
+          <Eyebrow>Acompanhamento para sua carreira</Eyebrow>
+          <h2 id="apoio-carreira" className="sr-only">Fale com a Íris ou agende uma sessão com sua mentora</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <a
+              href="https://wa.me/5511959561795?text=Ol%C3%A1%2C%20%C3%8Dris.%20Sou%20mentorado%28a%29%20da%20SOMA%20e%20gostaria%20de%20conversar%20sobre%20minha%20carreira."
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Falar com Íris, sua agente de carreira, pelo WhatsApp (abre em nova aba)"
+              className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep"
+            >
+              <Panel className="group h-full border-mint-deep/30 bg-mint-light/25 p-4 transition-colors hover:border-mint-deep hover:bg-mint-light/45 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="mb-2 shrink-0 text-mint-deep" size={22} strokeWidth={1.5} />
+                  <div>
+                    <p className="mb-1 font-medium text-lotus-brown group-hover:text-mint-deep">
+                      Falar com a Íris, agente de carreira
+                    </p>
+                    <p className="text-sm leading-5 text-gray-text">
+                      Converse pelo WhatsApp sobre suas dúvidas, próximos passos e desenvolvimento profissional.
+                    </p>
+                    <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-mint-deep group-hover:underline">
+                      Conversar no WhatsApp <ExternalLink size={14} />
+                    </span>
                   </div>
                 </div>
-              </div>
-            </Panel>
-          </a>
-        </section>
+              </Panel>
+            </a>
 
+            <a
+              href="https://calendar.app.google/x5fpXiMY7PVp59TL6"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Agendar sessão individual com a mentora pelo Google Calendar (abre em nova aba)"
+              className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep"
+            >
+              <Panel className="group h-full border-gray-faint p-4 transition-colors hover:border-lotus-brown/40 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <Calendar className="mb-2 shrink-0 text-lotus-brown" size={22} strokeWidth={1.5} />
+                  <div>
+                    <p className="mb-1 font-medium text-lotus-brown group-hover:text-lotus-brown">
+                      Agendar Sessão Individual
+                    </p>
+                    <p className="text-sm leading-5 text-gray-text">
+                      Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
+                    </p>
+                    <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-lotus-brown group-hover:underline">
+                      Agendar agora <ExternalLink size={14} />
+                    </span>
+                  </div>
+                </div>
+              </Panel>
+            </a>
+          </div>
+        </section>
 
         {/* Timeline dos 90 dias */}
         <section className="mb-8">
