@@ -640,7 +640,7 @@ export default function DashboardClient({
         <section className="mb-10">
           <Eyebrow>Sessão Individual com Mentora</Eyebrow>
           <a
-            href="https://calendar.app.google/T9DhtbrVVG9hKShN7"
+            href="https://calendar.app.google/x5fpXiMY7PVp59TL6"
             target="_blank"
             rel="noopener noreferrer"
           >
