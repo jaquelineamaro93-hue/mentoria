@@ -1,4 +1,5 @@
-import { NextRequest,NextResponse } from 'next/server';
+import { NextRequest,NextResponse,after } from 'next/server';
+import { enviarEmailPausa } from '@/lib/pausas-notificacoes';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime='nodejs';
@@ -56,6 +57,8 @@ export async function POST(request:NextRequest) {
       p_dias:input.dias,p_confirmou:true,
     });
     if(error)return NextResponse.json({error:error.message},{status:409,headers:noStore});
+    const nova=data as {id?:string}|null;
+    if(nova?.id)after(async()=>{await enviarEmailPausa(nova.id!,'inicio');});
     return NextResponse.json({ok:true,pausa:data},{headers:noStore});
   }
   if(input.acao==='retomar'){
@@ -67,6 +70,7 @@ export async function POST(request:NextRequest) {
       p_pausa_id:pausa.id,p_antecipada:true,
     });
     if(error)return NextResponse.json({error:error.message},{status:409,headers:noStore});
+    after(async()=>{await enviarEmailPausa(pausa.id,'retomada');});
     return NextResponse.json({ok:true,retomada:data},{headers:noStore});
   }
   return NextResponse.json({error:'Ação não reconhecida'},{status:400,headers:noStore});
