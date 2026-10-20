@@ -71,6 +71,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
         )}
 
         {termo ? (
+          <>
           <Panel className="p-6">
             <div className="mb-5 pb-5 border-b border-gray-faint grid sm:grid-cols-2 gap-3">
               <div>
@@ -107,6 +108,7 @@ export default function TermosClient({ profile, termo, aceitoEm }: Props) {
               {erro&&<p role="alert" className="mt-3 text-sm text-red-700">{erro}</p>}
             </div>
           )}
+          </>
         ) : (
           <p className="text-sm text-gray-text">Nenhum termo publicado ainda.</p>
         )}
