@@ -49,7 +49,6 @@ export default async function AdminPage() {
     admin
       .from('profiles')
       .select('*')
-      .eq('is_admin', false)
       .order('nome'),
     supabase.from('diagnostics').select('user_id'),
     supabase.from('journal_notes').select('user_id'),
@@ -78,7 +77,9 @@ export default async function AdminPage() {
   }
 
   const linhas: LinhaMentorado[] = (perfis ?? [])
-    
+    // A conta administrativa de teste também precisa ser encontrável para
+    // revisão da experiência. Outros administradores continuam fora da lista.
+    .filter((p) => !p.is_admin || /^(jaque|jaqueline)\s+teste$/i.test(p.nome?.trim()??''))
     .map((p) => ({
       profile: p,
       diagnosticos: contar(diagnosticos, p.id),
