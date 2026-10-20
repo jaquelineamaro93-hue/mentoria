@@ -38,7 +38,7 @@ export default function InspecaoBanner(){
   }
 
   if(!ativo)return null;
-  return <div role="status" className="mb-4 flex flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-950 sm:flex-row sm:items-center sm:justify-between">
+  return <div role="status" className="sticky top-2 z-[100] mb-4 flex flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-950 shadow-lg sm:flex-row sm:items-center sm:justify-between">
     <div className="flex items-start gap-2">
       <ShieldCheck size={19} className="mt-0.5 shrink-0" aria-hidden="true"/>
       <div>
