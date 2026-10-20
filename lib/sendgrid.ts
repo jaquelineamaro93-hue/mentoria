@@ -50,7 +50,7 @@ export const templateBoasVindas = (nome: string) => `
 `;
 
 export const templateInatividade = (nome: string) => {
-  const primeiro=nome.trim().split(/\\s+/)[0].replace(/[&<>"']/g,(ch)=>({
+  const primeiro=nome.trim().split(/\s+/)[0].replace(/[&<>"']/g,(ch)=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;',
   }[ch]||ch));
   return `
