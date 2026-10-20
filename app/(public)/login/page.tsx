@@ -2,35 +2,14 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Check, Circle } from 'lucide-react';
+import { requisitosSenha, senhaAtendeRequisitos, traduzirErroCadastro } from '@/lib/auth/senha-cadastro';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, identificarMentorado } from '@/lib/posthog';
 import OAuthButtons from '@/components/OAuthButtons';
 import type { TipoPacote } from '@/lib/types';
 
 type Modo = 'entrar' | 'cadastrar';
-
-function traduzirErroCadastro(mensagem: string): string {
-  const m = mensagem.toLowerCase();
-  if (m.includes('already registered') || m.includes('already exists')) {
-    return 'Esse e-mail já tem uma conta. Tenta entrar, ou usa "Esqueci a senha" se não lembrar.';
-  }
-  if (m.includes('invalid') && m.includes('email')) {
-    return 'Esse e-mail parece inválido. Confere se digitou certo.';
-  }
-  if (m.includes('password') && (m.includes('weak') || m.includes('easy to guess'))) {
-    return 'Essa senha é fácil demais de adivinhar. Escolhe uma senha diferente.';
-  }
-  if (m.includes('password') && m.includes('least')) {
-    return 'A senha precisa ter pelo menos 8 caracteres.';
-  }
-  if (m.includes('rate limit') || m.includes('security purposes')) {
-    return 'Muitas tentativas seguidas. Espera um minuto e tenta de novo.';
-  }
-  // Sem tradução conhecida: mostra o texto original em vez de esconder o
-  // motivo real, pra não deixar a pessoa (ou o suporte) no escuro.
-  return `Não consegui criar sua conta: ${mensagem}`;
-}
 
 function LoginPageContent() {
   const router = useRouter();
@@ -51,6 +30,7 @@ function LoginPageContent() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [tipoPacote, setTipoPacote] = useState<TipoPacote>('online');
+  const criteriosSenha = requisitosSenha(senha);
 
   async function iniciarTrialSeSolicitado() {
     if (!trialPlanId) return true;
@@ -146,6 +126,10 @@ function LoginPageContent() {
     e.preventDefault();
     setErro(null);
     setSucesso(null);
+    if (!senhaAtendeRequisitos(senha)) {
+      setErro('Para criar sua conta, a senha precisa ter pelo menos 8 caracteres, com letra maiúscula, minúscula, número e símbolo.');
+      return;
+    }
     setLoading(true);
 
     let resultado;
@@ -279,6 +263,8 @@ function LoginPageContent() {
                 <Field label="E-mail">
                   <input
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -290,6 +276,8 @@ function LoginPageContent() {
                   <div className="relative">
                     <input
                       type={mostrarSenha ? 'text' : 'password'}
+                      name="password"
+                      autoComplete="current-password"
                       required
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
@@ -337,6 +325,8 @@ function LoginPageContent() {
                 <Field label="Nome completo">
                   <input
                     type="text"
+                    name="nome"
+                    autoComplete="name"
                     required
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
@@ -347,6 +337,8 @@ function LoginPageContent() {
                 <Field label="E-mail">
                   <input
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -368,13 +360,20 @@ function LoginPageContent() {
                   <div className="relative">
                     <input
                       type={mostrarSenha ? 'text' : 'password'}
+                      name="password"
+                      autoComplete="new-password"
                       required
                       minLength={8}
+                      maxLength={128}
                       value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
+                      onChange={(e) => {
+                        setSenha(e.target.value);
+                        setErro(null);
+                      }}
+                      aria-describedby="cadastro-senha-requisitos"
                       className="input"
                       style={{ paddingRight: 40 }}
-                      placeholder="Mínimo 8 caracteres"
+                      placeholder="Crie uma senha segura"
                     />
                     <button
                       type="button"
@@ -383,6 +382,29 @@ function LoginPageContent() {
                     >
                       {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
+                  </div>
+                  <div id="cadastro-senha-requisitos" className="mt-2 rounded-lg border border-gray-faint bg-[#F7FAF8] px-3 py-3" aria-label="Requisitos para criar uma senha">
+                    <p className="mb-2 text-xs font-semibold text-black">Sua senha precisa conter:</p>
+                    <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+                      {([
+                        ['tamanho', '8 caracteres ou mais'],
+                        ['maiuscula', 'Uma letra maiúscula'],
+                        ['minuscula', 'Uma letra minúscula'],
+                        ['numero', 'Um número'],
+                        ['simbolo', 'Um símbolo, como @ ou #'],
+                      ] as const).map(([chave, descricao]) => {
+                        const ok = criteriosSenha[chave];
+                        return (
+                          <span key={chave} className={`flex items-center gap-1.5 text-xs ${ok ? 'text-[#246044]' : 'text-gray-text'}`}>
+                            {ok ? <Check size={14} aria-hidden="true" /> : <Circle size={10} aria-hidden="true" />}
+                            {descricao}
+                          </span>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-2 text-[11px] leading-4 text-gray-text">
+                      Evite senhas comuns ou já utilizadas em outros sites.
+                    </p>
                   </div>
                 </Field>
 
