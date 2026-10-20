@@ -172,7 +172,8 @@ export async function proxy(request: NextRequest) {
 
     const somenteMentoria=[
       '/gravacoes','/votar-encontro','/sessao-extra',
-      '/feedback-pares','/minha-trilha',
+      '/feedback-pares','/minha-trilha','/diario',
+      '/feedbacks','/passaporte','/onboarding',
     ].some(rota=>path===rota||path.startsWith(rota+'/'));
 
     const historicoMentoriaExpirado=!!profile && !profile.is_admin &&
