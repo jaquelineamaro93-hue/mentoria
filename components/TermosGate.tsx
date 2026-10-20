@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
@@ -8,7 +9,10 @@ import { posthog } from '@/lib/posthog';
 import type { TermoVersao } from '@/lib/types';
 
 export default function TermosGate() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+  const pathname = usePathname();
+  const adiados = useRef(new Set<string>());
+  const chaveExibida = useRef<string | null>(null);
   const [termo, setTermo] = useState<TermoVersao | null>(null);
   const [precisaAceitar, setPrecisaAceitar] = useState(false);
   const [marcado, setMarcado] = useState(false);
@@ -19,49 +23,71 @@ export default function TermosGate() {
   const [emailMentoranda, setEmailMentoranda] = useState('');
 
   useEffect(() => {
+    let cancelado = false;
+
+    // O termo é parte da área logada, nunca da página pública. A página
+    // /termos já possui seu próprio botão de aceite e não precisa de modal.
+    // Meu Plano também deve permitir consultar as condições da pausa sem
+    // um bloqueio visual. O acesso à pausa exige o aceite na própria ação.
+    const rotaSemModal = ['/termos', '/meu-plano', '/perfil', '/renovar'].some(
+      (rota) => pathname === rota || pathname.startsWith(rota + '/')
+    );
+    setPrecisaAceitar(false);
+    setTermo(null);
+    setMarcado(false);
+    if (rotaSemModal) return;
+
     async function checar() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+      const {data:{user},error:erroAuth}=await supabase.auth.getUser();
+      if(cancelado || erroAuth || !user)return;
 
-      const { data: perfil } = await supabase
-        .from('profiles')
-        .select('nome, email')
-        .eq('id', user.id)
-        .maybeSingle();
+      const {data:perfil,error:erroPerfil}=await supabase.from('profiles')
+        .select('nome,email,is_admin,status_assinatura,data_fim_acesso')
+        .eq('id',user.id).maybeSingle();
 
-      setNomeMentoranda(perfil?.nome ?? '');
-      setEmailMentoranda(perfil?.email ?? user.email ?? '');
-
-      const { data: ultimoTermo } = await supabase
-        .from('termos_versoes')
-        .select('*')
-        .eq('ativo', true)
-        .order('publicado_em', { ascending: false })
-        .limit(1)
-        .single<TermoVersao>();
-
-      if (!ultimoTermo) return;
-
-      const { data: aceite } = await supabase
-        .from('termos_aceites')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('termo_id', ultimoTermo.id)
-        .maybeSingle();
-
-      if (!aceite) {
-        const {data:anteriores}=await supabase.from('termos_aceites')
-          .select('id').eq('user_id',user.id).limit(1);
-        setPodeAdiar(!!anteriores?.length);
-        setTermo(ultimoTermo);
-        setPrecisaAceitar(true);
+      // Exclui visitantes, trial, admins, planos vencidos e inativos.
+      if(cancelado || erroPerfil || !perfil || perfil.is_admin ||
+         perfil.status_assinatura!=='ativo')return;
+      if(perfil.data_fim_acesso) {
+        const vencimento=new Date(perfil.data_fim_acesso+'T23:59:59-03:00');
+        if(!Number.isFinite(vencimento.getTime()) ||
+           vencimento.getTime()<Date.now())return;
       }
+
+      const {data:pausa,error:erroPausa}=await supabase.from('mentoria_pausas')
+        .select('id').eq('user_id',user.id).eq('status','ativa')
+        .limit(1).maybeSingle();
+      if(cancelado || erroPausa || pausa)return;
+
+      const {data:ultimoTermo,error:erroTermo}=await supabase.from('termos_versoes')
+        .select('*').eq('ativo',true)
+        .order('publicado_em',{ascending:false}).limit(1)
+        .single<TermoVersao>();
+      if(cancelado || erroTermo || !ultimoTermo)return;
+      const chave=user.id+':'+ultimoTermo.id;
+      if(adiados.current.has(chave))return;
+
+      const {data:aceite,error:erroAceite}=await supabase.from('termos_aceites')
+        .select('id').eq('user_id',user.id).eq('termo_id',ultimoTermo.id)
+        .maybeSingle();
+      if(cancelado || erroAceite || aceite)return;
+
+      const {data:anteriores,error:erroAnteriores}=await supabase
+        .from('termos_aceites').select('id').eq('user_id',user.id)
+        .limit(1);
+      if(cancelado || erroAnteriores)return;
+
+      chaveExibida.current=chave;
+      setNomeMentoranda(perfil.nome??'');
+      setEmailMentoranda(perfil.email??user.email??'');
+      setPodeAdiar(!!anteriores?.length);
+      setTermo(ultimoTermo);
+      setPrecisaAceitar(true);
     }
 
-    checar();
-  }, [supabase]);
+    void checar();
+    return () => { cancelado=true; };
+  }, [pathname,supabase]);
 
   async function aceitar() {
     if (!termo) return;
@@ -130,7 +156,7 @@ export default function TermosGate() {
             {enviando ? 'Salvando...' : 'Aceitar e continuar'}
           </button>
           {podeAdiar && (
-            <button type="button" onClick={()=>setPrecisaAceitar(false)} disabled={enviando}
+            <button type="button" onClick={()=>{if(chaveExibida.current)adiados.current.add(chaveExibida.current);setPrecisaAceitar(false);}} disabled={enviando}
               className="mt-3 w-full rounded-full border border-gray-faint px-5 py-2.5 text-sm text-gray-text">
               Agora não. Continuar sob os termos anteriores
             </button>
