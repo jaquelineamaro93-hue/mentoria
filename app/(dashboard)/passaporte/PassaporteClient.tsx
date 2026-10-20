@@ -8,6 +8,7 @@ import { posthog } from '@/lib/posthog';
 import { SOMA_ACHIEVEMENTS, getNomePilar } from '@/lib/soma-badges';
 import CareerJourney from '@/components/soma/CareerJourney';
 import RankingComunidade from './components/RankingComunidade';
+import OfensivaCarreira from './components/OfensivaCarreira';
 import type { Achievement, Profile, Reward, UserAchievement } from '@/lib/types';
 
 type Tab = 'conquistas' | 'loja' | 'ranking';
@@ -71,6 +72,8 @@ export default function PassaporteClient({
             Carreira em movimento
           </p>
           <h1 className="font-display text-3xl text-black mb-8">Meu mapa de carreira</h1>
+
+          <OfensivaCarreira userId={userId}/>
 
           <div role="tablist" aria-label="Áreas do Passaporte" className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-[#DDE6E0] bg-white p-2 sm:grid-cols-3">
             {([

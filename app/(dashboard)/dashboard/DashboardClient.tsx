@@ -262,6 +262,18 @@ export default function DashboardClient({
       {profile && !profile.tour_concluido && (
         <TourPortal userId={profile.id} aberturaAutomatica />
       )}
+      <Link href="/passaporte" className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-[#CCE2D3] bg-[#F3FAF4] px-5 py-4 transition hover:border-[#85B899]">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E1EFE3] text-[#295946]">
+            <Flame size={22} aria-hidden="true"/>
+          </span>
+          <div>
+            <p className="font-semibold text-[#204D3B]">Ofensiva de carreira</p>
+            <p className="text-xs leading-5 text-[#446657]">Uma ação real por dia: inglês, currículo, networking ou entrevista. Sua evolução rende Impulsos.</p>
+          </div>
+        </div>
+        <span className="shrink-0 text-xs font-semibold text-[#295946]">Registrar hoje →</span>
+      </Link>
       {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
           {profile?.foto_url ? (
