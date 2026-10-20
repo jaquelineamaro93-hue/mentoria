@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { moduleForRequest } from '@/lib/modules/routes';
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -91,7 +92,7 @@ export async function proxy(request: NextRequest) {
             path==='/termos'||path.startsWith('/termos/') ||
             path==='/perfil'||path.startsWith('/perfil/') ||
             path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/login') ||
-            path.startsWith('/checkout');
+            path.startsWith('/checkout') || path.startsWith('/modulos');
           if(!permitida){
             const destino=request.nextUrl.clone();
             destino.pathname='/meu-plano';
@@ -103,10 +104,35 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Autorização modular efetiva no servidor (JWT Supabase, nunca permissões
+  // vindas de props, localStorage ou query strings). Gate desativado por
+  // módulo durante a migração mantém o comportamento atual da SOMA.
+  if(user){
+    const modulo=moduleForRequest(path,request.nextUrl.searchParams);
+    if(modulo){
+      const {data:permitido,error:permissaoErro}=await supabase.rpc(
+        'soma_has_module',{p_slug:modulo}
+      );
+      if(permissaoErro||permitido!==true){
+        if(path.startsWith('/api/')){
+          return NextResponse.json(
+            {error:'Este recurso exige assinatura do módulo '+modulo+'.',modulo},
+            {status:403,headers:{'Cache-Control':'private, no-store'}}
+          );
+        }
+        const checkout=request.nextUrl.clone();
+        checkout.pathname='/modulos';
+        checkout.searchParams.set('modulo',modulo);
+        return NextResponse.redirect(checkout);
+      }
+    }
+  }
+
   const rotaLiberada =
     path.startsWith('/login') ||
     path.startsWith('/checkout') ||
     path === '/planos' ||
+    path === '/modulos' ||
     path === '/reset-password' ||
     path === '/renovar' ||
     path.startsWith('/api') ||
@@ -139,9 +165,23 @@ export async function proxy(request: NextRequest) {
         (profile.status_assinatura === 'inadimplente' &&
           profile.origem_assinatura === 'mercadopago'));
 
-    if (precisaPagar) {
+    // Uma assinatura por módulo não depende de renovação do plano completo.
+    // A consulta é protegida por auth.uid() no banco.
+    let temModulo=false;
+    if(precisaPagar){
+      const {data,error}=await supabase.rpc('soma_has_paid_module');
+      temModulo=!error&&data===true;
+    }
+    if (precisaPagar && !temModulo) {
       const url = request.nextUrl.clone();
       url.pathname = '/renovar';
+      return NextResponse.redirect(url);
+    }
+    if(temModulo && path==='/dashboard'){
+      // A vitrine modular é o início do assinante independente. Não exibe
+      // agenda de mentoria, encontros e materiais exclusivos no Dashboard VIP.
+      const url=request.nextUrl.clone();
+      url.pathname='/modulos';url.search='';
       return NextResponse.redirect(url);
     }
   }
