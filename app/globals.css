@@ -119,3 +119,9 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .soma-mascote-animado { animation: none !important; }
 }
+
+@keyframes soma-loading-stride {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(300%); }
+}
