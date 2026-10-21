@@ -66,21 +66,31 @@
 .skipLink:focus { top: 12px; }
 .sidebar :is(a, button):focus-visible { outline: 2px solid #8debd8; outline-offset: -2px; }
 @media (max-width: 1199px) { .portalCaption { display: none; } .topbar { padding-inline: 26px; } .pageContent { padding-inline: 26px; } }
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .shell, .shellCompact { --sidebar-width: 0px; }
   .sidebar { width: min(310px, calc(100vw - 32px)); transform: translateX(-100%); visibility: hidden; transition: transform .2s ease, visibility .2s; }
   .mobileOpen { transform: translateX(0); visibility: visible; }
   .backdrop { position: fixed; inset: 0; z-index: 45; background: #050c1ca6; backdrop-filter: blur(3px); }
   .brandRow { min-height: 99px; }
   .topbar { min-height: 66px; padding: 12px 16px; gap: 10px; }
-  .mobileToggle { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; color: #203447; border: 1px solid #dfe6ed; background: #fff; border-radius: 10px; cursor: pointer; }
+  .mobileToggle { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; color: #203447; border: 1px solid #dfe6ed; background: #fff; border-radius: 10px; cursor: pointer; }
   .breadcrumb { gap: 8px; font-size: 13px; flex-wrap: nowrap; overflow: hidden; }
   .breadcrumb > a { flex-shrink: 0; }
   .breadcrumbGroup { display: none; }
   .currentPage { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pageContent { padding: 20px 14px 30px; }
-  .pageContent :global(.overflow-x-auto) { -webkit-overflow-scrolling: touch; }
+  .pageContent { padding: 24px 20px 38px; }
+  .pageContent :global(.overflow-x-auto) { -webkit-overflow-scrolling: touch; max-width: 100%; }
+  .pageContent :global(table) { max-width: 100%; }
+  .pageContent :global(img), .pageContent :global(video), .pageContent :global(svg) { max-width: 100%; }
   .pageContent :global(button), .pageContent :global(a) { max-width: 100%; }
   .main { scrollbar-gutter: auto; }
+}
+@media (max-width: 639px) {
+  .topbar { min-height: 62px; padding: 10px 12px; }
+  .pageContent { padding: 16px 12px calc(36px + env(safe-area-inset-bottom)); }
+  .pageContent :global(input:not([type='checkbox']):not([type='radio'])),
+  .pageContent :global(textarea),
+  .pageContent :global(select) { font-size: 16px; }
+  .breadcrumb { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .sidebar, .workspace, .navLink, .groupToggle > svg { transition: none; } }
