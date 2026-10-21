@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Obter codigo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c3f
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
       - name: Executar testes estruturais do modulo
