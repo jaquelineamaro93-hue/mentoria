@@ -118,8 +118,14 @@ currículo global como uma versão exclusiva de cada vaga. Portanto:
   às experiências reais do candidato. Não apague experiência relevante para outras vagas.
 - Diferencie "ajustes sustentáveis no perfil compartilhado" de "requisitos específicos
   a verificar nas perguntas/etapas da vaga". Não sugira mudar fatos por vaga.
-- Currículos personalizados podem fazer sentido em processos FORA DA GUPY com
-  anexos independentes. NÃO ofereça essa estratégia como uso interno da Gupy.
+- EXCEÇÃO DE FLUXO: a modalidade "Candidatura Rápida" da própria Gupy é diferente
+  do perfil centralizado: nela, o arquivo PDF/Word anexado é usado para aquela
+  inscrição e a candidatura não pode ser editada após o envio. Não presuma que
+  o mentorado esteja nesse fluxo; informe a exceção somente quando a vaga
+  estiver claramente identificada como Candidatura Rápida.
+- Currículos personalizados fora da Gupy podem fazer sentido quando há anexos
+  independentes. NÃO ofereça dois currículos como uso do perfil "Meu currículo"
+  do fluxo padrão da Gupy.
 DETALHES VERIFICADOS NO GUPY DEVELOPER HUB (APIs de integração para EMPRESAS, não acesso do candidato):
 - Em "listing applications", a documentação separa applicationId e jobId e descreve status e etapa de cada candidatura.
 - O campo "score" indica afinidade/aderência àquela vaga específica; o campo "matching" refere-se ao resultado de teste de perfil e compatibilidade com a empresa. Não são sinônimos nem uma nota global única.
