@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import AuthJourneyLoading from '@/components/AuthJourneyLoading';
 
 function AuthConfirmContent() {
   const router = useRouter();
@@ -16,7 +17,7 @@ function AuthConfirmContent() {
       const registrarLogin = async () => {
         const { error } = await supabase.rpc('registrar_login_portal');
         if (error) {
-          console.warn('[AUTH-CONFIRM] Não foi possível registrar o login:', error.message);
+          // Falha de telemetria não interfere na autenticação.
         }
       };
 
@@ -47,13 +48,10 @@ function AuthConfirmContent() {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!isSubscribed) return;
         
-        console.log('🔔 Auth Event:', event);
 
         if (event === 'PASSWORD_RECOVERY') {
-          console.log('🔐 Password recovery detectado');
           router.push('/reset-password'); 
         } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
-          console.log('✅ SIGNED_IN com usuário:', session.user.email);
           await registrarLogin();
           if (await concluirTrial()) router.push('/dashboard');
         }
@@ -76,19 +74,14 @@ function AuthConfirmContent() {
 
       // 2b. Lê tokens da HASH da URL (magic link - NAO MEXER)
       if (typeof window !== 'undefined' && window.location.hash) {
-        console.log('📍 Hash encontrada:', window.location.hash.substring(1, 50) + '...');
         
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
         const type = hashParams.get('type');
 
-        console.log('🔑 Access token:', !!accessToken);
-        console.log('🔄 Refresh token:', !!refreshToken);
-        console.log('📝 Type:', type);
 
         if (accessToken && refreshToken) {
-          console.log('⚙️ Chamando setSession...');
           
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -96,16 +89,13 @@ function AuthConfirmContent() {
           });
 
           if (error) {
-            console.error('❌ setSession error:', error);
+            setStatus('Não foi possível validar o link de acesso. Entre novamente.');
           } else {
-            console.log('✅ setSession sucesso:', data.user?.email);
             await registrarLogin();
             
             if (type === 'recovery') {
-              console.log('➡️ Redirecionando para reset-password');
               router.push('/reset-password');
             } else {
-              console.log('➡️ Redirecionando para dashboard');
               if (await concluirTrial()) router.push('/dashboard');
             }
             return;
@@ -118,10 +108,8 @@ function AuthConfirmContent() {
         if (!isSubscribed) return;
         
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('⏱️ Fallback check - Session:', session?.user?.email || 'nenhuma');
         
         if (!session) {
-          console.log('❌ Nenhuma sessão encontrada');
           router.push('/login?error=no_session');
         }
       }, 5000);
@@ -140,18 +128,16 @@ function AuthConfirmContent() {
   }, [router, supabase]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-gray-text mb-2">{status}</p>
-        <p className="text-xs text-gray-text">F12 para logs completos</p>
-      </div>
-    </div>
+    <AuthJourneyLoading
+      etapa={status.startsWith('Não foi possível') ? 'erro' : status.includes('Verificando') ? 'preparando' : 'verificando'}
+      detalhe={status.startsWith('Não foi possível') ? status : undefined}
+    />
   );
 }
 
 export default function AuthConfirmPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-text">Carregando...</p></div>}>
+    <Suspense fallback={<AuthJourneyLoading etapa="verificando" />}>
       <AuthConfirmContent />
     </Suspense>
   );
