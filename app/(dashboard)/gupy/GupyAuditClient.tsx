@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileSearch, Loader2, Upload, ShieldCheck, ListChecks, Info, TrendingDown } from 'lucide-react';
+import { FileSearch, Loader2, Upload, ShieldCheck, Info, TrendingDown } from 'lucide-react';
 import { extrairTextoPdf } from '@/lib/pdf';
 import type { SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
 import GupyAnalysisOutput from '@/components/GupyAnalysisOutput';
@@ -120,41 +120,21 @@ export default function GupyAuditClient({
           </label>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <label className="block">
-            <span className="text-sm font-medium text-black">Histórico e sinais de triagem (opcional)</span>
-            <p className="mb-2 mt-1 text-xs leading-relaxed text-gray-text">
-              Conte, se desejar, o que você observou em processos anteriores, como candidaturas
-              em várias vagas da mesma empresa, reprovações ou mudanças após atualizar seu perfil.
-              Não informe CPF, e-mail ou dados de outras pessoas.
-            </p>
-            <textarea
-              rows={5}
-              value={observacoes}
-              maxLength={1800}
-              onChange={(event) => setObservacoes(event.target.value)}
-              placeholder="Ex.: Candidatei-me a três vagas da mesma empresa e notei mudanças no retorno. Não sei a causa."
-              className="w-full rounded-lg border border-gray-faint px-4 py-3 text-base resize-y focus:border-mint-deep focus:outline-none"
-            />
-          </label>
-          <section className="rounded-xl border border-[#d5e9e3] bg-[#f5fbf8] p-4" aria-labelledby="praticas-gupy-titulo">
-            <h2 id="praticas-gupy-titulo" className="flex items-center gap-2 text-sm font-semibold text-[#154c42]">
-              <ListChecks size={17} aria-hidden="true" />
-              Aprendizados de três anos de testes
-            </h2>
-            <p className="mt-2 text-xs leading-relaxed text-[#3e5b52]">
-              Conteúdo derivado do Guia GUPY da mentora. As estratégias abaixo refletem
-              observações práticas acumuladas em três anos e os recursos visíveis na
-              interface de recrutamento. Resultados relatados não são uma garantia para toda candidatura.
-            </p>
-            <ul className="mt-3 space-y-2 text-xs leading-relaxed text-[#344c43]">
-              <li><strong>Perfil completo:</strong> descreva experiências, datas, cursos e requisitos realmente atendidos.</li>
-              <li><strong>Candidaturas na mesma empresa:</strong> o guia registra que inscrições repetidas podem afetar a triagem percebida. Escolha vagas com aderência real e acompanhe o histórico de cada candidatura.</li>
-              <li><strong>Likes e dislikes:</strong> a interface de recrutamento apresentada no guia permite curtir e descurtir candidaturas. A mentora observou efeitos no histórico ao longo dos testes, sem acesso aos pesos internos.</li>
-              <li><strong>Reorganização e novo cadastro:</strong> o guia documenta experimentos de exclusão e recriação de perfil. A SOMA apresenta a experiência como relato de campo, sem inventar bloqueios permanentes ou garantir que notas sejam apagadas.</li>
-            </ul>
-          </section>
-        </div>
+        <label className="mt-5 block">
+          <span className="text-sm font-medium text-black">Histórico e sinais de triagem (opcional)</span>
+          <p className="mb-2 mt-1 max-w-4xl text-xs leading-relaxed text-gray-text">
+            Caso já tenha se candidatado pela Gupy, conte o que percebeu sobre ranqueamento,
+            retornos ou candidaturas repetidas. Não inclua dados pessoais de outras pessoas.
+          </p>
+          <textarea
+            rows={4}
+            value={observacoes}
+            maxLength={1800}
+            onChange={(event) => setObservacoes(event.target.value)}
+            placeholder="Ex.: Meu perfil recebeu avaliações anteriores ou fui candidata a mais de uma vaga da mesma empresa."
+            className="w-full rounded-lg border border-gray-faint px-4 py-3 text-base resize-y focus:border-mint-deep focus:outline-none"
+          />
+        </label>
 
         <div className="mt-5 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
           <span className="inline-flex items-center gap-1 font-semibold"><Info size={14} aria-hidden="true" /> Como ler suas notas</span>
