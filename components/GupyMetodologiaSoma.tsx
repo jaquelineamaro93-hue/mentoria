@@ -17,7 +17,7 @@ const estrategias = [
     nome: 'Título e atividades estratégicos',
     Icon: BookOpenCheck,
     pratica: 'Cargos, descrições das atividades e palavras-chave influenciam a leitura e a encontrabilidade do perfil.',
-    aplicar: 'Use nomenclaturas coerentes com sua experiência real e com os requisitos da vaga.',
+    aplicar: 'Use nomenclaturas coerentes com sua experiência real e relevantes para o conjunto de vagas. O currículo do perfil Gupy é compartilhado entre candidaturas ativas.',
   },
   {
     nome: 'Cursos e certificações',
@@ -68,6 +68,23 @@ export default function GupyMetodologiaSoma({ expandido = false }: { expandido?:
            target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs font-semibold text-mint-deep underline underline-offset-2">
           Orientação oficial da Gupy
         </a>
+      </div>
+      <div className="mt-5 rounded-xl border border-[#c7ddd4] bg-[#f0f8f4] px-4 py-4" role="note">
+        <p className="text-sm font-semibold text-[#18483c]">Regra importante: um currículo para todas as vagas na Gupy</p>
+        <p className="mt-2 text-sm leading-6 text-[#3b5d51]">
+          A Gupy confirma que alterações em <strong>Meu currículo</strong> são refletidas em todas as
+          candidaturas ativas, inclusive as realizadas anteriormente. A SOMA compara a aderência
+          a cada vaga, mas recomenda apenas <strong>um perfil curricular único</strong> na Gupy.
+          Não é indicado alternar versões de PDF para diferentes vagas dentro da plataforma.
+        </p>
+        <p className="mt-2 text-xs leading-5 text-[#527368]">
+          Conforme o Developer Hub, o score de afinidade é relacionado à vaga e o matching
+          se refere a resultado de teste de perfil. A SOMA não consulta esses indicadores privados:
+          suas notas são estimativas próprias, distintas dos dados internos da Gupy.
+        </p>
+        <a href="https://suporte-candidatos.gupy.io/s/article/Como-atualizar-o-meu-curriculo?language=pt_BR"
+          className="mt-2 inline-block text-xs font-semibold text-mint-deep underline underline-offset-2"
+          target="_blank" rel="noopener noreferrer">Consultar orientação oficial da Gupy</a>
       </div>
       <div className={'mt-5 grid gap-3 ' + (expandido ? 'lg:grid-cols-2' : 'md:grid-cols-2 xl:grid-cols-3')}>
         {estrategias.map(({ nome, Icon, pratica, aplicar }) => (
