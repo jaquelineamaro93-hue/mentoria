@@ -312,10 +312,10 @@ export default function DashboardClient({
         <section aria-labelledby="discover-tools" className="mb-5 rounded-2xl border border-mint-deep/20 bg-white p-4 sm:p-5">
           <p className="text-xs uppercase tracking-widest text-mint-deep">{entrevista ? 'Seu próximo capítulo' : 'Da reflexão à oportunidade'}</p>
           <h2 id="discover-tools" className="mt-1 font-display text-xl leading-snug text-lotus-brown sm:text-2xl">{entrevista ? 'A partir de agora, seu caminho ganha direção' : 'O que você quer destravar hoje?'}</h2>
-          <p className="mt-1 text-sm leading-5 text-gray-700">{entrevista ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos começar por suas forças e sua história, respeitando seu ritmo.` : 'Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.'}</p>
+          <p className="mt-1 text-sm leading-5 text-gray-700">{entrevista ? `${quemSouCompleto ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Seu Mapa Quem Sou Eu já foi concluído. Consulte seu resultado e siga para as próximas etapas.` : `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos começar por suas forças e sua história, respeitando seu ritmo.`}` : 'Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.'}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             {(entrevista ? [
-              { href: '/quem-sou-eu', title: 'Conhecer minha história', description: 'Comece pelo Mapa Quem Sou Eu para reconhecer seus valores, experiências e forças.', action: 'Continuar meu mapa' },
+              { href: '/quem-sou-eu', title: quemSouCompleto ? 'Meu mapa concluído' : 'Conhecer minha história', description: quemSouCompleto ? 'Seu Mapa Quem Sou Eu está completo. Revise seu resultado e a Bússola de Posicionamento sempre que desejar.' : 'Comece pelo Mapa Quem Sou Eu para reconhecer seus valores, experiências e forças.', action: quemSouCompleto ? 'Consultar meu mapa' : 'Continuar meu mapa' },
               { href: '/exercicios', title: 'Reconhecer minhas forças', description: 'Use o diagnóstico para identificar suas forças e como elas aparecem no trabalho.', action: 'Fazer meu diagnóstico' },
               { href: '/onboarding', title: 'Ver meu caminho', description: 'Acompanhe as próximas etapas de acordo com o objetivo que compartilhou na entrevista.', action: 'Abrir minha jornada' },
             ] : [
