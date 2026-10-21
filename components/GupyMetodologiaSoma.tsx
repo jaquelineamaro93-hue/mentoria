@@ -75,7 +75,13 @@ export default function GupyMetodologiaSoma({ expandido = false }: { expandido?:
           A Gupy confirma que alterações em <strong>Meu currículo</strong> são refletidas em todas as
           candidaturas ativas, inclusive as realizadas anteriormente. A SOMA compara a aderência
           a cada vaga, mas recomenda apenas <strong>um perfil curricular único</strong> na Gupy.
-          Não é indicado alternar versões de PDF para diferentes vagas dentro da plataforma.
+          Não alterne versões para vagas no perfil centralizado.
+        </p>
+        <p className="mt-2 text-xs leading-5 text-[#527368]">
+          Há uma modalidade distinta de <strong>Candidatura Rápida</strong> que aceita
+          um arquivo anexado na inscrição e não permite editá-lo após o envio.
+          A auditoria da SOMA considera o perfil compartilhado como fluxo padrão,
+          a menos que essa modalidade esteja identificada.
         </p>
         <p className="mt-2 text-xs leading-5 text-[#527368]">
           Conforme o Developer Hub, o score de afinidade é relacionado à vaga e o matching
