@@ -119,3 +119,13 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .soma-mascote-animado { animation: none !important; }
 }
+
+/* Movimento da transição de login: leve, sem vídeos nem recursos externos. */
+@keyframes soma-loading-stride {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(300%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .soma-auth-loading-motion { animation: none !important; }
+}
