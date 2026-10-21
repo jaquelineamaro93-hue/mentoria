@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { chamarClaude } from '@/lib/anthropic';
+import { revisarOrientacoesLegadasGupy } from '@/lib/gupy-report-parser';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -120,7 +121,8 @@ export async function POST(request: NextRequest) {
   ].join('\n');
 
   try {
-    const resultado = await chamarClaude(prompt, 7000);
+    const gerado = await chamarClaude(prompt, 7000);
+    const resultado = revisarOrientacoesLegadasGupy(gerado).texto;
     if (typeof resultado !== 'string' || resultado.trim().length < 300) {
       return json({ error: 'A análise não pôde ser atualizada agora.' }, 503);
     }
