@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { FileSearch, Loader2, Upload, ShieldCheck, ListChecks, Info, TrendingDown } from 'lucide-react';
 import { extrairTextoPdf } from '@/lib/pdf';
-import SomaAnalysisOutput, { type SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
+import type { SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
+import GupyAnalysisOutput from '@/components/GupyAnalysisOutput';
 
 export default function GupyAuditClient({
   historicoInicial,
@@ -192,7 +193,7 @@ export default function GupyAuditClient({
           <p className="mt-1 text-xs leading-relaxed text-gray-text">Não acessa notas privadas, não altera candidaturas na Gupy e não promete aprovação ou reversão de avaliações internas.</p>
         </div>
       </section>
-      <SomaAnalysisOutput atual={atual} historico={historico} onSelect={setAtual} />
+      <GupyAnalysisOutput atual={atual} historico={historico} onSelect={setAtual} />
     </main>
   );
 }
