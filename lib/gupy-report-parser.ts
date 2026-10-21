@@ -118,7 +118,7 @@ export function revisarOrientacoesLegadasGupy(markdown: string): { texto: string
       || /sem\s+hist[oó]rico\s+de\s+rejei[cç][õo]es\s*\/\s*dislikes[^\n]*mencionad[oa]s?/i.test(linha);
     if (inferenciaNeutralidade) {
       revisoes++;
-      return '**Histórico de candidaturas e dislikes (metodologia SOMA):** os testes documentados no Guia GUPY da SOMA identificaram impactos de avaliações anteriores e candidaturas repetidas sobre oportunidades futuras. O relatório não dá acesso às avaliações internas do perfil analisado; não atribua a esta pessoa um histórico positivo, negativo ou neutro sem essa informação.';
+      return '**Histórico de candidaturas e dislikes (metodologia SOMA):** os testes documentados no Guia GUPY da SOMA identificaram impactos de avaliações anteriores e candidaturas repetidas sobre oportunidades futuras. O relatório não dá acesso às avaliações internas do perfil analisado; não atribua um resultado individual sem essa informação.';
     }
     return linha;
   }).join('\n');
