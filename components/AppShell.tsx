@@ -92,7 +92,7 @@ function SectionNavigationCards({
   );
 }
 
-function AppShellContent({ children, initialProfile }: { children: React.ReactNode; initialProfile: Profile | null }) {
+function AppShellContent({ children, initialProfile, copilotoLiberado }: { children: React.ReactNode; initialProfile: Profile | null; copilotoLiberado: boolean }) {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -226,7 +226,7 @@ function AppShellContent({ children, initialProfile }: { children: React.ReactNo
             {children}
           </div>
         </main>
-        {!pathname.startsWith('/admin') && initialProfile && <IrisCopiloto />}
+        {!pathname.startsWith('/admin') && copilotoLiberado && <IrisCopiloto />}
       </div>
     </div>
   );
@@ -235,15 +235,17 @@ function AppShellContent({ children, initialProfile }: { children: React.ReactNo
 export default function AppShell({
   children,
   initialProfile = null,
+  copilotoLiberado = false,
 }: {
   children: React.ReactNode;
   initialProfile?: Profile | null;
+  copilotoLiberado?: boolean;
 }) {
   return (
     <UserProvider initialProfile={initialProfile}>
       <SidebarProvider>
         <Suspense fallback={<div className="min-h-screen bg-white" />}>
-          <AppShellContent initialProfile={initialProfile}>{children}</AppShellContent>
+          <AppShellContent initialProfile={initialProfile} copilotoLiberado={copilotoLiberado}>{children}</AppShellContent>
         </Suspense>
       </SidebarProvider>
     </UserProvider>
