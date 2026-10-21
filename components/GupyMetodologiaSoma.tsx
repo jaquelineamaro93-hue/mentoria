@@ -57,6 +57,18 @@ export default function GupyMetodologiaSoma({ expandido = false }: { expandido?:
           </p>
         </div>
       </div>
+      <div className="mt-5 rounded-xl border border-[#b9d9cd] bg-[#edf7f2] px-4 py-4">
+        <p className="text-sm font-semibold text-[#183f37]">Uma regra importante: currículo único na Gupy</p>
+        <p className="mt-1 text-sm leading-6 text-[#375748]">
+          Alterações em “Meu currículo” são replicadas para todas as candidaturas ativas.
+          Por isso, a SOMA recomenda melhorar um único perfil completo e fiel à trajetória,
+          sem criar versões por vaga nem alternar o currículo a cada inscrição.
+        </p>
+        <a href="https://suporte-candidatos.gupy.io/s/article/Como-atualizar-o-meu-curriculo?language=pt_BR"
+           target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs font-semibold text-mint-deep underline underline-offset-2">
+          Orientação oficial da Gupy
+        </a>
+      </div>
       <div className={'mt-5 grid gap-3 ' + (expandido ? 'lg:grid-cols-2' : 'md:grid-cols-2 xl:grid-cols-3')}>
         {estrategias.map(({ nome, Icon, pratica, aplicar }) => (
           <article key={nome} className="min-w-0 rounded-xl border border-gray-faint bg-[#fbfcfb] p-4">
