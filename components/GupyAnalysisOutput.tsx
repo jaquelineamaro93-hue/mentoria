@@ -3,15 +3,16 @@
 import React, { useMemo, useState } from 'react';
 import {
   ArrowRight, BookOpen, Check, ClipboardCheck, Copy, FileCheck2,
-  FileText, History, Layers3, ListChecks, SearchCheck, Sparkles, Target, TrendingUp,
+  FileText, History, Layers3, ListChecks, SearchCheck, Sparkles, Target, TrendingUp, RefreshCcw,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
+import GupyMetodologiaSoma from '@/components/GupyMetodologiaSoma';
 import { dividirRelatorioGupy, extrairNotaSoma, extrairVagasGupy, revisarOrientacoesLegadasGupy, separarIntroducaoGupy } from '@/lib/gupy-report-parser';
 import type { GupySecao } from '@/lib/gupy-report-parser';
 
-type Modo = 'resumo' | 'assuntos' | 'completo' | 'curriculo';
+type Modo = 'resumo' | 'metodo' | 'assuntos' | 'completo' | 'curriculo';
 type TextoProps = { children?: React.ReactNode };
 
 function elementosComTag(nodes: React.ReactNode, tag: string): React.ReactElement<TextoProps>[] {
@@ -124,6 +125,7 @@ function MarkdownLegivel({ markdown }: { markdown: string }) {
 
 const MODOS: { id: Modo; nome: string }[] = [
   { id: 'resumo', nome: 'Visão geral' },
+  { id: 'metodo', nome: 'Hacks e práticas SOMA' },
   { id: 'assuntos', nome: 'Por assunto' },
   { id: 'completo', nome: 'Relatório completo' },
   { id: 'curriculo', nome: 'Currículo para copiar' },
@@ -134,16 +136,20 @@ function botaoEstilo(ativo: boolean) {
     (ativo ? 'bg-mint-deep text-white shadow-sm' : 'border border-gray-faint bg-white text-[#46594e] hover:border-mint-deep');
 }
 
-function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
+function GupyRelatorio({ atual, onReanalisar, reanalisando, erroReanalise }: {
+  atual: SomaAnaliseResumo;
+  onReanalisar: (item: SomaAnaliseResumo) => Promise<void>;
+  reanalisando: boolean;
+  erroReanalise: string | null;
+}) {
   const [modo, setModo] = useState<Modo>('resumo');
   const [secaoAtiva, setSecaoAtiva] = useState(0);
   const [copiado, setCopiado] = useState<string | null>(null);
-  const [mostrarOriginal, setMostrarOriginal] = useState(false);
   const leituraCorrigida = useMemo(
     () => revisarOrientacoesLegadasGupy(atual.resultado_markdown),
     [atual.resultado_markdown],
   );
-  const markdownExibido = mostrarOriginal ? atual.resultado_markdown : leituraCorrigida.texto;
+  const markdownExibido = leituraCorrigida.texto;
   const { introducao, secoes } = useMemo(() => dividirRelatorioGupy(markdownExibido), [markdownExibido]);
   const { titulo: tituloIntroducao, contexto: contextoIntroducao } = useMemo(
     () => separarIntroducaoGupy(introducao), [introducao],
@@ -185,7 +191,7 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
         )}
         <p className="max-w-2xl text-sm leading-6 text-[#486157]">
           Comece pelos principais indicadores, navegue por assunto ou consulte o relatório integral.
-          Todo o conteúdo original da análise continua disponível.
+          Sua análise completa e as estratégias da metodologia SOMA estão organizadas por assunto.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-[#d9e8e1] bg-white p-4">
@@ -222,19 +228,23 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
         </button>
       </div>
 
-      {leituraCorrigida.revisoes > 0 && (
-        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#c8ded5] bg-[#f3faf7] px-4 py-3">
-          <p className="max-w-3xl text-sm leading-6 text-[#315548]">
-            Esta análise antiga contém {leituraCorrigida.revisoes} orientação(ões) revisada(s)
-            conforme o Guia GUPY da SOMA. O relatório original continua preservado no seu histórico.
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#c8ded5] bg-[#f3faf7] p-4 sm:p-5">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold text-[#1a473b]">Quer atualizar esta análise com os hacks da SOMA?</p>
+          <p className="mt-1 text-xs leading-6 text-[#49695e]">
+            Gere uma nova leitura usando o relatório salvo e a metodologia do Guia GUPY.
+            O currículo e as vagas completas originais não foram armazenados nas análises antigas.
+            Para uma nova comparação integral, utilize o formulário acima.
           </p>
-          <button type="button"
-            onClick={() => setMostrarOriginal(v => !v)}
-            className="min-h-10 rounded-lg border border-[#accdc0] bg-white px-3 py-2 text-xs font-semibold text-[#165448] hover:border-mint-deep">
-            {mostrarOriginal ? 'Voltar à leitura atualizada' : 'Consultar texto original'}
-          </button>
+          {erroReanalise && <p role="alert" className="mt-2 text-sm text-red-700">{erroReanalise}</p>}
         </div>
-      )}
+        <button type="button" disabled={reanalisando}
+          onClick={() => void onReanalisar(atual)}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50">
+          <RefreshCcw size={17} className={reanalisando ? 'animate-spin' : ''} aria-hidden="true" />
+          {reanalisando ? 'Gerando nova análise...' : 'Gerar nova análise'}
+        </button>
+      </div>
 
       <div className="min-w-0 overflow-x-auto overscroll-x-contain rounded-xl border border-gray-faint bg-white p-2" role="tablist" aria-label="Modos de leitura da análise">
         <div className="flex min-w-max gap-2">
@@ -268,6 +278,7 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
                 </div>
               </section>
             )}
+            <GupyMetodologiaSoma />
             <section className="grid gap-3 md:grid-cols-3">
               {[
                 { title: 'Entenda sua aderência', detail: 'Veja os critérios avaliados e a fundamentação das notas.', icon: TrendingUp, index: diagnostico },
@@ -294,6 +305,8 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
             )}
           </div>
         )}
+
+        {modo === 'metodo' && <GupyMetodologiaSoma expandido />}
 
         {modo === 'assuntos' && (
           <div className="space-y-4">
@@ -368,16 +381,19 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
   );
 }
 
-export default function GupyAnalysisOutput({ atual, historico, onSelect }: {
+export default function GupyAnalysisOutput({ atual, historico, onSelect, onReanalisar, reanalisandoId, erroReanalise }: {
   atual: SomaAnaliseResumo | null;
   historico: SomaAnaliseResumo[];
   onSelect: (item: SomaAnaliseResumo) => void;
+  onReanalisar: (item: SomaAnaliseResumo) => Promise<void>;
+  reanalisandoId: string | null;
+  erroReanalise: string | null;
 }) {
   if (!atual && !historico.length) return null;
   return (
     <div className="mt-8 grid min-w-0 gap-5 2xl:grid-cols-[minmax(0,1fr)_250px]" aria-label="Resultado e histórico da análise Gupy">
       <div className="min-w-0">
-        {atual ? <GupyRelatorio key={atual.id} atual={atual} /> :
+        {atual ? <GupyRelatorio key={atual.id} atual={atual} onReanalisar={onReanalisar} reanalisando={reanalisandoId === atual.id} erroReanalise={erroReanalise} /> :
           <p className="rounded-xl border border-gray-faint bg-white p-5 text-sm text-gray-text">Selecione uma análise anterior.</p>}
       </div>
       <aside className="h-fit rounded-2xl border border-gray-faint bg-white p-4 2xl:sticky 2xl:top-5">

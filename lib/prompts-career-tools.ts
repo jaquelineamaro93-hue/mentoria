@@ -145,19 +145,21 @@ Considere os resultados observados nos três anos de testes documentados no Guia
 - Oriente o preenchimento de cargos, resultados, cursos, competências e requisitos pertinentes, usando evidências verdadeiras. Sobre alterações de cadastro, descreva o experimento histórico sem ensinar falsificação de identificação nem prometer zerar notas internas.
 - Preserve o caráter autoral do guia. Não crie uma seção de "Anti-Sabotagem" com proibições ou afirmações não sustentadas pelo material. Não reduza três anos de observação a "pode ser impressão".
 
-## 4. Seis pontos de melhoria do currículo
-Avalie:
-1. rejeição humana na leitura rápida
-2. nomenclatura de cargos e aderência semântica
-3. currículo genérico ou sem foco
-4. cursos e certificações mal apresentados ou ausentes
-5. requisitos obrigatórios e palavras-chave faltantes
-6. experiências rasas ou descritas como tarefas
+## 4. Auditoria dos seis fatores críticos do Guia GUPY da SOMA
+Analise obrigatoriamente estes SEIS fatores do prompt autoral SOMA, sem descartá-los ou trocar a nomenclatura:
+1. Risco de Rejeição Humana e Histórico de Dislikes: excesso de texto, formatação ruim e falta de evidências que prejudicam a leitura rápida do recrutador; explique a observação SOMA sobre dislikes.
+2. Desalinhamento para a Ordenação da IA Gaia: nomenclaturas de cargos, habilidades e experiências que não deixam explícita a aderência à vaga.
+3. Alerta de Candidatura Múltipla e Perfil sem Foco: perfil genérico e candidaturas repetidas a vagas da mesma empresa, conforme observado nos testes SOMA.
+4. Omissão ou Mau Agrupamento de Cursos e Certificações: avaliar se Word, Excel, PowerPoint e outros treinamentos reais deveriam aparecer separadamente, incluindo cursos comportamentais quando efetivamente cursados.
+5. Queda nos Filtros de Requisitos Obrigatórios: termos técnicos, competências e perguntas de triagem da vaga que precisam ser respondidos com experiências verdadeiras.
+6. Campos Incompletos e Baixa Densidade de Experiência: atividades descritas de modo superficial, sem aplicação prática e impactos demonstráveis.
 
-Para cada um:
-- trecho/evidência do currículo
-- risco
-- versão corrigida
+PARA CADA UM DOS SEIS, entregue nesta ordem:
+- **Onde está o problema:** transcrição EXATA do trecho do currículo ou [NÃO EVIDENCIADO NO MATERIAL] se não houver trecho.
+- **Mecânica de possível perda de aderência:** explique o efeito observado na metodologia SOMA e diferencie requisitos visíveis de mecanismos internos que não conseguimos medir.
+- **Versão corrigida:** texto diretamente copiável com verbo de ação + aplicação prática + impacto REAL. Quando faltar comprovação de resultado, escreva [PREENCHER MÉTRICA] em vez de criar números.
+- **Prioridade:** Alta, Média ou Baixa, com justificativa curta.
+Evite repetir as seis análises em outros capítulos. O Guia GUPY e o arquivo "Prompt - Mentoria - Soma" são a metodologia autoral de referência.
 
 ## 5. Palavras-chave
 Liste as palavras-chave da(s) vaga(s) que aparecem, as que faltam e as que NÃO podem ser adicionadas sem comprovação.

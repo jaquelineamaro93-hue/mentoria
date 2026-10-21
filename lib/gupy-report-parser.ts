@@ -27,16 +27,19 @@ export function tipoDaSecao(titulo: string): GupySecao['tipo'] {
   return 'outros';
 }
 
-const PISTAS = /diagn[oó]stico|ader[eê]ncia|reduzir|sabotador|pr[aá]ticas|palavras.chave|experi[eê]ncias|vers[aã]o final|vers[aã]o corrigida|curr[ií]culo final|cursos|compet[eê]ncias|checklist|requisitos|perfil pronto|checagem|resumo visual/i;
+// Capítulos reais apenas. "2. Aderência estimada: 82/100" é dado da análise,
+ // não um novo capítulo, e não pode virar cartão vazio.
+const CAPITULOS = /^(?:diagn[oó]stico(?: de ader[eê]ncia)?|sinais que podem reduzir|pr[aá]ticas(?: de candidatura)?|hacks e pr[aá]ticas|seis (?:sabotadores|pontos|fatores)|(?:requisitos obrigat[oó]rios e )?palavras.chave|experi[eê]ncias reescritas|experi[eê]ncias e ajustes|cursos e compet[eê]ncias|vers[aã]o final|vers[aã]o corrigida|curr[ií]culo final|checklist|checagem de qualidade|resumo visual(?: de ader[eê]ncia)?|perfil pronto|(?:diagn[oó]stico do )?relat[oó]rio revisitado)/i;
 
 function extrairCabecalho(linha: string): string | null {
   const limpa = linha.trim();
-  // Aceita o formato da versão atual (## 1. ...) e relatórios legados (1. ...).
-  const match = limpa.match(/^(?:#{2,3}\s+)?(?:\*\*)?(\d{1,2})[.)]\s+(.+?)(?:\*\*)?$/)
-    || limpa.match(/^#{2,3}\s+(.+)$/);
+  // Aceita ## capítulos ou relatórios legados com títulos numerados em linha exclusiva.
+  const match = limpa.match(/^#{2,3}\s+(?:\d{1,2}[.)]\s*)?(.+)$/)
+    || limpa.match(/^(?:\*\*)?(?:\d{1,2})[.)]\s+(.+?)(?:\*\*)?$/);
   if (!match) return null;
-  const titulo = (match[2] || match[1] || '').replace(/\*\*/g, '').trim();
-  return PISTAS.test(titulo) ? titulo : null;
+  const titulo = (match[1] || '').replace(/\*\*/g, '').trim();
+  if (/\b\d{1,3}\s*\/\s*100\b|:.*\d{1,3}/.test(titulo)) return null;
+  return CAPITULOS.test(titulo) ? titulo : null;
 }
 
 export function dividirRelatorioGupy(markdown: string) {

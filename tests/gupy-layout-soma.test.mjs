@@ -8,7 +8,7 @@ test('Gupy uses its own SOMA layout, preserving LinkedIn generic report', () => 
   const gupy = src('app/(dashboard)/gupy/GupyAuditClient.tsx');
   const linkedin = src('app/(dashboard)/linkedin/LinkedinAuditClient.tsx');
   assert.match(gupy, /import GupyAnalysisOutput from/);
-  assert.match(gupy, /<GupyAnalysisOutput atual=\{atual\}/);
+  assert.match(gupy, /<GupyAnalysisOutput[\s\S]*?atual=\{atual\}/);
   assert.match(linkedin, /<SomaAnalysisOutput atual=\{atual\}/);
 });
 
