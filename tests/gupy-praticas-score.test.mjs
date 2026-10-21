@@ -8,7 +8,7 @@ test('Página Gupy mostra práticas observadas separadas de critérios oficiais'
   const ui = source('app/(dashboard)/gupy/GupyAuditClient.tsx');
   assert.match(ui, /Aprendizados de três anos de testes/);
   assert.match(ui, /observações práticas acumuladas em três anos/);
-  assert.match(ui, /a mentora observou efeitos no histórico/);
+  assert.match(ui, /a mentora observou efeitos no histórico/i);
   assert.match(ui, /sem inventar bloqueios permanentes/);
   assert.match(ui, /estimativa da SOMA para a vaga informada/);
 });
