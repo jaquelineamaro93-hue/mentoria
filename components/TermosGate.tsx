@@ -51,8 +51,8 @@ export default function TermosGate() {
         .select('nome,email,is_admin,status_assinatura,data_fim_acesso')
         .eq('id',user.id).maybeSingle();
 
-      // Exclui visitantes, trial, admins, planos vencidos e inativos.
-      if(cancelado || erroPerfil || !perfil || perfil.is_admin ||
+      // Exclui visitantes, trial, planos vencidos e inativos. Admins com assinatura ativa\n      // também devem receber a versão vigente dos termos ao acessar o portal.
+      if(cancelado || erroPerfil || !perfil ||
          perfil.status_assinatura!=='ativo')return;
       if(perfil.data_fim_acesso) {
         const vencimento=new Date(perfil.data_fim_acesso+'T23:59:59-03:00');
