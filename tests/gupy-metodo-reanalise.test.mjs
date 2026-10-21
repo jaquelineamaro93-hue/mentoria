@@ -49,7 +49,7 @@ test('Risco de falta de fontes originais é declarado; não prometer score da Gu
   const ui = read('components/GupyAnalysisOutput.tsx');
   const route = read('app/api/ferramentas-soma/reanalisar-gupy/route.ts');
   assert.match(ui, /O currículo e as vagas completas originais não foram armazenados/);
-  assert.match(route, /não foram armazenados nas análises antigas/);
+  assert.match(route, /As análises anteriores não guardavam PDF/);
   assert.match(route, /NÃO finja que realizou uma auditoria nova/);
   assert.match(route, /documentosOriginaisDisponiveis: false/);
 });
