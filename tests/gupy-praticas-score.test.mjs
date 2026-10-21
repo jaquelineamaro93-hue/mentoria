@@ -4,11 +4,11 @@ import { readFileSync } from 'node:fs';
 
 const source = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('Formulário Gupy permanece útil sem caixa autoral redundante', () => {
+test('Formulário Gupy não exige nem oferece histórico de triagem', () => {
   const ui = source('app/(dashboard)/gupy/GupyAuditClient.tsx');
-  assert.match(ui, /Histórico e sinais de triagem/);
+  assert.match(ui, /Auditar currículo da Gupy/);
   assert.match(ui, /estimativa da SOMA para a vaga informada/);
-  assert.doesNotMatch(ui, /Aprendizados de três anos de testes|Conteúdo derivado do Guia GUPY da mentora/);
+  assert.doesNotMatch(ui, /Histórico e sinais de triagem|observacoes|setObservacoes|Aprendizados de três anos de testes/);
 });
 
 test('Prompt Gupy preserva três anos de testes e não inventa desmentidos', () => {
@@ -23,14 +23,10 @@ test('Prompt Gupy preserva três anos de testes e não inventa desmentidos', () 
   assert.match(prompt, /Jamais invente pontos perdidos/);
 });
 
-test('Relato é opcional, limitado e não é armazenado integralmente no histórico', () => {
-  const ui = source('app/(dashboard)/gupy/GupyAuditClient.tsx');
+test('A API e o prompt não coletam relatos adicionais de triagem', () => {
   const api = source('app/api/ferramentas-soma/analisar/route.ts');
-  assert.match(ui, /maxLength=\{1800\}/);
-  assert.match(api, /observacoes: String\(body\.observacoes/);
-  assert.match(api, /incluiuObservacoes: Boolean/);
-  const historicos = api.split('entradasParaHistorico = {');
-  const historicoGupy = historicos[2]?.split('};')[0] ?? '';
-  assert.ok(historicoGupy.includes('incluiuObservacoes:'));
-  assert.ok(!historicoGupy.includes('observacoes:'), 'O relato completo não deve ficar no banco de histórico');
+  const prompt = source('lib/prompts-career-tools.ts');
+  assert.doesNotMatch(api, /body\.observacoes|incluiuObservacoes/);
+  assert.doesNotMatch(prompt, /input\.observacoes|observacoes\?: string|OBSERVAÇÕES DA PESSOA SOBRE PROCESSOS ANTERIORES/);
+  assert.match(prompt, /resultados observados nos três anos de testes/);
 });
