@@ -1,0 +1,27 @@
+name: Gupy regressao
+
+on:
+  pull_request:
+    paths:
+      - 'app/(dashboard)/gupy/**'
+      - 'components/GupyAnalysisOutput.tsx'
+      - 'lib/gupy-report-parser.ts'
+      - 'lib/prompts-career-tools.ts'
+      - 'tests/gupy-*.test.mjs'
+      - '.github/workflows/gupy-regressao.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar-gupy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obter codigo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c3f
+        with:
+          persist-credentials: false
+      - name: Executar testes estruturais do modulo
+        run: node --test tests/gupy-praticas-score.test.mjs tests/gupy-layout-soma.test.mjs tests/gupy-historico-revisao.test.mjs
