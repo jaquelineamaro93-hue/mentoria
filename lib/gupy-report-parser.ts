@@ -111,8 +111,8 @@ export function revisarOrientacoesLegadasGupy(markdown: string): { texto: string
     // Algumas gerações anteriores sugeriam CVs distintos por vaga dentro da Gupy.
     // A Central de Ajuda confirma um único perfil curricular replicado às inscrições ativas.
     // Revisão somente visual: nunca alterar as análises persistidas.
-    if (/\*\*(?:Recomendação SOMA|Hack SOMA validado|Hack SOMA)\*\*\s*:\s*(?:Fazer|Criar|Montar)\s+\*\*?(?:dois|2)\s+(?:arquivos|documentos|currículos)/i.test(linha)
-      || /Fazer\s+\*\*(?:dois|2)\s+arquivos de currículo/i.test(linha)
+    if (/(?:Recomendação SOMA|Hack SOMA validado|Hack SOMA)[^\n]{0,80}(?:dois|2)\s+(?:arquivos|documentos|currículos)\s+de currículo/i.test(linha)
+      || /Fazer\s+\*{0,2}(?:dois|2)\s+(?:arquivos|documentos)\s+de currículo/i.test(linha)
       || /(?:dois|duas)\s+(?:PDFs|arquivos de currículo|versões verbais do LinkedIn)/i.test(linha)) {
       revisoes++;
       return '**Recomendação SOMA corrigida para a Gupy:** manter UM currículo no perfil compartilhado. Alterações em "Meu currículo" são refletidas em todas as candidaturas ativas. Compare Topaz e Gauge como diagnósticos separados, mas não envie versões diferentes para cada vaga na Gupy.';
