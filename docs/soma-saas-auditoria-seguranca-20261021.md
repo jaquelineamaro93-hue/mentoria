@@ -95,3 +95,20 @@ Com custo fixo informado de R$ 300/mês, seria preciso faturar pelo menos R$ 300
 - https://www.kickresume.com/pt/preco/
 - https://recrutaai.ia.br/
 - https://talenn.ia.br/precos
+
+## Resultados de teste de isolamento RLS (21/10/2026)
+
+Testes read-only, em transações revertidas (BEGIN/ROLLBACK), simulando o papel Postgres authenticated com identidade não administrativa. Nenhuma resposta individual foi extraída; apenas contagens foram verificadas.
+
+| Área consultada como usuário A com alvo usuário B | Resultado |
+|---|---|
+| Mapa Quem Sou Eu | Zero linhas de B (PASS) |
+| Ações do PDI | Zero linhas de B (PASS) |
+| Currículos analisados | Zero linhas de B (PASS) |
+| Respostas das perguntas do PDI | Zero linhas de B (PASS) |
+| Candidaturas | Zero linhas de B (PASS) |
+| Entrevista inicial | Zero linhas de B (PASS) |
+
+Verificações positivas separadas: o proprietário consegue ler seu Mapa e suas ações do PDI; chamada RPC de verificação de módulo com ID de terceiro é rejeitada (PASS).
+
+**Limite:** isso testa uma amostra de tabelas e o RLS, não o login por HTTP de dois usuários, não cobre todas as operações e não cobre prompt injection, função administrativa ou webhooks. Não substitui pentest/QA end-to-end.
