@@ -108,6 +108,18 @@ export function revisarOrientacoesLegadasGupy(markdown: string): { texto: string
       revisoes++;
       return '- **Histórico de candidaturas (Guia GUPY da SOMA):** os testes da SOMA registraram que candidaturas repetidas e avaliações anteriores podem influenciar novas oportunidades na plataforma. Isso é uma observação documentada, não uma pontuação interna acessível pela SOMA.';
     }
+    // Não informado no documento != inexistente na conta privada Gupy.
+    // Revisão de saída legada, limitada à Gupy. Não regrava o histórico.
+    const inferenciaNeutralidade =
+      /(?:assum[ea]-?se|presum[ea]-?se|considera-se|hist[oó]rico\s+considerado)\s+(?:como\s+)?neutr(?:o|a|alidade)/i.test(linha)
+      || /n[aã]o\s+(?:h[aá]|existe|tem)\s+(?:qualquer\s+)?(?:evid[eê]ncias?\s+de|indic[aã]o\s+de)\s+(?:penaliza[cç][aã]o|puni[cç][aã]o|impacto\s+negativo)/i.test(linha)
+      || /(?:hist[oó]rico|dislikes|rejei[cç][õo]es)[^\n]{0,90}(?:n[aã]o\s+(?:causa|impacta|afeta)|sem\s+penaliza[cç][aã]o|neutr[oa])/i.test(linha)
+      || /sem\s+hist[oó]rico\s+de\s+(?:rejei[cç][õo]es|dislikes)[^\n]{0,100}(?:penali|neutral)/i.test(linha)
+      || /sem\s+hist[oó]rico\s+de\s+rejei[cç][õo]es\s*\/\s*dislikes[^\n]*mencionad[oa]s?/i.test(linha);
+    if (inferenciaNeutralidade) {
+      revisoes++;
+      return '**Histórico individual de avaliações na Gupy: não verificável com o material disponível.** A SOMA não tem acesso aos registros privados de likes, dislikes ou decisões de recrutadores. A ausência desses dados no relatório não comprova neutralidade nem ausência de impactos. Nos testes do Guia GUPY da SOMA, o histórico de avaliações e candidaturas repetidas influenciou oportunidades.';
+    }
     return linha;
   }).join('\n');
   return { texto, revisoes };
