@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createClient } from '@/lib/supabase/client';
@@ -11,6 +11,7 @@ import type { TermoVersao } from '@/lib/types';
 export default function TermosGate() {
   const supabase = useMemo(() => createClient(), []);
   const pathname = usePathname();
+  const router = useRouter();
   const adiados = useRef(new Set<string>());
   const chaveExibida = useRef<string | null>(null);
   const [termo, setTermo] = useState<TermoVersao | null>(null);
@@ -105,6 +106,7 @@ export default function TermosGate() {
       if(error && error.code!=='23505')throw new Error('Não foi possível registrar o aceite. Tente novamente.');
       posthog.capture('termo_aceito',{versao:termo.versao});
       setPrecisaAceitar(false);
+      router.refresh();
     }catch(e){setErro(e instanceof Error?e.message:'Falha ao salvar o aceite.');}
     finally{setEnviando(false);}
   }
