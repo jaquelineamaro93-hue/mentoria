@@ -81,7 +81,6 @@ export function montarPromptGupy(input: {
   curriculo: string;
   vagas: string;
   cargoAlvo?: string;
-  observacoes?: string;
 }) {
   return `
 Você é um especialista sênior em Talent Acquisition, ATS e redação de currículo.
@@ -117,9 +116,6 @@ ${limitar(input.curriculo)}
 VAGA(S) ALVO:
 ${limitar(input.vagas, 30000)}
 
-OBSERVAÇÕES DA PESSOA SOBRE PROCESSOS ANTERIORES (RELATO, NÃO DADO INTERNO DA GUPY):
-${limitar(input.observacoes, 1800) || 'Não informado.'}
-
 Não invente métricas, certificações, ferramentas, competências ou experiências. Se um dado importante estiver ausente, marque [PREENCHER].
 
 Entregue em Markdown:
@@ -139,7 +135,7 @@ Identifique separadamente fatores diretamente verificáveis no currículo e na v
 - vocabulário de habilidades e ferramentas presente na vaga e ausente do currículo;
 - descrição superficial das entregas ou excesso de currículo genérico.
 Apresente uma tabela compacta com: critério; evidência exata; impacto qualitativo (alto, médio, baixo); correção baseada em fatos. Jamais invente pontos perdidos ou porcentagens do algoritmo oficial.
-Se a pessoa descrever candidaturas repetidas, likes/dislikes ou reorganização do perfil, combine o relato com os resultados observados nos três anos de testes documentados no Guia GUPY da SOMA. Explique os riscos de avaliação/histórico documentados pela metodologia sem afirmar que eles não existem ou negar sua relevância. Não invente pesos numéricos nem previsões de desclassificação.
+Considere os resultados observados nos três anos de testes documentados no Guia GUPY da SOMA sobre candidaturas repetidas, likes/dislikes e reorganização do perfil, mesmo sem um relato adicional da pessoa. Explique os riscos de avaliação/histórico documentados pela metodologia sem afirmar que eles não existem ou negar sua relevância. Não invente pesos numéricos nem previsões de desclassificação.
 
 ## 3. Práticas de candidatura observadas e o que a Gupy documenta
 - Distinga três classes: "Documentado publicamente pela Gupy", "Observado nos testes da metodologia SOMA" e "Informação interna não disponível".
