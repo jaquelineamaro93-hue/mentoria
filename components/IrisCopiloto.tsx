@@ -23,18 +23,82 @@ export default function IrisCopiloto() {
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
   const [ocupada, setOcupada] = useState(false);
-  const final = useRef<HTMLDivElement>(null);
+  const [mobile, setMobile] = useState(false);
+  const [visualHeight, setVisualHeight] = useState<number | null>(null);
+  const [visualTop, setVisualTop] = useState(0);
   const caixa = useRef<HTMLTextAreaElement>(null);
+  const historico = useRef<HTMLDivElement>(null);
+  const painel = useRef<HTMLDivElement>(null);
+  const acionador = useRef<HTMLButtonElement>(null);
+  const abertoUmaVez = useRef(false);
 
   useEffect(() => {
-    if (aberto) {
-      final.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-  }, [aberto, mensagens, ocupada]);
+    const media = window.matchMedia('(max-width: 639px)');
+    const sincronizar = () => setMobile(media.matches);
+    sincronizar();
+    media.addEventListener('change', sincronizar);
+    return () => media.removeEventListener('change', sincronizar);
+  }, []);
+
+  // Em celulares, acompanha a área realmente visível quando o teclado abre.
+  // A janela deve permanecer acessível tanto no Safari como nos demais navegadores.
+  useEffect(() => {
+    if (!aberto || !mobile) return;
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const atualizar = () => {
+      setVisualHeight(Math.round(viewport.height));
+      setVisualTop(Math.round(viewport.offsetTop));
+    };
+    atualizar();
+    viewport.addEventListener('resize', atualizar);
+    viewport.addEventListener('scroll', atualizar);
+    return () => {
+      viewport.removeEventListener('resize', atualizar);
+      viewport.removeEventListener('scroll', atualizar);
+    };
+  }, [aberto, mobile]);
 
   useEffect(() => {
-    if (aberto) caixa.current?.focus();
+    if (!aberto) return;
+    const area = historico.current;
+    if (area) area.scrollTop = area.scrollHeight;
+  }, [aberto, mensagens, ocupada, visualHeight]);
+
+  useEffect(() => {
+    if (aberto) abertoUmaVez.current = true;
+    else if (abertoUmaVez.current) acionador.current?.focus();
   }, [aberto]);
+
+  useEffect(() => {
+    if (!aberto) return;
+    if (mobile) painel.current?.focus();
+    else caixa.current?.focus();
+    const teclado = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setAberto(false);
+      }
+      if (!mobile || event.key !== 'Tab' || !painel.current) return;
+      const botoes = [...painel.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]),a[href],textarea:not([disabled]),input:not([disabled])'
+      )].filter(element => element.getClientRects().length > 0);
+      if (!botoes.length) return;
+      const primeiro = botoes[0];
+      const ultimo = botoes[botoes.length - 1];
+      if (!painel.current.contains(document.activeElement) || document.activeElement === painel.current) {
+        event.preventDefault(); (event.shiftKey ? ultimo : primeiro).focus();
+      } else if (event.shiftKey && document.activeElement === primeiro) {
+        event.preventDefault(); ultimo.focus();
+      } else if (!event.shiftKey && document.activeElement === ultimo) {
+        event.preventDefault(); primeiro.focus();
+      }
+    };
+    document.addEventListener('keydown', teclado);
+    return () => {
+      document.removeEventListener('keydown', teclado);
+    };
+  }, [aberto, mobile]);
 
   async function enviar(pedidoExterno?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
@@ -104,25 +168,43 @@ export default function IrisCopiloto() {
   }
 
   return (
-    <aside className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6" aria-label="Íris Copiloto de Carreira">
+    <aside
+      className={aberto && mobile
+        ? 'fixed inset-0 z-[70]'
+        : 'fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-3 z-[60] sm:bottom-6 sm:right-6'}
+      style={aberto && mobile && visualHeight
+        ? { height: visualHeight + 'px', top: visualTop + 'px' }
+        : undefined}
+      aria-label="Íris Copiloto de Carreira"
+    >
       {!aberto ? (
         <button
+          ref={acionador}
           type="button"
           aria-label="Abrir Íris Copiloto"
           aria-expanded={false}
           onClick={() => setAberto(true)}
-          className="flex items-center gap-2 rounded-full border border-[#7b5c4c] bg-[#5B453E] px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#45322c]"
+          className="flex min-h-12 items-center gap-2 rounded-full border border-[#7b5c4c] bg-[#5B453E] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-[#45322c]"
         >
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f0e9fa]" aria-hidden="true"><Mascot index={3} size={28} /></span>
           <span>Íris Copiloto</span>
         </button>
       ) : (
-        <div className="flex h-[min(660px,calc(100dvh-2rem))] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-[#d8cec9] bg-white shadow-2xl" role="region" aria-label="Conversa com Íris Copiloto">
-          <header className="flex shrink-0 items-center justify-between bg-[#5B453E] px-4 py-3 text-white">
+        <div
+          ref={painel}
+          tabIndex={-1}
+          className={mobile
+            ? 'flex h-full w-full min-w-0 flex-col overflow-hidden bg-white outline-none'
+            : 'flex h-[min(720px,calc(100dvh-3rem))] w-[min(460px,calc(100vw-2rem))] min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8cec9] bg-white shadow-2xl outline-none'}
+          role={mobile ? 'dialog' : 'region'}
+          aria-modal={mobile ? true : undefined}
+          aria-labelledby="iris-copiloto-title"
+        >
+          <header className="flex shrink-0 items-center justify-between bg-[#5B453E] px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
             <div className="flex items-center gap-2">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/30 bg-[#f3ecfc]" aria-hidden="true"><Mascot index={3} size={36} /></span>
               <div>
-                <p className="text-sm font-semibold">Íris Copiloto</p>
+                <p id="iris-copiloto-title" className="text-sm font-semibold">Íris Copiloto</p>
                 <p className="text-xs text-white/80">Assistente nativa da SOMA</p>
               </div>
             </div>
@@ -130,14 +212,14 @@ export default function IrisCopiloto() {
               type="button"
               onClick={() => setAberto(false)}
               aria-label="Fechar conversa"
-              className="rounded-full p-2 hover:bg-white/15"
+              className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15"
             >
               <X size={19} />
             </button>
           </header>
-          <div className="flex-1 space-y-3 overflow-y-auto bg-[#fbfaf8] p-4" aria-live="polite" aria-relevant="additions">
+          <div ref={historico} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#fbfaf8] p-3 sm:p-4" aria-live="polite" aria-relevant="additions">
             {mensagens.map((m, indice) => (
-              <div key={indice} className={m.tipo === 'mentorado' ? 'ml-8' : 'mr-6'}>
+              <div key={indice} className={m.tipo === 'mentorado' ? 'ml-5 sm:ml-8' : 'mr-3 sm:mr-6'}>
                 <div className={m.tipo === 'mentorado'
                   ? 'rounded-2xl rounded-tr-sm bg-[#e3f5f0] p-3 text-sm leading-relaxed text-[#28322e]'
                   : 'rounded-2xl rounded-tl-sm border border-[#e8e0dc] bg-white p-3 text-sm leading-relaxed text-[#312b27]'
@@ -154,12 +236,12 @@ export default function IrisCopiloto() {
                       <p className="mt-2 font-semibold">{m.proposta.titulo}</p>
                       <p className="mt-1 text-xs">{m.proposta.descricao}</p>
                       <p className="mt-1 text-xs text-gray-600">Pilar: {m.proposta.pilar}</p>
-                      <div className="mt-3 flex gap-2">
+                      <div className="mt-3 flex flex-wrap gap-2">
                         <button
                           type="button"
                           disabled={ocupada}
                           onClick={() => void confirmar(indice, m.proposta as Proposta, m.token as string)}
-                          className="rounded-full bg-[#5B453E] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                          className="min-h-11 rounded-full bg-[#5B453E] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                         >
                           Confirmar e salvar
                         </button>
@@ -169,7 +251,7 @@ export default function IrisCopiloto() {
                           onClick={() => setMensagens(anteriores => anteriores.map((item, i) =>
                             i === indice ? { ...item, proposta: undefined, token: undefined } : item
                           ))}
-                          className="rounded-full border border-[#cfc3bb] px-3 py-2 text-xs disabled:opacity-50"
+                          className="min-h-11 rounded-full border border-[#cfc3bb] px-3 py-2 text-xs disabled:opacity-50"
                         >
                           Cancelar
                         </button>
@@ -180,17 +262,16 @@ export default function IrisCopiloto() {
               </div>
             ))}
             {ocupada && <p className="text-xs text-gray-600">Íris está preparando a resposta...</p>}
-            <div ref={final} />
           </div>
           {mensagens.length === 1 && (
-            <div className="flex flex-wrap gap-1.5 border-t border-[#eee6df] px-3 py-2">
+            <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto border-t border-[#eee6df] px-3 py-2">
               {['Como está meu progresso?', 'Analisar uma vaga', 'Criar ação no PDI'].map(sugestao => (
                 <button
                   key={sugestao}
                   type="button"
                   disabled={ocupada}
                   onClick={() => void enviar(sugestao)}
-                  className="rounded-full border border-[#d9d0c9] px-2.5 py-1.5 text-xs text-[#5B453E] disabled:opacity-50"
+                  className="min-h-10 rounded-full border border-[#d9d0c9] px-3 py-2 text-xs text-[#5B453E] disabled:opacity-50"
                 >
                   {sugestao}
                 </button>
@@ -215,18 +296,18 @@ export default function IrisCopiloto() {
               }}
               placeholder="Peça uma análise ou ação..."
               aria-label="Mensagem para Íris Copiloto"
-              className="min-h-12 flex-1 resize-none rounded-xl border border-[#d9d0c9] bg-white px-3 py-2 text-sm text-[#312b27] outline-none focus:border-[#5B453E]"
+              className="min-h-12 min-w-0 flex-1 resize-none rounded-xl border border-[#d9d0c9] bg-white px-3 py-2 text-base text-[#312b27] outline-none focus:border-[#5B453E]"
             />
             <button
               type="submit"
               disabled={ocupada || !texto.trim()}
               aria-label="Enviar mensagem"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
             >
               {ocupada ? <ChevronDown size={19} /> : <Send size={19} />}
             </button>
           </form>
-          <p className="bg-white px-3 pb-2 text-center text-[10px] text-gray-500">
+          <p className="shrink-0 bg-white px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center text-[11px] text-gray-600">
             Ações no PDI só são salvas após sua confirmação.
           </p>
         </div>

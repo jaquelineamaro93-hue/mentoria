@@ -38,8 +38,8 @@ export default function MeuPdiClient({
 
   return (
     <>
-      <div className="border-b border-gray-faint bg-white px-6 md:px-12 py-4 sticky top-0 z-10">
-        <div className="flex gap-2 sm:gap-5 overflow-x-auto" role="tablist" aria-label="Plano de desenvolvimento">
+      <div className="sticky top-0 z-10 min-w-0 border-b border-gray-faint bg-white px-3 py-3 sm:px-5 lg:px-8">
+        <div className="flex max-w-full snap-x gap-2 overflow-x-auto overscroll-x-contain sm:gap-5" role="tablist" aria-label="Plano de desenvolvimento">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const ativa = activeTab === tab.id;
@@ -52,7 +52,7 @@ export default function MeuPdiClient({
                 aria-selected={ativa}
                 onClick={() => setActiveTab(tab.id)}
                 className={[
-                  'inline-flex items-center gap-2 pb-4 px-2 text-sm font-medium transition-colors whitespace-nowrap',
+                  'inline-flex min-h-11 shrink-0 snap-start items-center gap-2 border-b-2 px-2 py-2 text-sm font-medium transition-colors whitespace-nowrap',
                   ativa
                     ? 'border-b-2 border-mint-deep text-black'
                     : 'border-b-2 border-transparent text-gray-text hover:text-black',
@@ -66,7 +66,7 @@ export default function MeuPdiClient({
         </div>
       </div>
 
-      <main className="flex-1 px-6 py-10 md:px-12 w-full">
+      <main className="min-w-0 w-full flex-1 px-2 py-5 sm:px-5 sm:py-8 lg:px-8">
         {activeTab === 'perguntas' && (
           <PdiClientContent
             profile={profile}

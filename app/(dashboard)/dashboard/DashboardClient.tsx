@@ -313,7 +313,7 @@ export default function DashboardClient({
           <p className="text-xs uppercase tracking-widest text-mint-deep">{entrevista ? 'Seu próximo capítulo' : 'Da reflexão à oportunidade'}</p>
           <h2 id="discover-tools" className="mt-1 font-display text-xl leading-snug text-lotus-brown sm:text-2xl">{entrevista ? 'A partir de agora, seu caminho ganha direção' : 'O que você quer destravar hoje?'}</h2>
           <p className="mt-1 text-sm leading-5 text-gray-700">{entrevista ? (quemSouCompleto ? `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Seu mapa de autoconhecimento está concluído. Agora você pode consultar o resultado e avançar na sua jornada.` : `Você compartilhou seu objetivo: ${entrevista.objetivo_principal}. Vamos começar por suas forças e sua história, respeitando seu ritmo.`) : 'Escolha uma necessidade real. Sua jornada não precisa seguir uma ordem única.'}</p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
             {(entrevista ? [
               { href: '/quem-sou-eu', title: quemSouCompleto ? 'Meu mapa concluído' : 'Conhecer minha história', description: quemSouCompleto ? 'Você já concluiu os nove blocos. Consulte a sua síntese, SWOT e Bússola sempre que desejar.' : 'Comece pelo Mapa Quem Sou Eu para reconhecer seus valores, experiências e forças.', action: quemSouCompleto ? 'Consultar meu mapa' : 'Continuar meu mapa' },
               { href: '/exercicios', title: 'Reconhecer minhas forças', description: 'Use o diagnóstico para identificar suas forças e como elas aparecem no trabalho.', action: 'Fazer meu diagnóstico' },

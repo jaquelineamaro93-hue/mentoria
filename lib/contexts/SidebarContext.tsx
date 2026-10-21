@@ -18,7 +18,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try { setIsCollapsed(localStorage.getItem('soma_sidebar_collapsed') === 'true'); } catch { /* Storage can be unavailable. */ }
-    const media = window.matchMedia('(max-width: 767px)');
+    const media = window.matchMedia('(max-width: 1199px)');
     const sync = () => { setIsMobile(media.matches); setIsMobileOpen(false); };
     sync();
     media.addEventListener('change', sync);
