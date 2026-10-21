@@ -24,4 +24,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Executar testes estruturais do modulo
-        run: node --test tests/gupy-praticas-score.test.mjs tests/gupy-layout-soma.test.mjs tests/gupy-historico-revisao.test.mjs tests/gupy-metodo-reanalise.test.mjs
+        run: node --test tests/gupy-praticas-score.test.mjs tests/gupy-layout-soma.test.mjs tests/gupy-historico-revisao.test.mjs tests/gupy-metodo-reanalise.test.mjs tests/gupy-reanalise-integridade.test.mjs
