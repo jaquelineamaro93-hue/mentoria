@@ -4,11 +4,13 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('As análises históricas são preservadas e há opção de comparar o original', () => {
+test('Relatório legado mostra leitura atualizada com CTA sem botão de texto original', () => {
   const view = read('components/GupyAnalysisOutput.tsx');
-  assert.ok(view.includes('mostrarOriginal ? atual.resultado_markdown : leituraCorrigida.texto'));
-  assert.ok(view.includes('Consultar texto original'));
-  assert.ok(view.includes('Voltar à leitura atualizada'));
+  assert.ok(view.includes('const markdownExibido = leituraCorrigida.texto'));
+  assert.ok(view.includes('Gerar nova análise'));
+  assert.ok(view.includes('onReanalisar(atual)'));
+  assert.ok(!view.includes('Consultar texto original'));
+  assert.ok(!view.includes('mostrarOriginal'));
   assert.ok(view.includes("copiar(markdownExibido, 'total')"));
 });
 
