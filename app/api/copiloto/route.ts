@@ -110,13 +110,35 @@ export async function POST(request: NextRequest) {
     .select('nome,is_admin,status_assinatura,trial_status,trial_ends_at,data_fim_acesso,raw_resume')
     .eq('id', user.id).maybeSingle();
   if (erroPerfil || !perfil) return json({ erro: 'Perfil indisponível.' }, 403);
+  const hojeSP = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
   const assinante = perfil.status_assinatura === 'ativo' &&
-    (!perfil.data_fim_acesso || perfil.data_fim_acesso >= new Date().toISOString().slice(0, 10));
+    (!perfil.data_fim_acesso || perfil.data_fim_acesso >= hojeSP);
   const trial = perfil.trial_status === 'active' &&
     !!perfil.trial_ends_at && Date.parse(perfil.trial_ends_at) > Date.now();
   if (!perfil.is_admin && !assinante && !trial) {
     return json({ erro: 'Seu acesso à mentoria está inativo.' }, 403);
   }
+  // Segurança independentemente do botão: pausas e termos vigentes são verificados no servidor.
+  const [pausaResp, termoResp] = await Promise.all([
+    db.from('mentoria_pausas').select('id').eq('user_id', user.id)
+      .eq('status', 'ativa').limit(1).maybeSingle(),
+    db.from('termos_versoes').select('id').eq('ativo', true)
+      .order('publicado_em', { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  if (pausaResp.error || termoResp.error || !termoResp.data) {
+    return json({ erro: 'Não foi possível validar seu acesso ao Copiloto.' }, 503);
+  }
+  if (pausaResp.data) {
+    return json({ erro: 'Sua mentoria está pausada. Consulte Meu Plano.', href: '/meu-plano' }, 403);
+  }
+  const { data: aceiteVigente, error: erroAceite } = await db.from('termos_aceites')
+    .select('id').eq('user_id', user.id).eq('termo_id', termoResp.data.id)
+    .limit(1).maybeSingle();
+  if (erroAceite) return json({ erro: 'Não foi possível validar seu aceite.' }, 503);
+  if (!aceiteVigente) {
+    return json({ erro: 'Aceite os termos vigentes antes de usar o Copiloto.', href: '/termos' }, 403);
+  }
+
   const permitido = await consumeIdentifierRateLimit({
     scope: 'iris_copiloto', identifier: user.id, limit: 35, windowSeconds: 3600,
   });
@@ -133,6 +155,8 @@ export async function POST(request: NextRequest) {
   // Esta operação é determinística: exige confirmação explícita e token assinado.
   // Nunca usa uma escolha de IA como autorização para escrever.
   if (body.acao === 'confirmar_pdi') {
+    const { data: pdiPermitido, error: erroModulo } = await db.rpc('soma_has_module', { p_slug: 'desenvolvimento' });
+    if (erroModulo || pdiPermitido !== true) return json({ erro: 'Seu plano não permite ações no PDI.' }, 403);
     const raw = body.proposta as Partial<Proposta> | undefined;
     const proposta: Proposta = {
       titulo: texto(raw?.titulo, 120),
@@ -153,6 +177,15 @@ export async function POST(request: NextRequest) {
       .eq('titulo', proposta.titulo).limit(1).maybeSingle();
     if (erroDuplicada) return json({ erro: 'Não consegui verificar suas ações.' }, 503);
     if (duplicada) return json({ resposta: 'Essa ação já existe no seu PDI.', href: '/meu-pdi' });
+    // Registra uma trilha mínima antes de permitir a escrita, sem guardar dados do PDI no evento.
+    const { error: erroAuditoria } = await db.from('product_events').insert({
+      user_id: user.id, event_name: 'copilot_pdi_action_approved',
+      feature_key: 'iris-copiloto', path: '/api/copiloto',
+      metadata: { plano_id: plano.id, evento: 'aprovacao_confirmada' },
+    });
+    if (erroAuditoria) {
+      return json({ erro: 'Não foi possível registrar a autorização. Nenhuma ação foi criada.' }, 503);
+    }
     const { error } = await db.from('pdi_acoes').insert({
       plano_id: plano.id,
       mentorado_id: user.id,
@@ -165,25 +198,50 @@ export async function POST(request: NextRequest) {
       console.error('[Copiloto] erro ao adicionar ação', error.code);
       return json({ erro: 'Não foi possível registrar a ação no PDI.' }, 500);
     }
+    const { error: erroRegistro } = await db.from('product_events').insert({
+      user_id: user.id, event_name: 'copilot_pdi_action_created',
+      feature_key: 'iris-copiloto', path: '/api/copiloto',
+      metadata: { plano_id: plano.id, evento: 'acao_criada' },
+    });
+    if (erroRegistro) console.warn('[Copiloto] log de criação não persistido', erroRegistro.code);
     return json({ resposta: 'Ação criada no seu PDI com sua autorização.', href: '/meu-pdi' });
   }
 
   const pedido = texto(body.mensagem, 4000);
   if (pedido.length < 3) return json({ erro: 'Escreva o que você precisa.' }, 400);
-  const intencao = await classificarComJev(pedido);
+  const classificada = await classificarComJev(pedido);
+  // Consultas de status não devem gerar novas tarefas, mesmo se a classificação for PDI.
+  const perguntaDeStatus = /\b(complet[oa]|conclu[ií]d[oa]|finalizad[oa]|preenchi|progresso|pend[êe]ncia|quantas? (etapas|tarefas|a[cç][õo]es|se[cç][õo]es))\b/i.test(pedido);
+  const intencao: Intencao = perguntaDeStatus ? 'progresso' : classificada;
+
+  const [mapaPermissao, pdiPermissao, curriculoPermissao] = await Promise.all([
+    db.rpc('soma_has_module', { p_slug: 'autoconhecimento' }),
+    db.rpc('soma_has_module', { p_slug: 'desenvolvimento' }),
+    db.rpc('soma_has_module', { p_slug: 'curriculo-ats' }),
+  ]);
+  if (mapaPermissao.error || pdiPermissao.error || curriculoPermissao.error) {
+    return json({ erro: 'Não foi possível validar as ferramentas do seu plano.' }, 503);
+  }
+  const podeMapa = mapaPermissao.data === true;
+  const podePdi = pdiPermissao.data === true;
+  const podeCurriculo = curriculoPermissao.data === true;
+  if ((intencao === 'pdi' && !podePdi) || (intencao === 'vaga' && !podeCurriculo) ||
+      (intencao === 'progresso' && !podeMapa && !podePdi)) {
+    return json({ erro: 'Esta funcionalidade não está disponível no seu plano atual.', href: '/meu-plano' }, 403);
+  }
 
   // Todas as consultas usam a sessão autenticada e filtros do próprio mentorado.
   const [
     respostas, bussola, planoResponse, acoesResponse, cvResponse, entrevistaResponse,
   ] = await Promise.all([
-    db.from('quem_sou_eu_respostas').select('bloco,resposta').eq('user_id', user.id),
-    db.from('bussola_posicionamento').select('norte,centro').eq('user_id', user.id)
-      .order('gerado_em', { ascending: false }).limit(1).maybeSingle(),
-    db.from('pdi_planos').select('id,pilares').eq('mentorado_id', user.id)
-      .eq('status', 'ativo').order('gerado_em', { ascending: false }).limit(1).maybeSingle(),
-    db.from('pdi_acoes').select('titulo,concluida').eq('mentorado_id', user.id).limit(100),
-    db.from('cv_simulacoes').select('curriculo_texto').eq('user_id', user.id)
-      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    podeMapa ? db.from('quem_sou_eu_respostas').select('bloco,resposta').eq('user_id', user.id) : Promise.resolve({ data: [], error: null }),
+    podeMapa ? db.from('bussola_posicionamento').select('norte,centro').eq('user_id', user.id)
+      .order('gerado_em', { ascending: false }).limit(1).maybeSingle() : Promise.resolve({ data: null, error: null }),
+    podePdi ? db.from('pdi_planos').select('id,pilares').eq('mentorado_id', user.id)
+      .eq('status', 'ativo').order('gerado_em', { ascending: false }).limit(1).maybeSingle() : Promise.resolve({ data: null, error: null }),
+    podePdi ? db.from('pdi_acoes').select('titulo,concluida').eq('mentorado_id', user.id).limit(100) : Promise.resolve({ data: [], error: null }),
+    podeCurriculo && intencao === 'vaga' ? db.from('cv_simulacoes').select('curriculo_texto').eq('user_id', user.id)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle() : Promise.resolve({ data: null, error: null }),
     db.from('entrevistas_iniciais').select('objetivo_principal').eq('user_id', user.id).maybeSingle(),
   ]);
   if (respostas.error || bussola.error || planoResponse.error ||
@@ -205,13 +263,30 @@ export async function POST(request: NextRequest) {
 
   // Consultas diretas não consomem tokens de um LLM generativo.
   if (intencao === 'progresso') {
-    const statusMapa = mapaPronto ? 'concluído' : 'com ' + respondidos.size + ' de ' + BLOCOS_QUEM_SOU_EU.length + ' blocos respondidos';
-    const statusPdi = plano ? 'No PDI, ' + concluidas + ' de ' + acoes.length + ' ações foram concluídas.' :
-      'Você ainda não tem um plano de ações do PDI gerado.';
+    const [guia, preenchidas] = podePdi ? await Promise.all([
+      db.from('pdi_guia_secoes').select('codigo'),
+      db.from('pdi_respostas').select('secao,dados,concluido').eq('user_id', user.id),
+    ]) : [{ data: [], error: null }, { data: [], error: null }];
+    if (guia.error || preenchidas.error) {
+      return json({ erro: 'Não consegui conferir as perguntas do PDI com segurança.' }, 503);
+    }
+    const validas = new Set((guia.data ?? []).map(s => s.codigo));
+    const salvas = new Set((preenchidas.data ?? []).filter(r => r.concluido &&
+      typeof r.dados?.texto === 'string' && r.dados.texto.trim() && validas.has(r.secao))
+      .map(r => r.secao));
+    const perguntas = validas.size > 0 ? salvas.size + ' de ' + validas.size : 'não disponíveis';
+    const completo = validas.size > 0 && salvas.size === validas.size;
+    const statusMapa = podeMapa ? (mapaPronto ? 'concluído (9 de 9 blocos)' :
+      'com ' + respondidos.size + ' de ' + BLOCOS_QUEM_SOU_EU.length + ' blocos respondidos') : 'não disponível no seu plano';
+    const statusPdi = podePdi ? (
+      'As perguntas-guia do PDI estão ' + (completo ? '100% concluídas (' + perguntas + '). ' : 'com ' + perguntas + ' respondidas. ') +
+      (plano ? 'No plano de execução, ' + concluidas + ' de ' + acoes.length + ' ações foram marcadas como realizadas.' :
+      'O plano de ações ainda não foi gerado.')
+    ) : 'O PDI não está disponível no seu plano.';
     return json({
       resposta: 'Seu Mapa Quem Sou Eu está ' + statusMapa + '. ' + statusPdi +
-        (pendentes.length ? ' Próximas atividades: ' + pendentes.join('; ') + '.' : ''),
-      href: '/onboarding',
+        (podePdi && pendentes.length ? ' Próximas ações sugeridas: ' + pendentes.join('; ') + '.' : ''),
+      href: podePdi ? '/meu-pdi' : '/quem-sou-eu',
     });
   }
 
