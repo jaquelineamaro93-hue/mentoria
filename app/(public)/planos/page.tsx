@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import { Mascot } from '@/components/soma/CareerJourney';
+import SomaSaasShowcase from '@/components/public/SomaSaasShowcase';
 
 export default async function PlanosPage() {
   const supabase = await createClient();
@@ -14,6 +15,10 @@ export default async function PlanosPage() {
     .eq('visivel_checkout', true)
     .order('duracao_meses', { ascending: true })
     .order('ordem', { ascending: true });
+
+  const { data: modulosRaw } = await supabase.from('soma_modules')
+    .select('slug,title,description')
+    .eq('enabled', true).order('display_order', { ascending: true });
 
   const planos = (planosRaw || []).filter((p) => {
     const hasTestInCodigo = p.codigo && p.codigo.toLowerCase().includes('teste');
@@ -121,6 +126,7 @@ export default async function PlanosPage() {
             </div>
           ))}
         </div>
+        <SomaSaasShowcase modulos={modulosRaw ?? []} />
       </div>
     </div>
   );
