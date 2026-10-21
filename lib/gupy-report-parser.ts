@@ -108,6 +108,30 @@ export function revisarOrientacoesLegadasGupy(markdown: string): { texto: string
       revisoes++;
       return '- **Histórico de candidaturas (Guia GUPY da SOMA):** os testes da SOMA registraram que candidaturas repetidas e avaliações anteriores podem influenciar novas oportunidades na plataforma. Isso é uma observação documentada, não uma pontuação interna acessível pela SOMA.';
     }
+    // Algumas gerações anteriores sugeriam CVs distintos por vaga dentro da Gupy.
+    // A Central de Ajuda confirma um único perfil curricular replicado às inscrições ativas.
+    // Revisão somente visual: nunca alterar as análises persistidas.
+    if (/\*\*(?:Recomendação SOMA|Hack SOMA validado|Hack SOMA)\*\*\s*:\s*(?:Fazer|Criar|Montar)\s+\*\*?(?:dois|2)\s+(?:arquivos|documentos|currículos)/i.test(linha)
+      || /Fazer\s+\*\*(?:dois|2)\s+arquivos de currículo/i.test(linha)
+      || /(?:dois|duas)\s+(?:PDFs|arquivos de currículo|versões verbais do LinkedIn)/i.test(linha)) {
+      revisoes++;
+      return '**Recomendação SOMA corrigida para a Gupy:** manter UM currículo no perfil compartilhado. Alterações em "Meu currículo" são refletidas em todas as candidaturas ativas. Compare Topaz e Gauge como diagnósticos separados, mas não envie versões diferentes para cada vaga na Gupy.';
+    }
+    if (/^\s*[-*]\s*\*\*?CV_(?:Topaz|Gauge)[^\n]*\.pdf\*\*?/i.test(linha)) {
+      revisoes++;
+      return /^\s*[-*]\s*\*\*?CV_Topaz/i.test(linha)
+        ? '- **Topaz:** avaliar se o currículo único já demonstra suporte, operações, SLA e liderança técnica realmente exercidos, preservando experiências relevantes para outras candidaturas.'
+        : '- **Gauge:** avaliar se o mesmo currículo único demonstra estratégia de CRM, liderança, martech e resultados reais, sem criar outro arquivo na Gupy.';
+    }
+    if (/^\s*\*\*(?:Erro comum|Hack SOMA)[^\n]*\*\*.*(?:mesmo currículo genérico|dois documentos de currículo)/i.test(linha)
+      || /Não copiar-colar; adaptar ordem de experiências, palavras-chave, métricas/i.test(linha)) {
+      revisoes++;
+      return '- **Atenção ao perfil global:** corrigir lacunas verificadas e organizar competências reais de modo abrangente, considerando os efeitos da edição nas demais candidaturas ativas.';
+    }
+    if (/^\s*Não é falsificar dados; é \*\*reorganizar narrativa para cada público/i.test(linha)) {
+      revisoes++;
+      return 'Na Gupy, não alterne a narrativa do mesmo perfil por vaga. Ajustes devem manter a trajetória verdadeira e servir ao conjunto das candidaturas ativas.';
+    }
     return linha;
   }).join('\n');
   return { texto, revisoes };
