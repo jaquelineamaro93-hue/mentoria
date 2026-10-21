@@ -66,7 +66,7 @@
 .skipLink:focus { top: 12px; }
 .sidebar :is(a, button):focus-visible { outline: 2px solid #8debd8; outline-offset: -2px; }
 @media (max-width: 1199px) { .portalCaption { display: none; } .topbar { padding-inline: 26px; } .pageContent { padding-inline: 26px; } }
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
   .shell, .shellCompact { --sidebar-width: 0px; }
   .sidebar { width: min(310px, calc(100vw - 32px)); transform: translateX(-100%); visibility: hidden; transition: transform .2s ease, visibility .2s; }
   .mobileOpen { transform: translateX(0); visibility: visible; }
