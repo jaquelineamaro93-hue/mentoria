@@ -15,6 +15,8 @@ export default function GupyAuditClient({
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [vagas, setVagas] = useState('');
   const [gerando, setGerando] = useState(false);
+  const [reanalisandoId, setReanalisandoId] = useState<string | null>(null);
+  const [erroReanalise, setErroReanalise] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [historico, setHistorico] = useState(historicoInicial);
   const [atual, setAtual] = useState<SomaAnaliseResumo | null>(historicoInicial[0] ?? null);
@@ -52,6 +54,29 @@ export default function GupyAuditClient({
       setErro(error instanceof Error ? error.message : 'Não foi possível analisar o currículo.');
     } finally {
       setGerando(false);
+    }
+  }
+
+  async function reanalisarDoHistorico(item: SomaAnaliseResumo) {
+    if (gerando || reanalisandoId) return;
+    setReanalisandoId(item.id);
+    setErroReanalise(null);
+    try {
+      const response = await fetch('/api/ferramentas-soma/reanalisar-gupy', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ analiseId: item.id }),
+      });
+      const data = await response.json() as { analise?: SomaAnaliseResumo; error?: string };
+      if (!response.ok || !data.analise) throw new Error(data.error || 'Não foi possível gerar a nova leitura.');
+      setAtual(data.analise);
+      setHistorico(lista => [data.analise as SomaAnaliseResumo, ...lista.filter(x => x.id !== data.analise?.id)]);
+    } catch (err) {
+      setErroReanalise(err instanceof Error ? err.message : 'Não foi possível gerar a nova análise.');
+    } finally {
+      setReanalisandoId(null);
     }
   }
 
@@ -155,7 +180,14 @@ export default function GupyAuditClient({
           <p className="mt-1 text-xs leading-relaxed text-gray-text">Não acessa notas privadas, não altera candidaturas na Gupy e não promete aprovação ou reversão de avaliações internas.</p>
         </div>
       </section>
-      <GupyAnalysisOutput atual={atual} historico={historico} onSelect={setAtual} />
+      <GupyAnalysisOutput
+        atual={atual}
+        historico={historico}
+        onSelect={setAtual}
+        onReanalisar={reanalisarDoHistorico}
+        reanalisandoId={reanalisandoId}
+        erroReanalise={erroReanalise}
+      />
     </main>
   );
 }
