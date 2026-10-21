@@ -12,8 +12,8 @@ const ofertas = [
   },
   {
     nome: 'SOMA Essencial',
-    preco: 'R$ 39,90',
-    subtitulo: 'por mês',
+    preco: 'R$ 34,90',
+    subtitulo: 'por mês, preço regional para o Brasil',
     icone: Workflow,
     descricao: 'Uma jornada de autoconhecimento e desenvolvimento, no seu ritmo.',
     itens: ['Mapa Quem Sou Eu', 'Diagnóstico & Perfil', 'PDI & crescimento'],
