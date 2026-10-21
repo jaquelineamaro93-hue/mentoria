@@ -6,6 +6,9 @@
    Fonte: https://suporte-candidatos.gupy.io/s/article/Como-atualizar-o-meu-curriculo?language=pt_BR
    Fonte complementar: https://www.gupy.io/blog-do-emprego/curriculo-gupy
 
+**Exceção importante para não generalizar:** a Candidatura Rápida é um fluxo diferente do perfil centralizado: permite anexar PDF/Word específico naquela inscrição, sem edição da candidatura após o envio. Uma análise da SOMA que usa "Meu currículo" não deve inferir que essa possibilidade se aplica às candidaturas padrão.
+   Fonte: https://suporte-candidatos.gupy.io/s/article/como-funciona-a-ordenacao-das-candidaturas-em-vagas-de-candidatura-rapida?language=pt_BR
+
 2. **Campos por candidatura na API empresarial.** A documentação listing applications do Developer Hub registra job.id (vaga), id (applicationId), status, etapa, score (afinidade do candidato àquela vaga) e matching (resultado do teste de perfil/compatibilidade com a empresa). Essas métricas não devem ser confundidas e não equivalem a uma pontuação global acessível pelo candidato.
    Fonte: https://developers.gupy.io/docs/listing-applications
 
