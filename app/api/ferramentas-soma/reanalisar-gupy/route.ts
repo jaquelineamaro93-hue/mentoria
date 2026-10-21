@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return json({ error: 'Faça login para atualizar sua análise.' }, 401);
 
+  const { data: podeUsar, error: erroModulo } = await supabase.rpc('soma_has_module', { p_slug: 'curriculo-ats' });
+  if (erroModulo) return json({ error: 'Não foi possível validar o acesso ao módulo.' }, 503);
+  if (podeUsar !== true) return json({ error: 'O módulo Gupy & ATS não está disponível no seu plano.' }, 403);
+
   let payload: { analiseId?: unknown };
   try { payload = await request.json(); }
   catch { return json({ error: 'Solicitação inválida.' }, 400); }
@@ -46,8 +50,9 @@ export async function POST(request: NextRequest) {
   // As análises anteriores não guardavam PDF e descrição integral de vagas.
   // A geração é uma releitura do relatório salvo e nunca uma auditoria nova do score Gupy.
   const titulo = typeof anterior.titulo === 'string' ? anterior.titulo.slice(0, 140) : 'Gupy & ATS';
-  const cargo = typeof anterior.entradas?.cargoAlvo === 'string'
-    ? anterior.entradas.cargoAlvo.slice(0, 200) : '';
+  const entradas = anterior.entradas && typeof anterior.entradas === 'object' && !Array.isArray(anterior.entradas)
+    ? anterior.entradas : {};
+  const cargo = typeof entradas.cargoAlvo === 'string' ? entradas.cargoAlvo.slice(0, 200) : '';
   const fonte = resultadoAntigo.length > 32000
     ? resultadoAntigo.slice(0, 24500) + '\n\n[PARTE INTERMEDIÁRIA NÃO REENVIADA]\n\n' + resultadoAntigo.slice(-7500)
     : resultadoAntigo;
