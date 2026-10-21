@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Bot, ChevronDown, ExternalLink, Send, Sparkles, X } from 'lucide-react';
+import { ChevronDown, ExternalLink, Send, Sparkles, X } from 'lucide-react';
+import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
 type Mensagem = {
@@ -112,14 +113,14 @@ export default function IrisCopiloto() {
           onClick={() => setAberto(true)}
           className="flex items-center gap-2 rounded-full border border-[#7b5c4c] bg-[#5B453E] px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#45322c]"
         >
-          <Sparkles size={20} aria-hidden="true" />
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f0e9fa]" aria-hidden="true"><Mascot index={3} size={28} /></span>
           <span>Íris Copiloto</span>
         </button>
       ) : (
         <div className="flex h-[min(660px,calc(100dvh-2rem))] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-[#d8cec9] bg-white shadow-2xl" role="region" aria-label="Conversa com Íris Copiloto">
           <header className="flex shrink-0 items-center justify-between bg-[#5B453E] px-4 py-3 text-white">
             <div className="flex items-center gap-2">
-              <Bot size={23} aria-hidden="true" />
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/30 bg-[#f3ecfc]" aria-hidden="true"><Mascot index={3} size={36} /></span>
               <div>
                 <p className="text-sm font-semibold">Íris Copiloto</p>
                 <p className="text-xs text-white/80">Assistente nativa da SOMA</p>
