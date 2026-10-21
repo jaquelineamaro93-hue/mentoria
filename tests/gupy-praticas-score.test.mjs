@@ -30,5 +30,8 @@ test('Relato é opcional, limitado e não é armazenado integralmente no histór
   assert.match(ui, /maxLength=\{1800\}/);
   assert.match(api, /observacoes: String\(body\.observacoes/);
   assert.match(api, /incluiuObservacoes: Boolean/);
-  assert.doesNotMatch(api, /entradasParaHistorico\s*=\s*\{[\s\S]*?observacoes:\s*String\(body\.observacoes/);
+  const historicos = api.split('entradasParaHistorico = {');
+  const historicoGupy = historicos[2]?.split('};')[0] ?? '';
+  assert.ok(historicoGupy.includes('incluiuObservacoes:'));
+  assert.ok(!historicoGupy.includes('observacoes:'), 'O relato completo não deve ficar no banco de histórico');
 });
