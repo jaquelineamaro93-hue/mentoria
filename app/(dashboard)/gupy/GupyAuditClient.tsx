@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileSearch, Loader2, Upload } from 'lucide-react';
+import { FileSearch, Loader2, Upload, ShieldCheck, ListChecks, Info, TrendingDown } from 'lucide-react';
 import { extrairTextoPdf } from '@/lib/pdf';
 import SomaAnalysisOutput, { type SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
 
@@ -13,6 +13,7 @@ export default function GupyAuditClient({
   const [cargoAlvo, setCargoAlvo] = useState('');
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [vagas, setVagas] = useState('');
+  const [observacoes, setObservacoes] = useState('');
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [historico, setHistorico] = useState(historicoInicial);
@@ -38,6 +39,7 @@ export default function GupyAuditClient({
           curriculo,
           vagas,
           cargoAlvo,
+          observacoes,
         }),
       });
 
@@ -55,7 +57,7 @@ export default function GupyAuditClient({
   }
 
   return (
-    <main className="px-6 py-8 md:px-12 md:py-10 w-full">
+    <main className="min-w-0 w-full px-3 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
       <header className="max-w-4xl mb-8">
         <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2">Mercado de trabalho</p>
         <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Gupy & ATS</h1>
@@ -117,9 +119,50 @@ export default function GupyAuditClient({
           </label>
         </div>
 
+        <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <label className="block">
+            <span className="text-sm font-medium text-black">Histórico e sinais de triagem (opcional)</span>
+            <p className="mb-2 mt-1 text-xs leading-relaxed text-gray-text">
+              Conte, se desejar, o que você observou em processos anteriores, como candidaturas
+              em várias vagas da mesma empresa, reprovações ou mudanças após atualizar seu perfil.
+              Não informe CPF, e-mail ou dados de outras pessoas.
+            </p>
+            <textarea
+              rows={5}
+              value={observacoes}
+              maxLength={1800}
+              onChange={(event) => setObservacoes(event.target.value)}
+              placeholder="Ex.: Candidatei-me a três vagas da mesma empresa e notei mudanças no retorno. Não sei a causa."
+              className="w-full rounded-lg border border-gray-faint px-4 py-3 text-base resize-y focus:border-mint-deep focus:outline-none"
+            />
+          </label>
+          <section className="rounded-xl border border-[#d5e9e3] bg-[#f5fbf8] p-4" aria-labelledby="praticas-gupy-titulo">
+            <h2 id="praticas-gupy-titulo" className="flex items-center gap-2 text-sm font-semibold text-[#154c42]">
+              <ListChecks size={17} aria-hidden="true" />
+              Boas práticas de triagem
+            </h2>
+            <p className="mt-2 text-xs leading-relaxed text-[#3e5b52]">
+              Recomendações da SOMA, combinando documentação pública da Gupy com observações
+              práticas realizadas pela mentora ao longo de três anos. Isso não equivale a
+              conhecer o algoritmo ou as notas internas da plataforma.
+            </p>
+            <ul className="mt-3 space-y-2 text-xs leading-relaxed text-[#344c43]">
+              <li><strong>Perfil completo:</strong> descreva experiências, datas, cursos e requisitos realmente atendidos.</li>
+              <li><strong>Candidaturas com foco:</strong> priorize vagas aderentes. Evite inscrições indiscriminadas na mesma empresa. É uma boa prática baseada na experiência da mentora, não uma regra eliminatória publicada.</li>
+              <li><strong>Curtidas e descurtidas:</strong> recrutadores podem registrar avaliações. Não é possível afirmar que uma descurtida gera punição global permanente.</li>
+              <li><strong>Histórico e perfil:</strong> acompanhe resultados e atualize dados verdadeiros; não use CPF ou identidade fictícia para criar uma conta.</li>
+            </ul>
+          </section>
+        </div>
+
         <div className="mt-5 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
-          A SOMA não tem acesso ao score interno da Gaia nem aos pesos privados da Gupy. A nota exibida é uma
-          estimativa própria de aderência baseada no conteúdo do currículo e das vagas informadas.
+          <span className="inline-flex items-center gap-1 font-semibold"><Info size={14} aria-hidden="true" /> Como ler suas notas</span>
+          <span className="mt-1 block">
+            A SOMA não tem acesso às notas internas da Gupy nem aos pesos privados dos Agentes de IA.
+            A nota de 0 a 100 exibida na análise é uma <strong>estimativa da SOMA para a vaga informada</strong>,
+            não o score da Gupy. A ferramenta identifica fatores que podem reduzir a aderência
+            percebida, mas não consegue detectar descurtidas privadas ou bloqueios ocultos.
+          </span>
         </div>
 
         {erro && (
@@ -139,6 +182,16 @@ export default function GupyAuditClient({
         </button>
       </section>
 
+      <section className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-gray-faint bg-white px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-black"><TrendingDown size={17} className="text-[#ad634e]" aria-hidden="true" /> O que pode baixar sua aderência?</p>
+          <p className="mt-1 text-xs leading-relaxed text-gray-text">Requisitos essenciais ausentes, informações incompletas, experiência pouco demonstrada e currículo genérico. Confira os motivos na análise.</p>
+        </div>
+        <div className="rounded-xl border border-gray-faint bg-white px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-black"><ShieldCheck size={17} className="text-mint-deep" aria-hidden="true" /> O que a SOMA não faz</p>
+          <p className="mt-1 text-xs leading-relaxed text-gray-text">Não acessa notas privadas, não altera candidaturas na Gupy e não promete aprovação ou reversão de avaliações internas.</p>
+        </div>
+      </section>
       <SomaAnalysisOutput atual={atual} historico={historico} onSelect={setAtual} />
     </main>
   );
