@@ -14,7 +14,6 @@ export default function GupyAuditClient({
   const [cargoAlvo, setCargoAlvo] = useState('');
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [vagas, setVagas] = useState('');
-  const [observacoes, setObservacoes] = useState('');
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [historico, setHistorico] = useState(historicoInicial);
@@ -40,7 +39,6 @@ export default function GupyAuditClient({
           curriculo,
           vagas,
           cargoAlvo,
-          observacoes,
         }),
       });
 
@@ -119,22 +117,6 @@ export default function GupyAuditClient({
             />
           </label>
         </div>
-
-        <label className="mt-5 block">
-          <span className="text-sm font-medium text-black">Histórico e sinais de triagem (opcional)</span>
-          <p className="mb-2 mt-1 max-w-4xl text-xs leading-relaxed text-gray-text">
-            Caso já tenha se candidatado pela Gupy, conte o que percebeu sobre ranqueamento,
-            retornos ou candidaturas repetidas. Não inclua dados pessoais de outras pessoas.
-          </p>
-          <textarea
-            rows={4}
-            value={observacoes}
-            maxLength={1800}
-            onChange={(event) => setObservacoes(event.target.value)}
-            placeholder="Ex.: Meu perfil recebeu avaliações anteriores ou fui candidata a mais de uma vaga da mesma empresa."
-            className="w-full rounded-lg border border-gray-faint px-4 py-3 text-base resize-y focus:border-mint-deep focus:outline-none"
-          />
-        </label>
 
         <div className="mt-5 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
           <span className="inline-flex items-center gap-1 font-semibold"><Info size={14} aria-hidden="true" /> Como ler suas notas</span>

@@ -95,13 +95,11 @@ export async function POST(request: NextRequest) {
       curriculo,
       vagas,
       cargoAlvo: String(body.cargoAlvo ?? ''),
-      observacoes: String(body.observacoes ?? '').trim().slice(0, 1800),
     });
 
     entradasParaHistorico = {
       cargoAlvo: String(body.cargoAlvo ?? '').trim().slice(0, 1000),
       quantidadeCaracteresVagas: vagas.length,
-      incluiuObservacoes: Boolean(String(body.observacoes ?? '').trim()),
     };
   } else {
     const situacao = String(body.situacao ?? '').trim();
