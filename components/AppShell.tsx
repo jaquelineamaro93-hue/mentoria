@@ -16,6 +16,7 @@ import TrialBanner from '@/components/TrialBanner';
 import InspecaoBanner from '@/components/InspecaoBanner';
 import ConfirmacaoContatoModal from '@/components/ConfirmacaoContatoModal';
 import EntrevistaInicialModal from '@/components/EntrevistaInicialModal';
+import IrisCopiloto from '@/components/IrisCopiloto';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
 import type { Profile } from '@/lib/types';
@@ -225,6 +226,7 @@ function AppShellContent({ children, initialProfile }: { children: React.ReactNo
             {children}
           </div>
         </main>
+        {!pathname.startsWith('/admin') && initialProfile && <IrisCopiloto />}
       </div>
     </div>
   );
