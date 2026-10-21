@@ -16,7 +16,8 @@ test('All information remains accessible in the full report and copy actions', (
   const view = src('components/GupyAnalysisOutput.tsx');
   assert.match(view, /Relatório completo/);
   assert.match(view, /atual\.resultado_markdown/);
-  assert.match(view, /markdown=\{secao\.markdown\}/);
+  assert.match(view, /<CorpoDeSecao secao=\{secao\}/);
+  assert.match(view, /secao\.markdown\.split/);
   assert.match(view, /markdown=\{introducao\}/);
   assert.match(view, /Copiar relatório/);
   assert.match(view, /Copiar versão/);
