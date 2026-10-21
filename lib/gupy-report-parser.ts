@@ -33,7 +33,7 @@ const CAPITULOS = /^(?:diagn[oó]stico(?: de ader[eê]ncia)?|sinais que podem re
 
 function extrairCabecalho(linha: string): string | null {
   const limpa = linha.trim();
-  // ## capítulos ou títulos legados numerados em linha exclusiva.
+  // Aceita ## capítulos ou relatórios legados com títulos numerados em linha exclusiva.
   const match = limpa.match(/^#{2,3}\s+(?:\d{1,2}[.)]\s*)?(.+)$/)
     || limpa.match(/^(?:\*\*)?(?:\d{1,2})[.)]\s+(.+?)(?:\*\*)?$/);
   if (!match) return null;
