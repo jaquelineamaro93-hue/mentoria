@@ -48,17 +48,14 @@ export default function TermosGate() {
       if(cancelado || erroAuth || !user)return;
 
       const {data:perfil,error:erroPerfil}=await supabase.from('profiles')
-        .select('nome,email,is_admin,status_assinatura,data_fim_acesso')
+        .select('nome,email,is_admin,status_assinatura,data_fim_acesso,trial_status,trial_ends_at')
         .eq('id',user.id).maybeSingle();
 
-      // Exclui visitantes, trial, admins, planos vencidos e inativos.
-      if(cancelado || erroPerfil || !perfil || perfil.is_admin ||
-         perfil.status_assinatura!=='ativo')return;
-      if(perfil.data_fim_acesso) {
-        const vencimento=new Date(perfil.data_fim_acesso+'T23:59:59-03:00');
-        if(!Number.isFinite(vencimento.getTime()) ||
-           vencimento.getTime()<Date.now())return;
-      }
+      // Exibir os termos aos usuários logados elegíveis, inclusive trial ativo e contas de teste/admin.
+      if(cancelado || erroPerfil || !perfil)return;
+      const pagoAtivo=perfil.status_assinatura==='ativo' && (!perfil.data_fim_acesso || perfil.data_fim_acesso>=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}));
+      const trialAtivo=perfil.trial_status==='active' && !!perfil.trial_ends_at && new Date(perfil.trial_ends_at).getTime()>Date.now();
+      if(!perfil.is_admin && !pagoAtivo && !trialAtivo)return;
 
       const {data:pausa,error:erroPausa}=await supabase.from('mentoria_pausas')
         .select('id').eq('user_id',user.id).eq('status','ativa')
