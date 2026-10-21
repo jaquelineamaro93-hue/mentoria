@@ -1,158 +1,128 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import AuthJourneyLoading from '@/components/AuthJourneyLoading';
 
-function AuthConfirmContent() {
+type Etapa = 'verificando' | 'preparando' | 'finalizando' | 'erro';
+
+function ConfirmarLogin() {
   const router = useRouter();
-  const supabase = createClient();
-  const [status, setStatus] = useState('Processando autenticação...');
+  const [etapa, setEtapa] = useState<Etapa>('verificando');
+  const [detalhe, setDetalhe] = useState<string | undefined>();
 
   useEffect(() => {
-    let isSubscribed = true;
+    let ativa = true;
+    const supabase = createClient();
+    const setStatus = (novaEtapa: Etapa, mensagem?: string) => {
+      if (!ativa) return;
+      setEtapa(novaEtapa);
+      setDetalhe(mensagem);
+    };
 
-    const handleAuth = async () => {
-      const registrarLogin = async () => {
-        const { error } = await supabase.rpc('registrar_login_portal');
-        if (error) {
-          console.warn('[AUTH-CONFIRM] Não foi possível registrar o login:', error.message);
-        }
-      };
-
-      // Só ativa trial depois que a sessão foi estabelecida. A rota valida usuário e plano.
-      const concluirTrial = async () => {
-        const planId = new URLSearchParams(window.location.search).get('trial_plan');
-        if (!planId) return true;
-        try {
-          const response = await fetch('/api/trial/start', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            cache: 'no-store',
-            body: JSON.stringify({ planId, source: 'magic_code' }),
-          });
-          if (response.ok) return true;
-          const result = await response.json().catch(() => ({}));
-          if (response.status === 409 && String(result.error || '').includes('acesso ativo')) return true;
-          setStatus(result.error || 'Não foi possível iniciar o teste. Atualize a página para tentar novamente.');
-          return false;
-        } catch {
-          setStatus('Não foi possível iniciar o teste. Atualize a página para tentar novamente.');
-          return false;
-        }
-      };
-
-      // 1. Escuta eventos do Supabase
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (!isSubscribed) return;
-        
-        console.log('🔔 Auth Event:', event);
-
-        if (event === 'PASSWORD_RECOVERY') {
-          console.log('🔐 Password recovery detectado');
-          router.push('/reset-password'); 
-        } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
-          console.log('✅ SIGNED_IN com usuário:', session.user.email);
-          await registrarLogin();
-          if (await concluirTrial()) router.push('/dashboard');
-        }
-      });
-
-      // 2a. Lê token_hash da QUERY (OAuth Google)
-      if (typeof window !== "undefined") {
-        const queryParams = new URLSearchParams(window.location.search);
-        const tokenHash = queryParams.get("token_hash");
-        const tokenType = queryParams.get("type");
-        if (tokenHash && tokenType) {
-          setStatus("Verificando login com Google...");
-          const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
-          if (otpError) { router.push('/login?error=token_invalid'); return; }
-          await registrarLogin();
-          if (await concluirTrial()) router.push('/dashboard');
-          return;
-        }
+    // Evita imprimir tokens, fragmentos, e-mails ou dados de sessão no console.
+    const concluir = async (tipo?: string | null) => {
+      setStatus('preparando');
+      const { data: identidade, error } = await supabase.auth.getUser();
+      if (!ativa) return;
+      if (error || !identidade.user) {
+        setStatus('erro', 'Não conseguimos validar sua sessão. Entre novamente para continuar.');
+        return;
       }
 
-      // 2b. Lê tokens da HASH da URL (magic link - NAO MEXER)
-      if (typeof window !== 'undefined' && window.location.hash) {
-        console.log('📍 Hash encontrada:', window.location.hash.substring(1, 50) + '...');
-        
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        const type = hashParams.get('type');
+      // Este registro é complementar e não deve comprometer a entrada.
+      const login = supabase.rpc('registrar_login_portal')
+        .then(() => undefined, () => undefined);
 
-        console.log('🔑 Access token:', !!accessToken);
-        console.log('🔄 Refresh token:', !!refreshToken);
-        console.log('📝 Type:', type);
-
-        if (accessToken && refreshToken) {
-          console.log('⚙️ Chamando setSession...');
-          
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-
-          if (error) {
-            console.error('❌ setSession error:', error);
-          } else {
-            console.log('✅ setSession sucesso:', data.user?.email);
-            await registrarLogin();
-            
-            if (type === 'recovery') {
-              console.log('➡️ Redirecionando para reset-password');
-              router.push('/reset-password');
-            } else {
-              console.log('➡️ Redirecionando para dashboard');
-              if (await concluirTrial()) router.push('/dashboard');
-            }
+      const trialPlan = new URLSearchParams(window.location.search).get('trial_plan');
+      if (trialPlan && tipo !== 'recovery') {
+        const response = await fetch('/api/trial/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify({ planId: trialPlan, source: 'magic_code' }),
+        }).catch(() => null);
+        if (!ativa) return;
+        if (!response) {
+          setStatus('erro', 'Não conseguimos iniciar seu teste gratuito. Tente entrar novamente.');
+          return;
+        }
+        if (!response.ok) {
+          const result = await response.json().catch(() => ({})) as { error?: string };
+          if (response.status !== 409 || !String(result.error || '').includes('acesso ativo')) {
+            setStatus('erro', result.error || 'Não foi possível iniciar o período de teste.');
             return;
           }
         }
       }
+      void login;
+      if (!ativa) return;
+      setStatus('finalizando');
+      router.replace(tipo === 'recovery' ? '/reset-password' : '/dashboard');
+      router.refresh();
+    };
 
-      // 3. Fallback após 5s
-      const timeout = setTimeout(async () => {
-        if (!isSubscribed) return;
-        
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('⏱️ Fallback check - Session:', session?.user?.email || 'nenhuma');
-        
-        if (!session) {
-          console.log('❌ Nenhuma sessão encontrada');
-          router.push('/login?error=no_session');
+    const processar = async () => {
+      try {
+        const url = new URL(window.location.href);
+        const tokenHash = url.searchParams.get('token_hash');
+        const tokenType = url.searchParams.get('type');
+
+        if (tokenHash && tokenType) {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: tokenType as Parameters<typeof supabase.auth.verifyOtp>[0]['type'],
+          });
+          if (!ativa) return;
+          if (error) throw new Error('Link inválido ou expirado.');
+          url.searchParams.delete('token_hash');
+          url.searchParams.delete('type');
+          window.history.replaceState(null, '', url.pathname + url.search);
+          await concluir(tokenType);
+          return;
         }
-      }, 5000);
 
-      return () => {
-        clearTimeout(timeout);
-        subscription?.unsubscribe();
-      };
+        // Magic link legado via URL fragment. Não registra nem envia o token a terceiros.
+        const fragmento = new URLSearchParams(url.hash.replace(/^#/, ''));
+        const accessToken = fragmento.get('access_token');
+        const refreshToken = fragmento.get('refresh_token');
+        const tipo = fragmento.get('type');
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (!ativa) return;
+          if (error) throw new Error('O link de acesso expirou. Solicite um novo.');
+          window.history.replaceState(null, '', url.pathname + url.search);
+          await concluir(tipo);
+          return;
+        }
+
+        // Login realizado pelo servidor ou retorno do provedor Google.
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (!ativa) return;
+        if (error || !session) {
+          throw new Error('Não localizamos uma sessão ativa. Entre novamente.');
+        }
+        await concluir();
+      } catch (erro) {
+        setStatus('erro', erro instanceof Error ? erro.message : 'Não foi possível concluir a autenticação.');
+      }
     };
+    void processar();
+    return () => { ativa = false; };
+  }, [router]);
 
-    handleAuth();
-
-    return () => {
-      isSubscribed = false;
-    };
-  }, [router, supabase]);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-gray-text mb-2">{status}</p>
-        <p className="text-xs text-gray-text">F12 para logs completos</p>
-      </div>
-    </div>
-  );
+  return <AuthJourneyLoading etapa={etapa} detalhe={detalhe} />;
 }
 
 export default function AuthConfirmPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-text">Carregando...</p></div>}>
-      <AuthConfirmContent />
+    <Suspense fallback={<AuthJourneyLoading etapa="verificando" />}>
+      <ConfirmarLogin />
     </Suspense>
   );
 }
