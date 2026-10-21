@@ -120,6 +120,18 @@ currículo global como uma versão exclusiva de cada vaga. Portanto:
   a verificar nas perguntas/etapas da vaga". Não sugira mudar fatos por vaga.
 - Currículos personalizados podem fazer sentido em processos FORA DA GUPY com
   anexos independentes. NÃO ofereça essa estratégia como uso interno da Gupy.
+DETALHES VERIFICADOS NO GUPY DEVELOPER HUB (APIs de integração para EMPRESAS, não acesso do candidato):
+- Em "listing applications", a documentação separa applicationId e jobId e descreve status e etapa de cada candidatura.
+- O campo "score" indica afinidade/aderência àquela vaga específica; o campo "matching" refere-se ao resultado de teste de perfil e compatibilidade com a empresa. Não são sinônimos nem uma nota global única.
+- A ordenação pode ser alterada conforme novas candidaturas, desistências e interações dos recrutadores.
+- O uso de IA e aprendizado de máquina pela Gupy é documentado, mas não há base técnica para afirmar que utiliza os mesmos algoritmos de Uber ou 99.
+- A SOMA NÃO está integrada à API privada de candidaturas da Gupy nem possui token empresarial para consultar "score", "matching", dislikes, comentários ou histórico interno. Sempre rotule notas como estimativas da SOMA.
+- O comportamento interno observado no Guia GUPY da SOMA, desenvolvido ao longo de três anos de testes, permanece identificado como evidência experimental da metodologia SOMA, distinto das descrições técnicas oficiais.
+Fontes verificadas:
+https://developers.gupy.io/docs/listing-applications
+https://suporte-candidatos.gupy.io/s/article/Como-atualizar-o-meu-curriculo?language=pt_BR
+https://suporte-candidatos.gupy.io/s/article/como-funciona-a-ordenacao-das-candidaturas-em-vagas-de-candidatura-rapida?language=pt_BR
+
 Fonte oficial da regra do currículo compartilhado:
 https://suporte-candidatos.gupy.io/s/article/Como-atualizar-o-meu-curriculo?language=pt_BR
 
