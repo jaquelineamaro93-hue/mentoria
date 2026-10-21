@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { chamarClaude } from '@/lib/anthropic';
+import { revisarOrientacoesLegadasGupy } from '@/lib/gupy-report-parser';
 import {
   montarPromptLinkedIn,
   montarPromptGupy,
@@ -134,7 +135,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const resultado = await chamarClaude(prompt, 8000);
+    const gerado = await chamarClaude(prompt, 8000);
+    // Exclusivamente Gupy: não persistir a inferência "sem dados = histórico neutro".
+    // LinkedIn e Leitura de Cenário não são alterados.
+    const resultado = ferramenta === 'gupy'
+      ? revisarOrientacoesLegadasGupy(gerado).texto
+      : gerado;
 
     const { data, error } = await supabase
       .from('soma_analises')
