@@ -136,8 +136,9 @@ function botaoEstilo(ativo: boolean) {
     (ativo ? 'bg-mint-deep text-white shadow-sm' : 'border border-gray-faint bg-white text-[#46594e] hover:border-mint-deep');
 }
 
-function GupyRelatorio({ atual, onReanalisar, reanalisando, erroReanalise }: {
+function GupyRelatorio({ atual, historico, onReanalisar, reanalisando, erroReanalise }: {
   atual: SomaAnaliseResumo;
+  historico: SomaAnaliseResumo[];
   onReanalisar: (item: SomaAnaliseResumo) => Promise<void>;
   reanalisando: boolean;
   erroReanalise: string | null;
@@ -154,8 +155,19 @@ function GupyRelatorio({ atual, onReanalisar, reanalisando, erroReanalise }: {
   const { titulo: tituloIntroducao, contexto: contextoIntroducao } = useMemo(
     () => separarIntroducaoGupy(introducao), [introducao],
   );
-  const nota = useMemo(() => extrairNotaSoma(markdownExibido), [markdownExibido]);
-  const vagas = useMemo(() => extrairVagasGupy(markdownExibido), [markdownExibido]);
+  const isReanalise = atual.entradas?.origem === 'reanalise_relatorio_salvo'
+    || /^Reanálise\s*·/i.test(atual.titulo || '');
+  const fonte = historico.find(item => item.id === atual.entradas?.analiseOrigemId);
+  // Em reanálises, as notas são apenas referências da auditoria original.
+  // Não sugerir que foram recalculadas pelo modelo.
+  const notaAtual = extrairNotaSoma(markdownExibido);
+  const notaReferencia = typeof atual.entradas?.notaReferenciaSoma === 'number'
+    ? atual.entradas.notaReferenciaSoma : fonte ? extrairNotaSoma(fonte.resultado_markdown) : null;
+  const nota = isReanalise ? notaReferencia : notaAtual;
+  const vagasReferencia = atual.entradas?.vagasReferenciaSoma || (fonte ? extrairVagasGupy(fonte.resultado_markdown) : []);
+  const vagas = isReanalise ? vagasReferencia : extrairVagasGupy(markdownExibido);
+  const possuiChecklist = secoes.some(secao => secao.tipo === 'checklist');
+  const relatorioParcial = isReanalise && !possuiChecklist;
   const secaoCurriculo = secoes.filter(s => s.tipo === 'curriculo');
   const diagnostico = secoes.findIndex(s => s.tipo === 'diagnostico');
   const riscos = secoes.findIndex(s => s.tipo === 'riscos');
@@ -195,21 +207,28 @@ function GupyRelatorio({ atual, onReanalisar, reanalisando, erroReanalise }: {
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-[#d9e8e1] bg-white p-4">
-            <p className="text-xs font-medium text-[#526b61]">Aderência estimada SOMA</p>
+            <p className="text-xs font-medium text-[#526b61]">{isReanalise ? 'Aderência da análise original' : 'Aderência estimada SOMA'}</p>
             <p className="mt-1 text-3xl font-semibold tabular-nums text-[#183f37]">
-              {nota !== null ? String(nota) + '/100' : 'Não informada'}
+              {nota !== null ? String(nota) + '/100' : 'Não recalculada'}
             </p>
-            <p className="mt-1 text-xs leading-5 text-[#61756c]">Estimativa própria, não é o score interno da Gupy.</p>
+            <p className="mt-1 text-xs leading-5 text-[#61756c]">
+              {isReanalise ? 'Referência histórica da SOMA, não é uma nova pontuação nem o score da Gupy.'
+                : 'Estimativa própria, não é o score interno da Gupy.'}
+            </p>
           </div>
           <div className="rounded-xl border border-[#d9e8e1] bg-white p-4">
             <p className="text-xs font-medium text-[#526b61]">Vagas com notas identificadas</p>
             <p className="mt-1 text-3xl font-semibold tabular-nums text-[#183f37]">{vagas.length || '—'}</p>
-            <p className="mt-1 text-xs leading-5 text-[#61756c]">Comparações extraídas do relatório, quando disponíveis.</p>
+            <p className="mt-1 text-xs leading-5 text-[#61756c]">
+              {isReanalise ? 'Notas da auditoria original, sem recálculo.' : 'Comparações extraídas do relatório, quando disponíveis.'}
+            </p>
           </div>
           <div className="rounded-xl border border-[#d9e8e1] bg-white p-4">
             <p className="text-xs font-medium text-[#526b61]">Etapas da análise</p>
             <p className="mt-1 text-3xl font-semibold tabular-nums text-[#183f37]">{secoes.length}</p>
-            <p className="mt-1 text-xs leading-5 text-[#61756c]">Seções detalhadas disponíveis para leitura.</p>
+            <p className="mt-1 text-xs leading-5 text-[#61756c]">
+              {relatorioParcial ? 'Leitura parcial: o checklist não foi concluído.' : 'Seções detalhadas disponíveis para leitura.'}
+            </p>
           </div>
         </div>
       </div>
@@ -230,20 +249,31 @@ function GupyRelatorio({ atual, onReanalisar, reanalisando, erroReanalise }: {
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#c8ded5] bg-[#f3faf7] p-4 sm:p-5">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-[#1a473b]">Quer atualizar esta análise com os hacks da SOMA?</p>
+          <p className="text-sm font-semibold text-[#1a473b]">
+            {isReanalise ? (relatorioParcial ? 'Esta reanálise ficou incompleta' : 'Leitura atualizada do relatório salvo')
+              : 'Quer atualizar esta análise com os hacks da SOMA?'}
+          </p>
           <p className="mt-1 text-xs leading-6 text-[#49695e]">
-            Gere uma nova leitura usando o relatório salvo e a metodologia do Guia GUPY.
-            O currículo e as vagas completas originais não foram armazenados nas análises antigas.
-            Para uma nova comparação integral, utilize o formulário acima.
+            {isReanalise
+              ? (relatorioParcial
+                ? 'A geração anterior terminou antes do checklist. Você pode solicitar uma versão completa a partir da auditoria original. O histórico não será apagado.'
+                : 'Esta leitura usa informações já salvas. Para calcular uma nova aderência, use o currículo e as descrições das vagas no formulário acima.')
+              : 'Gere uma nova leitura usando o relatório salvo e a metodologia SOMA. Para uma nova auditoria de aderência, use o currículo e as vagas no formulário acima.'}
           </p>
           {erroReanalise && <p role="alert" className="mt-2 text-sm text-red-700">{erroReanalise}</p>}
         </div>
-        <button type="button" disabled={reanalisando}
-          onClick={() => void onReanalisar(atual)}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50">
-          <RefreshCcw size={17} className={reanalisando ? 'animate-spin' : ''} aria-hidden="true" />
-          {reanalisando ? 'Gerando nova análise...' : 'Gerar nova análise'}
-        </button>
+        {(!isReanalise || (relatorioParcial && fonte)) ? (
+          <button type="button" disabled={reanalisando}
+            onClick={() => void onReanalisar(isReanalise && fonte ? fonte : atual)}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50">
+            <RefreshCcw size={17} className={reanalisando ? 'animate-spin' : ''} aria-hidden="true" />
+            {reanalisando ? 'Gerando...' : isReanalise ? 'Gerar versão completa' : 'Gerar nova análise'}
+          </button>
+        ) : (
+          <a href="#auditoria-gupy-form" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mint-deep px-4 py-2.5 text-sm font-semibold text-white">
+            Nova auditoria com currículo e vagas
+          </a>
+        )}
       </div>
 
       <div className="min-w-0 overflow-x-auto overscroll-x-contain rounded-xl border border-gray-faint bg-white p-2" role="tablist" aria-label="Modos de leitura da análise">
@@ -272,7 +302,7 @@ function GupyRelatorio({ atual, onReanalisar, reanalisando, erroReanalise }: {
                       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#e2ebe7]">
                         <div className="h-full rounded-full bg-mint-deep" style={{ width: vaga.nota + '%' }} />
                       </div>
-                      <p className="mt-2 text-xs text-gray-text">Aderência estimada pela SOMA</p>
+                      <p className="mt-2 text-xs text-gray-text">{isReanalise ? 'Estimativa histórica da análise original' : 'Aderência estimada pela SOMA'}</p>
                     </div>
                   ))}
                 </div>
@@ -393,7 +423,9 @@ export default function GupyAnalysisOutput({ atual, historico, onSelect, onReana
   return (
     <div className="mt-8 grid min-w-0 gap-5 2xl:grid-cols-[minmax(0,1fr)_250px]" aria-label="Resultado e histórico da análise Gupy">
       <div className="min-w-0">
-        {atual ? <GupyRelatorio key={atual.id} atual={atual} onReanalisar={onReanalisar} reanalisando={reanalisandoId === atual.id} erroReanalise={erroReanalise} /> :
+        {atual ? <GupyRelatorio key={atual.id} atual={atual} historico={historico} onReanalisar={onReanalisar}
+          reanalisando={!!reanalisandoId && (reanalisandoId === atual.id || reanalisandoId === atual.entradas?.analiseOrigemId)}
+          erroReanalise={erroReanalise} /> :
           <p className="rounded-xl border border-gray-faint bg-white p-5 text-sm text-gray-text">Selecione uma análise anterior.</p>}
       </div>
       <aside className="h-fit rounded-2xl border border-gray-faint bg-white p-4 2xl:sticky 2xl:top-5">
