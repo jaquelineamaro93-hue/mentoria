@@ -87,3 +87,40 @@ export function extrairVagasGupy(markdown: string): GupyVaga[] {
   }
   return vagas;
 }
+
+
+/**
+ * Ajusta somente a exibição de afirmações incorretas geradas em relatórios
+ * legados. Nenhum registro persistido é modificado e o original fica disponível.
+ * As substituições refletem observações documentadas no Guia GUPY da SOMA.
+ */
+export function revisarOrientacoesLegadasGupy(markdown: string): { texto: string; revisoes: number } {
+  let revisoes = 0;
+  const texto = markdown.split('\n').map(linha => {
+    if (/curtidas\/descurtidas de perfil s[aã]o a[cç][õo]es de recruiter,\s*n[aã]o penalidades algor[ií]tmicas globais/i.test(linha)) {
+      revisoes++;
+      return '- **Histórico de curtidas e descurtidas (Guia GUPY da SOMA):** nos testes documentados pela SOMA ao longo de três anos, avaliações negativas no histórico puderam reduzir oportunidades futuras. Os pesos internos da Gupy não são conhecidos pela SOMA.';
+    }
+    if (/voc[eê] n[aã]o [eé] automaticamente desclassificad[oa] por candidaturas pr[eé]vias rejeitadas/i.test(linha)) {
+      revisoes++;
+      return '- **Histórico de candidaturas (Guia GUPY da SOMA):** os testes da SOMA registraram que candidaturas repetidas e avaliações anteriores podem influenciar novas oportunidades na plataforma. Isso é uma observação documentada, não uma pontuação interna acessível pela SOMA.';
+    }
+    return linha;
+  }).join('\n');
+  return { texto, revisoes };
+}
+
+/** Evita um cartão vazio com apenas o título e um traço horizontal. */
+export function separarIntroducaoGupy(introducao: string): { titulo: string | null; contexto: string } {
+  let titulo: string | null = null;
+  const texto = introducao.split('\n').filter(linha => {
+    const limpa = linha.trim();
+    if (!titulo && /^#{1,6}\s+/.test(limpa)) {
+      titulo = limpa.replace(/^#{1,6}\s+/, '').replace(/\*\*/g, '').trim();
+      return false;
+    }
+    if (/^([-*_]\s*){3,}$/.test(limpa)) return false;
+    return true;
+  }).join('\n').trim();
+  return { titulo, contexto: texto };
+}

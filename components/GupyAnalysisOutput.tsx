@@ -8,7 +8,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
-import { dividirRelatorioGupy, extrairNotaSoma, extrairVagasGupy } from '@/lib/gupy-report-parser';
+import { dividirRelatorioGupy, extrairNotaSoma, extrairVagasGupy, revisarOrientacoesLegadasGupy, separarIntroducaoGupy } from '@/lib/gupy-report-parser';
 import type { GupySecao } from '@/lib/gupy-report-parser';
 
 type Modo = 'resumo' | 'assuntos' | 'completo' | 'curriculo';
@@ -138,9 +138,18 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
   const [modo, setModo] = useState<Modo>('resumo');
   const [secaoAtiva, setSecaoAtiva] = useState(0);
   const [copiado, setCopiado] = useState<string | null>(null);
-  const { introducao, secoes } = useMemo(() => dividirRelatorioGupy(atual.resultado_markdown), [atual.resultado_markdown]);
-  const nota = useMemo(() => extrairNotaSoma(atual.resultado_markdown), [atual.resultado_markdown]);
-  const vagas = useMemo(() => extrairVagasGupy(atual.resultado_markdown), [atual.resultado_markdown]);
+  const [mostrarOriginal, setMostrarOriginal] = useState(false);
+  const leituraCorrigida = useMemo(
+    () => revisarOrientacoesLegadasGupy(atual.resultado_markdown),
+    [atual.resultado_markdown],
+  );
+  const markdownExibido = mostrarOriginal ? atual.resultado_markdown : leituraCorrigida.texto;
+  const { introducao, secoes } = useMemo(() => dividirRelatorioGupy(markdownExibido), [markdownExibido]);
+  const { titulo: tituloIntroducao, contexto: contextoIntroducao } = useMemo(
+    () => separarIntroducaoGupy(introducao), [introducao],
+  );
+  const nota = useMemo(() => extrairNotaSoma(markdownExibido), [markdownExibido]);
+  const vagas = useMemo(() => extrairVagasGupy(markdownExibido), [markdownExibido]);
   const secaoCurriculo = secoes.filter(s => s.tipo === 'curriculo');
   const diagnostico = secoes.findIndex(s => s.tipo === 'diagnostico');
   const riscos = secoes.findIndex(s => s.tipo === 'riscos');
@@ -169,6 +178,11 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
         <h2 className="mb-2 mt-3 font-display text-3xl leading-tight text-[#183f37] sm:text-4xl">
           Sua análise de aderência
         </h2>
+        {tituloIntroducao && (
+          <p className="mb-2 max-w-3xl text-sm font-medium leading-6 text-[#254a3c]">
+            {tituloIntroducao}
+          </p>
+        )}
         <p className="max-w-2xl text-sm leading-6 text-[#486157]">
           Comece pelos principais indicadores, navegue por assunto ou consulte o relatório integral.
           Todo o conteúdo original da análise continua disponível.
@@ -201,12 +215,26 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
             {new Date(atual.created_at).toLocaleString('pt-BR')}
           </p>
         </div>
-        <button type="button" onClick={() => void copiar(atual.resultado_markdown, 'total')}
+        <button type="button" onClick={() => void copiar(markdownExibido, 'total')}
           className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-faint px-4 py-2 text-sm font-medium hover:border-mint-deep">
           {copiado === 'total' ? <Check size={16} className="text-mint-deep" /> : <Copy size={16} />}
           {copiado === 'total' ? 'Copiado' : 'Copiar relatório'}
         </button>
       </div>
+
+      {leituraCorrigida.revisoes > 0 && (
+        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#c8ded5] bg-[#f3faf7] px-4 py-3">
+          <p className="max-w-3xl text-sm leading-6 text-[#315548]">
+            Esta análise antiga contém {leituraCorrigida.revisoes} orientação(ões) revisada(s)
+            conforme o Guia GUPY da SOMA. O relatório original continua preservado no seu histórico.
+          </p>
+          <button type="button"
+            onClick={() => setMostrarOriginal(v => !v)}
+            className="min-h-10 rounded-lg border border-[#accdc0] bg-white px-3 py-2 text-xs font-semibold text-[#165448] hover:border-mint-deep">
+            {mostrarOriginal ? 'Voltar à leitura atualizada' : 'Consultar texto original'}
+          </button>
+        </div>
+      )}
 
       <div className="min-w-0 overflow-x-auto overscroll-x-contain rounded-xl border border-gray-faint bg-white p-2" role="tablist" aria-label="Modos de leitura da análise">
         <div className="flex min-w-max gap-2">
@@ -258,10 +286,10 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
                 );
               })}
             </section>
-            {introducao && (
+            {contextoIntroducao && (
               <section className="rounded-2xl border border-gray-faint bg-white p-5 sm:p-6">
-                <h3 className="mb-3 font-semibold text-[#183f37]">Apresentação da análise</h3>
-                <MarkdownLegivel markdown={introducao} />
+                <h3 className="mb-3 font-semibold text-[#183f37]">Contexto da análise</h3>
+                <MarkdownLegivel markdown={contextoIntroducao} />
               </section>
             )}
           </div>
