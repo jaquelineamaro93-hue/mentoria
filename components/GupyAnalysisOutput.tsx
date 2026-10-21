@@ -84,6 +84,18 @@ function TabelaLegivel({ children }: TextoProps) {
   );
 }
 
+function CorpoDeSecao({ secao }: { secao: GupySecao }) {
+  // O cabeçalho numerado se torna título visual; a íntegra fica preservada
+  // na cópia e no histórico. Evita que "1. Diagnóstico" vire bullet.
+  const corpo = secao.markdown.split('\n').slice(1).join('\n').trim();
+  return (
+    <>
+      <h3 className="mb-5 mt-1 font-display text-2xl leading-tight text-[#183f37] sm:text-3xl">{secao.titulo}</h3>
+      {corpo && <MarkdownLegivel markdown={corpo} />}
+    </>
+  );
+}
+
 function MarkdownLegivel({ markdown }: { markdown: string }) {
   return (
     <div className="min-w-0 max-w-none break-words text-[15px] leading-7 text-[#29372f] sm:text-base">
@@ -278,7 +290,7 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
                     {copiado === 'secao' ? 'Copiado' : 'Copiar esta etapa'}
                   </button>
                 </div>
-                <MarkdownLegivel markdown={secoes[secaoAtiva].markdown} />
+                <CorpoDeSecao secao={secoes[secaoAtiva]} />
               </section>
             )}
           </div>
@@ -294,7 +306,7 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
             {secoes.map((secao, index) => (
               <section key={secao.id} className="min-w-0 overflow-hidden rounded-2xl border border-gray-faint bg-white p-5 sm:p-7">
                 <p className="text-xs font-semibold uppercase tracking-[.12em] text-mint-deep">Etapa {index + 1} de {secoes.length}</p>
-                <MarkdownLegivel markdown={secao.markdown} />
+                <CorpoDeSecao secao={secao} />
               </section>
             ))}
           </div>
@@ -316,7 +328,7 @@ function GupyRelatorio({ atual }: { atual: SomaAnaliseResumo }) {
               )}
             </div>
             {secaoCurriculo.length > 0
-              ? secaoCurriculo.map(secao => <MarkdownLegivel key={secao.id} markdown={secao.markdown} />)
+              ? secaoCurriculo.map(secao => <div key={secao.id}><CorpoDeSecao secao={secao} /></div>)
               : <div className="rounded-xl bg-[#f6faf8] p-5 text-sm leading-7 text-[#465e55]">
                   Esta análise não tem uma seção identificada como currículo final.
                   Acesse <button type="button" onClick={() => setModo('completo')} className="font-semibold text-mint-deep underline underline-offset-2">o relatório completo</button> para consultar a versão original.
