@@ -43,6 +43,10 @@ test('Prompt Gupy e reanálise distinguem documentação de score/matching e reg
   const reanalisar = read('app/api/ferramentas-soma/reanalisar-gupy/route.ts');
   const original = read('app/api/ferramentas-soma/analisar/route.ts');
   assert.match(prompt, /currículo do perfil é COMPARTILHADO/);
+  assert.match(prompt, /Candidatura Rápida/);
+  assert.match(prompt, /não pode ser editada após o envio/);
+  assert.match(reanalisar, /Esse é um fluxo/);
+
   assert.match(prompt, /Developer Hub/i);
   assert.match(prompt, /O campo "score" indica afinidade\/aderência àquela vaga/);
   assert.match(prompt, /"matching" refere-se ao resultado de teste de perfil/);
