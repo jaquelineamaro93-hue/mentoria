@@ -139,18 +139,18 @@ export default function GupyAuditClient({
           <section className="rounded-xl border border-[#d5e9e3] bg-[#f5fbf8] p-4" aria-labelledby="praticas-gupy-titulo">
             <h2 id="praticas-gupy-titulo" className="flex items-center gap-2 text-sm font-semibold text-[#154c42]">
               <ListChecks size={17} aria-hidden="true" />
-              Boas práticas de triagem
+              Aprendizados de três anos de testes
             </h2>
             <p className="mt-2 text-xs leading-relaxed text-[#3e5b52]">
-              Recomendações da SOMA, combinando documentação pública da Gupy com observações
-              práticas realizadas pela mentora ao longo de três anos. Isso não equivale a
-              conhecer o algoritmo ou as notas internas da plataforma.
+              Conteúdo derivado do Guia GUPY da mentora. As estratégias abaixo refletem
+              observações práticas acumuladas em três anos e os recursos visíveis na
+              interface de recrutamento. Resultados relatados não são uma garantia para toda candidatura.
             </p>
             <ul className="mt-3 space-y-2 text-xs leading-relaxed text-[#344c43]">
               <li><strong>Perfil completo:</strong> descreva experiências, datas, cursos e requisitos realmente atendidos.</li>
-              <li><strong>Candidaturas com foco:</strong> priorize vagas aderentes. Evite inscrições indiscriminadas na mesma empresa. É uma boa prática baseada na experiência da mentora, não uma regra eliminatória publicada.</li>
-              <li><strong>Curtidas e descurtidas:</strong> recrutadores podem registrar avaliações. Não é possível afirmar que uma descurtida gera punição global permanente.</li>
-              <li><strong>Histórico e perfil:</strong> acompanhe resultados e atualize dados verdadeiros; não use CPF ou identidade fictícia para criar uma conta.</li>
+              <li><strong>Candidaturas na mesma empresa:</strong> o guia registra que inscrições repetidas podem afetar a triagem percebida. Escolha vagas com aderência real e acompanhe o histórico de cada candidatura.</li>
+              <li><strong>Likes e dislikes:</strong> a interface de recrutamento apresentada no guia permite curtir e descurtir candidaturas. A mentora observou efeitos no histórico ao longo dos testes, sem acesso aos pesos internos.</li>
+              <li><strong>Reorganização e novo cadastro:</strong> o guia documenta experimentos de exclusão e recriação de perfil. A SOMA apresenta a experiência como relato de campo, sem inventar bloqueios permanentes ou garantir que notas sejam apagadas.</li>
             </ul>
           </section>
         </div>
@@ -160,8 +160,8 @@ export default function GupyAuditClient({
           <span className="mt-1 block">
             A SOMA não tem acesso às notas internas da Gupy nem aos pesos privados dos Agentes de IA.
             A nota de 0 a 100 exibida na análise é uma <strong>estimativa da SOMA para a vaga informada</strong>,
-            não o score da Gupy. A ferramenta identifica fatores que podem reduzir a aderência
-            percebida, mas não consegue detectar descurtidas privadas ou bloqueios ocultos.
+            não o score da Gupy. A ferramenta relaciona fatores verificáveis na vaga e no currículo
+            e destaca as observações da mentora sobre histórico e interação de recrutadores, sem atribuir números secretos.
           </span>
         </div>
 

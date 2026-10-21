@@ -6,10 +6,10 @@ const source = path => readFileSync(new URL('../' + path, import.meta.url), 'utf
 
 test('Página Gupy mostra práticas observadas separadas de critérios oficiais', () => {
   const ui = source('app/(dashboard)/gupy/GupyAuditClient.tsx');
-  assert.match(ui, /Boas práticas de triagem/);
-  assert.match(ui, /observações\s+práticas realizadas pela mentora ao longo de três anos/);
-  assert.match(ui, /Não é possível afirmar que uma descurtida gera punição global permanente/);
-  assert.match(ui, /não use CPF ou identidade fictícia/);
+  assert.match(ui, /Aprendizados de três anos de testes/);
+  assert.match(ui, /observações práticas acumuladas em três anos/);
+  assert.match(ui, /a mentora observou efeitos no histórico/);
+  assert.match(ui, /sem inventar bloqueios permanentes/);
   assert.match(ui, /estimativa da SOMA para a vaga informada/);
 });
 
@@ -20,8 +20,10 @@ test('Relatório inclui fatores que reduzem aderência e metodologia verificáve
   assert.match(prompt, /Documentado publicamente/);
   assert.match(prompt, /Observação prática da mentora/);
   assert.match(prompt, /Não verificável com os dados disponíveis/);
-  assert.match(prompt, /Desaconselhe criar perfis com CPF ou identidade fictícia/);
+  assert.match(prompt, /sem ensinar falsificação de identificação/);
   assert.match(prompt, /Jamais invente pontos perdidos/);
+  assert.doesNotMatch(ui, /bloqueio permanente|não use CPF ou identidade fictícia|Anti-Sabotagem/);
+  assert.doesNotMatch(prompt, /Desaconselhe criar perfis com CPF/);
 });
 
 test('Relato é opcional, limitado e não é armazenado integralmente no histórico', () => {
