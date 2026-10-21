@@ -29,6 +29,8 @@ export default function IrisCopiloto() {
   const caixa = useRef<HTMLTextAreaElement>(null);
   const historico = useRef<HTMLDivElement>(null);
   const painel = useRef<HTMLDivElement>(null);
+  const acionador = useRef<HTMLButtonElement>(null);
+  const abertoUmaVez = useRef(false);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 639px)');
@@ -64,8 +66,12 @@ export default function IrisCopiloto() {
   }, [aberto, mensagens, ocupada, visualHeight]);
 
   useEffect(() => {
+    if (aberto) abertoUmaVez.current = true;
+    else if (abertoUmaVez.current) acionador.current?.focus();
+  }, [aberto]);
+
+  useEffect(() => {
     if (!aberto) return;
-    const anterior = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (mobile) painel.current?.focus();
     else caixa.current?.focus();
     const teclado = (event: KeyboardEvent) => {
@@ -80,7 +86,9 @@ export default function IrisCopiloto() {
       if (!botoes.length) return;
       const primeiro = botoes[0];
       const ultimo = botoes[botoes.length - 1];
-      if (event.shiftKey && document.activeElement === primeiro) {
+      if (!painel.current.contains(document.activeElement) || document.activeElement === painel.current) {
+        event.preventDefault(); (event.shiftKey ? ultimo : primeiro).focus();
+      } else if (event.shiftKey && document.activeElement === primeiro) {
         event.preventDefault(); ultimo.focus();
       } else if (!event.shiftKey && document.activeElement === ultimo) {
         event.preventDefault(); primeiro.focus();
@@ -89,7 +97,6 @@ export default function IrisCopiloto() {
     document.addEventListener('keydown', teclado);
     return () => {
       document.removeEventListener('keydown', teclado);
-      anterior?.focus();
     };
   }, [aberto, mobile]);
 
@@ -172,6 +179,7 @@ export default function IrisCopiloto() {
     >
       {!aberto ? (
         <button
+          ref={acionador}
           type="button"
           aria-label="Abrir Íris Copiloto"
           aria-expanded={false}
