@@ -48,7 +48,7 @@ test('Reanálise só consulta relatório Gupy pertencente à própria sessão', 
 test('Risco de falta de fontes originais é declarado; não prometer score da Gupy', () => {
   const ui = read('components/GupyAnalysisOutput.tsx');
   const route = read('app/api/ferramentas-soma/reanalisar-gupy/route.ts');
-  assert.match(ui, /O currículo e as vagas completas originais não foram armazenados/);
+  assert.match(ui, /Para uma nova auditoria de aderência, use o currículo e as vagas/);
   assert.match(route, /As análises anteriores não guardavam PDF/);
   assert.match(route, /NÃO finja que realizou uma auditoria nova/);
   assert.match(route, /documentosOriginaisDisponiveis: false/);
