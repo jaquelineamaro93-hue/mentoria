@@ -17,6 +17,7 @@
 | P0 | Login mostrava F12 e registrava informações do fragmento da sessão em console. | Corrigido no código de prévia; verificar deploy após revisão. |
 | P1 | AcessoGate redireciona no navegador; não é proteção de API. | Entitlement obrigatório em servidor/banco para cada operação. |
 | P1 | Íris usa auth.user.id e RLS, sem ferramenta livre de SQL, mas assinatura da confirmação de PDI deriva da chave service role. | Chave exclusiva para assinatura, nonce único, idempotência, transação de aprovação/auditoria/escrita. |
+| P1 | product_events permite INSERT pelo próprio usuário autenticado e é uma tabela de analytics. | Não considerar esses registros trilha forense confiável; criar auditoria de segurança server-only, append-only, inacessível ao cliente. |
 | P1 | Advisor: 7 SECURITY DEFINER executáveis por anon, sendo 5 funções trigger e 2 funções de feedback 360 com token público. | Revisar individualmente propósito, token, expiração, rate limit e privilégios; não revogar tudo sem avaliação. |
 | P1 | Advisor: 20 SECURITY DEFINER executáveis por authenticated. | Auditar parâmetros, ownership, retorno e concessão explícita de EXECUTE. |
 | P2 | Advisor performance: 142 alertas auth_rls_initplan; 117 múltiplas políticas permissivas; 33 FKs sem índice; 2 índices duplicados. | EXPLAIN ANALYZE e migrações pequenas com regressão, nunca alterações em massa. |
