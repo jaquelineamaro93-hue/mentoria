@@ -81,6 +81,7 @@ export function montarPromptGupy(input: {
   curriculo: string;
   vagas: string;
   cargoAlvo?: string;
+  observacoes?: string;
 }) {
   return `
 Você é um especialista sênior em Talent Acquisition, ATS e redação de currículo.
@@ -96,6 +97,9 @@ ${limitar(input.curriculo)}
 VAGA(S) ALVO:
 ${limitar(input.vagas, 30000)}
 
+OBSERVAÇÕES DA PESSOA SOBRE PROCESSOS ANTERIORES (RELATO, NÃO DADO INTERNO DA GUPY):
+${limitar(input.observacoes, 1800) || 'Não informado.'}
+
 Não invente métricas, certificações, ferramentas, competências ou experiências. Se um dado importante estiver ausente, marque [PREENCHER].
 
 Entregue em Markdown:
@@ -108,7 +112,23 @@ Mostre uma aderência estimada pela SOMA de 0 a 100 e explique os fatores visív
 - profundidade das experiências
 - foco da narrativa
 
-## 2. Seis sabotadores
+## 2. Sinais que podem reduzir sua avaliação de aderência
+Identifique separadamente fatores diretamente verificáveis no currículo e na vaga:
+- requisito obrigatório não demonstrado;
+- datas, cargos, formação, experiências ou certificados incompletos;
+- vocabulário de habilidades e ferramentas presente na vaga e ausente do currículo;
+- descrição superficial das entregas ou excesso de currículo genérico.
+Apresente uma tabela compacta com: critério; evidência exata; impacto qualitativo (alto, médio, baixo); correção baseada em fatos. Jamais invente pontos perdidos ou porcentagens do algoritmo oficial.
+Se a pessoa descreveu resultados anteriores ou candidaturas repetidas, avalie isso como sinais relatados e hipóteses, nunca como prova de penalização oculta. Deixe claro que curtidas/descurtidas podem ser ações de recrutadores, mas você não tem acesso a elas nem pode afirmar penalização global.
+
+## 3. Práticas de candidatura observadas e o que a Gupy documenta
+- Distinga três classes: "Documentado publicamente", "Observação prática da mentora" e "Não verificável com os dados disponíveis".
+- Inclua como orientação prática de foco evitar candidaturas indiscriminadas a muitas vagas da mesma empresa, sem afirmar desclassificação automática.
+- Explique que a ordenação de aderência depende da vaga, pode ser revista por humanos e que a IA não deve ser tratada como rejeição automática.
+- Desaconselhe criar perfis com CPF ou identidade fictícia. Nunca sugira um suposto reset de notas internas nem prometa limpar histórico de avaliações.
+- Priorize dados reais, currículo atualizado, requisitos demonstráveis e escolhas de vagas mais coerentes com a trajetória.
+
+## 4. Seis sabotadores
 Avalie:
 1. rejeição humana na leitura rápida
 2. nomenclatura de cargos e aderência semântica
@@ -122,21 +142,21 @@ Para cada um:
 - risco
 - versão corrigida
 
-## 3. Palavras-chave
+## 5. Palavras-chave
 Liste as palavras-chave da(s) vaga(s) que aparecem, as que faltam e as que NÃO podem ser adicionadas sem comprovação.
 
-## 4. Experiências reescritas
+## 6. Experiências reescritas
 Reescreva os bullets para leitura rápida:
 Verbo de ação + aplicação prática + impacto/resultado.
 Sem inventar números. Use [PREENCHER MÉTRICA] quando necessário.
 
-## 5. Cursos e competências
+## 7. Cursos e competências
 Organize cursos/certificações e competências técnicas/comportamentais apenas com o que estiver comprovado no material. Sugestões não comprovadas devem ficar em "avaliar se possui".
 
-## 6. Versão final para a plataforma
+## 8. Versão final para a plataforma
 Entregue uma versão final do currículo em texto limpo, com seções claras e bullets curtos, pronta para copiar e colar. Priorize aderência à vaga e leitura humana. Evite tabelas, colunas, ícones, imagens e excesso de formatação.
 
-## 7. Checklist antes de se candidatar
+## 9. Checklist antes de se candidatar
 Checklist curto com campos da plataforma que a pessoa deve revisar, inclusive compartilhamento/visibilidade do currículo, dados de contato, experiências, formação, cursos e perguntas de triagem.
 
 Não mostre cadeia de raciocínio privada. Mostre evidências e justificativas objetivas.
