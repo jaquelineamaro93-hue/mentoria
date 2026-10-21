@@ -64,7 +64,7 @@ export default async function DashboardPage() {
 
   let bussola: BussolaPosicionamento | null = null;
   try {
-    const { data } = await supabase.from('bussola_posicionamento').select('*').eq('user_id', user.id).maybeSingle<BussolaPosicionamento>();
+    const { data } = await supabase.from('bussola_posicionamento').select('*').eq('user_id', user.id).order('gerado_em', { ascending: false }).limit(1).maybeSingle<BussolaPosicionamento>();
     bussola = data;
   } catch { bussola = null; }
 
