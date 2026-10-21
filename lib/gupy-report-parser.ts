@@ -29,7 +29,7 @@ export function tipoDaSecao(titulo: string): GupySecao['tipo'] {
 
 // Capítulos reais apenas. "2. Aderência estimada: 82/100" é dado da análise,
  // não um novo capítulo, e não pode virar cartão vazio.
-const CAPITULOS = /^(?:diagn[oó]stico(?: de ader[eê]ncia)?|sinais que podem reduzir|pr[aá]ticas(?: de candidatura)?|hacks e pr[aá]ticas|seis (?:sabotadores|pontos)|(?:requisitos obrigat[oó]rios e )?palavras.chave|experi[eê]ncias reescritas|experi[eê]ncias e ajustes|cursos e compet[eê]ncias|vers[aã]o final|vers[aã]o corrigida|curr[ií]culo final|checklist|checagem de qualidade|resumo visual(?: de ader[eê]ncia)?|perfil pronto|(?:diagn[oó]stico do )?relat[oó]rio revisitado)/i;
+const CAPITULOS = /^(?:diagn[oó]stico(?: de ader[eê]ncia)?|sinais que podem reduzir|pr[aá]ticas(?: de candidatura)?|hacks e pr[aá]ticas|seis (?:sabotadores|pontos|fatores)|(?:requisitos obrigat[oó]rios e )?palavras.chave|experi[eê]ncias reescritas|experi[eê]ncias e ajustes|cursos e compet[eê]ncias|vers[aã]o final|vers[aã]o corrigida|curr[ií]culo final|checklist|checagem de qualidade|resumo visual(?: de ader[eê]ncia)?|perfil pronto|(?:diagn[oó]stico do )?relat[oó]rio revisitado)/i;
 
 function extrairCabecalho(linha: string): string | null {
   const limpa = linha.trim();
