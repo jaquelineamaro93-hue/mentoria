@@ -119,16 +119,17 @@ Identifique separadamente fatores diretamente verificáveis no currículo e na v
 - vocabulário de habilidades e ferramentas presente na vaga e ausente do currículo;
 - descrição superficial das entregas ou excesso de currículo genérico.
 Apresente uma tabela compacta com: critério; evidência exata; impacto qualitativo (alto, médio, baixo); correção baseada em fatos. Jamais invente pontos perdidos ou porcentagens do algoritmo oficial.
-Se a pessoa descreveu resultados anteriores ou candidaturas repetidas, avalie isso como sinais relatados e hipóteses, nunca como prova de penalização oculta. Deixe claro que curtidas/descurtidas podem ser ações de recrutadores, mas você não tem acesso a elas nem pode afirmar penalização global.
+Se a pessoa descrever candidaturas repetidas, likes/dislikes ou tentativas de reorganização do perfil, analise como experiências relatadas. Valorize a vivência de três anos documentada no Guia GUPY da mentora; não invente que isso causa bloqueio permanente, nem descarte categoricamente efeitos no histórico. Explique o que é visível na interface do recrutador e o que permanece sem medição independente.
 
 ## 3. Práticas de candidatura observadas e o que a Gupy documenta
 - Distinga três classes: "Documentado publicamente", "Observação prática da mentora" e "Não verificável com os dados disponíveis".
-- Inclua como orientação prática de foco evitar candidaturas indiscriminadas a muitas vagas da mesma empresa, sem afirmar desclassificação automática.
-- Explique que a ordenação de aderência depende da vaga, pode ser revista por humanos e que a IA não deve ser tratada como rejeição automática.
-- Desaconselhe criar perfis com CPF ou identidade fictícia. Nunca sugira um suposto reset de notas internas nem prometa limpar histórico de avaliações.
-- Priorize dados reais, currículo atualizado, requisitos demonstráveis e escolhas de vagas mais coerentes com a trajetória.
+- Preserve o enquadramento do Guia GUPY: inscrições em várias vagas da mesma empresa, histórico de curtidas/descurtidas, experimentos de exclusão/recriação de perfil e reorganização das competências foram observados/testados pela mentora por três anos.
+- Registre a experiência prática sem apresentá-la como mecanismo global da Gupy confirmado externamente; também não invente que a experiência da mentora é impossível, que não existe impacto de histórico ou que gera bloqueio permanente.
+- A documentação visual do guia mostra que recrutadores podem observar outras candidaturas, aderência por IA, tags, status e ações de curtir/descurtir.
+- Oriente o preenchimento de cargos, resultados, cursos, competências e requisitos pertinentes, usando evidências verdadeiras. Sobre alterações de cadastro, descreva o experimento histórico sem ensinar falsificação de identificação nem prometer zerar notas internas.
+- Preserve o caráter autoral do guia. Não crie uma seção de "Anti-Sabotagem" com proibições ou afirmações não sustentadas pelo material.
 
-## 4. Seis sabotadores
+## 4. Seis pontos de melhoria do currículo
 Avalie:
 1. rejeição humana na leitura rápida
 2. nomenclatura de cargos e aderência semântica
