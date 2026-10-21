@@ -62,11 +62,11 @@ Benchmark consultado em 21/10/2026:
 
 Proposta:
 - Módulo avulso R$ 24,90/mês, com consumo limitado;
-- Essencial R$ 39,90/mês: autoconhecimento, diagnóstico, PDI;
+- Essencial R$ 34,90/mês: autoconhecimento, diagnóstico, PDI;
 - Pro R$ 69,90/mês: módulos integrados e franquia da Íris Copiloto;
 - Mentoria: contrato/planos humanos existentes mantidos independentes.
 
-Com custo fixo informado de R$ 300/mês, seria preciso faturar pelo menos R$ 300 **brutos**: 13 módulos avulsos (R$ 323,70), 8 Essencial (R$ 319,20) ou 5 Pro (R$ 349,50). Essa conta NÃO inclui IA, taxas, impostos, suporte nem margem. Implementar orçamento e créditos por módulo antes do checkout.
+Com custo fixo informado de R$ 300/mês, seria preciso faturar pelo menos R$ 300 **brutos**: 13 módulos avulsos (R$ 323,70), 9 Essencial (R$ 314,10) ou 5 Pro (R$ 349,50). Essa conta NÃO inclui IA, taxas, impostos, suporte nem margem. Implementar orçamento e créditos por módulo antes do checkout.
 
 ## Desempenho
 
@@ -112,3 +112,5 @@ Testes read-only, em transações revertidas (BEGIN/ROLLBACK), simulando o papel
 Verificações positivas separadas: o proprietário consegue ler seu Mapa e suas ações do PDI; chamada RPC de verificação de módulo com ID de terceiro é rejeitada (PASS).
 
 **Limite:** isso testa uma amostra de tabelas e o RLS, não o login por HTTP de dois usuários, não cobre todas as operações e não cobre prompt injection, função administrativa ou webhooks. Não substitui pentest/QA end-to-end.
+
+Precificação para o mercado brasileiro: valores em BRL são definidos por poder de compra, margem e custos locais, não conversões automáticas do USD. Exemplo: oferta internacional US$ 29 pode inspirar preço nacional de R$ 34,90, que não corresponde ao câmbio. Não ofertar IA sem limites de consumo.
