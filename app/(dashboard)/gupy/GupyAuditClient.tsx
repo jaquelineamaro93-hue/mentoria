@@ -143,7 +143,12 @@ export default function GupyAuditClient({
           </label>
         </div>
 
-        <div className="mt-5 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
+        <div className="mt-5 rounded-xl border border-[#bcdacb] bg-[#edf7f2] px-4 py-3 text-sm leading-6 text-[#315847]">
+          <strong>Currículo compartilhado na Gupy:</strong> antes de atualizar seu perfil,
+          considere que as alterações se refletem em todas as candidaturas ativas.
+          A SOMA avalia vagas diferentes, mas recomenda um único currículo verdadeiro e abrangente na plataforma.
+        </div>
+        <div className="mt-4 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
           <span className="inline-flex items-center gap-1 font-semibold"><Info size={14} aria-hidden="true" /> Como ler suas notas</span>
           <span className="mt-1 block">
             A SOMA não tem acesso às notas internas da Gupy nem aos pesos privados dos Agentes de IA.
