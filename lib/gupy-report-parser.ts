@@ -17,8 +17,8 @@ function normalizar(valor: string) {
 
 export function tipoDaSecao(titulo: string): GupySecao['tipo'] {
   const t = normalizar(titulo);
-  if (/diagnostico|aderencia|resumo visual/.test(t)) return 'diagnostico';
   if (/reduzir|sabotador|risco|gap|lacuna|melhoria/.test(t)) return 'riscos';
+  if (/diagnostico|aderencia|resumo visual/.test(t)) return 'diagnostico';
   if (/pratica|candidatura observada|recrutador|triagem/.test(t)) return 'praticas';
   if (/palavras.chave|requisitos obrigatorios/.test(t)) return 'palavras';
   if (/experiencias reescritas|experiencias: antes|reescrita/.test(t)) return 'experiencias';
