@@ -70,7 +70,7 @@ export default function IrisCopiloto() {
     if (!aberto) return;
     const area = historico.current;
     if (area) area.scrollTop = area.scrollHeight;
-  }, [aberto, mensagens, ocupada, visualHeight]);
+  }, [aberto, mensagens.length, ocupada, visualHeight]);
 
   useEffect(() => {
     if (aberto) abertoUmaVez.current = true;
@@ -343,7 +343,7 @@ export default function IrisCopiloto() {
                             O que não funcionou nesta resposta?
                           </label>
                           <p className="mt-1 text-xs text-[#6b625e]">
-                            Conte o que faltou ou o que a Íris entendeu errado. Seu comentário ajuda a melhorar o Copiloto.
+                            Conte o que faltou ou o que a Íris entendeu errado. Seu comentário é salvo na SOMA para revisão da qualidade, sem treinar automaticamente modelos externos.
                           </p>
                           <textarea
                             id={'iris-motivo-' + indice}
