@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { FileSearch, Loader2, Upload, ShieldCheck, Info, TrendingDown } from 'lucide-react';
+import { FileSearch, Loader2, Upload, ShieldCheck, Info, TrendingDown, Link2, ExternalLink } from 'lucide-react';
+import type { VagaPublica } from '@/lib/gupy-public-job';
 import { extrairTextoPdf } from '@/lib/pdf';
 import type { SomaAnaliseResumo } from '@/components/SomaAnalysisOutput';
 import GupyAnalysisOutput from '@/components/GupyAnalysisOutput';
@@ -14,6 +15,10 @@ export default function GupyAuditClient({
   const [cargoAlvo, setCargoAlvo] = useState('');
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [vagas, setVagas] = useState('');
+  const [links, setLinks] = useState(['', '', '']);
+  const [vagasExtraidas, setVagasExtraidas] = useState<VagaPublica[]>([]);
+  const [falhasLinks, setFalhasLinks] = useState<string[]>([]);
+  const [buscandoLinks, setBuscandoLinks] = useState(false);
   const [gerando, setGerando] = useState(false);
   const [reanalisandoId, setReanalisandoId] = useState<string | null>(null);
   const [erroReanalise, setErroReanalise] = useState<string | null>(null);
@@ -22,15 +27,24 @@ export default function GupyAuditClient({
   const [atual, setAtual] = useState<SomaAnaliseResumo | null>(historicoInicial[0] ?? null);
 
   async function analisar() {
-    if (!cvFile || !vagas.trim()) {
-      setErro('Envie o currículo exportado da Gupy e cole ao menos uma vaga-alvo.');
+    if (!cvFile) {
+      setErro('Envie o currículo que está cadastrado na Gupy.');
       return;
     }
-
     setGerando(true);
     setErro(null);
-
     try {
+      // Auditar importa os links mesmo se a pessoa não tiver clicado em Buscar descrições.
+      const importadas = links.some(x => x.trim()) && vagasExtraidas.length === 0
+        ? await buscarLinksPublicos()
+        : vagasExtraidas;
+      const descricoesExtraidas = importadas.map((vaga, index) =>
+        'VAGA EXTRAÍDA ' + (index + 1) + ': ' + vaga.titulo + '\nOrigem: ' + vaga.url + '\n' + vaga.descricao
+      ).join('\n\n------\n\n');
+      const vagasParaAnalise = [vagas.trim(), descricoesExtraidas].filter(Boolean).join('\n\n------\n\n');
+      if (!vagasParaAnalise.trim()) {
+        throw new Error('Não foi possível importar as vagas. Cole ao menos uma descrição manual para analisar.');
+      }
       const curriculo = await extrairTextoPdf(cvFile);
 
       const response = await fetch('/api/ferramentas-soma/analisar', {
@@ -39,7 +53,7 @@ export default function GupyAuditClient({
         body: JSON.stringify({
           ferramenta: 'gupy',
           curriculo,
-          vagas,
+          vagas: vagasParaAnalise.slice(0, 38000),
           cargoAlvo,
         }),
       });
@@ -54,6 +68,45 @@ export default function GupyAuditClient({
       setErro(error instanceof Error ? error.message : 'Não foi possível analisar o currículo.');
     } finally {
       setGerando(false);
+    }
+  }
+
+  async function buscarLinksPublicos() {
+    const selecionados = links.map(x => x.trim()).filter(Boolean);
+    if (!selecionados.length) {
+      setErro('Adicione ao menos um link de vaga da Gupy.');
+      return [] as VagaPublica[];
+    }
+    setBuscandoLinks(true);
+    setErro(null);
+    setFalhasLinks([]);
+    setVagasExtraidas([]);
+    try {
+      const response = await fetch('/api/ferramentas-soma/gupy-vagas-publicas', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls: selecionados }),
+        cache: 'no-store',
+      });
+      const json = await response.json() as {
+        error?: string;
+        resultados?: Array<{ url: string; ok: boolean; vaga?: VagaPublica; erro?: string }>;
+      };
+      if (!response.ok) throw new Error(json.error || 'Não foi possível consultar as vagas.');
+      const validas = (json.resultados || []).filter(x => x.ok && x.vaga).map(x => x.vaga as VagaPublica);
+      setVagasExtraidas(validas);
+      const falhas = (json.resultados || []).filter(x => !x.ok).map((x, i) =>
+        'Link ' + (i + 1) + ': ' + (x.erro || 'Cole a descrição manualmente.')
+      );
+      setFalhasLinks(falhas);
+      if (!validas.length) setErro('Não foi possível extrair essas páginas. Cole a descrição da vaga no campo abaixo.');
+      return validas;
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : 'Falha na leitura das vagas.');
+      return [] as VagaPublica[];
+    } finally {
+      setBuscandoLinks(false);
     }
   }
 
@@ -128,19 +181,82 @@ export default function GupyAuditClient({
             </div>
           </div>
 
-          <label className="block">
-            <span className="text-sm font-medium text-black">Vaga(s) alvo *</span>
+          <div className="min-w-0 space-y-4">
+            <div className="rounded-xl border border-[#cce2dc] bg-[#f5faf8] p-4">
+              <div className="flex items-center gap-2">
+                <Link2 size={17} className="text-mint-deep" aria-hidden="true" />
+                <p className="text-sm font-semibold text-black">Importar até 3 vagas por link</p>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-gray-text">
+                Cole links individuais de vagas públicas da Gupy. A SOMA tenta ler a descrição,
+                requisitos e atividades. Se a página bloquear a leitura, use o texto manual abaixo.
+              </p>
+              <div className="mt-3 space-y-2">
+                {links.map((link, indice) => (
+                  <label key={indice} className="block">
+                    <span className="sr-only">Link público da vaga {indice + 1}</span>
+                    <input
+                      type="url"
+                      value={link}
+                      placeholder={indice === 0 ? 'https://empresa.gupy.io/jobs/123456' : 'Link ' + (indice + 1) + ' (opcional)'}
+                      onChange={event => {
+                        const novo = [...links];
+                        novo[indice] = event.target.value;
+                        setLinks(novo);
+                        setVagasExtraidas([]);
+                        setFalhasLinks([]);
+                      }}
+                      disabled={gerando || buscandoLinks}
+                      className="w-full min-w-0 rounded-lg border border-[#dae9e4] bg-white px-3 py-2.5 text-sm focus:border-mint-deep focus:outline-none disabled:opacity-60"
+                    />
+                  </label>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={buscarLinksPublicos}
+                disabled={buscandoLinks || gerando || !links.some(x => x.trim())}
+                className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg border border-mint-deep px-4 py-2 text-sm font-semibold text-mint-deep hover:bg-[#edf7f2] disabled:opacity-50"
+              >
+                {buscandoLinks ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Link2 size={16} aria-hidden="true" />}
+                {buscandoLinks ? 'Consultando vagas...' : 'Buscar descrições'}
+              </button>
+              {vagasExtraidas.length > 0 && (
+                <div className="mt-4 space-y-2" role="status" aria-live="polite">
+                  {vagasExtraidas.map(vaga => (
+                    <div key={vaga.url} className="rounded-lg border border-[#bfdfd5] bg-white p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-semibold text-[#145647]">{vaga.titulo}</p>
+                        <a href={vaga.url} target="_blank" rel="noopener noreferrer" aria-label={'Abrir vaga ' + vaga.titulo} className="shrink-0 text-mint-deep">
+                          <ExternalLink size={16} aria-hidden="true" />
+                        </a>
+                      </div>
+                      <p className="mt-1 text-xs text-gray-text">{vaga.descricao.length} caracteres importados para comparar</p>
+                      <p className="mt-2 line-clamp-3 text-xs leading-5 text-gray-text">{vaga.descricao}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {falhasLinks.length > 0 && (
+                <div role="alert" className="mt-3 space-y-1 text-xs leading-5 text-[#9a4d39]">
+                  {falhasLinks.map((msg, i) => <p key={i}>{msg}</p>)}
+                </div>
+              )}
+            </div>
+            <label className="block">
+              <span className="text-sm font-medium text-black">Descrição manual (opcional se importou links)</span>
             <p className="text-xs text-gray-text mt-1 mb-2">
-              Cole uma, duas ou até três descrições de vaga. Quanto mais específicas, melhor a comparação.
+              Caso não consiga importar a vaga ou queira acrescentar detalhes, cole sua descrição aqui.
             </p>
             <textarea
               rows={14}
               value={vagas}
               onChange={(event) => setVagas(event.target.value)}
-              placeholder="Cole aqui as descrições completas das vagas..."
+              placeholder="Cole aqui a descrição da vaga quando não houver acesso público pelo link..."
               className="w-full rounded-lg border border-gray-faint px-4 py-3 text-sm resize-y focus:outline-none focus:border-mint-deep"
             />
-          </label>
+            </label>
+          </div>
         </div>
 
         <div className="mt-5 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
@@ -162,7 +278,7 @@ export default function GupyAuditClient({
         <button
           type="button"
           onClick={analisar}
-          disabled={gerando}
+          disabled={gerando || buscandoLinks}
           className="mt-5 inline-flex items-center gap-2 rounded-lg bg-mint-deep px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
         >
           {gerando ? <Loader2 size={16} className="animate-spin" /> : <FileSearch size={16} />}
