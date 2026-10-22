@@ -50,7 +50,7 @@ test('Servidor limita 3 links, sessão, acesso ao módulo e respostas externas',
   assert.match(helper, /credentials: 'omit'/);
   assert.match(helper, /AbortSignal\.timeout\(7000\)/);
   assert.match(helper, /550_000/);
-  assert.match(helper, /application\/ld\\\+json/);
+  assert.ok(helper.includes('application\\/ld\\+json'), 'JSON-LD deve ser identificado');
   assert.doesNotMatch(route, /\.from\('soma_analises'\)\.insert/);
   assert.doesNotMatch(route, /serviceRole|authorization:\s*Bearer/i);
 });
