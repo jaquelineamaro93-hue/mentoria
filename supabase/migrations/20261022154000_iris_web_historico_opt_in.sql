@@ -64,7 +64,7 @@ grant all on public.iris_web_conversations, public.iris_web_messages,
   public.iris_web_admin_audit to service_role;
 
 -- Instalado em alguns ambientes antes do merge: não recriar policies existentes.
-do $
+do $iris_privacy_policy$
 begin
   if not exists (
     select 1 from pg_policies where schemaname = 'public'
@@ -85,7 +85,7 @@ begin
       using ((select auth.uid()) = user_id);
   end if;
 end
-$;
+$iris_privacy_policy$;
 
 comment on table public.iris_web_conversations is
   'Conversa web SOMA de usuário; sem acesso público ou ao histórico WhatsApp.';
