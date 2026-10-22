@@ -1,0 +1,26 @@
+name: Gupy links públicos
+
+on:
+  pull_request:
+    paths:
+      - 'lib/gupy-public-job.ts'
+      - 'app/api/ferramentas-soma/gupy-vagas-publicas/route.ts'
+      - 'app/(dashboard)/gupy/GupyAuditClient.tsx'
+      - 'tests/gupy-links-publicos.test.mjs'
+      - '.github/workflows/gupy-links-publicos.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Testar extração e proteções Gupy
+        run: node --test tests/gupy-links-publicos.test.mjs
