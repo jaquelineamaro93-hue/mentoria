@@ -1,0 +1,28 @@
+name: SOMA rede e feedback da Iris
+
+on:
+  pull_request:
+    paths:
+      - 'components/IrisCopiloto.tsx'
+      - 'app/api/copiloto/route.ts'
+      - 'app/api/copiloto/feedback/route.ts'
+      - 'components/public/SomaNetworkCompanies.tsx'
+      - 'app/(public)/page.tsx'
+      - 'tests/soma-rede-feedback.test.mjs'
+      - '.github/workflows/soma-rede-feedback.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rede-feedback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Testar rede e feedback
+        run: node --test tests/soma-rede-feedback.test.mjs
