@@ -27,20 +27,24 @@ export default function GupyAuditClient({
   const [atual, setAtual] = useState<SomaAnaliseResumo | null>(historicoInicial[0] ?? null);
 
   async function analisar() {
-    const descricoesExtraidas = vagasExtraidas.map((vaga, index) =>
-      'VAGA EXTRAÍDA ' + (index + 1) + ': ' + vaga.titulo + '\nOrigem: ' + vaga.url + '\n' + vaga.descricao
-    ).join('\n\n------\n\n');
-    const vagasParaAnalise = [vagas.trim(), descricoesExtraidas].filter(Boolean).join('\n\n------\n\n');
-    if (!cvFile || !vagasParaAnalise.trim()) {
-      setErro('Envie o currículo exportado da Gupy e informe ao menos uma descrição de vaga ou importe um link público.');
-
+    if (!cvFile) {
+      setErro('Envie o currículo que está cadastrado na Gupy.');
       return;
     }
-
     setGerando(true);
     setErro(null);
-
     try {
+      // Auditar importa os links mesmo se a pessoa não tiver clicado em Buscar descrições.
+      const importadas = links.some(x => x.trim()) && vagasExtraidas.length === 0
+        ? await buscarLinksPublicos()
+        : vagasExtraidas;
+      const descricoesExtraidas = importadas.map((vaga, index) =>
+        'VAGA EXTRAÍDA ' + (index + 1) + ': ' + vaga.titulo + '\nOrigem: ' + vaga.url + '\n' + vaga.descricao
+      ).join('\n\n------\n\n');
+      const vagasParaAnalise = [vagas.trim(), descricoesExtraidas].filter(Boolean).join('\n\n------\n\n');
+      if (!vagasParaAnalise.trim()) {
+        throw new Error('Não foi possível importar as vagas. Cole ao menos uma descrição manual para analisar.');
+      }
       const curriculo = await extrairTextoPdf(cvFile);
 
       const response = await fetch('/api/ferramentas-soma/analisar', {
@@ -71,7 +75,7 @@ export default function GupyAuditClient({
     const selecionados = links.map(x => x.trim()).filter(Boolean);
     if (!selecionados.length) {
       setErro('Adicione ao menos um link de vaga da Gupy.');
-      return;
+      return [] as VagaPublica[];
     }
     setBuscandoLinks(true);
     setErro(null);
@@ -97,8 +101,10 @@ export default function GupyAuditClient({
       );
       setFalhasLinks(falhas);
       if (!validas.length) setErro('Não foi possível extrair essas páginas. Cole a descrição da vaga no campo abaixo.');
+      return validas;
     } catch (error) {
       setErro(error instanceof Error ? error.message : 'Falha na leitura das vagas.');
+      return [] as VagaPublica[];
     } finally {
       setBuscandoLinks(false);
     }
