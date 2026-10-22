@@ -42,7 +42,7 @@ test('Banco tem RLS owner-only, sem leitura anon e com registro de auditoria', (
   assert.match(sql, /revoke all on public\.iris_web_conversations/);
   assert.match(sql, /from public, anon, authenticated/);
   assert.match(sql, /using \(\(select auth\.uid\(\)\) = user_id\)/g);
-  assert.doesNotMatch(sql, /for select to anon|security definer/i);
+  assert.doesNotMatch(sql.replace(/^--.*$/gm, ''), /for select to anon|security definer/i);
   assert.match(sql, /foreign key \(conversation_id, user_id\)/);
   assert.match(sql, /references public\.iris_web_conversations\(id,user_id\)/);
 });
