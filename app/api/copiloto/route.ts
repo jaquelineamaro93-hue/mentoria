@@ -168,6 +168,7 @@ export async function POST(request: NextRequest) {
       return json({ erro: 'Não foi possível validar sua conversa.' }, 503);
     }
   }
+  const usuarioAutenticadoId = user.id;
   const perguntaParaHistorico = body.acao === 'confirmar_pdi'
     ? 'Solicitei confirmação de uma ação do PDI'
     : texto(body.mensagem, 4000);
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest) {
     }
     try {
       const salvo = await saveIrisTurn({
-        userId: user.id,
+        userId: usuarioAutenticadoId,
         conversationId,
         question: perguntaParaHistorico,
         answer: payload.resposta,
