@@ -89,6 +89,8 @@ export const HISTORIAS_SOMA = [
 export default function SomaSuccessStories() {
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [canGoForward, setCanGoForward] = useState(true);
 
   function move(direction: -1 | 1) {
     const container = scroller.current;
@@ -101,7 +103,7 @@ export default function SomaSuccessStories() {
     const destination = Math.min(max, Math.max(0, container.scrollLeft + direction * step));
     container.scrollTo({
       left: destination,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     });
   }
 
@@ -112,6 +114,8 @@ export default function SomaSuccessStories() {
     if (!card) return;
     const gap = parseFloat(getComputedStyle(container).columnGap || '16') || 16;
     setActive(Math.min(HISTORIAS_SOMA.length - 1, Math.max(0, Math.round(container.scrollLeft / (card.offsetWidth + gap)))));
+    setCanGoBack(container.scrollLeft > 2);
+    setCanGoForward(container.scrollLeft + container.clientWidth < container.scrollWidth - 2);
   }
 
   return (
@@ -142,7 +146,7 @@ export default function SomaSuccessStories() {
             <button
               type="button"
               onClick={() => move(-1)}
-              disabled={active === 0}
+              disabled={!canGoBack}
               className="grid h-11 w-11 place-items-center rounded-full border border-white/25 text-white transition hover:border-[#65cbb8] hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
               aria-label="Ver depoimentos anteriores"
             >
@@ -151,7 +155,7 @@ export default function SomaSuccessStories() {
             <button
               type="button"
               onClick={() => move(1)}
-              disabled={active >= HISTORIAS_SOMA.length - 1}
+              disabled={!canGoForward}
               className="grid h-11 w-11 place-items-center rounded-full border border-[#65cbb8]/55 bg-[#0D8071] text-white transition hover:bg-[#0a6d60] disabled:cursor-not-allowed disabled:opacity-30"
               aria-label="Ver próximos depoimentos"
             >
