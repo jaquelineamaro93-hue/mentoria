@@ -344,6 +344,11 @@ export default function IrisCopiloto() {
         >
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f0e9fa]" aria-hidden="true"><Mascot index={3} size={28} /></span>
           <span>Íris Copiloto</span>
+          {!historicoCarregando && !conversationId && (
+            <span className="rounded-full bg-[#e3f5f0] px-2 py-0.5 text-[10px] font-medium text-[#285d51]">
+              Privacidade
+            </span>
+          )}
         </button>
       ) : (
         <div
@@ -409,7 +414,7 @@ export default function IrisCopiloto() {
                 onChange={event => setPermitirHistorico(event.target.checked)}
                 className="mt-1 h-4 w-4 shrink-0 accent-[#0D8071]" />
               <span><strong>Atualização de privacidade: ativar meu histórico.</strong> Ao marcar, autorizo a SOMA a armazenar minhas mensagens da Íris Copilot para que eu possa continuar minhas conversas depois.
-                A administração autorizada poderá consultá-las para melhorar o atendimento, com acesso registrado.
+                O histórico fica restrito à minha conta, e a equipe autorizada poderá acessá-lo apenas para suporte e segurança, conforme as regras de privacidade.
                 Posso excluir conversas quando quiser. Sem marcar, a Íris continua funcionando sem histórico salvo.</span>
             </label>
           )}
