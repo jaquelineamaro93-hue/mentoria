@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ExternalLink, Send, Sparkles, X } from 'lucide-react';
+import { ChevronDown, ExternalLink, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
@@ -11,6 +11,13 @@ type Mensagem = {
   href?: string;
   proposta?: Proposta;
   token?: string;
+  feedbackToken?: string;
+  responseId?: string;
+  avaliacao?: 'positivo' | 'negativo';
+  feedbackAberto?: boolean;
+  motivoFeedback?: string;
+  feedbackSalvando?: boolean;
+  feedbackErro?: string;
 };
 
 const SAUDACAO: Mensagem = {
@@ -117,6 +124,7 @@ export default function IrisCopiloto() {
       const dados = await resposta.json() as {
         resposta?: string; erro?: string; href?: string;
         proposta?: Proposta; token?: string;
+        feedbackToken?: string; responseId?: string;
       };
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
@@ -124,6 +132,8 @@ export default function IrisCopiloto() {
         href: resposta.ok ? dados.href : undefined,
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
+        feedbackToken: resposta.ok ? dados.feedbackToken : undefined,
+        responseId: resposta.ok ? dados.responseId : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
@@ -146,7 +156,7 @@ export default function IrisCopiloto() {
         cache: 'no-store',
         body: JSON.stringify({ acao: 'confirmar_pdi', proposta, token }),
       });
-      const data = await res.json() as { resposta?: string; erro?: string; href?: string };
+      const data = await res.json() as { resposta?: string; erro?: string; href?: string; feedbackToken?: string; responseId?: string };
       if (res.ok) {
         setMensagens(anteriores => anteriores.map((m, i) =>
           i === indice ? { ...m, proposta: undefined, token: undefined } : m
@@ -156,6 +166,8 @@ export default function IrisCopiloto() {
         tipo: 'iris',
         texto: data.resposta || data.erro || 'Não consegui executar essa ação.',
         href: res.ok ? data.href : undefined,
+        feedbackToken: res.ok ? data.feedbackToken : undefined,
+        responseId: res.ok ? data.responseId : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
@@ -165,6 +177,60 @@ export default function IrisCopiloto() {
     } finally {
       setOcupada(false);
     }
+  }
+
+  async function salvarFeedback(indice: number, avaliacao: 'positivo' | 'negativo', motivo = '') {
+    const mensagem = mensagens[indice];
+    if (!mensagem?.feedbackToken || mensagem.feedbackSalvando) return;
+    const justificativa = motivo.trim();
+    if (avaliacao === 'negativo' && (justificativa.length < 8 || justificativa.length > 800)) {
+      setMensagens(anteriores => anteriores.map((item, i) =>
+        i === indice ? { ...item, feedbackErro: 'Explique em pelo menos 8 caracteres o que faltou na resposta.' } : item
+      ));
+      return;
+    }
+    setMensagens(anteriores => anteriores.map((item, i) =>
+      i === indice ? { ...item, feedbackSalvando: true, feedbackErro: undefined } : item
+    ));
+    try {
+      const res = await fetch('/api/copiloto/feedback', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          feedbackToken: mensagem.feedbackToken,
+          rating: avaliacao,
+          reason: avaliacao === 'negativo' ? justificativa : '',
+        }),
+      });
+      const data = await res.json() as { salvo?: boolean; erro?: string };
+      if (!res.ok || !data.salvo) throw new Error(data.erro || 'Não foi possível salvar sua avaliação.');
+      setMensagens(anteriores => anteriores.map((item, i) =>
+        i === indice ? {
+          ...item,
+          avaliacao,
+          feedbackAberto: false,
+          motivoFeedback: '',
+          feedbackSalvando: false,
+          feedbackErro: undefined,
+        } : item
+      ));
+    } catch (error) {
+      setMensagens(anteriores => anteriores.map((item, i) =>
+        i === indice ? {
+          ...item,
+          feedbackSalvando: false,
+          feedbackErro: error instanceof Error ? error.message : 'Não foi possível salvar. Tente novamente.',
+        } : item
+      ));
+    }
+  }
+
+  function abrirJustificativa(indice: number) {
+    setMensagens(anteriores => anteriores.map((item, i) =>
+      i === indice ? { ...item, feedbackAberto: true, feedbackErro: undefined } : item
+    ));
   }
 
   return (
@@ -229,6 +295,91 @@ export default function IrisCopiloto() {
                     <a href={m.href} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#5B453E] underline">
                       Abrir ferramenta <ExternalLink size={12} aria-hidden="true" />
                     </a>
+                  )}
+                  {m.tipo === 'iris' && m.feedbackToken && (
+                    <div className="mt-3 border-t border-[#eee6df] pt-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] text-[#6b625e]">
+                          {m.avaliacao ? 'Avaliação registrada. Obrigada pelo retorno.' : 'Esta resposta ajudou?'}
+                        </span>
+                        <div className="flex shrink-0 gap-1.5">
+                          <button
+                            type="button"
+                            aria-label="Gostei desta resposta"
+                            aria-pressed={m.avaliacao === 'positivo'}
+                            title="Gostei desta resposta"
+                            disabled={m.feedbackSalvando}
+                            onClick={() => void salvarFeedback(indice, 'positivo')}
+                            className={m.avaliacao === 'positivo'
+                              ? 'grid h-10 w-10 place-items-center rounded-lg bg-[#e2f5ee] text-[#0D8071]'
+                              : 'grid h-10 w-10 place-items-center rounded-lg text-[#65544f] hover:bg-[#f1eae5] focus-visible:outline-2 focus-visible:outline-[#0D8071]'}
+                          >
+                            <ThumbsUp size={17} aria-hidden="true" />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Não gostei desta resposta"
+                            aria-pressed={m.avaliacao === 'negativo'}
+                            title="Não gostei desta resposta"
+                            disabled={m.feedbackSalvando}
+                            onClick={() => abrirJustificativa(indice)}
+                            className={m.avaliacao === 'negativo'
+                              ? 'grid h-10 w-10 place-items-center rounded-lg bg-[#f9e7df] text-[#8f4431]'
+                              : 'grid h-10 w-10 place-items-center rounded-lg text-[#65544f] hover:bg-[#f1eae5] focus-visible:outline-2 focus-visible:outline-[#0D8071]'}
+                          >
+                            <ThumbsDown size={17} aria-hidden="true" />
+                          </button>
+                        </div>
+                      </div>
+                      {m.feedbackAberto && (
+                        <form
+                          className="mt-2 rounded-xl border border-[#e4d5cb] bg-[#fbfaf8] p-3"
+                          onSubmit={event => {
+                            event.preventDefault();
+                            void salvarFeedback(indice, 'negativo', m.motivoFeedback || '');
+                          }}
+                        >
+                          <label htmlFor={'iris-motivo-' + indice} className="block text-xs font-semibold text-[#463730]">
+                            O que não funcionou nesta resposta?
+                          </label>
+                          <p className="mt-1 text-xs text-[#6b625e]">
+                            Conte o que faltou ou o que a Íris entendeu errado. Seu comentário ajuda a melhorar o Copiloto.
+                          </p>
+                          <textarea
+                            id={'iris-motivo-' + indice}
+                            rows={3}
+                            minLength={8}
+                            maxLength={800}
+                            required
+                            disabled={m.feedbackSalvando}
+                            value={m.motivoFeedback || ''}
+                            onChange={event => setMensagens(anteriores => anteriores.map((item, i) =>
+                              i === indice ? { ...item, motivoFeedback: event.target.value, feedbackErro: undefined } : item
+                            ))}
+                            placeholder="Ex.: Meu PDI já está preenchido, mas a resposta tratou como incompleto."
+                            className="mt-2 w-full resize-y rounded-lg border border-[#d9d0c9] bg-white p-3 text-base text-[#312b27] outline-none focus:border-[#0D8071]"
+                          />
+                          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-[11px] text-[#746661]">{(m.motivoFeedback || '').length}/800</span>
+                            <div className="flex gap-2">
+                              <button type="button" disabled={m.feedbackSalvando}
+                                onClick={() => setMensagens(anteriores => anteriores.map((item, i) =>
+                                  i === indice ? { ...item, feedbackAberto: false, feedbackErro: undefined } : item
+                                ))}
+                                className="min-h-10 rounded-lg border border-[#d9d0c9] px-3 text-xs font-medium text-[#463730]">
+                                Cancelar
+                              </button>
+                              <button type="submit"
+                                disabled={m.feedbackSalvando || (m.motivoFeedback || '').trim().length < 8}
+                                className="min-h-10 rounded-lg bg-[#5B453E] px-3 text-xs font-semibold text-white disabled:opacity-50">
+                                {m.feedbackSalvando ? 'Salvando...' : 'Enviar avaliação'}
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      )}
+                      {m.feedbackErro && <p role="alert" className="mt-2 text-xs text-[#a33325]">{m.feedbackErro}</p>}
+                    </div>
                   )}
                   {m.proposta && m.token && (
                     <div className="mt-3 rounded-lg border border-[#cfc3bb] bg-[#faf7f3] p-3">
