@@ -175,7 +175,7 @@ export default function SomaSuccessStories() {
             <article
               data-story-card
               key={index}
-              className="flex min-h-[290px] w-[85%] max-w-[350px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-white/15 bg-[#1c2825] p-5 transition-colors hover:border-[#65cbb8]/65 sm:w-[calc((100%-16px)/2)] sm:max-w-none sm:p-6 lg:w-[calc((100%-48px)/4)]"
+              className="flex min-h-[290px] w-[85%] max-w-[350px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-white/15 bg-[#1c2825] p-5 transition-colors hover:border-[#65cbb8]/65 sm:w-[calc((100%_-_16px)/2)] sm:max-w-none sm:p-6 lg:w-[calc((100%_-_48px)/4)]"
             >
               <div>
                 <div className="flex items-start justify-between gap-3">
@@ -198,7 +198,7 @@ export default function SomaSuccessStories() {
 
         <div className="mt-1 flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-3xl text-xs leading-5 text-[#a7bdb5]">
-            Excertos de mensagens recebidas, com identificação omitida. Experiências individuais,
+            Trechos selecionados de mensagens recebidas, com edição leve para leitura e identificação omitida. Experiências individuais,
             sem promessa de aprovação ou contratação.
           </p>
           <Link
