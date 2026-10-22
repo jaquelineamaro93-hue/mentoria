@@ -30,23 +30,30 @@ test('Carrossel responsivo e com recursos basicos de acessibilidade', () => {
   assert.match(ui, /onScroll=\{syncActive\}/);
 });
 
-test('Relatos anonimizados: sem prints, numeros e nomes dos contatos privados', () => {
+test('Autores autorizados aparecem sem números, telefones ou conversas privadas', () => {
   const ui = source('components/public/SomaSuccessStories.tsx');
+  for (const pessoa of ['Nathalia Ferlin', 'Henrique Silva', 'Paulo Cézar Silveira', 'Erick Almeida', 'Geraldo Macinelli', 'Jaque Ferreira']) {
+    assert.ok(ui.includes(pessoa), 'Nome ausente: ' + pessoa);
+  }
   assert.doesNotMatch(ui, /wa\.me|whatsapp\.com|<img|next\/image|\\.jpeg|\\.jpg|\\.png/i);
-  assert.doesNotMatch(ui, /\b(?:Jaqueline Amaro|Henrique Silva|Nathalia Ferlin|Erick Almeida|Geraldo Macinelli|Jaque Ferreira)\b/i);
-  assert.doesNotMatch(ui, /\+55\s?\d{2}|\b\d{11}\b/);
-  assert.match(ui, /Nome preservado por privacidade/);
-  assert.match(ui, /sem promessa de aprovação ou contratação/);
+  assert.doesNotMatch(ui, /\+55\s?\d{2}|\b\d{11}\b|@gmail\.com/i);
+  assert.match(ui, /historia.nome/);
+  assert.match(ui, /historia.iniciais/);
+  assert.match(ui, /historia.origem/);
+  assert.match(ui, /Depoimentos reais compartilhados com autorização/);
+  assert.match(ui, /Resultados individuais não representam promessa de aprovação ou contratação/);
   assert.doesNotMatch(ui, /⭐⭐⭐⭐⭐|99%|empresas parceiras/i);
 });
 
 test('Depoimentos nao fazem todos os relatos parecerem contratacoes pela plataforma', () => {
   const ui = source('components/public/SomaSuccessStories.tsx');
-  assert.match(ui, /mentorias e comunidades/);
-  assert.match(ui, /Relato de evolução em entrevistas/);
-  assert.match(ui, /Relato de oportunidade profissional/);
+  assert.match(ui, /orientações em comunidades/);
+  assert.match(ui, /Evolução em entrevistas/);
+  assert.match(ui, /Novo contrato profissional/);
   assert.match(ui, /LinkedIn e currículo/);
-  assert.match(ui, /Currículo e Gupy/);
+  assert.match(ui, /Aprovação na Gupy/);
   const cards = (ui.match(/\scategoria:/g) || []).length;
+  const autores = (ui.match(/\snome:/g) || []).length;
+  assert.equal(cards, autores);
   assert.ok(cards >= 10 && cards <= 20, 'Quantidade de relatos inesperada: ' + cards);
 });
