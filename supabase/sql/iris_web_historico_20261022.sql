@@ -7,6 +7,8 @@ create table if not exists public.iris_web_conversations (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null default 'Nova conversa' check (char_length(title) between 1 and 120),
+  consent_at timestamptz not null default now(),
+  consent_version text not null default 'iris_web_v1' check (consent_version = 'iris_web_v1'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (id, user_id)
