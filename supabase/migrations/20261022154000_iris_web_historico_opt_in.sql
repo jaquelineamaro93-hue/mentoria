@@ -63,12 +63,29 @@ grant select on public.iris_web_conversations, public.iris_web_messages to authe
 grant all on public.iris_web_conversations, public.iris_web_messages,
   public.iris_web_admin_audit to service_role;
 
-create policy iris_web_conversations_select_owner
-  on public.iris_web_conversations for select to authenticated
-  using ((select auth.uid()) = user_id);
-create policy iris_web_messages_select_owner
-  on public.iris_web_messages for select to authenticated
-  using ((select auth.uid()) = user_id);
+-- Instalado em alguns ambientes antes do merge: não recriar policies existentes.
+do $
+begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public'
+      and tablename = 'iris_web_conversations'
+      and policyname = 'iris_web_conversations_select_owner'
+  ) then
+    create policy iris_web_conversations_select_owner
+      on public.iris_web_conversations for select to authenticated
+      using ((select auth.uid()) = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public'
+      and tablename = 'iris_web_messages'
+      and policyname = 'iris_web_messages_select_owner'
+  ) then
+    create policy iris_web_messages_select_owner
+      on public.iris_web_messages for select to authenticated
+      using ((select auth.uid()) = user_id);
+  end if;
+end
+$;
 
 comment on table public.iris_web_conversations is
   'Conversa web SOMA de usuário; sem acesso público ou ao histórico WhatsApp.';
