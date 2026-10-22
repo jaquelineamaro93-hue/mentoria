@@ -1,11 +1,14 @@
 /**
- * Marcas só podem ser adicionadas aqui após confirmar que profissionais da rede
- * atuam na empresa. Nenhuma marca da LP de referência é prova de associação.
- *
- * Exemplo de entrada validada:
- * { nome: 'Empresa', logoUrl: '/logos/empresa.svg' }
+ * Logos de empresas citadas em trajetórias profissionais da SOMA e da mentora.
+ * Não indicam vínculo empregatício atual, parceria ou disponibilidade para contato.
+ * Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons (atribuição).
  */
-const EMPRESAS_REDE: ReadonlyArray<{ nome: string; logoUrl: string }> = [];
+const EMPRESAS_REDE: ReadonlyArray<{ nome: string; logoUrl: string }> = [
+  { nome: 'Banco do Brasil', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Banco_do_Brasil_Logo.svg' },
+  { nome: 'Volvo', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/54/Volvo_logo.svg' },
+  { nome: 'Webmotors', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/LogoWebmotors_250px.png' },
+  { nome: 'Ansell', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Ansell_Logo.svg' },
+];
 
 const AREAS_REDE = ['CRM', 'Customer Experience', 'Customer Success', 'Dados', 'Produto', 'Inteligência Artificial'];
 
@@ -25,16 +28,17 @@ export default function SomaNetworking() {
         </p>
         {EMPRESAS_REDE.length > 0 ? (
           <>
-            <div aria-label="Empresas onde atuam profissionais da rede" className="mt-9 grid grid-cols-2 items-center gap-5 sm:grid-cols-3 lg:grid-cols-6">
+            <div aria-label="Empresas presentes em trajetórias profissionais relacionadas à SOMA" className="mt-9 grid grid-cols-2 items-center gap-3 sm:grid-cols-4 sm:gap-5">
               {EMPRESAS_REDE.map(empresa => (
-                <div key={empresa.nome} className="flex min-h-24 items-center justify-center rounded-xl border border-[#d9e8e2] bg-white px-5 py-4">
-                  {/* Logos locais verificados, sem rastreadores externos */}
+                <div key={empresa.nome} className="flex min-h-24 items-center justify-center rounded-xl border border-[#d9e8e2] bg-white px-4 py-5 shadow-sm transition-colors hover:border-[#a4cec0] sm:min-h-28">
+                  {/* Imagens verificadas com origem conhecida, sem scripts ou pixels de rastreamento */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img alt={empresa.nome} src={empresa.logoUrl} loading="lazy" className="max-h-11 max-w-full object-contain" />
+                  <img alt={empresa.nome} src={empresa.logoUrl} loading="lazy" className="max-h-12 max-w-full object-contain" decoding="async" referrerPolicy="no-referrer" />
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-xs text-[#74877e]">Marcas empregadoras dos participantes, sem vínculo de parceria ou patrocínio com a SOMA.</p>
+            <p className="mt-5 text-xs text-[#74877e]">Marcas presentes em trajetórias profissionais que inspiram a SOMA, sem vínculo de parceria ou patrocínio. A menção não indica vínculo atual nem garante contato com colaboradores.
+              <span className="mt-1 block">Logotipo Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons.</span></p>
           </>
         ) : (
           <div aria-label="Áreas de atuação presentes na proposta de networking" className="mx-auto mt-9 flex max-w-4xl flex-wrap justify-center gap-2.5">

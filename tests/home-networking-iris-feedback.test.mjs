@@ -15,7 +15,13 @@ test('Networking fica na home e fala de conexões genuínas, sem confundir marca
   assert.match(networking, /EMPRESAS_REDE\.length > 0/);
   assert.match(networking, /sem vínculo de parceria ou patrocínio/);
   assert.match(networking, /CRM/);
-  assert.match(networking, /sm:grid-cols-3 lg:grid-cols-6/);
+  assert.match(networking, /sm:grid-cols-4/);
+  for (const marca of ['Banco do Brasil', 'Volvo', 'Webmotors', 'Ansell']) {
+    assert.ok(networking.includes(marca), 'Logo ausente: ' + marca);
+  }
+  assert.match(networking, /upload\.wikimedia\.org\/wikipedia\/commons/);
+  assert.match(networking, /não indica vínculo atual nem garante contato com colaboradores/);
+  assert.match(networking, /Logotipo Webmotors: © Lucas Manfre Barreiro/);
 });
 
 test('Íris tem avaliação por resposta com joinha e comentário opcional, sem aparecer na LP', () => {
