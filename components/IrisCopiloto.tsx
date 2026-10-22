@@ -278,7 +278,7 @@ export default function IrisCopiloto() {
         tipo: 'iris',
         texto: data.resposta || data.erro || 'Não consegui executar essa ação.',
         href: res.ok ? data.href : undefined,
-        respostaRef: res.ok && data.resposta ? data.resposta_ref : undefined,
+        respostaRef: res.ok && data.resposta ? (data.resposta_ref || crypto.randomUUID()) : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
