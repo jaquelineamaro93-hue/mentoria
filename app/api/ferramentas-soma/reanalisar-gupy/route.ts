@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { chamarClaude } from '@/lib/anthropic';
+import { extrairNotaSoma, extrairVagasGupy } from '@/lib/gupy-report-parser';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -39,6 +40,11 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   if (erroLeitura) return json({ error: 'Não foi possível recuperar sua análise.' }, 503);
   if (!anterior) return json({ error: 'Análise não encontrada na sua conta.' }, 404);
+  const entradasOrigem = anterior.entradas && typeof anterior.entradas === 'object' && !Array.isArray(anterior.entradas)
+    ? anterior.entradas : {};
+  if (entradasOrigem.origem === 'reanalise_relatorio_salvo') {
+    return json({ error: 'Selecione a análise original para gerar uma nova leitura. Reanálises não podem ser usadas como fonte.' }, 409);
+  }
   const resultadoAntigo = String(anterior.resultado_markdown || '');
   if (resultadoAntigo.trim().length < 100) return json({ error: 'A análise salva não tem conteúdo suficiente.' }, 422);
 
@@ -50,9 +56,9 @@ export async function POST(request: NextRequest) {
   // As análises anteriores não guardavam PDF e descrição integral de vagas.
   // A geração é uma releitura do relatório salvo e nunca uma auditoria nova do score Gupy.
   const titulo = typeof anterior.titulo === 'string' ? anterior.titulo.slice(0, 140) : 'Gupy & ATS';
-  const entradas = anterior.entradas && typeof anterior.entradas === 'object' && !Array.isArray(anterior.entradas)
-    ? anterior.entradas : {};
-  const cargo = typeof entradas.cargoAlvo === 'string' ? entradas.cargoAlvo.slice(0, 200) : '';
+  const cargo = typeof entradasOrigem.cargoAlvo === 'string' ? entradasOrigem.cargoAlvo.slice(0, 200) : '';
+  const notaReferencia = extrairNotaSoma(resultadoAntigo);
+  const vagasReferencia = extrairVagasGupy(resultadoAntigo);
   const fonte = resultadoAntigo.length > 32000
     ? resultadoAntigo.slice(0, 24500) + '\n\n[PARTE INTERMEDIÁRIA NÃO REENVIADA]\n\n' + resultadoAntigo.slice(-7500)
     : resultadoAntigo;
@@ -97,6 +103,11 @@ export async function POST(request: NextRequest) {
     '## 8. Checklist antes de candidatar-se',
     'Se faltar o currículo original para reescrever com fidelidade, explique quais',
     'trechos podem ser recuperados do relatório e quais exigem novo documento.',
+    'IMPORTANTE: entregue todas as OITO seções numeradas ## 1. até ## 8., incluindo',
+    'o checklist final. Nunca pare na seção 5 ou envie relatório incompleto.',
+    'Seja profundo nos seis fatores (até 140 palavras por fator), mas evite repetição;',
+    'as demais seções podem ter até 250 palavras cada, totalizando até 3000 palavras.',
+    'Não replique longas tabelas da fonte; só traga trechos necessários para agir.',
     'Diferencie ações imediatas, hipóteses e evidências concretas.',
     'Não recomende adulteração de identificação nem experiências falsas.',
     'Título antigo: ' + JSON.stringify(titulo),
@@ -108,9 +119,15 @@ export async function POST(request: NextRequest) {
   ].join('\n');
 
   try {
-    const resultado = await chamarClaude(prompt, 7000);
+    const resultado = await chamarClaude(prompt, 8000);
     if (typeof resultado !== 'string' || resultado.trim().length < 300) {
       return json({ error: 'A análise não pôde ser atualizada agora.' }, 503);
+    }
+    // Nunca apresentar uma saída truncada como relatório finalizado.
+    const capitulosFaltantes = Array.from({ length: 8 }, (_, index) => index + 1)
+      .filter(numero => !new RegExp('^##\\s*' + numero + '[.)]\\s+', 'im').test(resultado));
+    if (capitulosFaltantes.length > 0) {
+      return json({ error: 'A geração foi interrompida antes de concluir todas as oito seções. Nenhum novo relatório foi salvo. Tente novamente.' }, 503);
     }
 
     // INSERT de uma nova versão. O registro antigo não é sobrescrito ou excluído.
@@ -124,10 +141,12 @@ export async function POST(request: NextRequest) {
           origem: 'reanalise_relatorio_salvo',
           analiseOrigemId: anterior.id,
           documentosOriginaisDisponiveis: false,
+          notaReferenciaSoma: notaReferencia,
+          vagasReferenciaSoma: vagasReferencia,
         },
         resultado_markdown: resultado,
       })
-      .select('id,titulo,resultado_markdown,created_at')
+      .select('id,titulo,resultado_markdown,created_at,entradas')
       .single();
     if (erroSalvar || !atualizada) return json({ error: 'Não foi possível salvar a nova análise.' }, 503);
     return json({ analise: atualizada });

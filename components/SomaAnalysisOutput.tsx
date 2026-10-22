@@ -10,6 +10,14 @@ export interface SomaAnaliseResumo {
   titulo: string | null;
   resultado_markdown: string;
   created_at: string;
+  entradas?: {
+    origem?: string;
+    analiseOrigemId?: string;
+    notaReferenciaSoma?: number | null;
+    vagasReferenciaSoma?: { nome: string; nota: number }[];
+    documentosOriginaisDisponiveis?: boolean;
+    cargoAlvo?: string;
+  } | null;
 }
 
 export default function SomaAnalysisOutput({

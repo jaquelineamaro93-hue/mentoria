@@ -91,7 +91,7 @@ export default function GupyAuditClient({
         </p>
       </header>
 
-      <section className="rounded-2xl border border-gray-faint bg-white p-5 md:p-6">
+      <section id="auditoria-gupy-form" className="scroll-mt-6 rounded-2xl border border-gray-faint bg-white p-5 md:p-6">
         <div className="grid lg:grid-cols-[minmax(0,360px)_1fr] gap-5">
           <div>
             <label className="block">

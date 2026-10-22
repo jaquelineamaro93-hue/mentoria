@@ -12,7 +12,7 @@ export default async function GupyPage() {
 
   const { data: historico } = await supabase
     .from('soma_analises')
-    .select('id, titulo, resultado_markdown, created_at')
+    .select('id, titulo, resultado_markdown, created_at, entradas')
     .eq('user_id', user.id)
     .eq('ferramenta', 'gupy')
     .order('created_at', { ascending: false })

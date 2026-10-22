@@ -8,7 +8,10 @@ test('Relatório legado mostra leitura atualizada com CTA sem botão de texto or
   const view = read('components/GupyAnalysisOutput.tsx');
   assert.ok(view.includes('const markdownExibido = leituraCorrigida.texto'));
   assert.ok(view.includes('Gerar nova análise'));
-  assert.ok(view.includes('onReanalisar(atual)'));
+  assert.ok(view.includes('onReanalisar(isReanalise && fonte ? fonte : atual)'));
+  assert.ok(view.includes('relatorioParcial'));
+  assert.ok(view.includes('notaReferencia'));
+  assert.ok(view.includes('Aderência da análise original'));
   assert.ok(!view.includes('Consultar texto original'));
   assert.ok(!view.includes('mostrarOriginal'));
   assert.ok(view.includes("copiar(markdownExibido, 'total')"));
