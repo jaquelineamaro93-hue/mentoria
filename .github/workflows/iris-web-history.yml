@@ -26,3 +26,22 @@ jobs:
           persist-credentials: false
       - name: Validate chat-history isolation and permissions
         run: node --test tests/iris-historico-web.test.mjs
+      - name: Node environment
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Compile TypeScript and Next production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          ANTHROPIC_API_KEY: placeholder
+          SENDGRID_API_KEY: placeholder
+          SENDGRID_FROM_EMAIL: contato@example.com
+          NEXT_PUBLIC_POSTHOG_KEY: placeholder
+          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
+
