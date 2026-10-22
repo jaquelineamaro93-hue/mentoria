@@ -210,7 +210,7 @@ export default function IrisCopiloto() {
 
   async function enviar(pedidoExterno?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
-    if (!pedido || ocupada || historicoCarregando || historicoErro) return;
+    if (!pedido || ocupada || historicoCarregando) return;
     setTexto('');
     setOcupada(true);
     setMensagens(anteriores => [...anteriores, { tipo: 'mentorado', texto: pedido }]);
@@ -403,6 +403,16 @@ export default function IrisCopiloto() {
               ))}
             </div>
           )}
+          {!conversationId && !historicoCarregando && (
+            <label className="flex shrink-0 items-start gap-3 border-b border-[#e8e0dc] bg-[#f5fbf8] px-3 py-2 text-xs leading-5 text-[#294d42]">
+              <input type="checkbox" checked={permitirHistorico}
+                onChange={event => setPermitirHistorico(event.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-[#0D8071]" />
+              <span><strong>Ativar meu histórico.</strong> Minhas conversas serão salvas na SOMA para eu retomar depois.
+                A administração autorizada poderá consultá-las para melhorar o atendimento, com acesso registrado.
+                Posso excluir conversas quando quiser. Sem marcar, a Íris continua funcionando sem histórico salvo.</span>
+            </label>
+          )}
           {historicoErro && <p role="alert" className="shrink-0 bg-[#fff3ec] px-3 py-2 text-xs text-[#854938]">{historicoErro}</p>}
           {historicoCarregando && <p role="status" className="shrink-0 px-3 py-2 text-xs text-gray-600">Carregando seu histórico...</p>}
           {mensagensAntigasLimitadas && <p className="shrink-0 px-3 py-2 text-xs text-gray-600">Exibindo as últimas 150 mensagens desta conversa.</p>}
@@ -537,7 +547,7 @@ export default function IrisCopiloto() {
             />
             <button
               type="submit"
-              disabled={ocupada || historicoCarregando || !!historicoErro || !texto.trim()}
+              disabled={ocupada || historicoCarregando || !texto.trim()}
               aria-label="Enviar mensagem"
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
             >
