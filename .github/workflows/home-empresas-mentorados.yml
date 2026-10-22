@@ -1,0 +1,26 @@
+name: Logos da LP SOMA
+
+on:
+  pull_request:
+    paths:
+      - 'app/(public)/page.tsx'
+      - 'app/(public)/depoimentos/page.tsx'
+      - 'components/public/SomaEmpresasMentorados.tsx'
+      - 'tests/home-empresas-mentorados.test.mjs'
+      - '.github/workflows/home-empresas-mentorados.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  empresas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verificar marcas e layout
+        run: node --test tests/home-empresas-mentorados.test.mjs
