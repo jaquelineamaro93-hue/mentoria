@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'app/(public)/page.tsx'
+      - 'app/(public)/depoimentos/page.tsx'
       - 'components/public/SomaEmpresasMentorados.tsx'
       - 'tests/home-empresas-mentorados.test.mjs'
       - '.github/workflows/home-empresas-mentorados.yml'
