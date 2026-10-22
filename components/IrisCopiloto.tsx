@@ -6,6 +6,7 @@ import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
 type Mensagem = {
+  id?: string;
   tipo: 'iris' | 'mentorado';
   texto: string;
   href?: string;
@@ -24,6 +25,8 @@ export default function IrisCopiloto() {
   const [aberto, setAberto] = useState(false);
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
+  const [historicoCarregando, setHistoricoCarregando] = useState(true);
+  const [historicoErro, setHistoricoErro] = useState<string | null>(null);
   const [ocupada, setOcupada] = useState(false);
   const [feedbackEdicao, setFeedbackEdicao] = useState<{ indice: number; avaliacao: 'util' | 'nao_util' } | null>(null);
   const [feedbackTexto, setFeedbackTexto] = useState('');
@@ -37,6 +40,32 @@ export default function IrisCopiloto() {
   const painel = useRef<HTMLDivElement>(null);
   const acionador = useRef<HTMLButtonElement>(null);
   const abertoUmaVez = useRef(false);
+
+  useEffect(() => {
+    let ativo = true;
+    fetch('/api/copiloto/historico', { credentials: 'same-origin', cache: 'no-store' })
+      .then(async resposta => {
+        if (!resposta.ok) throw new Error('Falha ao recuperar o histórico.');
+        return resposta.json() as Promise<{ mensagens?: Mensagem[] }>;
+      })
+      .then(dados => {
+        if (ativo && Array.isArray(dados.mensagens) && dados.mensagens.length) {
+          setMensagens([SAUDACAO, ...dados.mensagens]);
+        }
+      })
+      .catch(() => { if (ativo) setHistoricoErro('Não foi possível recuperar as conversas anteriores.'); })
+      .finally(() => { if (ativo) setHistoricoCarregando(false); });
+    return () => { ativo = false; };
+  }, []);
+
+  async function persistir(mensagem: Mensagem) {
+    const resposta = await fetch('/api/copiloto/historico', {
+      method: 'POST', credentials: 'same-origin', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mensagem),
+    });
+    if (!resposta.ok) setHistoricoErro('Uma mensagem não foi salva no histórico. Copie-a antes de sair.');
+  }
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 639px)');
@@ -108,10 +137,12 @@ export default function IrisCopiloto() {
 
   async function enviar(pedidoExterno?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
-    if (!pedido || ocupada) return;
+    if (!pedido || ocupada || historicoCarregando || historicoErro) return;
     setTexto('');
     setOcupada(true);
-    setMensagens(anteriores => [...anteriores, { tipo: 'mentorado', texto: pedido }]);
+    const enviada: Mensagem = { id: crypto.randomUUID(), tipo: 'mentorado', texto: pedido };
+    setMensagens(anteriores => [...anteriores, enviada]);
+    void persistir(enviada);
     try {
       const resposta = await fetch('/api/copiloto', {
         method: 'POST',
@@ -124,14 +155,17 @@ export default function IrisCopiloto() {
         resposta?: string; erro?: string; href?: string;
         proposta?: Proposta; token?: string;
       };
-      setMensagens(anteriores => [...anteriores, {
+      const recebida: Mensagem = {
+        id: crypto.randomUUID(),
         tipo: 'iris',
         texto: dados.resposta || dados.erro || 'Não consegui responder neste momento.',
         href: resposta.ok ? dados.href : undefined,
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
         respostaRef: resposta.ok && dados.resposta ? crypto.randomUUID() : undefined,
-      }]);
+      };
+      setMensagens(anteriores => [...anteriores, recebida]);
+      void persistir(recebida);
     } catch {
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
@@ -159,12 +193,15 @@ export default function IrisCopiloto() {
           i === indice ? { ...m, proposta: undefined, token: undefined } : m
         ));
       }
-      setMensagens(anteriores => [...anteriores, {
+      const recebida: Mensagem = {
+        id: crypto.randomUUID(),
         tipo: 'iris',
         texto: data.resposta || data.erro || 'Não consegui executar essa ação.',
         href: res.ok ? data.href : undefined,
         respostaRef: res.ok && data.resposta ? crypto.randomUUID() : undefined,
-      }]);
+      };
+      setMensagens(anteriores => [...anteriores, recebida]);
+      void persistir(recebida);
     } catch {
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
@@ -258,6 +295,8 @@ export default function IrisCopiloto() {
               <X size={19} />
             </button>
           </header>
+          {historicoCarregando && <p role="status" className="px-3 py-2 text-xs">Recuperando histórico...</p>}
+          {historicoErro && <p role="alert" className="px-3 py-2 text-xs text-red-700">{historicoErro}</p>}
           <div ref={historico} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#fbfaf8] p-3 sm:p-4" aria-live="polite" aria-relevant="additions">
             {mensagens.map((m, indice) => (
               <div key={indice} className={m.tipo === 'mentorado' ? 'ml-5 sm:ml-8' : 'mr-3 sm:mr-6'}>
@@ -358,7 +397,7 @@ export default function IrisCopiloto() {
                 <button
                   key={sugestao}
                   type="button"
-                  disabled={ocupada}
+                  disabled={ocupada || historicoCarregando || !!historicoErro}
                   onClick={() => void enviar(sugestao)}
                   className="min-h-10 rounded-full border border-[#d9d0c9] px-3 py-2 text-xs text-[#5B453E] disabled:opacity-50"
                 >
@@ -389,7 +428,7 @@ export default function IrisCopiloto() {
             />
             <button
               type="submit"
-              disabled={ocupada || !texto.trim()}
+              disabled={ocupada || historicoCarregando || !!historicoErro || !texto.trim()}
               aria-label="Enviar mensagem"
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
             >
