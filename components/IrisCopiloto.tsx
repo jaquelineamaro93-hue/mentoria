@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ExternalLink, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import { ChevronDown, ExternalLink, History, Plus, Trash2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
 type Mensagem = {
-  id?: string;
   tipo: 'iris' | 'mentorado';
   texto: string;
   href?: string;
@@ -15,6 +14,19 @@ type Mensagem = {
   respostaRef?: string;
   avaliacao?: 'util' | 'nao_util';
 };
+type ConversaIris = { id: string; title: string; updated_at: string };
+type MensagemSalva = { id: string; role: 'user' | 'assistant'; content: string; href: string | null;
+  response_ref: string | null; feedback_rating: 'util' | 'nao_util' | null };
+const converterMensagens = (rows: MensagemSalva[]): Mensagem[] => [
+  SAUDACAO,
+  ...rows.map(item => ({
+    tipo: item.role === 'user' ? 'mentorado' as const : 'iris' as const,
+    texto: item.content, href: item.href || undefined,
+    respostaRef: item.response_ref || undefined,
+    avaliacao: item.feedback_rating || undefined,
+  })),
+];
+
 
 const SAUDACAO: Mensagem = {
   tipo: 'iris',
@@ -25,9 +37,14 @@ export default function IrisCopiloto() {
   const [aberto, setAberto] = useState(false);
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
+  const [ocupada, setOcupada] = useState(false);
   const [historicoCarregando, setHistoricoCarregando] = useState(true);
   const [historicoErro, setHistoricoErro] = useState<string | null>(null);
-  const [ocupada, setOcupada] = useState(false);
+  const [conversas, setConversas] = useState<ConversaIris[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [mostrarHistorico, setMostrarHistorico] = useState(false);
+  const [permitirHistorico, setPermitirHistorico] = useState(false);
+  const [mensagensAntigasLimitadas, setMensagensAntigasLimitadas] = useState(false);
   const [feedbackEdicao, setFeedbackEdicao] = useState<{ indice: number; avaliacao: 'util' | 'nao_util' } | null>(null);
   const [feedbackTexto, setFeedbackTexto] = useState('');
   const [feedbackEnviando, setFeedbackEnviando] = useState(false);
@@ -41,30 +58,86 @@ export default function IrisCopiloto() {
   const acionador = useRef<HTMLButtonElement>(null);
   const abertoUmaVez = useRef(false);
 
+  // Ler da SOMA, não do armazenamento do dispositivo. Funciona em sessões e
+  // dispositivos diferentes, respeitando a autenticação e RLS por usuário.
   useEffect(() => {
     let ativo = true;
-    fetch('/api/copiloto/historico', { credentials: 'same-origin', cache: 'no-store' })
-      .then(async resposta => {
-        if (!resposta.ok) throw new Error('Falha ao recuperar o histórico.');
-        return resposta.json() as Promise<{ mensagens?: Mensagem[] }>;
-      })
-      .then(dados => {
-        if (ativo && Array.isArray(dados.mensagens) && dados.mensagens.length) {
-          setMensagens([SAUDACAO, ...dados.mensagens]);
-        }
-      })
-      .catch(() => { if (ativo) setHistoricoErro('Não foi possível recuperar as conversas anteriores.'); })
-      .finally(() => { if (ativo) setHistoricoCarregando(false); });
+    (async () => {
+      try {
+        const r = await fetch('/api/copiloto/historico', { credentials: 'same-origin', cache: 'no-store' });
+        const d = await r.json() as { erro?: string; conversas?: ConversaIris[];
+          mensagens?: MensagemSalva[]; conversation_id?: string | null; limite_atingido?: boolean };
+        if (!r.ok) throw new Error(d.erro || 'Não foi possível abrir seu histórico.');
+        if (!ativo) return;
+        setConversas(d.conversas ?? []);
+        setConversationId(d.conversation_id ?? null);
+        setPermitirHistorico(!!d.conversation_id);
+        setMensagens(converterMensagens(d.mensagens ?? []));
+        setMensagensAntigasLimitadas(!!d.limite_atingido);
+      } catch {
+        if (ativo) setHistoricoErro('Não foi possível carregar suas conversas. Recarregue antes de enviar uma nova mensagem.');
+      } finally {
+        if (ativo) setHistoricoCarregando(false);
+      }
+    })();
     return () => { ativo = false; };
   }, []);
 
-  async function persistir(mensagem: Mensagem) {
-    const resposta = await fetch('/api/copiloto/historico', {
-      method: 'POST', credentials: 'same-origin', cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(mensagem),
-    });
-    if (!resposta.ok) setHistoricoErro('Uma mensagem não foi salva no histórico. Copie-a antes de sair.');
+  async function abrirConversa(id: string) {
+    if (ocupada || historicoCarregando) return;
+    setHistoricoCarregando(true); setHistoricoErro(null);
+    try {
+      const r = await fetch('/api/copiloto/historico?conversation_id=' + encodeURIComponent(id),
+        { credentials: 'same-origin', cache: 'no-store' });
+      const d = await r.json() as { erro?: string; conversas?: ConversaIris[];
+        mensagens?: MensagemSalva[]; conversation_id?: string; limite_atingido?: boolean };
+      if (!r.ok) throw new Error(d.erro || 'Conversa indisponível.');
+      setMensagens(converterMensagens(d.mensagens ?? []));
+      setConversationId(d.conversation_id ?? id);
+      setPermitirHistorico(true);
+      setConversas(d.conversas ?? []);
+      setMensagensAntigasLimitadas(!!d.limite_atingido);
+      setMostrarHistorico(false);
+      setFeedbackEdicao(null);
+    } catch (e) {
+      setHistoricoErro(e instanceof Error ? e.message : 'Falha ao carregar.');
+    } finally {
+      setHistoricoCarregando(false);
+    }
+  }
+
+  function novaConversa() {
+    if (ocupada || historicoCarregando) return;
+    setConversationId(null);
+    setMensagens([SAUDACAO]);
+    setMensagensAntigasLimitadas(false);
+    setMostrarHistorico(false);
+    setFeedbackEdicao(null);
+    setHistoricoErro(null);
+  }
+
+  async function excluirConversa(id: string) {
+    if (ocupada || historicoCarregando) return;
+    if (!window.confirm('Excluir definitivamente esta conversa e suas mensagens?')) return;
+    setHistoricoCarregando(true);
+    try {
+      const r = await fetch('/api/copiloto/historico', {
+        method: 'DELETE', credentials: 'same-origin', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_id: id }),
+      });
+      const d = await r.json() as { erro?: string };
+      if (!r.ok) throw new Error(d.erro || 'Falha ao excluir.');
+      const atualizadas = conversas.filter(c => c.id !== id);
+      setConversas(atualizadas);
+      if (conversationId === id) {
+        setConversationId(null); setMensagens([SAUDACAO]); setMensagensAntigasLimitadas(false);
+      }
+    } catch (e) {
+      setHistoricoErro(e instanceof Error ? e.message : 'Não foi possível excluir.');
+    } finally {
+      setHistoricoCarregando(false);
+    }
   }
 
   useEffect(() => {
@@ -137,35 +210,41 @@ export default function IrisCopiloto() {
 
   async function enviar(pedidoExterno?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
-    if (!pedido || ocupada || historicoCarregando || historicoErro) return;
+    if (!pedido || ocupada || historicoCarregando) return;
     setTexto('');
     setOcupada(true);
-    const enviada: Mensagem = { id: crypto.randomUUID(), tipo: 'mentorado', texto: pedido };
-    setMensagens(anteriores => [...anteriores, enviada]);
-    void persistir(enviada);
+    setMensagens(anteriores => [...anteriores, { tipo: 'mentorado', texto: pedido }]);
     try {
       const resposta = await fetch('/api/copiloto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         cache: 'no-store',
-        body: JSON.stringify({ mensagem: pedido }),
+        body: JSON.stringify({ mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico }),
       });
       const dados = await resposta.json() as {
         resposta?: string; erro?: string; href?: string;
-        proposta?: Proposta; token?: string;
+        proposta?: Proposta; token?: string; conversation_id?: string;
+        resposta_ref?: string; aviso_historico?: string;
       };
-      const recebida: Mensagem = {
-        id: crypto.randomUUID(),
+      if (resposta.ok && dados.conversation_id) {
+        setConversationId(dados.conversation_id);
+        setConversas(anteriores => [
+          { id: dados.conversation_id as string,
+            title: anteriores.find(c => c.id === dados.conversation_id)?.title || pedido.replace(/\s+/g, ' ').slice(0, 95),
+            updated_at: new Date().toISOString() },
+          ...anteriores.filter(c => c.id !== dados.conversation_id),
+        ]);
+      }
+      if (dados.aviso_historico) setHistoricoErro(dados.aviso_historico);
+      setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
         texto: dados.resposta || dados.erro || 'Não consegui responder neste momento.',
         href: resposta.ok ? dados.href : undefined,
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
-        respostaRef: resposta.ok && dados.resposta ? crypto.randomUUID() : undefined,
-      };
-      setMensagens(anteriores => [...anteriores, recebida]);
-      void persistir(recebida);
+        respostaRef: resposta.ok && dados.resposta ? (dados.resposta_ref || crypto.randomUUID()) : undefined,
+      }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
@@ -185,23 +264,22 @@ export default function IrisCopiloto() {
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
-        body: JSON.stringify({ acao: 'confirmar_pdi', proposta, token }),
+        body: JSON.stringify({ acao: 'confirmar_pdi', proposta, token, conversation_id: conversationId }),
       });
-      const data = await res.json() as { resposta?: string; erro?: string; href?: string };
+      const data = await res.json() as { resposta?: string; erro?: string; href?: string; resposta_ref?: string; conversation_id?: string; aviso_historico?: string };
+      if (res.ok && data.conversation_id) setConversationId(data.conversation_id);
+      if (data.aviso_historico) setHistoricoErro(data.aviso_historico);
       if (res.ok) {
         setMensagens(anteriores => anteriores.map((m, i) =>
           i === indice ? { ...m, proposta: undefined, token: undefined } : m
         ));
       }
-      const recebida: Mensagem = {
-        id: crypto.randomUUID(),
+      setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
         texto: data.resposta || data.erro || 'Não consegui executar essa ação.',
         href: res.ok ? data.href : undefined,
-        respostaRef: res.ok && data.resposta ? crypto.randomUUID() : undefined,
-      };
-      setMensagens(anteriores => [...anteriores, recebida]);
-      void persistir(recebida);
+        respostaRef: res.ok && data.resposta ? (data.resposta_ref || crypto.randomUUID()) : undefined,
+      }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
@@ -286,6 +364,17 @@ export default function IrisCopiloto() {
                 <p className="text-xs text-white/80">Assistente nativa da SOMA</p>
               </div>
             </div>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => setMostrarHistorico(a => !a)}
+                disabled={historicoCarregando || ocupada} aria-label="Ver histórico da Íris"
+                className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 disabled:opacity-50">
+                <History size={20} aria-hidden="true" />
+              </button>
+              <button type="button" onClick={novaConversa}
+                disabled={historicoCarregando || ocupada} aria-label="Nova conversa com a Íris"
+                className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 disabled:opacity-50">
+                <Plus size={20} aria-hidden="true" />
+              </button>
             <button
               type="button"
               onClick={() => setAberto(false)}
@@ -294,9 +383,39 @@ export default function IrisCopiloto() {
             >
               <X size={19} />
             </button>
+            </div>
           </header>
-          {historicoCarregando && <p role="status" className="px-3 py-2 text-xs">Recuperando histórico...</p>}
-          {historicoErro && <p role="alert" className="px-3 py-2 text-xs text-red-700">{historicoErro}</p>}
+          {mostrarHistorico && (
+            <div className="max-h-[45%] shrink-0 overflow-y-auto border-b border-[#e8e0dc] bg-white p-3">
+              <h3 className="mb-2 text-sm font-semibold text-[#312b27]">Minhas conversas</h3>
+              {conversas.length === 0 && <p className="text-xs text-gray-600">Nenhuma conversa salva ainda.</p>}
+              {conversas.map(c => (
+                <div key={c.id} className="flex items-center gap-1 rounded-lg hover:bg-[#f2f7f5]">
+                  <button type="button" onClick={() => void abrirConversa(c.id)}
+                    className="min-h-11 min-w-0 flex-1 truncate px-3 text-left text-xs font-medium text-[#24483e]"
+                    aria-current={conversationId === c.id ? 'true' : undefined}>{c.title}</button>
+                  <button type="button" onClick={() => void excluirConversa(c.id)}
+                    aria-label={'Excluir conversa ' + c.title}
+                    className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-[#745c53] hover:bg-[#ffebe6]">
+                    <Trash2 size={16} aria-hidden="true" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {!conversationId && !historicoCarregando && (
+            <label className="flex shrink-0 items-start gap-3 border-b border-[#e8e0dc] bg-[#f5fbf8] px-3 py-2 text-xs leading-5 text-[#294d42]">
+              <input type="checkbox" checked={permitirHistorico}
+                onChange={event => setPermitirHistorico(event.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-[#0D8071]" />
+              <span><strong>Atualização de privacidade: ativar meu histórico.</strong> Ao marcar, autorizo a SOMA a armazenar minhas mensagens da Íris Copilot para que eu possa continuar minhas conversas depois.
+                A administração autorizada poderá consultá-las para melhorar o atendimento, com acesso registrado.
+                Posso excluir conversas quando quiser. Sem marcar, a Íris continua funcionando sem histórico salvo.</span>
+            </label>
+          )}
+          {historicoErro && <p role="alert" className="shrink-0 bg-[#fff3ec] px-3 py-2 text-xs text-[#854938]">{historicoErro}</p>}
+          {historicoCarregando && <p role="status" className="shrink-0 px-3 py-2 text-xs text-gray-600">Carregando seu histórico...</p>}
+          {mensagensAntigasLimitadas && <p className="shrink-0 px-3 py-2 text-xs text-gray-600">Exibindo as últimas 150 mensagens desta conversa.</p>}
           <div ref={historico} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#fbfaf8] p-3 sm:p-4" aria-live="polite" aria-relevant="additions">
             {mensagens.map((m, indice) => (
               <div key={indice} className={m.tipo === 'mentorado' ? 'ml-5 sm:ml-8' : 'mr-3 sm:mr-6'}>
@@ -397,7 +516,7 @@ export default function IrisCopiloto() {
                 <button
                   key={sugestao}
                   type="button"
-                  disabled={ocupada || historicoCarregando || !!historicoErro}
+                  disabled={ocupada}
                   onClick={() => void enviar(sugestao)}
                   className="min-h-10 rounded-full border border-[#d9d0c9] px-3 py-2 text-xs text-[#5B453E] disabled:opacity-50"
                 >
@@ -428,7 +547,7 @@ export default function IrisCopiloto() {
             />
             <button
               type="submit"
-              disabled={ocupada || historicoCarregando || !!historicoErro || !texto.trim()}
+              disabled={ocupada || historicoCarregando || !texto.trim()}
               aria-label="Enviar mensagem"
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
             >
@@ -436,6 +555,7 @@ export default function IrisCopiloto() {
             </button>
           </form>
           <p className="shrink-0 bg-white px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center text-[11px] text-gray-600">
+            {conversationId ? 'Seu histórico está ativo. Você pode excluir suas conversas a qualquer momento.' : 'Salvar o histórico é opcional. Sua conversa não será guardada sem autorização.'}
             Ações no PDI só são salvas após sua confirmação.
           </p>
         </div>
