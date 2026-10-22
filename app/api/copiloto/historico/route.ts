@@ -1,50 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { validConversationId } from '@/lib/iris-web-history';
+import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-async function session() {
+const json = (body: object, status = 200) =>
+  NextResponse.json(body, { status, headers: { 'Cache-Control': 'private, no-store' } });
+
+export async function GET(request: NextRequest) {
   const db = await createClient();
-  const { data: { user } } = await db.auth.getUser();
-  return { db, user };
+  const { data: { user }, error } = await db.auth.getUser();
+  if (error || !user) return json({ erro: 'Entre na SOMA para consultar seu histórico.' }, 401);
+  const permitido = await consumeIdentifierRateLimit({
+    scope: 'iris_history_list', identifier: user.id, limit: 90, windowSeconds: 3600,
+  });
+  if (!permitido) return json({ erro: 'Muitas consultas ao histórico.' }, 429);
+  const conversationId = request.nextUrl.searchParams.get('conversation_id');
+  if (conversationId && !validConversationId(conversationId)) {
+    return json({ erro: 'Conversa inválida.' }, 400);
+  }
+  const { data: threads, error: threadsError } = await db.from('iris_web_conversations')
+    .select('id,title,updated_at,created_at')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false }).limit(50);
+  if (threadsError) return json({ erro: 'Não foi possível carregar suas conversas.' }, 503);
+  const selected = conversationId || threads?.[0]?.id;
+  if (!selected) return json({ conversas: [], mensagens: [], conversation_id: null });
+  const { data: thread, error: selectedError } = await db.from('iris_web_conversations')
+    .select('id').eq('user_id', user.id).eq('id', selected).maybeSingle();
+  if (selectedError) return json({ erro: 'Não foi possível validar a conversa.' }, 503);
+  if (!thread) return json({ erro: 'Conversa não encontrada.' }, 404);
+  // Últimas 150 mensagens e ordem cronológica. Limite deliberado para carregamento.
+  const { data: recent, error: messagesError } = await db.from('iris_web_messages')
+    .select('id,role,content,href,response_ref,feedback_rating,created_at')
+    .eq('user_id', user.id).eq('conversation_id', selected)
+    .order('created_at', { ascending: false }).limit(150);
+  if (messagesError) return json({ erro: 'Não foi possível carregar as mensagens.' }, 503);
+  return json({ conversas: threads ?? [], mensagens: (recent ?? []).reverse(), conversation_id: selected,
+    limite_atingido: (recent ?? []).length === 150 });
 }
 
-export async function GET() {
-  const { db, user } = await session();
-  if (!user) return NextResponse.json({ erro: 'Não autenticado.' }, { status: 401 });
-  const { data, error } = await db.from('soma_copilot_messages')
-    .select('id,role,content,href,response_ref,created_at')
-    .eq('user_id', user.id).order('created_at', { ascending: false })
-    .limit(100);
-  if (error) return NextResponse.json({ erro: 'Histórico indisponível.' }, { status: 503 });
-  return NextResponse.json({ mensagens: (data ?? []).reverse().map(item => ({
-    id: item.id, tipo: item.role, texto: item.content,
-    href: item.href ?? undefined, respostaRef: item.response_ref ?? undefined,
-  })) }, { headers: { 'Cache-Control': 'no-store' } });
-}
-
-export async function POST(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   const origin = request.headers.get('origin');
-  if (origin && origin !== new URL(request.url).origin) {
-    return NextResponse.json({ erro: 'Origem não permitida.' }, { status: 403 });
-  }
-  const { db, user } = await session();
-  if (!user) return NextResponse.json({ erro: 'Não autenticado.' }, { status: 401 });
-  let body: Record<string, unknown>;
-  try { body = await request.json(); }
-  catch { return NextResponse.json({ erro: 'JSON inválido.' }, { status: 400 }); }
-  const id = typeof body.id === 'string' && /^[a-f0-9-]{36}$/i.test(body.id) ? body.id : '';
-  const role = body.tipo === 'iris' || body.tipo === 'mentorado' ? body.tipo : '';
-  const content = typeof body.texto === 'string' ? body.texto.trim() : '';
-  if (!id || !role || !content || content.length > 4000) {
-    return NextResponse.json({ erro: 'Mensagem inválida.' }, { status: 400 });
-  }
-  const href = typeof body.href === 'string' && /^\/[a-zA-Z0-9/?=&_-]{1,250}$/.test(body.href) ? body.href : null;
-  const responseRef = role === 'iris' && typeof body.respostaRef === 'string' &&
-    /^[a-f0-9-]{36}$/i.test(body.respostaRef) ? body.respostaRef : null;
-  const { error } = await db.from('soma_copilot_messages').upsert({
-    id, user_id: user.id, role, content, href, response_ref: responseRef,
-  }, { onConflict: 'id', ignoreDuplicates: true });
-  if (error) return NextResponse.json({ erro: 'Não foi possível salvar a mensagem.' }, { status: 503 });
-  return NextResponse.json({ sucesso: true });
+  if (origin && origin !== new URL(request.url).origin) return json({ erro: 'Origem inválida.' }, 403);
+  const db = await createClient();
+  const { data: { user }, error } = await db.auth.getUser();
+  if (error || !user) return json({ erro: 'Não autenticado.' }, 401);
+  let data: Record<string, unknown>;
+  try { data = await request.json() as Record<string, unknown>; }
+  catch { return json({ erro: 'Solicitação inválida.' }, 400); }
+  if (!validConversationId(data?.conversation_id)) return json({ erro: 'Conversa inválida.' }, 400);
+  const limite = await consumeIdentifierRateLimit({
+    scope: 'iris_history_delete', identifier: user.id, limit: 10, windowSeconds: 3600,
+  });
+  if (!limite) return json({ erro: 'Limite de exclusões atingido.' }, 429);
+  const admin = createAdminClient();
+  const { data: conversa, error: verificationError } = await admin.from('iris_web_conversations')
+    .select('id').eq('id', data.conversation_id).eq('user_id', user.id).maybeSingle();
+  if (verificationError) return json({ erro: 'Falha ao verificar a conversa.' }, 503);
+  if (!conversa) return json({ erro: 'Conversa não encontrada.' }, 404);
+  const { error: deleteError } = await admin.from('iris_web_conversations').delete()
+    .eq('id', conversa.id).eq('user_id', user.id);
+  if (deleteError) return json({ erro: 'Não foi possível excluir a conversa.' }, 503);
+  return json({ sucesso: true });
 }
