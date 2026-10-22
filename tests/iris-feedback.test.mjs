@@ -35,7 +35,7 @@ test('Feedback so acompanha respostas emitidas pelo backend e nao erros da conve
 test('Resposta de progresso diferencia mapeamento de execucao e prioriza proxima acao', () => {
   const route = read('app/api/copiloto/route.ts');
   assert.match(route, /Seu Mapa Quem Sou Eu está concluído/);
-  assert.match(route, /Você já concluiu as/);
+  assert.match(route, /Você concluiu todas as perguntas-guia do PDI/);
   assert.match(route, /ações cadastradas, mas nenhuma foi marcada como realizada/);
   assert.match(route, /Quer que eu te ajude a priorizar/);
   assert.match(route, /destaque até dois fatos relevantes e proponha um próximo passo/);
