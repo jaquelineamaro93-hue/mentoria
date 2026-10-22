@@ -108,8 +108,26 @@ export function revisarOrientacoesLegadasGupy(markdown: string): { texto: string
       revisoes++;
       return '- **Histórico de candidaturas (Guia GUPY da SOMA):** os testes da SOMA registraram que candidaturas repetidas e avaliações anteriores podem influenciar novas oportunidades na plataforma. Isso é uma observação documentada, não uma pontuação interna acessível pela SOMA.';
     }
+    // Não informado no documento != inexistente na conta privada Gupy.
+    // Revisão de saída legada, limitada à Gupy. Não regrava o histórico.
+    const inferenciaNeutralidade =
+      /(?:assum[ea]-?se|presum[ea]-?se|considera-se|hist[oó]rico\s+considerado)\s+(?:como\s+)?neutr(?:o|a|alidade)/i.test(linha)
+      || /n[aã]o\s+(?:h[aá]|existe|tem)\s+(?:qualquer\s+)?(?:evid[eê]ncias?\s+de|indic[aã]o\s+de)\s+(?:penaliza[cç][aã]o|penalidade|puni[cç][aã]o|impacto\s+negativo)/i.test(linha)
+      || /(?:hist[oó]rico|dislikes|rejei[cç][õo]es)[^\n]{0,90}(?:n[aã]o\s+(?:causa|impacta|afeta)|sem\s+penaliza[cç][aã]o|neutr[oa])/i.test(linha)
+      || /sem\s+hist[oó]rico\s+de\s+(?:rejei[cç][õo]es|dislikes)[^\n]{0,100}(?:penali|neutral)/i.test(linha)
+      || /sem\s+hist[oó]rico\s+de\s+rejei[cç][õo]es\s*\/\s*dislikes[^\n]*mencionad[oa]s?/i.test(linha)
+      || /hist[oó]rico[^\n]{0,60}(?:limpo|zerado|sem\s+(?:penalidades|restri[cç][õo]es|registros\s+negativos))/i.test(linha)
+      || /n[aã]o\s+(?:h[aá]|existem|foram\s+encontrados?)\s+(?:ind[ií]cios?|sinais?)\s+de\s+(?:hist[oó]rico\s+negativo|dislikes|penalidades)/i.test(linha);
+    if (inferenciaNeutralidade) {
+      revisoes++;
+      return '**Histórico de candidaturas e dislikes (metodologia SOMA):** os testes documentados no Guia GUPY da SOMA identificaram impactos de avaliações anteriores e candidaturas repetidas sobre oportunidades futuras. O relatório não dá acesso às avaliações internas do perfil analisado; não atribua um resultado individual sem essa informação.';
+    }
     return linha;
-  }).join('\n');
+  }).filter((linha, indice, todas) => !(
+    indice > 0
+    && linha === todas[indice - 1]
+    && linha.startsWith('**Histórico de candidaturas e dislikes (metodologia SOMA):**')
+  )).join('\n');
   return { texto, revisoes };
 }
 
