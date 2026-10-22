@@ -8,8 +8,10 @@ test('Networking fica na home e fala de conexões genuínas, sem confundir marca
   const home = read('app/(public)/page.tsx');
   const networking = read('components/public/SomaNetworking.tsx');
   assert.match(home, /<SomaNetworking \/>/);
-  assert.match(networking, /Conecte-se com profissionais de empresas como estas/);
-  assert.match(networking, /Carreira e networking não precisam ser pesados ou artificiais/);
+  assert.match(networking, /Conecte-se com profissionais de empresas como/);
+  assert.match(networking, /Carreira e networking não precisam ser pesados/);
+  assert.match(networking, /Podem ser genuínos/);
+  assert.match(networking, /Aprenda com quem também está investindo em si/);
   assert.match(networking, /EMPRESAS_REDE\.length > 0/);
   assert.match(networking, /sem vínculo de parceria ou patrocínio/);
   assert.match(networking, /CRM/);
