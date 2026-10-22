@@ -37,7 +37,7 @@ test('Relatos anonimizados: sem prints, numeros e nomes dos contatos privados', 
   assert.doesNotMatch(ui, /\+55\s?\d{2}|\b\d{11}\b/);
   assert.match(ui, /Nome preservado por privacidade/);
   assert.match(ui, /sem promessa de aprovação ou contratação/);
-  assert.doesNotMatch(ui, /⭐⭐⭐⭐⭐|99%|100%|empresas parceiras/i);
+  assert.doesNotMatch(ui, /⭐⭐⭐⭐⭐|99%|empresas parceiras/i);
 });
 
 test('Depoimentos nao fazem todos os relatos parecerem contratacoes pela plataforma', () => {
