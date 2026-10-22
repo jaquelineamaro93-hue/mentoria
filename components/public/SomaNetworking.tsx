@@ -16,13 +16,12 @@ export default function SomaNetworking() {
         <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#0D8071]">Pessoas e conexões</p>
         <h2 id="soma-networking-titulo" className="mx-auto mt-3 max-w-3xl font-display text-3xl leading-tight text-[#172823] sm:text-4xl">
           {EMPRESAS_REDE.length > 0
-            ? 'Conecte-se com profissionais de empresas como estas.'
-            : 'Conecte-se com profissionais que também estão evoluindo.'}
+            ? 'Conecte-se com profissionais de empresas como'
+            : 'Conecte-se com profissionais que também investem em si.'}
         </h2>
         <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-[#526760] sm:text-base">
-          Carreira e networking não precisam ser pesados ou artificiais. Construa conexões genuínas,
-          compartilhe experiências e aprenda com pessoas que também estão investindo
-          no próprio desenvolvimento.
+          Carreira e networking não precisam ser pesados. Podem ser genuínos.
+          Aprenda com quem também está investindo em si.
         </p>
         {EMPRESAS_REDE.length > 0 ? (
           <>
