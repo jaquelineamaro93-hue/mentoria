@@ -109,7 +109,7 @@ function MarcaMentoria({ empresa }: { empresa: (typeof EMPRESAS_MENTORADOS)[numb
         {usarLogo ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            src={empresa.logo}
+            src={empresa.logo ?? undefined}
             alt={'Logotipo ' + empresa.nome}
             loading="lazy"
             decoding="async"
@@ -118,23 +118,23 @@ function MarcaMentoria({ empresa }: { empresa: (typeof EMPRESAS_MENTORADOS)[numb
             className="max-h-12 max-w-[min(100%,150px)] object-contain transition-transform duration-200 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex items-center gap-2">
-            {!falhaIcone && (
+          <div className="flex items-center justify-center">
+            {!falhaIcone ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={favicon}
-                alt=""
+                alt={'Marca ' + empresa.nome}
                 loading="lazy"
                 decoding="async"
                 referrerPolicy="no-referrer"
                 onError={() => setFalhaIcone(true)}
-                className="h-10 w-10 rounded-md object-contain"
-                aria-hidden="true"
+                className="h-11 w-11 rounded-md object-contain"
               />
+            ) : (
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#edf7f3] text-lg font-semibold text-[#0D8071]">
+                {empresa.nome.slice(0, 1)}
+              </span>
             )}
-            <span className="text-center text-base font-bold tracking-tight text-[#293b37] sm:text-lg">
-              {empresa.nome}
-            </span>
           </div>
         )}
       </div>
