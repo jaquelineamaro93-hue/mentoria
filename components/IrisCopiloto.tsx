@@ -94,6 +94,7 @@ export default function IrisCopiloto() {
       if (!r.ok) throw new Error(d.erro || 'Conversa indisponível.');
       setMensagens(converterMensagens(d.mensagens ?? []));
       setConversationId(d.conversation_id ?? id);
+      setPermitirHistorico(true);
       setConversas(d.conversas ?? []);
       setMensagensAntigasLimitadas(!!d.limite_atingido);
       setMostrarHistorico(false);
