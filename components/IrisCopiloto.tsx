@@ -71,6 +71,7 @@ export default function IrisCopiloto() {
         if (!ativo) return;
         setConversas(d.conversas ?? []);
         setConversationId(d.conversation_id ?? null);
+        setPermitirHistorico(!!d.conversation_id);
         setMensagens(converterMensagens(d.mensagens ?? []));
         setMensagensAntigasLimitadas(!!d.limite_atingido);
       } catch {
