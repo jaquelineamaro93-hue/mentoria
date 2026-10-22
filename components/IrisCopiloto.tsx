@@ -220,7 +220,7 @@ export default function IrisCopiloto() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         cache: 'no-store',
-        body: JSON.stringify({ mensagem: pedido, conversation_id: conversationId }),
+        body: JSON.stringify({ mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico }),
       });
       const dados = await resposta.json() as {
         resposta?: string; erro?: string; href?: string;
