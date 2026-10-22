@@ -18,7 +18,11 @@ const LINKS: Record<Intencao, string> = {
 const texto = (v: unknown, limite: number) =>
   typeof v === 'string' ? v.trim().slice(0, limite) : '';
 const json = (value: object, status = 200) =>
-  NextResponse.json(value, { status, headers: { 'Cache-Control': 'no-store' } });
+  NextResponse.json(
+    // Só respostas bem-sucedidas recebem um ID efêmero para avaliação, sem salvar a conversa.
+    status === 200 && 'resposta' in value ? { ...value, response_id: crypto.randomUUID() } : value,
+    { status, headers: { 'Cache-Control': 'no-store' } }
+  );
 
 function intencaoLocal(pedido: string): Intencao {
   if (/pdi|plano de desenvolvimento|tarefas?|a[cç][õo]es?|metas?/i.test(pedido)) return 'pdi';
