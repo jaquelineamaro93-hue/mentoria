@@ -43,6 +43,7 @@ export default function IrisCopiloto() {
   const [conversas, setConversas] = useState<ConversaIris[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
+  const [permitirHistorico, setPermitirHistorico] = useState(false);
   const [mensagensAntigasLimitadas, setMensagensAntigasLimitadas] = useState(false);
   const [feedbackEdicao, setFeedbackEdicao] = useState<{ indice: number; avaliacao: 'util' | 'nao_util' } | null>(null);
   const [feedbackTexto, setFeedbackTexto] = useState('');
