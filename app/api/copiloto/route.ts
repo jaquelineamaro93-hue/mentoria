@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { chamarClaudeJson } from '@/lib/ai-json';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
+import { gerarComprovanteFeedback, type IntencaoFeedback } from '@/lib/iris-feedback-token';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -106,6 +107,9 @@ export async function POST(request: NextRequest) {
   const db = await createClient();
   const { data: { user } } = await db.auth.getUser();
   if (!user) return json({ erro: 'Entre na SOMA para conversar com a Íris.' }, 401);
+  let feedbackIntent: IntencaoFeedback = 'orientacao';
+  const responder = (data: { resposta: string; href?: string; proposta?: Proposta; token?: string }) =>
+    json({ ...data, ...gerarComprovanteFeedback(user.id, feedbackIntent) });
   const { data: perfil, error: erroPerfil } = await db.from('profiles')
     .select('nome,is_admin,status_assinatura,trial_status,trial_ends_at,data_fim_acesso,raw_resume')
     .eq('id', user.id).maybeSingle();
@@ -155,6 +159,7 @@ export async function POST(request: NextRequest) {
   // Esta operação é determinística: exige confirmação explícita e token assinado.
   // Nunca usa uma escolha de IA como autorização para escrever.
   if (body.acao === 'confirmar_pdi') {
+    feedbackIntent = 'pdi';
     const { data: pdiPermitido, error: erroModulo } = await db.rpc('soma_has_module', { p_slug: 'desenvolvimento' });
     if (erroModulo || pdiPermitido !== true) return json({ erro: 'Seu plano não permite ações no PDI.' }, 403);
     const raw = body.proposta as Partial<Proposta> | undefined;
@@ -176,7 +181,7 @@ export async function POST(request: NextRequest) {
       .select('id').eq('plano_id', plano.id).eq('mentorado_id', user.id)
       .eq('titulo', proposta.titulo).limit(1).maybeSingle();
     if (erroDuplicada) return json({ erro: 'Não consegui verificar suas ações.' }, 503);
-    if (duplicada) return json({ resposta: 'Essa ação já existe no seu PDI.', href: '/meu-pdi' });
+    if (duplicada) return responder({ resposta: 'Essa ação já existe no seu PDI.', href: '/meu-pdi' });
     // Registra uma trilha mínima antes de permitir a escrita, sem guardar dados do PDI no evento.
     const { error: erroAuditoria } = await db.from('product_events').insert({
       user_id: user.id, event_name: 'copilot_pdi_action_approved',
@@ -204,7 +209,7 @@ export async function POST(request: NextRequest) {
       metadata: { plano_id: plano.id, evento: 'acao_criada' },
     });
     if (erroRegistro) console.warn('[Copiloto] log de criação não persistido', erroRegistro.code);
-    return json({ resposta: 'Ação criada no seu PDI com sua autorização.', href: '/meu-pdi' });
+    return responder({ resposta: 'Ação criada no seu PDI com sua autorização.', href: '/meu-pdi' });
   }
 
   const pedido = texto(body.mensagem, 4000);
@@ -213,6 +218,7 @@ export async function POST(request: NextRequest) {
   // Consultas de status não devem gerar novas tarefas, mesmo se a classificação for PDI.
   const perguntaDeStatus = /\b(complet[oa]|conclu[ií]d[oa]|finalizad[oa]|preenchi|progresso|pend[êe]ncia|quantas? (etapas|tarefas|a[cç][õo]es|se[cç][õo]es))\b/i.test(pedido);
   const intencao: Intencao = perguntaDeStatus ? 'progresso' : classificada;
+  feedbackIntent = intencao;
 
   const [mapaPermissao, pdiPermissao, curriculoPermissao] = await Promise.all([
     db.rpc('soma_has_module', { p_slug: 'autoconhecimento' }),
@@ -276,22 +282,46 @@ export async function POST(request: NextRequest) {
       .map(r => r.secao));
     const perguntas = validas.size > 0 ? salvas.size + ' de ' + validas.size : 'não disponíveis';
     const completo = validas.size > 0 && salvas.size === validas.size;
-    const statusMapa = podeMapa ? (mapaPronto ? 'concluído (9 de 9 blocos)' :
-      'com ' + respondidos.size + ' de ' + BLOCOS_QUEM_SOU_EU.length + ' blocos respondidos') : 'não disponível no seu plano';
-    const statusPdi = podePdi ? (
-      'As perguntas-guia do PDI estão ' + (completo ? '100% concluídas (' + perguntas + '). ' : 'com ' + perguntas + ' respondidas. ') +
-      (plano ? 'No plano de execução, ' + concluidas + ' de ' + acoes.length + ' ações foram marcadas como realizadas.' :
-      'O plano de ações ainda não foi gerado.')
-    ) : 'O PDI não está disponível no seu plano.';
-    return json({
-      resposta: 'Seu Mapa Quem Sou Eu está ' + statusMapa + '. ' + statusPdi +
-        (podePdi && pendentes.length ? ' Próximas ações sugeridas: ' + pendentes.join('; ') + '.' : ''),
+    // O diagnóstico está completo quando os blocos foram respondidos.
+    // Executar as ações é outra fase: não rebaixar o avanço anterior nem
+    // chamar o PDI inteiro de incompleto por haver ações em aberto.
+    const resumo: string[] = [];
+    if (podeMapa) {
+      resumo.push(mapaPronto
+        ? 'Seu Mapa Quem Sou Eu está concluído.'
+        : 'Seu Mapa Quem Sou Eu tem ' + respondidos.size + ' de ' + BLOCOS_QUEM_SOU_EU.length + ' blocos respondidos.');
+    }
+    if (podePdi) {
+      resumo.push(validas.size === 0
+        ? 'Não consegui confirmar o preenchimento das perguntas-guia do PDI agora.'
+        : completo
+          ? 'Você concluiu todas as perguntas-guia do PDI (' + perguntas + ').'
+          : 'Nas perguntas-guia do PDI, você concluiu ' + perguntas + '.');
+      if (plano) {
+        resumo.push(acoes.length === 0
+          ? 'O plano de execução ainda não tem ações cadastradas.'
+          : concluidas === 0
+            ? 'Na etapa de execução, há ' + acoes.length + ' ações cadastradas, mas nenhuma foi marcada como realizada.'
+            : 'Na etapa de execução, ' + concluidas + ' de ' + acoes.length + ' ações estão marcadas como realizadas.');
+        if (acoes.length > concluidas) {
+          resumo.push('Seu próximo passo é escolher uma ação viável para esta semana. Quer que eu te ajude a priorizar?');
+        } else if (acoes.length > 0) {
+          resumo.push('Você registrou todas as ações como realizadas. Quer revisar seus próximos objetivos?');
+        } else {
+          resumo.push('Quer que eu ajude a estruturar o primeiro passo do plano?');
+        }
+      } else {
+        resumo.push('O próximo passo é transformar o diagnóstico em ações práticas. Quer começar?');
+      }
+    }
+    return responder({
+      resposta: resumo.join(' '),
       href: podePdi ? '/meu-pdi' : '/quem-sou-eu',
     });
   }
 
   if (intencao === 'pdi') {
-    if (!plano) return json({
+    if (!plano) return responder({
       resposta: 'Primeiro, gere seu plano de desenvolvimento. Depois posso preparar atividades para sua aprovação.',
       href: '/meu-pdi',
     });
@@ -319,18 +349,18 @@ export async function POST(request: NextRequest) {
       };
       if (!proposta.titulo || !proposta.descricao || !proposta.pilar) throw Error('Proposta vazia');
       const exp = Date.now() + 9 * 60_000;
-      return json({
+      return responder({
         resposta: 'Preparei uma atividade para seu PDI. Revise os detalhes e confirme antes de salvar.',
         proposta, token: String(exp) + '.' + assinatura(user.id, plano.id, proposta, exp),
         href: '/meu-pdi',
       });
     } catch {
-      return json({ resposta: 'Não consegui preparar a atividade agora. Você pode abrir seu PDI diretamente.', href: '/meu-pdi' });
+      return responder({ resposta: 'Não consegui preparar a atividade agora. Você pode abrir seu PDI diretamente.', href: '/meu-pdi' });
     }
   }
 
   const curriculo = texto(cvResponse.data?.curriculo_texto || perfil.raw_resume, 7000);
-  if (intencao === 'vaga' && !curriculo) return json({
+  if (intencao === 'vaga' && !curriculo) return responder({
     resposta: 'Ainda não encontrei um currículo salvo. Cadastre o currículo na ferramenta de carreira para analisarmos a vaga.',
     href: '/carreira?etapa=cv',
   });
@@ -345,6 +375,7 @@ export async function POST(request: NextRequest) {
     const prompt = [
       'Você é Íris, copiloto de carreira DENTRO da plataforma SOMA, independente do WhatsApp.',
       'Responda em português brasileiro, objetivamente, sem travessões, exclamações ou emojis.',
+      'Priorize a utilidade: comece respondendo ao pedido, destaque até dois fatos relevantes e proponha um próximo passo concreto. Evite listas longas de pendências sem contexto.',
       'Nunca diga que salvou ou executou algo se não fez isso.',
       'Não invente competências, cargos, resultados ou percentuais de aderência.',
       'Se uma vaga estiver sem descrição, solicite a descrição. Diferencie fatos documentados de hipóteses.',
@@ -358,9 +389,9 @@ export async function POST(request: NextRequest) {
       validar: (valor): valor is RespostaIA => !!valor && typeof valor === 'object' &&
         typeof (valor as RespostaIA).resposta === 'string',
     });
-    return json({ resposta: texto(ia.resposta, 1500), href: LINKS[intencao] });
+    return responder({ resposta: texto(ia.resposta, 1500), href: LINKS[intencao] });
   } catch {
-    return json({
+    return responder({
       resposta: 'Não consegui concluir a análise agora, mas suas informações continuam salvas.',
       href: LINKS[intencao],
     });
