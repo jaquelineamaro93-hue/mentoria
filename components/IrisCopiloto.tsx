@@ -399,7 +399,7 @@ export default function IrisCopiloto() {
                 </div>
               ))}
             </div>
-          }
+          )}
           {historicoErro && <p role="alert" className="shrink-0 bg-[#fff3ec] px-3 py-2 text-xs text-[#854938]">{historicoErro}</p>}
           {historicoCarregando && <p role="status" className="shrink-0 px-3 py-2 text-xs text-gray-600">Carregando seu histórico...</p>}
           {mensagensAntigasLimitadas && <p className="shrink-0 px-3 py-2 text-xs text-gray-600">Exibindo as últimas 150 mensagens desta conversa.</p>}
