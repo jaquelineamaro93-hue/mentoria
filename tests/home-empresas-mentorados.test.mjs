@@ -44,3 +44,13 @@ test('Padrão SOMA responsivo sem fingir patrocínio ou parceria comercial', () 
   assert.doesNotMatch(empresas, /Aprovados em empresas como|Nossas empresas parceiras|Nossos clientes corporativos/);
   assert.match(empresas, /noopener noreferrer/);
 });
+
+test('Página de depoimentos conserva os três LinkedIn e exibe o carrossel de histórias', () => {
+  const page = src('app/(public)/depoimentos/page.tsx');
+  assert.match(page, /import SomaSuccessStories from/);
+  assert.match(page, /<SomaSuccessStories \/>/);
+  for (const name of ['Maria Laura Soares','Giulia Gomes','Rita Alecrim']) {
+    assert.ok(page.includes(name), name + ' deve permanecer publicado');
+  }
+  assert.match(page, /mentorias e comunidades/);
+});
