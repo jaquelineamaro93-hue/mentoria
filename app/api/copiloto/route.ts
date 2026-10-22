@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
     ? 'Solicitei confirmação de uma ação do PDI'
     : texto(body.mensagem, 4000);
   async function responderComHistorico(payload: Record<string, unknown>, status = 200) {
-    if (status !== 200 || typeof payload.resposta !== 'string' || !perguntaParaHistorico) {
+    if (!manterHistorico || status !== 200 || typeof payload.resposta !== 'string' || !perguntaParaHistorico) {
       return json(payload, status);
     }
     try {
