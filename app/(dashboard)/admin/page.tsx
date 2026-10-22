@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import AdminClient from './AdminClient';
@@ -91,11 +92,20 @@ export default async function AdminPage() {
     }));
 
   return (
-    <AdminClient
-      profile={meuPerfil}
-      linhas={linhas}
-      totalBlocosQuemSouEu={BLOCOS_QUEM_SOU_EU.length}
-      totalSecoesPdi={(secoesPdiTotal ?? []).length}
-    />
+    <>
+      <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6">
+        <Link href="/admin/copiloto" className="inline-flex min-h-11 items-center rounded-xl
+          border border-[#b7d9cc] bg-[#e9f7f2] px-4 text-sm font-semibold text-[#135f50]
+          hover:bg-[#dff2eb]">
+          Central de Conversas da Íris
+        </Link>
+      </div>
+      <AdminClient
+        profile={meuPerfil}
+        linhas={linhas}
+        totalBlocosQuemSouEu={BLOCOS_QUEM_SOU_EU.length}
+        totalSecoesPdi={(secoesPdiTotal ?? []).length}
+      />
+    </>
   );
 }

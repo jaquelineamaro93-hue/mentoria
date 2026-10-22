@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 
 export const runtime = 'nodejs';
@@ -66,6 +67,21 @@ export async function POST(request: NextRequest) {
   if (error) {
     console.error('[Iris Feedback] Falha ao registrar feedback', error.code);
     return json({ erro: 'Não foi possível registrar sua avaliação.' }, 503);
+  }
+  // Mensagens antigas não tinham histórico persistente: evento legado continua válido.
+  // Para as novas, associar o voto à resposta real para restaurá-lo ao reabrir o chat.
+  try {
+    const admin = createAdminClient();
+    const { data: owned } = await admin.from('iris_web_messages').select('id')
+      .eq('response_ref', respostaRef).eq('user_id', user.id).eq('role', 'assistant').maybeSingle();
+    if (owned) {
+      const { error: updateError } = await admin.from('iris_web_messages').update({
+        feedback_rating: avaliacao, feedback_reason: comentario || null,
+      }).eq('id', owned.id).eq('user_id', user.id).eq('response_ref', respostaRef);
+      if (updateError) console.warn('[Íris feedback] evento salvo, atualização do histórico pendente', updateError.code);
+    }
+  } catch {
+    console.warn('[Íris feedback] histórico não disponível; evento registrado');
   }
   return json({ sucesso: true });
 }
