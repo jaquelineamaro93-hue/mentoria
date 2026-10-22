@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 
 const depoimentos = [
   {
@@ -54,7 +55,7 @@ export default function DepoimentosPage() {
             <p className="text-xs uppercase tracking-[0.22em] mb-3 text-mint-deep">Histórias reais</p>
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-black">Quem passou por aqui</h1>
             <p className="mt-5 text-gray-text leading-relaxed max-w-2xl mx-auto">
-              Relatos de pessoas que usaram a SOMA para organizar decisões, reconhecer forças e transformar clareza em movimento.
+              Depoimentos publicados no LinkedIn e histórias de pessoas que receberam orientações em mentorias e comunidades. Cada trajetória é única.
             </p>
           </div>
         </section>
@@ -88,6 +89,9 @@ export default function DepoimentosPage() {
             ))}
           </div>
         </section>
+
+        {/* Histórias adicionais anonimizadas, além dos três depoimentos públicos do LinkedIn */}
+        <SomaSuccessStories />
 
         <section className="px-4 sm:px-6 py-12 text-center" style={{ backgroundColor: '#1A1A1A' }}>
           <h2 className="font-display text-2xl sm:text-3xl text-white">Quer entender se a SOMA faz sentido para seu momento?</h2>
