@@ -1,0 +1,37 @@
+name: Feedback Íris Copiloto
+
+on:
+  pull_request:
+    paths:
+      - 'components/IrisCopiloto.tsx'
+      - 'app/api/copiloto/route.ts'
+      - 'app/api/copiloto/feedback/route.ts'
+      - 'lib/iris-feedback-token.ts'
+      - 'tests/iris-feedback.test.mjs'
+      - 'docs/iris-feedback-schema-aplicado.sql'
+      - '.github/workflows/iris-feedback.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  feedback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Regressao e integridade
+        run: node --test tests/iris-feedback.test.mjs tests/responsive-portal.test.mjs
+      - name: Validar TypeScript
+        run: |
+          npm ci --ignore-scripts
+          npx tsc --noEmit
