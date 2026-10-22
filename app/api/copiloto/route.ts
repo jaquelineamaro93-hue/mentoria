@@ -158,6 +158,7 @@ export async function POST(request: NextRequest) {
     return json({ erro: 'Conversa inválida.' }, 400);
   }
   const conversationId = validConversationId(receivedId) ? receivedId : null;
+  const manterHistorico = !!conversationId || body.persistir_historico === true;
   if (conversationId) {
     try {
       if (!(await ownsIrisConversation(user.id, conversationId))) {
