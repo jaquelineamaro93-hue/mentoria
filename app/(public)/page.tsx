@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
+import SomaNetworking from '@/components/public/SomaNetworking';
 
 export const metadata: Metadata = {
   title: 'SOMA Mentoria - Transforme sua Carreira',
@@ -185,6 +186,7 @@ export default async function HomePage() {
       <SomaProductShowcase />
 
       {/* Prova social real, relatos sem nomes ou prints privados */}
+      <SomaNetworking />
       <SomaSuccessStories />
 
       {/* Sobre a mentora — compacto e horizontal */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ExternalLink, Send, Sparkles, X } from 'lucide-react';
+import { ChevronDown, ExternalLink, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
@@ -11,6 +11,8 @@ type Mensagem = {
   href?: string;
   proposta?: Proposta;
   token?: string;
+  respostaRef?: string;
+  avaliacao?: 'util' | 'nao_util';
 };
 
 const SAUDACAO: Mensagem = {
@@ -23,6 +25,10 @@ export default function IrisCopiloto() {
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
   const [ocupada, setOcupada] = useState(false);
+  const [feedbackEdicao, setFeedbackEdicao] = useState<{ indice: number; avaliacao: 'util' | 'nao_util' } | null>(null);
+  const [feedbackTexto, setFeedbackTexto] = useState('');
+  const [feedbackEnviando, setFeedbackEnviando] = useState(false);
+  const [feedbackErro, setFeedbackErro] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const [visualHeight, setVisualHeight] = useState<number | null>(null);
   const [visualTop, setVisualTop] = useState(0);
@@ -124,6 +130,7 @@ export default function IrisCopiloto() {
         href: resposta.ok ? dados.href : undefined,
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
+        respostaRef: resposta.ok && dados.resposta ? crypto.randomUUID() : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
@@ -156,6 +163,7 @@ export default function IrisCopiloto() {
         tipo: 'iris',
         texto: data.resposta || data.erro || 'Não consegui executar essa ação.',
         href: res.ok ? data.href : undefined,
+        respostaRef: res.ok && data.resposta ? crypto.randomUUID() : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
@@ -164,6 +172,39 @@ export default function IrisCopiloto() {
       }]);
     } finally {
       setOcupada(false);
+    }
+  }
+
+  async function enviarFeedback(indice: number, avaliacao: 'util' | 'nao_util') {
+    const msg = mensagens[indice];
+    if (!msg?.respostaRef || feedbackEnviando || msg.avaliacao) return;
+    setFeedbackEnviando(true);
+    setFeedbackErro(null);
+    try {
+      const res = await fetch('/api/copiloto/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store',
+        body: JSON.stringify({
+          respostaRef: msg.respostaRef,
+          avaliacao,
+          comentario: feedbackEdicao?.indice === indice ? feedbackTexto : '',
+        }),
+      });
+      const dados = await res.json() as { sucesso?: boolean; erro?: string };
+      if (!res.ok || !dados.sucesso) {
+        setFeedbackErro(dados.erro || 'Não foi possível salvar sua avaliação.');
+        return;
+      }
+      setMensagens(anteriores => anteriores.map((item, i) => i === indice
+        ? { ...item, avaliacao } : item));
+      setFeedbackEdicao(null);
+      setFeedbackTexto('');
+    } catch {
+      setFeedbackErro('Houve uma falha de conexão. Tente novamente.');
+    } finally {
+      setFeedbackEnviando(false);
     }
   }
 
@@ -256,6 +297,54 @@ export default function IrisCopiloto() {
                           Cancelar
                         </button>
                       </div>
+                    </div>
+                  )}
+                  {m.tipo === 'iris' && m.respostaRef && (
+                    <div className="mt-3 border-t border-[#eee7e2] pt-2">
+                      {m.avaliacao ? (
+                        <p className="text-xs text-[#42685b]" role="status">
+                          <span aria-hidden="true">✓ </span>Avaliação registrada. Obrigada por ajudar a melhorar a Íris.
+                        </p>
+                      ) : (
+                        <>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="mr-1 text-xs text-[#746a65]">Esta resposta ajudou?</span>
+                            <button type="button" disabled={feedbackEnviando} aria-label="Resposta útil" aria-pressed={feedbackEdicao?.indice === indice && feedbackEdicao.avaliacao === 'util'}
+                              onClick={() => { setFeedbackEdicao({ indice, avaliacao: 'util' }); setFeedbackTexto(''); setFeedbackErro(null); }}
+                              className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#d8d0cb] px-3 py-2 text-xs text-[#5B453E] hover:bg-[#e9f7f3] disabled:opacity-50">
+                              <ThumbsUp size={15} aria-hidden="true" /> Útil
+                            </button>
+                            <button type="button" disabled={feedbackEnviando} aria-label="Resposta não ajudou" aria-pressed={feedbackEdicao?.indice === indice && feedbackEdicao.avaliacao === 'nao_util'}
+                              onClick={() => { setFeedbackEdicao({ indice, avaliacao: 'nao_util' }); setFeedbackTexto(''); setFeedbackErro(null); }}
+                              className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#d8d0cb] px-3 py-2 text-xs text-[#5B453E] hover:bg-[#fff3ee] disabled:opacity-50">
+                              <ThumbsDown size={15} aria-hidden="true" /> Não ajudou
+                            </button>
+                          </div>
+                          {feedbackEdicao?.indice === indice && (
+                            <div className="mt-3 space-y-2">
+                              <label htmlFor={`iris-feedback-${indice}`} className="block text-xs font-medium text-[#5B453E]">
+                                Quer contar o motivo? (opcional)
+                              </label>
+                              <textarea id={`iris-feedback-${indice}`} rows={2} maxLength={300}
+                                value={feedbackTexto} onChange={event => setFeedbackTexto(event.target.value)}
+                                placeholder="O que a Íris pode melhorar?"
+                                className="w-full resize-y rounded-lg border border-[#d8d0cb] bg-white p-2 text-sm text-[#312b27] outline-none focus:border-[#0D8071]" />
+                              {feedbackErro && <p role="alert" className="text-xs text-red-700">{feedbackErro}</p>}
+                              <div className="flex flex-wrap gap-2">
+                                <button type="button" disabled={feedbackEnviando}
+                                  onClick={() => void enviarFeedback(indice, feedbackEdicao.avaliacao)}
+                                  className="min-h-10 rounded-lg bg-[#0D8071] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
+                                  {feedbackEnviando ? 'Enviando...' : 'Enviar avaliação'}
+                                </button>
+                                <button type="button" onClick={() => { setFeedbackEdicao(null); setFeedbackTexto(''); setFeedbackErro(null); }}
+                                  className="min-h-10 rounded-lg border border-[#d8d0cb] px-3 py-2 text-xs">
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
