@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
+import SomaEmpresasMentorados from '@/components/public/SomaEmpresasMentorados';
 
 export const metadata: Metadata = {
   title: 'SOMA Mentoria - Transforme sua Carreira',
@@ -141,6 +142,9 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
+
+      {/* Empresas onde atuam profissionais mentorados, sem atribuir parceria */}
+      <SomaEmpresasMentorados />
 
       {/* Para qual momento */}
       <section className="bg-white py-12 sm:py-16 border-b border-gray-faint">
