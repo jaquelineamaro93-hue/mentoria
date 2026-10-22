@@ -80,9 +80,9 @@ export const HISTORIAS_SOMA = [
     detalhe: 'Relato de recolocação',
   },
   {
-    categoria: 'Currículo e Gupy',
-    texto: 'Queria avisar que passei no processo seletivo depois de 2 meses buscando emprego. O ebook da Gupy está divino.',
-    detalhe: 'Relato de aprovação e material recebido',
+    categoria: 'LinkedIn e recolocação',
+    texto: 'Segui tudo direitinho e consegui meu novo emprego. Muito obrigada de coração.',
+    detalhe: 'Relato de contratação',
   },
 ] as const;
 
