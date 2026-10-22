@@ -292,9 +292,11 @@ export async function POST(request: NextRequest) {
         : 'Seu Mapa Quem Sou Eu tem ' + respondidos.size + ' de ' + BLOCOS_QUEM_SOU_EU.length + ' blocos respondidos.');
     }
     if (podePdi) {
-      resumo.push(completo
-        ? 'Você já concluiu as ' + perguntas + ' perguntas-guia do PDI.'
-        : 'Nas perguntas-guia do PDI, você concluiu ' + perguntas + '.');
+      resumo.push(validas.size === 0
+        ? 'Não consegui confirmar o preenchimento das perguntas-guia do PDI agora.'
+        : completo
+          ? 'Você concluiu todas as perguntas-guia do PDI (' + perguntas + ').'
+          : 'Nas perguntas-guia do PDI, você concluiu ' + perguntas + '.');
       if (plano) {
         resumo.push(acoes.length === 0
           ? 'O plano de execução ainda não tem ações cadastradas.'
