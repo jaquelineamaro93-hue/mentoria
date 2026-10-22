@@ -5,84 +5,141 @@ import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
 /**
- * Excertos fiéis de mensagens recebidas pela mentora e apresentadas pela
- * titular da SOMA. Não identificar participantes por nome/foto/telefone sem
- * autorização específica para uso publicitário.
- *
- * Evitar contagens de contratações, avaliações 5 estrelas inventadas e
- * atribuição à plataforma SOMA de resultados que surgiram em mentorias ou
- * na comunidade anteriores ao produto.
+ * Trechos extraídos dos prints e relatos encaminhados pela criadora da SOMA,
+ * que confirmou a autorização para divulgação pública em 22/10/2026.
+ * Nomes seguem os identificadores visíveis, sem completar sobrenomes
+ * desconhecidos. Preservamos o contexto de mentoria, comunidade ou orientação.
+ * Sem telefone, email, conversas de terceiros, garantia de resultado ou
+ * atribuição artificial de resultado ao uso do SaaS.
  */
 export const HISTORIAS_SOMA = [
   {
-    categoria: 'Currículo e Gupy',
-    texto: 'Passei no processo seletivo, depois de 2 meses buscando emprego. Venci a Gupy.',
-    detalhe: 'Relato de aprovação em processo seletivo',
+    nome: 'Nathalia Ferlin',
+    iniciais: 'NF',
+    origem: 'Mentoria',
+    categoria: 'Aprovação na Gupy',
+    texto: 'Queria avisar que passei no processo seletivo, depois de 2 meses buscando emprego. Venci a Gupy.',
+    detalhe: 'Recolocação profissional',
   },
   {
-    categoria: 'LinkedIn e currículo',
-    texto: 'Finalmente meu “SIM” chegou, e tudo graças às mudanças que fiz no LinkedIn e no currículo.',
-    detalhe: 'Relato de recolocação',
-  },
-  {
-    categoria: 'Gupy e carreira',
-    texto: 'Venci a Gupy e me recoloquei.',
-    detalhe: 'Relato de recolocação',
-  },
-  {
-    categoria: 'LinkedIn',
-    texto: 'Depois de reestruturar melhor meu perfil do LinkedIn e ser mais ativo, consegui me recolocar de volta no mercado.',
-    detalhe: 'Relato de recolocação',
-  },
-  {
-    categoria: 'Currículo e Gupy',
-    texto: 'Venciiii tbm a Gupyyyyy e sou Analista de Dados.',
-    detalhe: 'Relato de contratação',
-  },
-  {
-    categoria: 'Mentoria e entrevistas',
-    texto: 'Com uma metodologia simples e assertiva, minha performance nas entrevistas evoluiu consideravelmente.',
-    detalhe: 'Relato de evolução em entrevistas',
-  },
-  {
-    categoria: 'Mercado de trabalho',
-    texto: 'Consegui um emprego na área que gostaria, agradeço todo o seu apoio.',
-    detalhe: 'Relato de contratação',
-  },
-  {
-    categoria: 'Currículo e carreira',
-    texto: 'Depois de algumas entrevistas consegui minha transição. Venci a Gupy.',
-    detalhe: 'Relato de transição profissional',
-  },
-  {
-    categoria: 'Evolução profissional',
-    texto: 'Meu SIM acabou de chegar. Estou de volta no mercado de trabalho.',
-    detalhe: 'Relato de recolocação',
-  },
-  {
-    categoria: 'Mentoria de carreira',
-    texto: 'Deu certo a vaga de CX Lead. Aprovado para analista e CX Lead, e nem terminei todos os passos da mentoria.',
-    detalhe: 'Relato de aprovação',
-  },
-  {
-    categoria: 'Gupy e tecnologia',
-    texto: 'Fui aprovado no processo seletivo da Gupy, mas desta vez para uma posição em Desenvolvimento de Software.',
-    detalhe: 'Relato de aprovação',
-  },
-  {
-    categoria: 'LinkedIn e oportunidades',
-    texto: 'Devido ao meu LinkedIn formatado e meu selo #OpenToWork, consegui fechar um contrato para configuração de uma Sales Cloud.',
-    detalhe: 'Relato de oportunidade profissional',
-  },
-  {
-    categoria: 'Acompanhamento',
-    texto: 'Comecei essa semana em um novo emprego. Valeu pela parceria.',
-    detalhe: 'Relato de recolocação',
-  },
-  {
+    nome: 'Henrique Silva',
+    iniciais: 'HS',
+    origem: 'Mentoria',
     categoria: 'LinkedIn e recolocação',
+    texto: 'Depois de reestruturar melhor meu perfil do LinkedIn e ser mais ativo, consegui me recolocar de volta no mercado.',
+    detalhe: 'Nova oportunidade',
+  },
+  {
+    nome: 'Paulo Cézar Silveira',
+    iniciais: 'PS',
+    origem: 'Mentoria',
+    categoria: 'Preparação para entrevistas',
+    texto: 'Com uma metodologia simples e assertiva minha performance nas entrevistas evoluiu consideravelmente.',
+    detalhe: 'Evolução em entrevistas',
+  },
+  {
+    nome: 'Jéssica Carolina',
+    iniciais: 'JC',
+    origem: 'Mentoria',
+    categoria: 'Transição de carreira',
+    texto: 'Depois de algumas entrevistas consegui minha transição. Venci a Gupy.',
+    detalhe: 'Transição profissional',
+  },
+  {
+    nome: 'Ari',
+    iniciais: 'AR',
+    origem: 'Mentoria',
+    categoria: 'Aprovação na Gupy',
+    texto: 'Venci a Gupy e me recoloquei.',
+    detalhe: 'Recolocação profissional',
+  },
+  {
+    nome: 'Erick Almeida',
+    iniciais: 'EA',
+    origem: 'Mentoria',
+    categoria: 'Recolocação',
+    texto: 'Consegui um emprego na área que gostaria, agradeço todo o seu apoio.',
+    detalhe: 'Conquista profissional',
+  },
+  {
+    nome: 'Rogério',
+    iniciais: 'RO',
+    origem: 'Mentoria',
+    categoria: 'Liderança em CX',
+    texto: 'Jaque, deu certo a vaga de CX Lead. Aprovado para analista e CX Lead e nem terminei todos os passos da mentoria.',
+    detalhe: 'Aprovação profissional',
+  },
+  {
+    nome: 'Nat',
+    iniciais: 'NA',
+    origem: 'Mentoria',
+    categoria: 'Gupy e Dados',
+    texto: 'Venciiii tbm a Gupyyyyy e sou Analista de Dados.',
+    detalhe: 'Nova posição em Dados',
+  },
+  {
+    nome: 'Geraldo Macinelli',
+    iniciais: 'GM',
+    origem: 'Relato recebido',
+    categoria: 'Volta ao mercado',
+    texto: 'MEU SIM ACABOU DE CHEGAR. Estou de volta no mercado de trabalho.',
+    detalhe: 'Recolocação profissional',
+  },
+  {
+    nome: 'Roberto Melo',
+    iniciais: 'RM',
+    origem: 'Mentoria',
+    categoria: 'Currículo e entrevistas',
+    texto: 'Depois de reestruturar meu currículo com base no modelo que você propôs, eu recebi mensagem de uma recrutadora marcando uma entrevista.',
+    detalhe: 'Convite para entrevista',
+  },
+  {
+    nome: 'Natan',
+    iniciais: 'NT',
+    origem: 'Mentoria',
+    categoria: 'LinkedIn e oportunidades',
+    texto: 'Ainda não consegui um emprego na área, mas devido ao meu linkedin formatado e meu selo #OpenToWork, consegui fechar um contrato para configuração de uma Sales Cloud.',
+    detalhe: 'Novo contrato profissional',
+  },
+  {
+    nome: 'Ana Júlia',
+    iniciais: 'AJ',
+    origem: 'Mentoria',
+    categoria: 'Novo emprego',
+    texto: 'Comecei essa semana em um novo emprego. Valeu pela parceria.',
+    detalhe: 'Recolocação profissional',
+  },
+  {
+    nome: 'Gustavo',
+    iniciais: 'GU',
+    origem: 'Relato recebido',
+    categoria: 'LinkedIn e currículo',
+    texto: 'Finalmente meu “SIM” chegou e tudo graças às mudanças que fiz no LinkedIn e no currículo.',
+    detalhe: 'Recolocação profissional',
+  },
+  {
+    nome: 'Ruth Ribeiro',
+    iniciais: 'RR',
+    origem: 'Comunidade',
+    categoria: 'Currículo e LinkedIn',
     texto: 'Segui tudo direitinho e consegui meu novo emprego. Muito obrigada de coração.',
-    detalhe: 'Relato de contratação',
+    detalhe: 'Compartilhamento na comunidade',
+  },
+  {
+    nome: 'Jéssica Torres',
+    iniciais: 'JT',
+    origem: 'Mentoria',
+    categoria: 'Visibilidade no LinkedIn',
+    texto: 'Desde que modifiquei meu CV, fiz ajustes no perfil do linkedin e notei que meu perfil tem uma melhora na visibilidade.',
+    detalhe: 'Mais visibilidade profissional',
+  },
+  {
+    nome: 'Jaque Ferreira',
+    iniciais: 'JF',
+    origem: 'Mentoria',
+    categoria: 'Aprovação na Gupy',
+    texto: 'Vim dizer que acabei de responder o RH. VENCI A GUPY.',
+    detalhe: 'Aprovação em processo seletivo',
   },
 ] as const;
 
@@ -135,8 +192,8 @@ export default function SomaSuccessStories() {
               O próximo capítulo pode começar com um <span className="text-[#65cbb8]">sim.</span>
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[#bbcbc6] sm:text-base">
-              Mensagens de pessoas que receberam orientações em mentorias e comunidades.
-              Histórias de recolocação, avanço em processos seletivos e novas possibilidades.
+              Depoimentos compartilhados por pessoas que passaram pela mentoria ou receberam
+              orientações em comunidades. Recolocação, evolução profissional e novas possibilidades.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
@@ -188,9 +245,14 @@ export default function SomaSuccessStories() {
                   “{historia.texto}”
                 </blockquote>
               </div>
-              <div className="mt-8 border-t border-white/10 pt-4">
-                <p className="text-sm font-semibold text-white">{historia.detalhe}</p>
-                <p className="mt-1 text-xs text-[#a7bdb5]">Nome preservado por privacidade</p>
+              <div className="mt-8 flex items-center gap-3 border-t border-white/10 pt-4">
+                <div aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#65cbb8]/35 bg-[#0D8071]/25 text-xs font-bold tracking-wide text-[#adf1e5]">
+                  {historia.iniciais}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">{historia.nome}</p>
+                  <p className="mt-0.5 text-xs text-[#a7bdb5]">{historia.detalhe} · {historia.origem}</p>
+                </div>
               </div>
             </article>
           ))}
@@ -198,8 +260,8 @@ export default function SomaSuccessStories() {
 
         <div className="mt-1 flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-3xl text-xs leading-5 text-[#a7bdb5]">
-            Trechos selecionados de mensagens recebidas, com edição leve para leitura e identificação omitida. Experiências individuais,
-            sem promessa de aprovação ou contratação.
+            Depoimentos reais compartilhados com autorização. Trechos editados apenas para concisão e legibilidade.
+            Resultados individuais não representam promessa de aprovação ou contratação.
           </p>
           <Link
             href="/depoimentos"
