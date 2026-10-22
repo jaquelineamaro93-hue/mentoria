@@ -243,7 +243,7 @@ export default function IrisCopiloto() {
         href: resposta.ok ? dados.href : undefined,
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
-        respostaRef: resposta.ok && dados.resposta ? dados.resposta_ref : undefined,
+        respostaRef: resposta.ok && dados.resposta ? (dados.resposta_ref || crypto.randomUUID()) : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
