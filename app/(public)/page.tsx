@@ -4,6 +4,7 @@ import { MessageCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
+import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 
 export const metadata: Metadata = {
   title: 'SOMA Mentoria - Transforme sua Carreira',
@@ -60,7 +61,7 @@ export default async function HomePage() {
           <a href="#topo" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
           <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
             <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
-            <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
+            <a href="#historias-reais" className="hover:text-white transition-colors">Depoimentos</a>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -182,6 +183,9 @@ export default async function HomePage() {
       </section>
 
       <SomaProductShowcase />
+
+      {/* Prova social real, relatos sem nomes ou prints privados */}
+      <SomaSuccessStories />
 
       {/* Sobre a mentora — compacto e horizontal */}
       <section className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
