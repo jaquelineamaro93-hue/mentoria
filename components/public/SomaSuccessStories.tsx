@@ -265,9 +265,11 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
           ))}
         </div>
 
-          <p className="mt-3 text-xs leading-5 text-[#a7bdb5]">
-            Os cartões mostram um resumo. Na página de Depoimentos estão os relatos integrais e os posts originais do LinkedIn.
-          </p>
+        {!completo && (
+          <>
+            <p className="mt-3 text-xs leading-5 text-[#a7bdb5]">
+              Os cartões mostram um resumo. Na página de Depoimentos estão os relatos integrais e os posts originais do LinkedIn.
+            </p>
         <nav aria-label="Depoimentos anteriores publicados no LinkedIn" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="mr-1 text-xs font-medium text-[#a7bdb5]">Relatos publicados no LinkedIn:</span>
           {DEPOIMENTOS_LINKEDIN.map(depoimento => (
@@ -282,17 +284,21 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
             </a>
           ))}
         </nav>
+          </>
+        )}
         <div className="mt-1 flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-3xl text-xs leading-5 text-[#a7bdb5]">
             Depoimentos reais compartilhados com autorização. Trechos editados apenas para concisão e legibilidade.
             Resultados individuais não representam promessa de aprovação ou contratação.
           </p>
-          <Link
-            href="/depoimentos"
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#8fe1d3] transition hover:text-white"
-          >
-            Ver depoimentos publicados no LinkedIn <ArrowRight size={17} aria-hidden="true" />
-          </Link>
+          {!completo && (
+            <Link
+              href="/depoimentos"
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#8fe1d3] transition hover:text-white"
+            >
+              Ver depoimentos publicados no LinkedIn <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+          )}
         </div>
       </div>
     </section>
