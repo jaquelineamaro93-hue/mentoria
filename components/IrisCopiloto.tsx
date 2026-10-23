@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import { ArrowUpRight, ClipboardList, ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
@@ -18,8 +21,8 @@ type Mensagem = {
 type ConversaIris = { id: string; title: string; updated_at: string };
 type MensagemSalva = { id: string; role: 'user' | 'assistant'; content: string; href: string | null;
   response_ref: string | null; feedback_rating: 'util' | 'nao_util' | null };
-const converterMensagens = (rows: MensagemSalva[]): Mensagem[] => [
-  SAUDACAO,
+const converterMensagens = (rows: MensagemSalva[], nome = ''): Mensagem[] => [
+  saudacaoIris(nome),
   ...rows.map(item => ({
     tipo: item.role === 'user' ? 'mentorado' as const : 'iris' as const,
     texto: item.content, href: item.href || undefined,
@@ -31,12 +34,18 @@ const converterMensagens = (rows: MensagemSalva[]): Mensagem[] => [
 
 const SAUDACAO: Mensagem = {
   tipo: 'iris',
-  texto: 'Sou a Íris, sua copiloto de carreira. Conte o que quer destravar e eu te ajudo a decidir o próximo passo, usando o contexto da sua jornada na SOMA.',
+  texto: 'Oi, que bom ter você por aqui. Sou a Íris, sua parceira para pensar a carreira com clareza e transformar ideias em ações. Qual situação você quer destravar agora?',
 };
+function saudacaoIris(nome = ''): Mensagem {
+  return nome
+    ? { ...SAUDACAO, texto: 'Oi, ' + nome + '. Que bom te encontrar aqui. Me conta o que você quer destravar na carreira e vamos pensar no próximo passo.' }
+    : SAUDACAO;
+}
 
 export default function IrisCopiloto() {
   const [aberto, setAberto] = useState(false);
   const [expandido, setExpandido] = useState(false);
+  const [nomeMentorado, setNomeMentorado] = useState('');
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
   const [ocupada, setOcupada] = useState(false);
@@ -68,13 +77,14 @@ export default function IrisCopiloto() {
       try {
         const r = await fetch('/api/copiloto/historico', { credentials: 'same-origin', cache: 'no-store' });
         const d = await r.json() as { erro?: string; conversas?: ConversaIris[];
-          mensagens?: MensagemSalva[]; conversation_id?: string | null; limite_atingido?: boolean };
+          mensagens?: MensagemSalva[]; conversation_id?: string | null; limite_atingido?: boolean; nome?: string };
         if (!r.ok) throw new Error(d.erro || 'Não foi possível abrir seu histórico.');
         if (!ativo) return;
+        setNomeMentorado(d.nome || '');
         setConversas(d.conversas ?? []);
         setConversationId(d.conversation_id ?? null);
         setPermitirHistorico(!!d.conversation_id);
-        setMensagens(converterMensagens(d.mensagens ?? []));
+        setMensagens(converterMensagens(d.mensagens ?? [], d.nome || ''));
         setMensagensAntigasLimitadas(!!d.limite_atingido);
       } catch {
         if (ativo) setHistoricoErro('Não foi possível carregar suas conversas. Recarregue antes de enviar uma nova mensagem.');
@@ -92,9 +102,9 @@ export default function IrisCopiloto() {
       const r = await fetch('/api/copiloto/historico?conversation_id=' + encodeURIComponent(id),
         { credentials: 'same-origin', cache: 'no-store' });
       const d = await r.json() as { erro?: string; conversas?: ConversaIris[];
-        mensagens?: MensagemSalva[]; conversation_id?: string; limite_atingido?: boolean };
+        mensagens?: MensagemSalva[]; conversation_id?: string; limite_atingido?: boolean; nome?: string };
       if (!r.ok) throw new Error(d.erro || 'Conversa indisponível.');
-      setMensagens(converterMensagens(d.mensagens ?? []));
+      setMensagens(converterMensagens(d.mensagens ?? [], d.nome || nomeMentorado));
       setConversationId(d.conversation_id ?? id);
       setPermitirHistorico(true);
       setConversas(d.conversas ?? []);
@@ -111,7 +121,7 @@ export default function IrisCopiloto() {
   function novaConversa() {
     if (ocupada || historicoCarregando) return;
     setConversationId(null);
-    setMensagens([SAUDACAO]);
+    setMensagens([saudacaoIris(nomeMentorado)]);
     setMensagensAntigasLimitadas(false);
     setMostrarHistorico(false);
     setFeedbackEdicao(null);
@@ -133,7 +143,7 @@ export default function IrisCopiloto() {
       const atualizadas = conversas.filter(c => c.id !== id);
       setConversas(atualizadas);
       if (conversationId === id) {
-        setConversationId(null); setMensagens([SAUDACAO]); setMensagensAntigasLimitadas(false);
+        setConversationId(null); setMensagens([saudacaoIris(nomeMentorado)]); setMensagensAntigasLimitadas(false);
       }
     } catch (e) {
       setHistoricoErro(e instanceof Error ? e.message : 'Não foi possível excluir.');
@@ -415,6 +425,12 @@ export default function IrisCopiloto() {
             </button>
             </div>
           </header>
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-[#dce6dd] bg-[#f6faf7] px-3 py-2 text-xs">
+            <span className="text-[#5c7467]">Uma conversa de cada vez, com direção</span>
+            <Link href="/plano-acoes-iris" className="inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#0D8071] underline-offset-2 hover:underline">
+              <ClipboardList size={15} aria-hidden="true" /> Plano de Ações da Íris <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
+          </div>
           {mostrarHistorico && (
             <div className="max-h-[45%] shrink-0 overflow-y-auto border-b border-[#e8e0dc] bg-white p-3">
               <h3 className="mb-2 text-sm font-semibold text-[#312b27]">Minhas conversas</h3>
@@ -455,7 +471,25 @@ export default function IrisCopiloto() {
                   ? 'rounded-2xl rounded-tr-sm bg-[#e3f5f0] p-3 text-sm leading-relaxed text-[#28322e]'
                   : 'rounded-2xl rounded-tl-sm border border-[#e8e0dc] bg-white p-3 text-sm leading-relaxed text-[#312b27]'
                 }>
-                  <p className="whitespace-pre-wrap break-words">{m.texto}</p>
+                  {m.tipo === 'iris' ? (
+                    <div className="break-words text-sm leading-6 [&>*+*]:mt-3 [&_strong]:font-semibold [&_strong]:text-[#233f34]">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+                        p: ({ children }) => <p className="leading-6">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc space-y-1.5 pl-5">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal space-y-1.5 pl-5">{children}</ol>,
+                        li: ({ children }) => <li className="pl-1">{children}</li>,
+                        h2: ({ children }) => <h2 className="text-base font-bold text-[#253c33]">{children}</h2>,
+                        h3: ({ children }) => <h3 className="font-semibold text-[#253c33]">{children}</h3>,
+                        a: ({ href, children }) =>
+                          <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#0D8071] underline">{children}</a>,
+                        table: ({children}) => <div className="overflow-x-auto"><table className="min-w-full border-collapse text-xs">{children}</table></div>,
+                        th: ({children}) => <th className="border border-[#e1e7e0] bg-[#f1f7f2] px-2 py-2 text-left">{children}</th>,
+                        td: ({children}) => <td className="border border-[#e1e7e0] px-2 py-2 align-top">{children}</td>,
+                      }}>{m.texto}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap break-words">{m.texto}</p>
+                  )}
                   {m.tipo === 'iris' && indice === mensagens.length - 1 && !!m.sugestoes?.length && (
                     <div className="mt-3 flex flex-wrap gap-2" aria-label="Próximos passos sugeridos pela Íris">
                       {m.sugestoes.map(sugestao => (
@@ -469,7 +503,11 @@ export default function IrisCopiloto() {
                   )}
                   {m.href && !m.proposta && (
                     <a href={m.href} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#5B453E] underline">
-                      Abrir ferramenta <ExternalLink size={12} aria-hidden="true" />
+                      {m.href === '/plano-acoes-iris'
+                        ? 'Abrir meu Plano de Ações da Íris'
+                        : m.href?.startsWith('/meu-pdi') ? 'Abrir meu PDI'
+                          : m.href?.startsWith('/carreira') ? 'Abrir currículo e carreira'
+                            : 'Abrir ferramenta'} <ExternalLink size={12} aria-hidden="true" />
                     </a>
                   )}
                   {m.proposta && m.token && (
