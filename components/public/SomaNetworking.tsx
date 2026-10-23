@@ -10,6 +10,26 @@ const EMPRESAS_REDE: ReadonlyArray<{ nome: string; logoUrl: string }> = [
   { nome: 'Ansell', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Ansell_Logo.svg' },
 ];
 
+/** Empresas informadas pela criadora como locais de atuação de mentorados atuais.
+ * A presença da marca não representa parceria, patrocínio ou endosso corporativo.
+ * O domínio serve apenas para buscar o ícone de marca; nada vem da conta do mentorado.
+ */
+const EMPRESAS_MENTORADOS: ReadonlyArray<{ nome: string; site: string; dominio: string }> = [
+  { nome: 'Porte', site: 'https://porte.com.br/', dominio: 'porte.com.br' },
+  { nome: 'Credsystem', site: 'https://www.credsystem.com.br/', dominio: 'credsystem.com.br' },
+  { nome: 'Lojas Torra', site: 'https://www.lojastorra.com.br/', dominio: 'lojastorra.com.br' },
+  { nome: 'Whirlpool', site: 'https://www.whirlpool.com.br/', dominio: 'whirlpool.com.br' },
+  { nome: 'O Boticário', site: 'https://www.boticario.com.br/', dominio: 'boticario.com.br' },
+  { nome: 'Monks', site: 'https://www.monks.com/pt', dominio: 'monks.com' },
+  { nome: 'Cielo', site: 'https://www.cielo.com.br/', dominio: 'cielo.com.br' },
+  { nome: 'Samsung', site: 'https://www.samsung.com/br/', dominio: 'samsung.com' },
+  { nome: 'LWSA', site: 'https://lwsa.tech/', dominio: 'lwsa.tech' },
+  { nome: 'Embraer', site: 'https://www.embraer.com/pt/', dominio: 'embraer.com' },
+  { nome: 'Gupy', site: 'https://portal.gupy.io/', dominio: 'gupy.io' },
+  { nome: 'PicPay', site: 'https://picpay.com/pt-br/pf', dominio: 'picpay.com' },
+  { nome: 'Loft', site: 'https://loft.teamtailor.com/#jobs', dominio: 'loft.com.br' },
+];
+
 const AREAS_REDE = ['CRM', 'Customer Experience', 'Customer Success', 'Dados', 'Produto', 'Inteligência Artificial'];
 
 export default function SomaNetworking() {
@@ -25,6 +45,66 @@ export default function SomaNetworking() {
         <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-[#526760] sm:text-base">
           Carreira e networking não precisam ser pesados. Podem ser genuínos.
           Aprenda com quem também está investindo em si.
+        </p>
+
+        <div className="mt-11 border-t border-[#d9e8e2] pt-9 sm:mt-14 sm:pt-11">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0D8071]">
+            Mentorado também é conexão
+          </p>
+          <h3 className="mx-auto mt-3 max-w-3xl font-display text-2xl leading-tight text-[#172823] sm:text-3xl">
+            Empresas onde nossos mentorados atuam
+          </h3>
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-6 text-[#526760] sm:text-base">
+            A SOMA reúne profissionais com diferentes histórias e desafios de carreira.
+            Estas são algumas das empresas presentes na trajetória dos mentorados.
+          </p>
+          <div
+            role="list"
+            aria-label="13 empresas onde atuam mentorados da SOMA"
+            className="mt-7 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-4 lg:grid-cols-5"
+          >
+            {EMPRESAS_MENTORADOS.map(empresa => (
+              <a
+                role="listitem"
+                key={empresa.nome}
+                href={empresa.site}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Visitar o site da ${empresa.nome}`}
+                className="group flex min-h-32 w-40 shrink-0 snap-start flex-col items-center justify-center gap-3 rounded-2xl border border-[#d9e8e2] bg-white px-3 py-5 shadow-sm transition-colors hover:border-[#82b7a6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] sm:w-auto"
+              >
+                <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#f6faf8]">
+                  {/* Ícone da identidade da empresa. O nome permanece visível mesmo se a imagem falhar. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`}
+                    alt=""
+                    aria-hidden="true"
+                    width={48}
+                    height={48}
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    className="h-12 w-12 object-contain"
+                  />
+                </span>
+                <span className="text-center text-sm font-semibold leading-tight text-[#293b35] group-hover:text-[#0D8071]">
+                  {empresa.nome}
+                </span>
+              </a>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-[#74877e] sm:hidden">
+            Deslize para o lado para conhecer todas as empresas.
+          </p>
+          <p className="mx-auto mt-5 max-w-4xl text-xs leading-5 text-[#74877e]">
+            As marcas representam apenas a atuação profissional de mentorados. Não há indicação de parceria,
+            patrocínio ou endosso dessas empresas à SOMA, nem promessa de contato com seus colaboradores.
+          </p>
+        </div>
+
+        <p className="mt-10 text-xs font-semibold uppercase tracking-[0.16em] text-[#74877e]">
+          Outras trajetórias profissionais que inspiram a SOMA
         </p>
         {EMPRESAS_REDE.length > 0 ? (
           <>
