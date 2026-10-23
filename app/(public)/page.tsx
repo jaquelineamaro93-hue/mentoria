@@ -263,7 +263,7 @@ export default async function HomePage() {
       </section>
 
       {/* Planos — resumo compacto */}
-      <section id="planos" className="py-14 bg-white">
+      <section id="planos" className="scroll-mt-24 py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-end md:justify-between">
             <div>
