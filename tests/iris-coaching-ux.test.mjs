@@ -33,7 +33,7 @@ test('Pedidos de mentoria recebem orientação, sem criar tarefas PDI automatica
 
 test('Especialista entrega ação concreta, preserva contexto e não repete perguntas', () => {
   assert.match(voice, /não apenas reproduzir dados|não pergunte de novo/);
-  assert.match(voice, /não faça questionários/);
+  assert.match(voice, /não faça questionários/i);
   assert.match(voice, /primeiro responda de verdade/);
   assert.match(voice, /evite promessas|sem garantias/i);
   assert.match(voice, /duas? ou três|2 a 3|2 ou 3/);
