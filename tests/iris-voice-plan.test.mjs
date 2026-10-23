@@ -33,7 +33,7 @@ test('Consultoria tem métodos claros de transição, recrutamento, renda e ment
   }
   assert.match(voz,/lacunas comprovadas/);
   assert.match(voz,/não promessa|nunca promessa|sem garantias|nunca garantias/i);
-  assert.match(voz,/não faça questionários/);
+  assert.match(voz,/não faça questionários/i);
   assert.match(voz,/plano persistente|planos persistentes/i);
 });
 
