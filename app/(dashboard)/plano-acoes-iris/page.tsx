@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import PlanoAcoesIrisClient from './PlanoAcoesIrisClient';
 
 export const metadata: Metadata = {
-  title: 'Plano de Ações da Íris | SOMA Mentoria',
+  title: 'Plano de Ação Íris | SOMA Mentoria',
   description: 'Transforme sua orientação de carreira em um plano prático e acompanhe suas próprias ações na SOMA.',
 };
 
