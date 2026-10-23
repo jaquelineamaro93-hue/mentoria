@@ -186,7 +186,7 @@ export default function SomaSuccessStories() {
     <section
       id="historias-reais"
       aria-labelledby="historias-soma-titulo"
-      className="overflow-hidden bg-[#111b19] py-9 text-white sm:py-12"
+      className="scroll-mt-24 overflow-hidden bg-[#111b19] py-9 text-white sm:py-12"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
