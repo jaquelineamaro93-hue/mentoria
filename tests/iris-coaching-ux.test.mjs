@@ -51,7 +51,7 @@ test('Íris oferece continuidade clicável e não empurra link genérico para da
   assert.match(ui, /Próximos passos sugeridos pela Íris/);
   assert.match(ui, /onClick=\{\(\) => void enviar\(sugestao\)\}/);
   assert.match(ui, /indice === mensagens\.length - 1/);
-  assert.match(api, /sugestoes: string\[\]/);
+  assert.match(api, /sugestoes\?: string\[\]/);
   assert.match(api, /intencao === 'vaga' \? LINKS\.vaga : undefined/);
   assert.doesNotMatch(api, /href: LINKS\[intencao\].*\n.*\}\);\s*\} catch/);
   assert.match(ui, /Monte um plano prático de 7 dias/);
