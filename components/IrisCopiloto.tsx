@@ -456,6 +456,17 @@ export default function IrisCopiloto() {
                   : 'rounded-2xl rounded-tl-sm border border-[#e8e0dc] bg-white p-3 text-sm leading-relaxed text-[#312b27]'
                 }>
                   <p className="whitespace-pre-wrap break-words">{m.texto}</p>
+                  {m.tipo === 'iris' && indice === mensagens.length - 1 && !!m.sugestoes?.length && (
+                    <div className="mt-3 flex flex-wrap gap-2" aria-label="Próximos passos sugeridos pela Íris">
+                      {m.sugestoes.map(sugestao => (
+                        <button key={sugestao} type="button" onClick={() => void enviar(sugestao)}
+                          disabled={ocupada || historicoCarregando}
+                          className="min-h-10 rounded-full border border-[#b8d7ca] bg-[#f3faf7] px-3 py-2 text-left text-xs font-medium text-[#215849] transition hover:bg-[#dff3ea] disabled:opacity-40">
+                          {sugestao}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {m.href && !m.proposta && (
                     <a href={m.href} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#5B453E] underline">
                       Abrir ferramenta <ExternalLink size={12} aria-hidden="true" />
