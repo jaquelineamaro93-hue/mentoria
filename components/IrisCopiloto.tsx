@@ -248,7 +248,7 @@ export default function IrisCopiloto() {
     const teclado = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        setAberto(false);
+        fecharConversa();
       }
       if ((!mobile && !expandido) || event.key !== 'Tab' || !painel.current) return;
       const botoes = [...painel.current.querySelectorAll<HTMLElement>(
@@ -269,11 +269,13 @@ export default function IrisCopiloto() {
     return () => {
       document.removeEventListener('keydown', teclado);
     };
-  }, [aberto, mobile]);
+  }, [aberto, mobile, expandido, nomeMentorado]);
 
   async function enviar(pedidoExterno?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
-    if (!pedido || ocupada || historicoCarregando) return;
+    if (!pedido || ocupada || historicoCarregando || preferenciaCarregando ||
+        (!!conversationId && !permitirHistorico)) return;
+    const geracao = geracaoConversa.current;
     setTexto('');
     setOcupada(true);
     setMensagens(anteriores => [...anteriores, { tipo: 'mentorado', texto: pedido }]);
@@ -301,7 +303,6 @@ export default function IrisCopiloto() {
         resposta_ref?: string; aviso_historico?: string; sugestoes?: string[];
       };
       if (resposta.ok && dados.conversation_id) {
-        setConversationId(dados.conversation_id);
         setConversas(anteriores => [
           { id: dados.conversation_id as string,
             title: anteriores.find(c => c.id === dados.conversation_id)?.title || pedido.replace(/\s+/g, ' ').slice(0, 95),
@@ -309,6 +310,10 @@ export default function IrisCopiloto() {
           ...anteriores.filter(c => c.id !== dados.conversation_id),
         ]);
       }
+      // Um envio anterior que terminou após o fechamento pode ficar salvo no
+      // histórico, mas não deve reaparecer na nova conversa da janela.
+      if (geracao !== geracaoConversa.current) return;
+      if (resposta.ok && dados.conversation_id) setConversationId(dados.conversation_id);
       if (dados.aviso_historico) setHistoricoErro(dados.aviso_historico);
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
@@ -320,7 +325,7 @@ export default function IrisCopiloto() {
         sugestoes: resposta.ok && Array.isArray(dados.sugestoes) ? dados.sugestoes.slice(0, 2) : undefined,
       }]);
     } catch {
-      setMensagens(anteriores => [...anteriores, {
+      if (geracao === geracaoConversa.current) setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
         texto: 'Houve uma falha de conexão. Você pode tentar novamente.',
       }]);
@@ -331,6 +336,7 @@ export default function IrisCopiloto() {
 
   async function confirmar(indice: number, proposta: Proposta, token: string) {
     if (ocupada) return;
+    const geracao = geracaoConversa.current;
     setOcupada(true);
     try {
       const res = await fetch('/api/copiloto', {
@@ -341,6 +347,7 @@ export default function IrisCopiloto() {
         body: JSON.stringify({ acao: 'confirmar_pdi', proposta, token, conversation_id: conversationId }),
       });
       const data = await res.json() as { resposta?: string; erro?: string; href?: string; resposta_ref?: string; conversation_id?: string; aviso_historico?: string };
+      if (geracao !== geracaoConversa.current) return;
       if (res.ok && data.conversation_id) setConversationId(data.conversation_id);
       if (data.aviso_historico) setHistoricoErro(data.aviso_historico);
       if (res.ok) {
@@ -355,7 +362,7 @@ export default function IrisCopiloto() {
         respostaRef: res.ok && data.resposta ? (data.resposta_ref || crypto.randomUUID()) : undefined,
       }]);
     } catch {
-      setMensagens(anteriores => [...anteriores, {
+      if (geracao === geracaoConversa.current) setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
         texto: 'Falha na conexão. A confirmação não foi concluída.',
       }]);
@@ -418,7 +425,7 @@ export default function IrisCopiloto() {
         >
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f0e9fa]" aria-hidden="true"><Mascot index={3} size={28} /></span>
           <span>Íris Copiloto</span>
-          {!historicoCarregando && !conversationId && (
+          {!historicoCarregando && !historicoAceito && (
             <span className="rounded-full bg-[#e3f5f0] px-2 py-0.5 text-[10px] font-medium text-[#285d51]">
               Privacidade
             </span>
@@ -468,7 +475,7 @@ export default function IrisCopiloto() {
               )}
             <button
               type="button"
-              onClick={() => setAberto(false)}
+              onClick={fecharConversa}
               aria-label="Fechar conversa"
               className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15"
             >
@@ -485,6 +492,16 @@ export default function IrisCopiloto() {
           {mostrarHistorico && (
             <div className="max-h-[45%] shrink-0 overflow-y-auto border-b border-[#e8e0dc] bg-white p-3">
               <h3 className="mb-2 text-sm font-semibold text-[#312b27]">Minhas conversas</h3>
+              {historicoAceito && (
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[#f2f8f4] px-3 py-2 text-xs text-[#426357]">
+                  <span>{permitirHistorico ? 'Salvamento de novas conversas ativo' : 'Salvamento de novas conversas pausado'}</span>
+                  <button type="button" onClick={() => void atualizarPrivacidade(!permitirHistorico)}
+                    disabled={ocupada || preferenciaCarregando || historicoCarregando}
+                    className="min-h-9 rounded-lg border border-[#a9d5c4] bg-white px-3 font-semibold text-[#1b6f5c] disabled:opacity-50">
+                    {preferenciaCarregando ? 'Salvando...' : permitirHistorico ? 'Pausar' : 'Reativar'}
+                  </button>
+                </div>
+              )}
               {conversas.length === 0 && <p className="text-xs text-gray-600">Nenhuma conversa salva ainda.</p>}
               {conversas.map(c => (
                 <div key={c.id} className="flex items-center gap-1 rounded-lg hover:bg-[#f2f7f5]">
@@ -500,15 +517,26 @@ export default function IrisCopiloto() {
               ))}
             </div>
           )}
-          {!conversationId && !historicoCarregando && (
-            <label className="flex shrink-0 items-start gap-3 border-b border-[#e8e0dc] bg-[#f5fbf8] px-3 py-2 text-xs leading-5 text-[#294d42]">
-              <input type="checkbox" checked={permitirHistorico}
-                onChange={event => setPermitirHistorico(event.target.checked)}
-                className="mt-1 h-4 w-4 shrink-0 accent-[#0D8071]" />
-              <span><strong>Atualização de privacidade: ativar meu histórico.</strong> Ao marcar, autorizo a SOMA a armazenar minhas mensagens da Íris Copilot para que eu possa continuar minhas conversas depois.
-                O histórico fica restrito à minha conta, e a equipe autorizada poderá acessá-lo apenas para suporte e segurança, conforme as regras de privacidade.
-                Posso excluir conversas quando quiser. Sem marcar, a Íris continua funcionando sem histórico salvo.</span>
-            </label>
+          {!historicoAceito && !historicoCarregando && (
+            <div className="shrink-0 border-b border-[#e8e0dc] bg-[#f5fbf8] px-3 py-2 text-xs leading-5 text-[#294d42]">
+              <label className="flex cursor-pointer items-center gap-2.5 font-semibold">
+                <input type="checkbox" checked={false} disabled={preferenciaCarregando}
+                  onChange={event => { if (event.target.checked) void atualizarPrivacidade(true); }}
+                  className="h-4 w-4 shrink-0 accent-[#0D8071]" />
+                <span>{preferenciaCarregando ? 'Salvando sua escolha...' : 'Salvar minhas conversas com a Íris'}</span>
+              </label>
+              <details className="ml-6 mt-1 text-[11px] text-[#557468]">
+                <summary className="cursor-pointer underline-offset-2 hover:underline">
+                  Atualização de privacidade: ativar meu histórico
+                </summary>
+                <p className="mt-2 leading-5">
+                  Ao marcar, autorizo a SOMA a armazenar minhas mensagens da Íris Copilot para continuar conversas depois.
+                  O histórico fica restrito à minha conta e a equipe autorizada poderá acessá-lo apenas para suporte
+                  e segurança, conforme as regras de privacidade. Posso excluir conversas quando quiser.
+                  Sem marcar, a Íris continua funcionando sem histórico salvo.
+                </p>
+              </details>
+            </div>
           )}
           {historicoErro && <p role="alert" className="shrink-0 bg-[#fff3ec] px-3 py-2 text-xs text-[#854938]">{historicoErro}</p>}
           {historicoCarregando && <p role="status" className="shrink-0 px-3 py-2 text-xs text-gray-600">Carregando seu histórico...</p>}
@@ -545,7 +573,7 @@ export default function IrisCopiloto() {
                     <div className="mt-3 flex flex-wrap gap-2" aria-label="Próximos passos sugeridos pela Íris">
                       {m.sugestoes.map(sugestao => (
                         <button key={sugestao} type="button" onClick={() => void enviar(sugestao)}
-                          disabled={ocupada || historicoCarregando}
+                          disabled={ocupada || historicoCarregando || preferenciaCarregando}
                           className="min-h-10 rounded-full border border-[#b8d7ca] bg-[#f3faf7] px-3 py-2 text-left text-xs font-medium text-[#215849] transition hover:bg-[#dff3ea] disabled:opacity-40">
                           {sugestao}
                         </button>
@@ -673,13 +701,17 @@ export default function IrisCopiloto() {
                   void enviar();
                 }
               }}
-              placeholder="O que você precisa resolver na carreira agora?"
+              disabled={!!conversationId && !permitirHistorico}
+              placeholder={conversationId && !permitirHistorico
+                ? 'Reative o histórico ou comece uma nova conversa'
+                : 'O que você precisa resolver na carreira agora?'}
               aria-label="Mensagem para Íris Copiloto"
               className="min-h-12 min-w-0 flex-1 resize-none rounded-xl border border-[#d9d0c9] bg-white px-3 py-2 text-base text-[#312b27] outline-none focus:border-[#5B453E]"
             />
             <button
               type="submit"
-              disabled={ocupada || historicoCarregando || !texto.trim()}
+              disabled={ocupada || historicoCarregando || preferenciaCarregando ||
+                (!!conversationId && !permitirHistorico) || !texto.trim()}
               aria-label="Enviar mensagem"
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
             >
@@ -687,8 +719,7 @@ export default function IrisCopiloto() {
             </button>
           </form>
           <p className="shrink-0 bg-white px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center text-[11px] text-gray-600">
-            {conversationId ? 'Seu histórico está ativo. Você pode excluir suas conversas a qualquer momento.' : 'Salvar o histórico é opcional. Sua conversa não será guardada sem autorização.'}
-            Ações no PDI só são salvas após sua confirmação.
+            {permitirHistorico ? 'Histórico ativo' : 'Conversa sem salvamento'} · Ações no PDI exigem confirmação.
           </p>
         </div>
       )}
