@@ -34,7 +34,7 @@ const AREAS_REDE = ['CRM', 'Customer Experience', 'Customer Success', 'Dados', '
 
 export default function SomaNetworking() {
   return (
-    <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="border-y border-[#e5ede9] bg-[#f6faf8] py-14 sm:py-20">
+    <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="scroll-mt-24 border-y border-[#e5ede9] bg-[#f6faf8] py-14 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#0D8071]">Pessoas e conexões</p>
         <h2 id="soma-networking-titulo" className="mx-auto mt-3 max-w-3xl font-display text-3xl leading-tight text-[#172823] sm:text-4xl">
