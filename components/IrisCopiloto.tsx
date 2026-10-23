@@ -154,6 +154,7 @@ export default function IrisCopiloto() {
 
   async function atualizarPrivacidade(habilitar: boolean) {
     if (preferenciaCarregando || historicoCarregando || ocupada) return;
+    const geracao = geracaoConversa.current;
     setPreferenciaCarregando(true);
     setHistoricoErro(null);
     try {
@@ -168,7 +169,7 @@ export default function IrisCopiloto() {
       if (!res.ok) throw new Error(d.erro || 'Não foi possível salvar sua escolha.');
       setHistoricoAceito(!!d.historico_aceito);
       setPermitirHistorico(!!d.historico_ativo);
-      if (!d.historico_ativo) {
+      if (!d.historico_ativo && geracao === geracaoConversa.current) {
         limparConversaVisivel();
         setMostrarHistorico(true);
       }
