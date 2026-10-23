@@ -25,11 +25,11 @@ export async function recentIrisContext(userId: string, conversationId: string |
   const { data, error } = await admin.from('iris_web_messages')
     .select('role,content')
     .eq('user_id', userId).eq('conversation_id', conversationId)
-    .order('created_at', { ascending: false }).limit(6);
+    .order('created_at', { ascending: false }).limit(12);
   if (error) return '';
   return (data ?? []).reverse().map(m =>
-    (m.role === 'user' ? 'Mentorado: ' : 'Íris: ') + cleanText(m.content, 420)
-  ).join('\n').slice(0, 1900);
+    (m.role === 'user' ? 'Mentorado: ' : 'Íris: ') + cleanText(m.content, 350)
+  ).join('\n').slice(0, 3400);
 }
 
 export async function saveIrisTurn(args: {
