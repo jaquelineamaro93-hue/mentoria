@@ -186,7 +186,7 @@ const SHOWCASES = [
 
 export default function SomaProductShowcase() {
   return (
-    <section id="portal" className="border-y border-gray-faint bg-[#f7f9fb] py-12 sm:py-16 lg:py-20">
+    <section id="portal" className="scroll-mt-24 border-y border-gray-faint bg-[#f7f9fb] py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto mb-10 sm:mb-14 max-w-3xl text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-mint-deep">
