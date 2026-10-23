@@ -4,6 +4,8 @@ type JsonOptions<T> = {
   maxTokens?: number;
   validar?: (valor: unknown) => valor is T;
   descricao?: string;
+  // Use somente para respostas de conversa sem efeitos de escrita.
+  recuperarTextoLivre?: (texto: string) => T | null;
 };
 
 function extrairTrechoBalanceado(texto: string): string {
@@ -65,6 +67,20 @@ export function parseJsonDaIA<T>(texto: string, validar?: (valor: unknown) => va
   return valor as T;
 }
 
+
+function recuperarSePermitido<T>(texto: string, options: JsonOptions<T>): T | null {
+  if (!options.recuperarTextoLivre) return null;
+  try {
+    const recuperado = options.recuperarTextoLivre(texto);
+    if (recuperado !== null && (!options.validar || options.validar(recuperado))) {
+      return recuperado;
+    }
+  } catch {
+    // Recuperação conservadora: falhas seguem para o retry estruturado.
+  }
+  return null;
+}
+
 export async function chamarClaudeJson<T>(
   prompt: string,
   options: JsonOptions<T> = {}
@@ -77,6 +93,11 @@ export async function chamarClaudeJson<T>(
   try {
     return parseJsonDaIA<T>(primeiraResposta, options.validar);
   } catch (primeiroErro) {
+    // Íris conversacional: a resposta em texto simples já é aproveitável.
+    // Evita a segunda chamada e elimina o warning falso do print.
+    const recuperada = recuperarSePermitido(primeiraResposta, options);
+    if (recuperada !== null) return recuperada;
+
     console.warn(
       '[AI JSON] primeira resposta inválida',
       descricao,
@@ -103,6 +124,9 @@ Mantenha o conteúdo objetivo e compacto para garantir que o JSON seja fechado p
   try {
     return parseJsonDaIA<T>(segundaResposta, options.validar);
   } catch (segundoErro) {
+    const recuperada = recuperarSePermitido(segundaResposta, options);
+    if (recuperada !== null) return recuperada;
+
     console.error(
       '[AI JSON] segunda resposta inválida',
       descricao,
