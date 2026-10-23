@@ -270,10 +270,12 @@ export async function POST(request: NextRequest) {
 
   const pedido = texto(body.mensagem, 4000);
   if (pedido.length < 3) return json({ erro: 'Escreva o que você precisa.' }, 400);
-  const classificada = await classificarComJev(pedido);
   const criarAcao = querCriarAcaoPdi(pedido);
   const perguntaDeStatus = /\b(complet[oa]|conclu[ií]d[oa]|finalizad[oa]|preenchi|progresso|pend[êe]ncia|quantas? (etapas|tarefas|a[cç][õo]es|se[cç][õo]es))\b/i.test(pedido);
   const orientacao = pedeOrientacao(pedido);
+  // Não cobrar latência de classificação externa em comandos claramente reconhecidos.
+  const classificada = (criarAcao || orientacao || perguntaDeStatus)
+    ? intencaoLocal(pedido) : await classificarComJev(pedido);
   // A rota de criação só existe para uma atividade explicitamente solicitada.
   // Orientação estratégica prevalece sobre status e classificadores genéricos.
   const intencao: Intencao = criarAcao ? 'pdi'
@@ -355,8 +357,8 @@ export async function POST(request: NextRequest) {
       : mapaPronto ? 'Próximo passo: transformar seu objetivo em um movimento de carreira mensurável.'
         : 'Próximo passo: avançar um bloco do seu mapa para usar esse diagnóstico na estratégia.';
     return responderComHistorico({
-      resposta: 'Seu panorama agora:\\n' + '• Mapa: ' + statusMapa + '.\\n' +
-        '• PDI: ' + statusPdi + '\\n' + prioridade,
+      resposta: 'Seu panorama agora:\n' + '• Mapa: ' + statusMapa + '.\n' +
+        '• PDI: ' + statusPdi + '\n' + prioridade,
       href: podePdi ? '/meu-pdi' : '/quem-sou-eu',
       sugestoes: ['Priorize meu próximo passo', 'Monte um plano prático de 7 dias'],
     });
@@ -402,9 +404,13 @@ export async function POST(request: NextRequest) {
   }
 
   const curriculo = texto(cvResponse.data?.curriculo_texto || perfil.raw_resume, 7000);
-  if (intencao === 'vaga' && !curriculo) return json({
-    resposta: 'Ainda não encontrei um currículo salvo. Cadastre o currículo na ferramenta de carreira para analisarmos a vaga.',
+  // Uma análise de compatibilidade exige CV, mas uma orientação sobre como
+  // encontrar vagas, currículo ou networking pode começar sem ele.
+  const pedeComparacaoComCV = /(?:compar[ae]|analisa?r?|avalie|ader[êe]ncia|compatibilidade|fit)[\s\S]{0,80}(?:curr[íi]culo|cv|vaga)|(?:curr[íi]culo|cv)[\s\S]{0,80}(?:compatibilidade|ader[êe]ncia|compar[ae])/i.test(pedido);
+  if (intencao === 'vaga' && !curriculo && pedeComparacaoComCV) return responderComHistorico({
+    resposta: 'Para comparar seu currículo com uma vaga específica, preciso do currículo salvo na SOMA e da descrição da oportunidade. Enquanto isso, posso ajudar a definir critérios de busca e posicionamento para os cargos que você quer.',
     href: '/carreira?etapa=cv',
+    sugestoes: ['Definir critérios das vagas', 'Planejar minha busca de emprego'],
   });
   try {
     const contexto = {
@@ -456,8 +462,8 @@ export async function POST(request: NextRequest) {
     });
   } catch {
     return responderComHistorico({
-      resposta: 'Não consegui concluir a análise agora, mas suas informações continuam salvas.',
-      href: LINKS[intencao],
+      resposta: 'Tive uma falha ao elaborar a orientação. Não vou inventar uma análise. Podemos continuar com uma etapa concreta: escolha um cargo-alvo e reúna três requisitos reais de vagas desse cargo para priorizarmos currículo e networking.',
+      sugestoes: ['Priorizar um cargo-alvo', 'Organizar meu próximo passo'],
     });
   }
 }
