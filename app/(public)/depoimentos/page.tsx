@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 
 const depoimentos = [
   {
@@ -96,10 +97,13 @@ export default function DepoimentosPage() {
           </div>
         </section>
 
+        {/* Todos os relatos atuais ficam completos aqui. A home apresenta cartões compactos. */}
+        <SomaSuccessStories completo />
+
         <section className="border-t border-gray-faint bg-[#f6faf8] px-4 py-8 text-center sm:px-6">
           <p className="text-sm text-[#526760]">Quer conhecer outras trajetórias de mentorados e profissionais da comunidade?</p>
           <Link href="/#historias-reais" className="mt-3 inline-flex min-h-11 items-center font-semibold text-[#0D8071] underline-offset-4 hover:underline">
-            Ver as 16 histórias compartilhadas na home
+            Rever o resumo das histórias na página inicial
           </Link>
         </section>
 
