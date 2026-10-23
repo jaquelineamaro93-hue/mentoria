@@ -6,12 +6,15 @@ on:
       - 'app/api/copiloto/**'
       - 'lib/iris-web-history.ts'
       - 'lib/iris-mentoria-voz.ts'
+      - 'lib/ai-json.ts'
+      - 'lib/iris-ai-response.ts'
       - 'app/(dashboard)/plano-acoes-iris/**'
       - 'supabase/migrations/20261023153000_iris_action_plans.sql'
       - 'supabase/migrations/20261022154000_iris_web_historico_opt_in.sql'
       - 'tests/iris-historico-web.test.mjs'
       - 'tests/iris-coaching-ux.test.mjs'
       - 'tests/iris-voice-plan.test.mjs'
+      - 'tests/iris-json-resilience.test.mjs'
       - '.github/workflows/iris-web-history.yml'
   workflow_dispatch:
 
@@ -29,6 +32,8 @@ jobs:
           persist-credentials: false
       - name: Verify privacy and isolation source tests
         run: node --test tests/iris-historico-web.test.mjs tests/iris-coaching-ux.test.mjs tests/iris-voice-plan.test.mjs
+      - name: Validate free-text fallback and strict JSON boundaries
+        run: node --experimental-strip-types --test tests/iris-json-resilience.test.mjs
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { chamarClaudeJson } from '@/lib/ai-json';
+import { recuperarTextoLivreIris } from '@/lib/iris-ai-response';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
@@ -455,6 +456,10 @@ export async function POST(request: NextRequest) {
     });
     const ia = await chamarClaudeJson<RespostaIA>(prompt, {
       maxTokens: 1150,
+      descricao: 'orientação conversacional da Íris',
+      // Apenas conselhos sem efeitos no banco aceitam texto livre.
+      // Criação de atividades PDI e planos mantém validação JSON estrita.
+      recuperarTextoLivre: recuperarTextoLivreIris,
       validar: (valor): valor is RespostaIA => !!valor && typeof valor === 'object' &&
         typeof (valor as RespostaIA).resposta === 'string',
     });
