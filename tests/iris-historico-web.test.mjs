@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 const read = p => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
-test('Íris restaura conversas da conta após reload e suporta nova conversa ou exclusão', () => {
+test('Íris inicia novo chat e permite recuperar e excluir conversas antigas pelo Histórico', () => {
   const ui = read('components/IrisCopiloto.tsx');
-  assert.match(ui, /fetch\('\/api\/copiloto\/historico'/);
-  assert.match(ui, /GET|fetch\('\/api\/copiloto\/historico/);
+  assert.match(ui, /fetch\('\/api\/copiloto\/historico\?list_only=1'/);
+  assert.match(ui, /fetch\('\/api\/copiloto\/historico\?conversation_id=/);
   assert.match(ui, /conversation_id: conversationId/);
   assert.match(ui, /setMensagens\(converterMensagens\(d\.mensagens/);
   assert.match(ui, /aria-label="Ver histórico da Íris"/);
