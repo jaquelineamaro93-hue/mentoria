@@ -150,7 +150,7 @@ const DEPOIMENTOS_LINKEDIN = [
   { autor: 'Rita Alecrim', href: 'https://lnkd.in/p/euSGD_V9' },
 ] as const;
 
-export default function SomaSuccessStories() {
+export default function SomaSuccessStories({ completo = false }: { completo?: boolean } = {}) {
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -239,7 +239,7 @@ export default function SomaSuccessStories() {
             <article
               data-story-card
               key={index}
-              className="flex h-[256px] w-[85%] max-w-[350px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-white/15 bg-[#1c2825] p-4 transition-colors hover:border-[#65cbb8]/65 sm:h-[240px] sm:w-[calc((100%_-_16px)/2)] sm:max-w-none lg:w-[calc((100%_-_48px)/4)]"
+              className={`flex w-[85%] max-w-[350px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-white/15 bg-[#1c2825] p-4 transition-colors hover:border-[#65cbb8]/65 sm:w-[calc((100%_-_16px)/2)] sm:max-w-none lg:w-[calc((100%_-_48px)/4)] ${completo ? 'min-h-[290px]' : 'h-[256px] sm:h-[240px]'}`}
             >
               <div>
                 <div className="flex items-start justify-between gap-3">
@@ -248,7 +248,7 @@ export default function SomaSuccessStories() {
                   </span>
                   <Quote size={20} className="shrink-0 text-[#65cbb8]/75" aria-hidden="true" />
                 </div>
-                <blockquote className="mt-3 line-clamp-4 text-sm leading-6 text-[#f3f7f5] sm:line-clamp-5">
+                <blockquote className={completo ? 'mt-3 text-sm leading-6 text-[#f3f7f5]' : 'mt-3 line-clamp-4 text-sm leading-6 text-[#f3f7f5]'}>
                   “{historia.texto}”
                 </blockquote>
               </div>
@@ -266,7 +266,7 @@ export default function SomaSuccessStories() {
         </div>
 
           <p className="mt-3 text-xs leading-5 text-[#a7bdb5]">
-            Os cartões mostram um resumo. Os relatos completos e os depoimentos com links originais estão na página de Depoimentos.
+            Os cartões mostram um resumo. Na página de Depoimentos estão os relatos integrais e os posts originais do LinkedIn.
           </p>
         <nav aria-label="Depoimentos anteriores publicados no LinkedIn" className="mt-3 flex flex-wrap items-center gap-2">
           <span className="mr-1 text-xs font-medium text-[#a7bdb5]">Relatos publicados no LinkedIn:</span>
