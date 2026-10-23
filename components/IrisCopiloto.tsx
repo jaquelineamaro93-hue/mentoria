@@ -55,6 +55,8 @@ export default function IrisCopiloto() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
   const [permitirHistorico, setPermitirHistorico] = useState(false);
+  const [historicoAceito, setHistoricoAceito] = useState(false);
+  const [preferenciaCarregando, setPreferenciaCarregando] = useState(false);
   const [mensagensAntigasLimitadas, setMensagensAntigasLimitadas] = useState(false);
   const [feedbackEdicao, setFeedbackEdicao] = useState<{ indice: number; avaliacao: 'util' | 'nao_util' } | null>(null);
   const [feedbackTexto, setFeedbackTexto] = useState('');
@@ -68,6 +70,8 @@ export default function IrisCopiloto() {
   const painel = useRef<HTMLDivElement>(null);
   const acionador = useRef<HTMLButtonElement>(null);
   const abertoUmaVez = useRef(false);
+  // Invalidar callbacks de requisições anteriores ao fechar a janela.
+  const geracaoConversa = useRef(0);
 
   // Ler da SOMA, não do armazenamento do dispositivo. Funciona em sessões e
   // dispositivos diferentes, respeitando a autenticação e RLS por usuário.
@@ -75,17 +79,20 @@ export default function IrisCopiloto() {
     let ativo = true;
     (async () => {
       try {
-        const r = await fetch('/api/copiloto/historico', { credentials: 'same-origin', cache: 'no-store' });
+        const r = await fetch('/api/copiloto/historico?list_only=1', { credentials: 'same-origin', cache: 'no-store' });
         const d = await r.json() as { erro?: string; conversas?: ConversaIris[];
-          mensagens?: MensagemSalva[]; conversation_id?: string | null; limite_atingido?: boolean; nome?: string };
+          mensagens?: MensagemSalva[]; conversation_id?: string | null; limite_atingido?: boolean; nome?: string;
+          historico_aceito?: boolean; historico_ativo?: boolean };
         if (!r.ok) throw new Error(d.erro || 'Não foi possível abrir seu histórico.');
         if (!ativo) return;
         setNomeMentorado(d.nome || '');
         setConversas(d.conversas ?? []);
-        setConversationId(d.conversation_id ?? null);
-        setPermitirHistorico(!!d.conversation_id);
-        setMensagens(converterMensagens(d.mensagens ?? [], d.nome || ''));
-        setMensagensAntigasLimitadas(!!d.limite_atingido);
+        // A chegada sempre começa com uma conversa nova; só a lista é carregada.
+        setConversationId(null);
+        setHistoricoAceito(!!d.historico_aceito);
+        setPermitirHistorico(!!d.historico_ativo);
+        setMensagens([saudacaoIris(d.nome || '')]);
+        setMensagensAntigasLimitadas(false);
       } catch {
         if (ativo) setHistoricoErro('Não foi possível carregar suas conversas. Recarregue antes de enviar uma nova mensagem.');
       } finally {
@@ -97,6 +104,7 @@ export default function IrisCopiloto() {
 
   async function abrirConversa(id: string) {
     if (ocupada || historicoCarregando) return;
+    const geracao = ++geracaoConversa.current;
     setHistoricoCarregando(true); setHistoricoErro(null);
     try {
       const r = await fetch('/api/copiloto/historico?conversation_id=' + encodeURIComponent(id),
@@ -104,28 +112,71 @@ export default function IrisCopiloto() {
       const d = await r.json() as { erro?: string; conversas?: ConversaIris[];
         mensagens?: MensagemSalva[]; conversation_id?: string; limite_atingido?: boolean; nome?: string };
       if (!r.ok) throw new Error(d.erro || 'Conversa indisponível.');
+      if (geracao !== geracaoConversa.current) return;
       setMensagens(converterMensagens(d.mensagens ?? [], d.nome || nomeMentorado));
       setConversationId(d.conversation_id ?? id);
-      setPermitirHistorico(true);
       setConversas(d.conversas ?? []);
       setMensagensAntigasLimitadas(!!d.limite_atingido);
       setMostrarHistorico(false);
       setFeedbackEdicao(null);
     } catch (e) {
-      setHistoricoErro(e instanceof Error ? e.message : 'Falha ao carregar.');
+      if (geracao === geracaoConversa.current)
+        setHistoricoErro(e instanceof Error ? e.message : 'Falha ao carregar.');
     } finally {
       setHistoricoCarregando(false);
     }
   }
 
-  function novaConversa() {
-    if (ocupada || historicoCarregando) return;
+  function limparConversaVisivel() {
+    ++geracaoConversa.current;
     setConversationId(null);
     setMensagens([saudacaoIris(nomeMentorado)]);
+    setTexto('');
     setMensagensAntigasLimitadas(false);
     setMostrarHistorico(false);
     setFeedbackEdicao(null);
+    setFeedbackTexto('');
+    setFeedbackErro(null);
     setHistoricoErro(null);
+    // Não altera o consentimento nem apaga as conversas da conta.
+  }
+
+  function novaConversa() {
+    if (ocupada || historicoCarregando) return;
+    limparConversaVisivel();
+  }
+
+  function fecharConversa() {
+    limparConversaVisivel();
+    setExpandido(false);
+    setAberto(false);
+  }
+
+  async function atualizarPrivacidade(habilitar: boolean) {
+    if (preferenciaCarregando || historicoCarregando || ocupada) return;
+    setPreferenciaCarregando(true);
+    setHistoricoErro(null);
+    try {
+      const res = await fetch('/api/copiloto/historico/consent', {
+        method: 'POST', credentials: 'same-origin', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ habilitar }),
+      });
+      const d = await res.json() as {
+        erro?: string; historico_aceito?: boolean; historico_ativo?: boolean;
+      };
+      if (!res.ok) throw new Error(d.erro || 'Não foi possível salvar sua escolha.');
+      setHistoricoAceito(!!d.historico_aceito);
+      setPermitirHistorico(!!d.historico_ativo);
+      if (!d.historico_ativo) {
+        limparConversaVisivel();
+        setMostrarHistorico(true);
+      }
+    } catch (e) {
+      setHistoricoErro(e instanceof Error ? e.message : 'Falha ao salvar privacidade.');
+    } finally {
+      setPreferenciaCarregando(false);
+    }
   }
 
   async function excluirConversa(id: string) {
