@@ -14,7 +14,9 @@ on:
       - 'app/(dashboard)/plano-acoes-iris/**'
       - 'supabase/migrations/20261023153000_iris_action_plans.sql'
       - 'supabase/migrations/20261022154000_iris_web_historico_opt_in.sql'
+      - 'supabase/migrations/20261023212000_iris_history_privacy_preference.sql'
       - 'tests/iris-historico-web.test.mjs'
+      - 'tests/iris-privacy-session.test.mjs'
       - 'tests/iris-coaching-ux.test.mjs'
       - 'tests/iris-voice-plan.test.mjs'
       - 'tests/iris-json-resilience.test.mjs'
@@ -35,7 +37,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Verify privacy and isolation source tests
-        run: node --test tests/iris-historico-web.test.mjs tests/iris-coaching-ux.test.mjs tests/iris-voice-plan.test.mjs
+        run: node --test tests/iris-historico-web.test.mjs tests/iris-coaching-ux.test.mjs tests/iris-voice-plan.test.mjs tests/iris-privacy-session.test.mjs
       - name: Verify Iris sidebar navigation
         run: node --test tests/iris-sidebar-navigation.test.mjs
       - name: Validate free-text fallback and strict JSON boundaries
