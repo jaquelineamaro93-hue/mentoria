@@ -143,6 +143,13 @@ export const HISTORIAS_SOMA = [
   },
 ] as const;
 
+/** Depoimentos públicos anteriores com links de origem informados pela criadora. */
+const DEPOIMENTOS_LINKEDIN = [
+  { nome: 'Maria Laura Soares', href: 'https://lnkd.in/p/esE9t5fr' },
+  { nome: 'Giulia Gomes', href: 'https://lnkd.in/p/eetWmSiv' },
+  { nome: 'Rita Alecrim', href: 'https://lnkd.in/p/euSGD_V9' },
+] as const;
+
 export default function SomaSuccessStories() {
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -261,6 +268,20 @@ export default function SomaSuccessStories() {
           <p className="mt-3 text-xs leading-5 text-[#a7bdb5]">
             Os cartões mostram um resumo. Os relatos completos e os depoimentos com links originais estão na página de Depoimentos.
           </p>
+        <nav aria-label="Depoimentos anteriores publicados no LinkedIn" className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-xs font-medium text-[#a7bdb5]">Relatos publicados no LinkedIn:</span>
+          {DEPOIMENTOS_LINKEDIN.map(depoimento => (
+            <a
+              key={depoimento.nome}
+              href={depoimento.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-9 items-center rounded-full border border-[#65cbb8]/35 bg-[#20332e] px-3 text-xs font-semibold text-[#b8f2e8] transition-colors hover:bg-[#31594d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#65cbb8]"
+            >
+              {depoimento.nome} <ArrowRight size={13} className="ml-2" aria-hidden="true" />
+            </a>
+          ))}
+        </nav>
         <div className="mt-1 flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-3xl text-xs leading-5 text-[#a7bdb5]">
             Depoimentos reais compartilhados com autorização. Trechos editados apenas para concisão e legibilidade.
