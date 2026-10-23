@@ -59,7 +59,7 @@ test('13 empresas de mentorados aparecem com marca, site oficial e sem confundir
     'Gupy', 'PicPay', 'Loft',
   ];
   const bloco = networking.split('const EMPRESAS_MENTORADOS:')[1]?.split('const AREAS_REDE')[0] ?? '';
-  assert.equal((bloco.match(/\\{ nome:/g) ?? []).length, 13, 'Devem existir 13 logos de mentorados');
+  assert.equal((bloco.match(/nome: '/g) ?? []).length, 13, 'Devem existir 13 logos de mentorados');
   for (const nome of empresas) {
     assert.ok(bloco.includes(`nome: '${nome}'`), 'Marca ausente: ' + nome);
   }
@@ -69,10 +69,10 @@ test('13 empresas de mentorados aparecem com marca, site oficial e sem confundir
   assert.match(networking, /rel="noopener noreferrer"/);
   assert.match(networking, /grid-cols-5/);
   assert.match(networking, /overflow-x-auto/);
-  assert.match(networking, /google\\.com\\/s2\\/favicons/);
+  assert.ok(networking.includes('google.com/s2/favicons'));
   assert.doesNotMatch(networking, /srsltid=|gclid=|gad_source=/);
-  assert.match(home, /<SomaNetworking \\/>/);
-  assert.match(home, /<SomaSuccessStories \\/>/);
+  assert.ok(home.includes('<SomaNetworking />'));
+  assert.ok(home.includes('<SomaSuccessStories />'));
   for (const antiga of ['Banco do Brasil', 'Volvo', 'Webmotors', 'Ansell']) {
     assert.ok(networking.includes(antiga), 'Marca anterior removida: ' + antiga);
   }
