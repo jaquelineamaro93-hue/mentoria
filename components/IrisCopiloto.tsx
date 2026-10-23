@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ExternalLink, History, Plus, Trash2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import { ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { Mascot } from '@/components/soma/CareerJourney';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
@@ -12,6 +12,7 @@ type Mensagem = {
   proposta?: Proposta;
   token?: string;
   respostaRef?: string;
+  sugestoes?: string[];
   avaliacao?: 'util' | 'nao_util';
 };
 type ConversaIris = { id: string; title: string; updated_at: string };
@@ -30,11 +31,12 @@ const converterMensagens = (rows: MensagemSalva[]): Mensagem[] => [
 
 const SAUDACAO: Mensagem = {
   tipo: 'iris',
-  texto: 'Sou a Íris, sua Copiloto de Carreira dentro da SOMA. Posso consultar sua evolução, analisar uma vaga com seu currículo ou preparar uma ação para o PDI, sempre pedindo confirmação antes de salvar.',
+  texto: 'Sou a Íris, sua copiloto de carreira. Conte o que quer destravar e eu te ajudo a decidir o próximo passo, usando o contexto da sua jornada na SOMA.',
 };
 
 export default function IrisCopiloto() {
   const [aberto, setAberto] = useState(false);
+  const [expandido, setExpandido] = useState(false);
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
   const [ocupada, setOcupada] = useState(false);
@@ -165,13 +167,13 @@ export default function IrisCopiloto() {
       viewport.removeEventListener('resize', atualizar);
       viewport.removeEventListener('scroll', atualizar);
     };
-  }, [aberto, mobile]);
+  }, [aberto, mobile, expandido]);
 
   useEffect(() => {
     if (!aberto) return;
     const area = historico.current;
     if (area) area.scrollTop = area.scrollHeight;
-  }, [aberto, mensagens, ocupada, visualHeight]);
+  }, [aberto, mensagens, ocupada, visualHeight, expandido]);
 
   useEffect(() => {
     if (aberto) abertoUmaVez.current = true;
@@ -180,14 +182,14 @@ export default function IrisCopiloto() {
 
   useEffect(() => {
     if (!aberto) return;
-    if (mobile) painel.current?.focus();
+    if (mobile || expandido) painel.current?.focus();
     else caixa.current?.focus();
     const teclado = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         setAberto(false);
       }
-      if (!mobile || event.key !== 'Tab' || !painel.current) return;
+      if ((!mobile && !expandido) || event.key !== 'Tab' || !painel.current) return;
       const botoes = [...painel.current.querySelectorAll<HTMLElement>(
         'button:not([disabled]),a[href],textarea:not([disabled]),input:not([disabled])'
       )].filter(element => element.getClientRects().length > 0);
@@ -220,12 +222,22 @@ export default function IrisCopiloto() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         cache: 'no-store',
-        body: JSON.stringify({ mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico }),
+        body: JSON.stringify({
+          mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico,
+          // Contexto da sessão apenas quando ainda não há conversa persistida.
+          // Vai somente nesta requisição; não é salvo sem consentimento.
+          contexto_temporario: !conversationId
+            ? mensagens.slice(1).slice(-10).map(m => ({
+              role: m.tipo === 'mentorado' ? 'user' : 'assistant',
+              content: m.texto.slice(0, 340),
+            }))
+            : undefined,
+        }),
       });
       const dados = await resposta.json() as {
         resposta?: string; erro?: string; href?: string;
         proposta?: Proposta; token?: string; conversation_id?: string;
-        resposta_ref?: string; aviso_historico?: string;
+        resposta_ref?: string; aviso_historico?: string; sugestoes?: string[];
       };
       if (resposta.ok && dados.conversation_id) {
         setConversationId(dados.conversation_id);
@@ -244,6 +256,7 @@ export default function IrisCopiloto() {
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
         respostaRef: resposta.ok && dados.resposta ? (dados.resposta_ref || crypto.randomUUID()) : undefined,
+        sugestoes: resposta.ok && Array.isArray(dados.sugestoes) ? dados.sugestoes.slice(0, 2) : undefined,
       }]);
     } catch {
       setMensagens(anteriores => [...anteriores, {
@@ -325,8 +338,8 @@ export default function IrisCopiloto() {
 
   return (
     <aside
-      className={aberto && mobile
-        ? 'fixed inset-0 z-[70]'
+      className={aberto && (mobile || expandido)
+        ? 'fixed inset-0 z-[70] sm:bg-[#141b18]/35 sm:p-5'
         : 'fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-3 z-[60] sm:bottom-6 sm:right-6'}
       style={aberto && mobile && visualHeight
         ? { height: visualHeight + 'px', top: visualTop + 'px' }
@@ -356,9 +369,11 @@ export default function IrisCopiloto() {
           tabIndex={-1}
           className={mobile
             ? 'flex h-full w-full min-w-0 flex-col overflow-hidden bg-white outline-none'
-            : 'flex h-[min(720px,calc(100dvh-3rem))] w-[min(460px,calc(100vw-2rem))] min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8cec9] bg-white shadow-2xl outline-none'}
-          role={mobile ? 'dialog' : 'region'}
-          aria-modal={mobile ? true : undefined}
+            : expandido
+              ? 'mx-auto flex h-full w-full max-w-[1200px] min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8cec9] bg-white shadow-2xl outline-none'
+              : 'flex h-[min(720px,calc(100dvh-3rem))] w-[min(460px,calc(100vw-2rem))] min-w-0 flex-col overflow-hidden rounded-2xl border border-[#d8cec9] bg-white shadow-2xl outline-none'}
+          role={mobile || expandido ? 'dialog' : 'region'}
+          aria-modal={mobile || expandido ? true : undefined}
           aria-labelledby="iris-copiloto-title"
         >
           <header className="flex shrink-0 items-center justify-between bg-[#5B453E] px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
@@ -366,7 +381,7 @@ export default function IrisCopiloto() {
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/30 bg-[#f3ecfc]" aria-hidden="true"><Mascot index={3} size={36} /></span>
               <div>
                 <p id="iris-copiloto-title" className="text-sm font-semibold">Íris Copiloto</p>
-                <p className="text-xs text-white/80">Assistente nativa da SOMA</p>
+                <p className="text-xs text-white/80">Sua estrategista de carreira</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -380,6 +395,16 @@ export default function IrisCopiloto() {
                 className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 disabled:opacity-50">
                 <Plus size={20} aria-hidden="true" />
               </button>
+              {!mobile && (
+                <button type="button"
+                  onClick={() => setExpandido(valor => !valor)}
+                  aria-label={expandido ? 'Reduzir janela da Íris' : 'Expandir janela da Íris'}
+                  aria-pressed={expandido}
+                  title={expandido ? 'Voltar ao tamanho compacto' : 'Expandir conversa'}
+                  className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white">
+                  {expandido ? <Minimize2 size={19} aria-hidden="true" /> : <Maximize2 size={19} aria-hidden="true" />}
+                </button>
+              )}
             <button
               type="button"
               onClick={() => setAberto(false)}
@@ -423,7 +448,9 @@ export default function IrisCopiloto() {
           {mensagensAntigasLimitadas && <p className="shrink-0 px-3 py-2 text-xs text-gray-600">Exibindo as últimas 150 mensagens desta conversa.</p>}
           <div ref={historico} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#fbfaf8] p-3 sm:p-4" aria-live="polite" aria-relevant="additions">
             {mensagens.map((m, indice) => (
-              <div key={indice} className={m.tipo === 'mentorado' ? 'ml-5 sm:ml-8' : 'mr-3 sm:mr-6'}>
+              <div key={indice} className={m.tipo === 'mentorado'
+                ? 'ml-auto max-w-[72ch]'
+                : 'mr-auto max-w-[80ch]'}>
                 <div className={m.tipo === 'mentorado'
                   ? 'rounded-2xl rounded-tr-sm bg-[#e3f5f0] p-3 text-sm leading-relaxed text-[#28322e]'
                   : 'rounded-2xl rounded-tl-sm border border-[#e8e0dc] bg-white p-3 text-sm leading-relaxed text-[#312b27]'
@@ -517,7 +544,7 @@ export default function IrisCopiloto() {
           </div>
           {mensagens.length === 1 && (
             <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto border-t border-[#eee6df] px-3 py-2">
-              {['Como está meu progresso?', 'Analisar uma vaga', 'Criar ação no PDI'].map(sugestao => (
+              {['Monte um plano prático de 7 dias', 'Qual meu próximo passo?', 'Treinar uma entrevista'].map(sugestao => (
                 <button
                   key={sugestao}
                   type="button"
@@ -546,7 +573,7 @@ export default function IrisCopiloto() {
                   void enviar();
                 }
               }}
-              placeholder="Peça uma análise ou ação..."
+              placeholder="O que você precisa resolver na carreira agora?"
               aria-label="Mensagem para Íris Copiloto"
               className="min-h-12 min-w-0 flex-1 resize-none rounded-xl border border-[#d9d0c9] bg-white px-3 py-2 text-base text-[#312b27] outline-none focus:border-[#5B453E]"
             />
