@@ -7,6 +7,7 @@ on:
       - 'lib/iris-web-history.ts'
       - 'supabase/migrations/20261022154000_iris_web_historico_opt_in.sql'
       - 'tests/iris-historico-web.test.mjs'
+      - 'tests/iris-coaching-ux.test.mjs'
       - '.github/workflows/iris-web-history.yml'
   workflow_dispatch:
 
@@ -23,7 +24,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Verify privacy and isolation source tests
-        run: node --test tests/iris-historico-web.test.mjs
+        run: node --test tests/iris-historico-web.test.mjs tests/iris-coaching-ux.test.mjs
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
