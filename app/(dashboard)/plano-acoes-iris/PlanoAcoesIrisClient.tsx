@@ -158,7 +158,7 @@ export default function PlanoAcoesIrisClient() {
         <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.17em] text-[#0D8071]">
           <Sparkles size={15} aria-hidden="true" /> Uma frente só sua
         </p>
-        <h1 className="mt-3 font-display text-3xl leading-tight text-[#1c3029] sm:text-4xl">Plano de Ações da Íris</h1>
+        <h1 className="mt-3 font-display text-3xl leading-tight text-[#1c3029] sm:text-4xl">Plano de Ação Íris</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-[#485d53] sm:text-base">
           {nome ? nome+', ' : ''}vamos transformar suas conversas em movimentos reais
           <span className="block">Sem atropelar seu ritmo e sem mexer no PDI ou nas outras etapas da mentoria.</span>

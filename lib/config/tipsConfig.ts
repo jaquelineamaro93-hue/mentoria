@@ -34,6 +34,10 @@ export const tipsConfig: Record<string, QuickTipData> = {
   '/meu-pdi': {
     title: 'Plano de Desenvolvimento Individual',
   },
+  '/plano-acoes-iris': {
+    title: 'Plano de Ação Íris',
+    description: 'Retome seus planos salvos, acompanhe as etapas e crie novas ações sem alterar seu PDI.',
+  },
   '/network': {
     title: 'Círculos de Influência',
   },

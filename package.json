@@ -36,6 +36,7 @@
   },
   "overrides": {
     "dompurify": "3.4.17",
-    "follow-redirects": "1.16.1"
+    "follow-redirects": "1.16.1",
+    "zod": "4.6.7"
   }
 }

@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ListChecks, Compass, Sparkles, CalendarDays, Target,
   NotebookPen, PlayCircle, Award, BriefcaseBusiness, Star,
   Users, MessageCircle, MapPin, Gift, CreditCard, HelpCircle, FileText, ShieldCheck,
-  FileSearch, MessageSquare,
+  FileSearch, MessageSquare, ClipboardList,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -32,6 +32,13 @@ export const portalNavGroups: PortalNavGroup[] = [
       { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
       { href: '/feedbacks', label: 'Feedbacks recebidos', icon: MessageCircle },
       { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
+    ],
+  },
+  {
+    id: 'iris-copiloto',
+    label: 'Íris Copiloto',
+    items: [
+      { href: '/plano-acoes-iris', label: 'Plano de Ação Íris', icon: ClipboardList },
     ],
   },
   {
