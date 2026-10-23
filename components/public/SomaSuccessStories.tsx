@@ -145,9 +145,9 @@ export const HISTORIAS_SOMA = [
 
 /** Depoimentos públicos anteriores com links de origem informados pela criadora. */
 const DEPOIMENTOS_LINKEDIN = [
-  { nome: 'Maria Laura Soares', href: 'https://lnkd.in/p/esE9t5fr' },
-  { nome: 'Giulia Gomes', href: 'https://lnkd.in/p/eetWmSiv' },
-  { nome: 'Rita Alecrim', href: 'https://lnkd.in/p/euSGD_V9' },
+  { autor: 'Maria Laura Soares', href: 'https://lnkd.in/p/esE9t5fr' },
+  { autor: 'Giulia Gomes', href: 'https://lnkd.in/p/eetWmSiv' },
+  { autor: 'Rita Alecrim', href: 'https://lnkd.in/p/euSGD_V9' },
 ] as const;
 
 export default function SomaSuccessStories() {
@@ -272,13 +272,13 @@ export default function SomaSuccessStories() {
           <span className="mr-1 text-xs font-medium text-[#a7bdb5]">Relatos publicados no LinkedIn:</span>
           {DEPOIMENTOS_LINKEDIN.map(depoimento => (
             <a
-              key={depoimento.nome}
+              key={depoimento.autor}
               href={depoimento.href}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-9 items-center rounded-full border border-[#65cbb8]/35 bg-[#20332e] px-3 text-xs font-semibold text-[#b8f2e8] transition-colors hover:bg-[#31594d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#65cbb8]"
             >
-              {depoimento.nome} <ArrowRight size={13} className="ml-2" aria-hidden="true" />
+              {depoimento.autor} <ArrowRight size={13} className="ml-2" aria-hidden="true" />
             </a>
           ))}
         </nav>
