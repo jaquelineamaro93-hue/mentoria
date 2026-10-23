@@ -57,3 +57,38 @@ test('Depoimentos nao fazem todos os relatos parecerem contratacoes pela platafo
   assert.equal(cards, autores);
   assert.ok(cards >= 10 && cards <= 20, 'Quantidade de relatos inesperada: ' + cards);
 });
+
+test('Carrossel compacto mantém histórias e revela os três depoimentos antigos do LinkedIn', () => {
+  const ui = source('components/public/SomaSuccessStories.tsx');
+  const landing = source('app/(public)/page.tsx');
+  const antiga = source('app/(public)/depoimentos/page.tsx');
+  assert.match(ui, /h-\[256px\]/);
+  assert.match(ui, /sm:h-\[240px\]/);
+  assert.match(ui, /line-clamp-4/);
+  assert.match(ui, /Ver depoimentos publicados no LinkedIn/);
+  assert.match(landing, /href="\/depoimentos"/);
+  assert.match(antiga, /Depoimentos com links para os posts originais/);
+  for (const pessoa of ['Maria Laura Soares', 'Giulia Gomes', 'Rita Alecrim']) {
+    assert.ok(ui.includes(pessoa), 'Link antigo invisível na home: ' + pessoa);
+    assert.ok(antiga.includes(pessoa), 'Depoimento antigo ausente: ' + pessoa);
+  }
+  for (const url of ['https://lnkd.in/p/esE9t5fr','https://lnkd.in/p/eetWmSiv','https://lnkd.in/p/euSGD_V9']) {
+    assert.ok(ui.includes(url) && antiga.includes(url), 'Link anterior não preservado: ' + url);
+  }
+});
+
+test('Navegação da home leva a seções e página de depoimentos no desktop e celular', () => {
+  const landing = source('app/(public)/page.tsx');
+  const rede = source('components/public/SomaNetworking.tsx');
+  const portal = source('components/public/SomaProductShowcase.tsx');
+  assert.match(landing, /aria-label="Navegação principal da SOMA"/);
+  assert.match(landing, /aria-label="Navegação móvel da SOMA"/);
+  assert.match(landing, /<details className="group relative lg:hidden"/);
+  assert.match(landing, /className="sticky top-0 z-50"/);
+  for (const href of ['#portal','#rede-soma','#planos','/como-funciona','/depoimentos']) {
+    assert.ok(landing.includes('href="' + href + '"'), 'Link de menu ausente: ' + href);
+  }
+  assert.match(rede, /id="rede-soma"/);
+  assert.match(portal, /id="portal"/);
+  assert.match(landing, /id="planos"/);
+});
