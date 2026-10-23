@@ -11,7 +11,7 @@ export const maxDuration = 60;
 
 type Intencao = 'progresso' | 'vaga' | 'pdi' | 'orientacao';
 type Proposta = { titulo: string; descricao: string; pilar: string };
-type RespostaIA = { resposta: string };
+type RespostaIA = { resposta: string; sugestoes?: string[] };
 const LINKS: Record<Intencao, string> = {
   progresso: '/onboarding', vaga: '/carreira?etapa=cv',
   pdi: '/meu-pdi', orientacao: '/dashboard',
@@ -26,6 +26,28 @@ function intencaoLocal(pedido: string): Intencao {
   if (/vaga|curr[íi]culo|candidatur|ader[êe]ncia|recrutad/i.test(pedido)) return 'vaga';
   if (/progresso|pend[êe]ncia|jornada|conclu[íi]|pr[oó]xima etapa|status/i.test(pedido)) return 'progresso';
   return 'orientacao';
+}
+
+// Falar sobre plano, carreira ou PDI não é autorização para gerar uma tarefa.
+// Ações no banco exigem intenção explícita e confirmação posterior do mentorado.
+function querCriarAcaoPdi(pedido: string) {
+  return /\b(?:criar?|crie|adicione|adicionar|registre|registrar|cadastre|cadastrar|salve|salvar|proponha|prepar[ea])\b[\s\S]{0,85}\b(?:a[cç][ãa]o|atividade|tarefa)\b[\s\S]{0,75}\b(?:pdi|plano de desenvolvimento)\b/i.test(pedido) ||
+    /\b(?:pdi|plano de desenvolvimento)\b[\s\S]{0,65}\b(?:criar?|crie|adicione|adicionar|registre|cadastre|salve)\b[\s\S]{0,55}\b(?:a[cç][ãa]o|atividade|tarefa)\b/i.test(pedido);
+}
+
+// Uma pergunta estratégica sobre "o que fazer" deve receber mentoria, não
+// o mesmo boletim de status ou a abertura forçada da ferramenta.
+function pedeOrientacao(pedido: string) {
+  return /\b(?:me (?:ajud[ae]|oriente|gui[ea])|por onde come[cç]o|o que (?:fa[cç]o|fazer)|como (?:posso|devo)|qual (?:estrat[eé]gia|caminho|prioridade)|plano de a[cç][ãa]o|plano de (?:7|15|30|60|90) dias|prioriz[ae]|direcion[ae]|estrutur[ae]|preciso de (?:ajuda|orienta[cç][ãa]o))\b/i.test(pedido);
+}
+
+function contextoTemporarioNaoSalvo(valor: unknown) {
+  if (!Array.isArray(valor)) return '';
+  return valor.slice(-10).filter(item => item && typeof item === 'object' &&
+    (item.role === 'user' || item.role === 'assistant') &&
+    typeof item.content === 'string').map(item =>
+    (item.role === 'user' ? 'Mentorado: ' : 'Íris: ') + texto(item.content, 340)
+  ).join('\n').slice(0, 2900);
 }
 
 // Jev decide o caminho antes de qualquer chamada ao LLM.
@@ -249,9 +271,15 @@ export async function POST(request: NextRequest) {
   const pedido = texto(body.mensagem, 4000);
   if (pedido.length < 3) return json({ erro: 'Escreva o que você precisa.' }, 400);
   const classificada = await classificarComJev(pedido);
-  // Consultas de status não devem gerar novas tarefas, mesmo se a classificação for PDI.
+  const criarAcao = querCriarAcaoPdi(pedido);
   const perguntaDeStatus = /\b(complet[oa]|conclu[ií]d[oa]|finalizad[oa]|preenchi|progresso|pend[êe]ncia|quantas? (etapas|tarefas|a[cç][õo]es|se[cç][õo]es))\b/i.test(pedido);
-  const intencao: Intencao = perguntaDeStatus ? 'progresso' : classificada;
+  const orientacao = pedeOrientacao(pedido);
+  // A rota de criação só existe para uma atividade explicitamente solicitada.
+  // Orientação estratégica prevalece sobre status e classificadores genéricos.
+  const intencao: Intencao = criarAcao ? 'pdi'
+    : orientacao ? 'orientacao'
+    : perguntaDeStatus ? 'progresso'
+    : classificada === 'pdi' ? 'orientacao' : classificada;
 
   const [mapaPermissao, pdiPermissao, curriculoPermissao] = await Promise.all([
     db.rpc('soma_has_module', { p_slug: 'autoconhecimento' }),
