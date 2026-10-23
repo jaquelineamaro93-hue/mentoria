@@ -18,6 +18,10 @@ export async function GET(request: NextRequest) {
     scope: 'iris_history_list', identifier: user.id, limit: 90, windowSeconds: 3600,
   });
   if (!permitido) return json({ erro: 'Muitas consultas ao histórico.' }, 429);
+  // A Íris saúda pelo primeiro nome da própria conta autenticada, nunca por dado fornecido no prompt.
+  const { data: perfil } = await db.from('profiles')
+    .select('nome').eq('id', user.id).maybeSingle();
+  const nome = typeof perfil?.nome === 'string' ? perfil.nome.trim().split(/\s+/)[0].slice(0, 45) : '';
   const conversationId = request.nextUrl.searchParams.get('conversation_id');
   if (conversationId && !validConversationId(conversationId)) {
     return json({ erro: 'Conversa inválida.' }, 400);
@@ -28,7 +32,7 @@ export async function GET(request: NextRequest) {
     .order('updated_at', { ascending: false }).limit(50);
   if (threadsError) return json({ erro: 'Não foi possível carregar suas conversas.' }, 503);
   const selected = conversationId || threads?.[0]?.id;
-  if (!selected) return json({ conversas: [], mensagens: [], conversation_id: null });
+  if (!selected) return json({ conversas: [], mensagens: [], conversation_id: null, nome });
   const { data: thread, error: selectedError } = await db.from('iris_web_conversations')
     .select('id').eq('user_id', user.id).eq('id', selected).maybeSingle();
   if (selectedError) return json({ erro: 'Não foi possível validar a conversa.' }, 503);
@@ -40,7 +44,7 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false }).limit(150);
   if (messagesError) return json({ erro: 'Não foi possível carregar as mensagens.' }, 503);
   return json({ conversas: threads ?? [], mensagens: (recent ?? []).reverse(), conversation_id: selected,
-    limite_atingido: (recent ?? []).length === 150 });
+    nome, limite_atingido: (recent ?? []).length === 150 });
 }
 
 export async function DELETE(request: NextRequest) {
