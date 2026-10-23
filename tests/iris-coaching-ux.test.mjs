@@ -6,6 +6,7 @@ const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8'
 const api = read('app/api/copiloto/route.ts');
 const ui = read('components/IrisCopiloto.tsx');
 const history = read('lib/iris-web-history.ts');
+const voice = read('lib/iris-mentoria-voz.ts');
 
 // Executa somente os classificadores locais, sem segredo, conta, IA nem chamada remota.
 function localClassifier(name) {
@@ -31,13 +32,12 @@ test('Pedidos de mentoria recebem orientação, sem criar tarefas PDI automatica
 });
 
 test('Especialista entrega ação concreta, preserva contexto e não repete perguntas', () => {
-  assert.match(api, /não apenas reproduzir dados do cadastro ou devolver perguntas/);
-  assert.match(api, /NÃO repita perguntas já respondidas/);
-  assert.match(api, /entregue uma primeira proposta útil mesmo que não haja vaga específica/);
-  assert.match(api, /uma possível inconsistência|possível inconsistência secundária/);
-  assert.match(api, /não declare que uma data passada é futura/);
-  assert.match(api, /2 ou 3 ações concretas/);
-  assert.match(api, /máximo de doze turnos curtos/);
+  assert.match(voice, /não apenas reproduzir dados|não pergunte de novo/);
+  assert.match(voice, /não faça questionários/);
+  assert.match(voice, /primeiro responda de verdade/);
+  assert.match(voice, /evite promessas|sem garantias/i);
+  assert.match(voice, /duas? ou três|2 a 3|2 ou 3/);
+  assert.match(voice, /Se a pessoa corrigir ou disser/);
   assert.match(history, /limit\(12\)/);
   assert.match(api, /primeiras_acoes_pendentes: pendentes/);
   assert.match(api, /objetivo_registrado:/);
