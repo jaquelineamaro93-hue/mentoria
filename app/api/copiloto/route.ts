@@ -182,7 +182,19 @@ export async function POST(request: NextRequest) {
     return json({ erro: 'Conversa inválida.' }, 400);
   }
   const conversationId = validConversationId(receivedId) ? receivedId : null;
-  const manterHistorico = !!conversationId || body.persistir_historico === true;
+  // Nunca confundir ID de conversa com consentimento. Apenas a escolha
+  // persistente da conta permite salvar, inclusive ao retomar conversas antigas.
+  const salvamentoSolicitado = body.persistir_historico === true;
+  let manterHistorico = false;
+  let avisoPrivacidade: string | null = null;
+  if (salvamentoSolicitado) {
+    const { data: preferencia, error: erroPreferencia } = await db
+      .from('iris_web_privacy_preferences').select('history_enabled')
+      .eq('user_id', user.id).maybeSingle();
+    manterHistorico = !erroPreferencia && preferencia?.history_enabled === true;
+    if (!manterHistorico) avisoPrivacidade =
+      'Seu histórico não foi salvo porque não consegui confirmar a preferência de privacidade. Confira em Histórico.';
+  }
   if (conversationId) {
     try {
       if (!(await ownsIrisConversation(user.id, conversationId))) {
@@ -198,7 +210,7 @@ export async function POST(request: NextRequest) {
     : texto(body.mensagem, 4000);
   async function responderComHistorico(payload: Record<string, unknown>, status = 200) {
     if (!manterHistorico || status !== 200 || typeof payload.resposta !== 'string' || !perguntaParaHistorico) {
-      return json(payload, status);
+      return json(avisoPrivacidade ? { ...payload, aviso_historico: avisoPrivacidade } : payload, status);
     }
     try {
       const salvo = await saveIrisTurn({

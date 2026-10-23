@@ -72,7 +72,7 @@ test('Janela pode expandir e reduzir no desktop mantendo mobile em tela cheia', 
 test('Privacidade continua opcional e as ações do PDI exigem confirmação', () => {
   assert.match(ui, /persistir_historico: permitirHistorico/);
   assert.match(ui, /Sem marcar, a Íris continua funcionando sem histórico salvo/);
-  assert.match(api, /const manterHistorico = !!conversationId \|\| body\.persistir_historico === true/);
+  assert.match(api, /const salvamentoSolicitado = body\.persistir_historico === true/);
   assert.match(api, /if \(body\.acao === 'confirmar_pdi'\)/);
   assert.match(api, /autenticarAcao/);
   assert.match(api, /ownsIrisConversation\(user\.id, conversationId\)/);
