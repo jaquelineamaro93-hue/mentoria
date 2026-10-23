@@ -34,7 +34,7 @@ const AREAS_REDE = ['CRM', 'Customer Experience', 'Customer Success', 'Dados', '
 
 export default function SomaNetworking() {
   return (
-    <section aria-labelledby="soma-networking-titulo" className="border-y border-[#e5ede9] bg-[#f6faf8] py-14 sm:py-20">
+    <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="scroll-mt-24 border-y border-[#e5ede9] bg-[#f6faf8] py-14 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#0D8071]">Pessoas e conexões</p>
         <h2 id="soma-networking-titulo" className="mx-auto mt-3 max-w-3xl font-display text-3xl leading-tight text-[#172823] sm:text-4xl">
@@ -73,19 +73,23 @@ export default function SomaNetworking() {
                 title={`Visitar o site da ${empresa.nome}`}
                 className="group flex min-h-32 w-40 shrink-0 snap-start flex-col items-center justify-center gap-3 rounded-2xl border border-[#d9e8e2] bg-white px-3 py-5 shadow-sm transition-colors hover:border-[#82b7a6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] sm:w-auto"
               >
-                <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#f6faf8]">
-                  {/* Ícone da identidade da empresa. O nome permanece visível mesmo se a imagem falhar. */}
+                <span className={empresa.nome === 'Cielo'
+                  ? 'flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg bg-[#214880]'
+                  : 'flex h-14 w-14 items-center justify-center rounded-xl bg-[#f6faf8]'}>
+                  {/* Logo da Cielo fornecido pela criadora e hospedado pela SOMA; demais ícones por domínio. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`}
+                    src={empresa.nome === 'Cielo'
+                      ? '/images/cielo-mentorado.svg'
+                      : `https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`}
                     alt=""
                     aria-hidden="true"
-                    width={48}
-                    height={48}
+                    width={empresa.nome === 'Cielo' ? 112 : 48}
+                    height={empresa.nome === 'Cielo' ? 42 : 48}
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
-                    className="h-12 w-12 object-contain"
+                    className={empresa.nome === 'Cielo' ? 'h-11 w-28 object-contain' : 'h-12 w-12 object-contain'}
                   />
                 </span>
                 <span className="text-center text-sm font-semibold leading-tight text-[#293b35] group-hover:text-[#0D8071]">

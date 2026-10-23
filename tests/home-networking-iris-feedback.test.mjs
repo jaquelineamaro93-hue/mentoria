@@ -77,3 +77,14 @@ test('13 empresas de mentorados aparecem com marca, site oficial e sem confundir
     assert.ok(networking.includes(antiga), 'Marca anterior removida: ' + antiga);
   }
 });
+
+test('Cielo usa imagem local baseada no logo fornecido, sem depender do favicon externo', () => {
+  const source = read('components/public/SomaNetworking.tsx');
+  const localLogo = read('public/images/cielo-mentorado.svg');
+  assert.match(source, /empresa\.nome === 'Cielo'/);
+  assert.match(source, /\/images\/cielo-mentorado\.svg/);
+  assert.match(localLogo, /<svg/);
+  assert.match(localLogo, /data:image\/webp;base64,/);
+  assert.ok(localLogo.length > 1000, 'Imagem da Cielo incompleta');
+  assert.match(source, /id="rede-soma"/);
+});
