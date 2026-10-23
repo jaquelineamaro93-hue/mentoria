@@ -76,11 +76,16 @@ function etapasNormalizadas(items: EtapaIris[], preservarEstado = false) {
 export async function GET() {
   const a = await autenticarMentorado();
   if ('erro' in a) return a.erro;
-  const { data, error } = await a.db.from('iris_action_plans')
-    .select('id,tema,titulo,diagnostico,objetivo,foco,etapas,created_at,updated_at')
-    .eq('user_id', a.user.id).order('updated_at', { ascending: false }).limit(25);
-  if (error) return resposta({ erro: 'Não consegui carregar seus Planos de Ações da Íris.' }, 503);
-  return resposta({ planos: data ?? [], nome: limpo(a.perfil.nome, 80).split(/\s+/)[0] });
+  const [lista, entrevista] = await Promise.all([
+    a.db.from('iris_action_plans')
+      .select('id,tema,titulo,diagnostico,objetivo,foco,etapas,created_at,updated_at')
+      .eq('user_id', a.user.id).order('updated_at', { ascending: false }).limit(25),
+    a.db.from('entrevistas_iniciais').select('objetivo_principal')
+      .eq('user_id', a.user.id).maybeSingle(),
+  ]);
+  if (lista.error || entrevista.error) return resposta({ erro: 'Não consegui carregar seus Planos de Ações da Íris.' }, 503);
+  return resposta({ planos: lista.data ?? [], nome: limpo(a.perfil.nome, 80).split(/\s+/)[0],
+    objetivo_inicial: limpo(entrevista.data?.objetivo_principal, 450) });
 }
 
 export async function POST(request: NextRequest) {
