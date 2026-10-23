@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { MessageCircle } from 'lucide-react';
+import { Menu, MessageCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
@@ -55,23 +55,38 @@ export default async function HomePage() {
     : `https://wa.me/?text=${whatsappMessage}`;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white">
+    <div className="min-h-screen overflow-x-clip bg-white">
       {/* Header */}
-      <header style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3 sm:gap-6">
-          <a href="#topo" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
-          <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
+      <header className="sticky top-0 z-50" style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
+          <a href="#topo" className="font-display text-lg sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
+          <nav aria-label="Navegação principal da SOMA" className="hidden lg:flex items-center gap-5 text-sm text-white/75">
             <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
-            <a href="#historias-reais" className="hover:text-white transition-colors">Depoimentos</a>
+            <a href="#portal" className="hover:text-white transition-colors">Portal</a>
+            <a href="#rede-soma" className="hover:text-white transition-colors">Rede SOMA</a>
+            <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-sm">
+            <details className="group relative lg:hidden">
+              <summary aria-label="Abrir menu da SOMA" className="flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-white/25 px-2.5 text-xs font-medium text-white marker:hidden [&::-webkit-details-marker]:hidden">
+                <Menu size={18} aria-hidden="true" />
+                <span className="hidden sm:inline">Menu</span>
+              </summary>
+              <nav aria-label="Navegação móvel da SOMA" className="absolute right-0 top-full z-50 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-white/15 bg-[#1A1A1A] p-2 shadow-2xl">
+                <Link href="/como-funciona" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Como funciona</Link>
+                <a href="#portal" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Portal</a>
+                <a href="#rede-soma" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Rede SOMA</a>
+                <Link href="/depoimentos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Depoimentos no LinkedIn</Link>
+                <a href="#planos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Planos</a>
+              </nav>
+            </details>
+            <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-xs sm:text-sm">
               Entrar
             </Link>
             <Link
               href="/planos"
-              className="px-3.5 sm:px-5 py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-xs sm:text-sm text-white whitespace-nowrap"
+              className="px-3 sm:px-5 py-2.5 rounded-lg font-medium transition-colors hover:opacity-90 text-xs sm:text-sm text-white whitespace-nowrap"
               style={{ backgroundColor: '#0D8071' }}
             >
               Começar
