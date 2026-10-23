@@ -436,7 +436,7 @@ export async function POST(request: NextRequest) {
       ? await recentIrisContext(user.id, conversationId)
       : !manterHistorico ? contextoTemporarioNaoSalvo(body.contexto_temporario) : '';
     const prompt = montarPromptMentoriaIris({
-      nome: texto(perfil.nome, 70).split(/\\s+/)[0],
+      nome: texto(perfil.nome, 70).split(/\s+/)[0],
       hojeSP,
       contexto: {
         ...contexto,
