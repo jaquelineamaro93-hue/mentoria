@@ -59,8 +59,15 @@ export default function DepoimentosPage() {
           </div>
         </section>
 
-        <section className="px-4 sm:px-6 py-10 sm:py-14 md:py-16">
-          <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+        <section id="depoimentos-linkedin" className="scroll-mt-24 px-4 sm:px-6 py-10 sm:py-14 md:py-16">
+          <div className="mx-auto max-w-5xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0D8071]">Relatos publicados no LinkedIn</p>
+            <h2 className="mt-2 font-display text-2xl text-black sm:text-3xl">Depoimentos com links para os posts originais</h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-text">
+              Leia as publicações de Maria Laura, Giulia e Rita diretamente no LinkedIn.
+            </p>
+          </div>
+          <div className="max-w-5xl mx-auto mt-6 grid md:grid-cols-3 gap-6">
             {depoimentos.map((item) => (
               <a
                 key={item.nome}
@@ -87,6 +94,13 @@ export default function DepoimentosPage() {
               </a>
             ))}
           </div>
+        </section>
+
+        <section className="border-t border-gray-faint bg-[#f6faf8] px-4 py-8 text-center sm:px-6">
+          <p className="text-sm text-[#526760]">Quer conhecer outras trajetórias de mentorados e profissionais da comunidade?</p>
+          <Link href="/#historias-reais" className="mt-3 inline-flex min-h-11 items-center font-semibold text-[#0D8071] underline-offset-4 hover:underline">
+            Ver as 16 histórias compartilhadas na home
+          </Link>
         </section>
 
         <section className="px-4 sm:px-6 py-12 text-center" style={{ backgroundColor: '#1A1A1A' }}>
