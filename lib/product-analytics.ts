@@ -13,6 +13,7 @@ const ROUTES: Array<{ match: (pathname: string, search: URLSearchParams) => bool
   { match: (p) => p.startsWith('/diario'), feature: { key: 'diario', label: 'Diário de Bordo', group: 'Minha jornada' } },
   { match: (p) => p.startsWith('/feedbacks'), feature: { key: 'feedbacks_mentoria', label: 'Feedbacks recebidos', group: 'Minha jornada' } },
   { match: (p) => p.startsWith('/gravacoes'), feature: { key: 'gravacoes', label: 'Gravações', group: 'Minha jornada' } },
+  { match: (p) => p.startsWith('/plano-acoes-iris'), feature: { key: 'iris_plano_acao', label: 'Plano de Ação Íris', group: 'Íris Copiloto' } },
   { match: (p) => p.startsWith('/primeiros-90-dias'), feature: { key: 'primeiros_90_dias', label: 'Primeiros 90 dias', group: 'Crescimento na empresa' } },
   { match: (p) => p.startsWith('/leitura-cenario'), feature: { key: 'leitura_cenario', label: 'Leitura de cenário', group: 'Crescimento na empresa' } },
   { match: (p) => p.startsWith('/meu-pdi') || p.startsWith('/pdi'), feature: { key: 'pdi', label: 'Plano de desenvolvimento', group: 'Crescimento na empresa' } },
