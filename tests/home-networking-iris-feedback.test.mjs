@@ -65,7 +65,7 @@ test('13 empresas de mentorados aparecem com marca, site oficial e sem confundir
   }
   assert.match(networking, /Empresas onde nossos mentorados atuam/);
   assert.match(networking, /As marcas representam apenas a atuação profissional de mentorados/);
-  assert.match(networking, /não.*parceria|parceria.*patrocínio/i);
+  assert.match(networking, /Não há indicação de parceria/);
   assert.match(networking, /rel="noopener noreferrer"/);
   assert.match(networking, /grid-cols-5/);
   assert.match(networking, /overflow-x-auto/);
