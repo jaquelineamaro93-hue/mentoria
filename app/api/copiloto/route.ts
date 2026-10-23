@@ -453,13 +453,14 @@ export async function POST(request: NextRequest) {
     const ia = await chamarClaudeJson<RespostaIA>(prompt, {
       maxTokens: 1150,
       validar: (valor): valor is RespostaIA => !!valor && typeof valor === 'object' &&
-        typeof (valor as RespostaIA).resposta === 'string' &&
-        ((valor as RespostaIA).sugestoes === undefined || (
-          Array.isArray((valor as RespostaIA).sugestoes) &&
-          (valor as RespostaIA).sugestoes!.every(item => typeof item === 'string')
-        )),
+        typeof (valor as RespostaIA).resposta === 'string',
     });
-    const sugestoes = (ia.sugestoes ?? []).slice(0, 2).map(item => texto(item, 70)).filter(Boolean);
+    // A orientação não deve ser descartada se o modelo omitir sugestões
+    // ou devolver esse campo em um formato diferente do esperado.
+    const sugestoes = Array.isArray(ia.sugestoes)
+      ? ia.sugestoes.filter((item): item is string => typeof item === 'string')
+        .slice(0, 2).map(item => texto(item, 70)).filter(Boolean)
+      : [];
     return responderComHistorico({
       resposta: texto(ia.resposta, 1550),
       sugestoes,
