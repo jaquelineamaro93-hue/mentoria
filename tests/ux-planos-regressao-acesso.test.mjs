@@ -24,9 +24,11 @@ test('precificação SaaS é apenas vitrine e mentoria mantém checkout e trial'
   assert.match(page, /SomaSaasShowcase/);
   assert.match(page, /\/checkout\?plan=/);
   assert.match(page, /trial_plan=/);
-  assert.match(saas, /R\$ 24,90/);
-  assert.match(saas, /R\$ 34,90/);
-  assert.match(saas, /R\$ 69,90/);
+  const pricing = file('lib/soma-saas-pricing.ts');
+  assert.match(pricing, /avulso: 2490/);
+  assert.match(pricing, /essencial: 3490/);
+  assert.match(pricing, /pro: 6990/);
+  assert.match(saas, /calcularPrecoSaas/);
   assert.match(saas, /Contratação disponível após validação de segurança/);
   assert.doesNotMatch(saas, /href=.*\/checkout|fetch\(.*mercadopago/);
 });
