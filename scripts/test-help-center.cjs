@@ -9,7 +9,7 @@ const temp = mkdtempSync(join(tmpdir(), 'soma-help-test-'));
 let checks = 0;
 function check(label, fn) { fn(); checks++; console.log('PASS', label); }
 try {
-  for (const file of ['lib/saas-access.ts', 'lib/help-center/types.ts', 'lib/help-center/access.ts', 'lib/help-center/validation.ts', 'lib/help-center/intent.ts']) {
+  for (const file of ['lib/saas-access.ts', 'lib/help-center/types.ts', 'lib/help-center/access.ts', 'lib/help-center/validation.ts', 'lib/help-center/intent.ts', 'lib/help-center/navigation.ts']) {
     const out = join(temp, file.replace(/\.ts$/, '.js'));
     mkdirSync(dirname(out), { recursive: true });
     const source = readFileSync(join(root, file), 'utf8').replace(/@\/lib\/saas-access/g, join(temp, 'lib/saas-access.js'));
@@ -20,6 +20,19 @@ try {
   const { parseHelpArticle, parseHelpRelease, isHelpId } = require(join(temp, 'lib/help-center/validation.js'));
   const { saasCanVisit } = require(join(temp, 'lib/saas-access.js'));
   const { helpIntent } = require(join(temp, 'lib/help-center/intent.js'));
+  const { helpHeadings, helpReadingMinutes, relatedHelpArticles } = require(join(temp, 'lib/help-center/navigation.js'));
+  check('heading anchors normalize accents and remove inline markup', () => assert.deepEqual(helpHeadings('## Como usar o **Diário**?').map(h => h.id), ['ajuda-como-usar-o-diario']));
+  check('duplicate headings get unique stable IDs', () => assert.deepEqual(helpHeadings('## Passos\n### Passos').map(h => h.id), ['ajuda-passos','ajuda-passos-2']));
+  check('fenced code headings do not create broken TOC links', () => assert.deepEqual(helpHeadings('```md\n## Exemplo\n```\n## Real').map(h => [h.title,h.line]), [['Real',4]]));
+  check('estimated reading time remains at least one minute', () => assert.equal(helpReadingMinutes('Breve tutorial'), 1));
+  const current = { id:'current', title:'PDI com a Íris', category:'Jornada' };
+  const candidates = [current,{ id:'other', title:'Outro recurso', category:'Conta' },{ id:'related', title:'Suas metas', category:'Jornada' }];
+  check('related articles prefer the same collection', () => assert.equal(relatedHelpArticles(candidates,current)[0].id, 'related'));
+  check('related articles exclude the current guide and honor limits', () => assert.deepEqual(relatedHelpArticles(candidates,current,1).map(a=>a.id), ['related']));
+  check('PDI topic is more relevant than an unrelated article in the same collection', () => assert.equal(relatedHelpArticles([
+    { id:'diary', title:'Registre seus aprendizados no Diário de Bordo', category:'Jornada' },
+    { id:'pdi', title:'Responda às perguntas do PDI com a Íris', category:'Íris' },
+  ], { id:'current', title:'Preencha e acompanhe seu PDI', category:'Jornada' })[0].id, 'pdi'));
   check('leadership job search keeps career coaching', () => assert.equal(helpIntent('Como encontrar vagas de liderança?'), null));
   check('salary negotiation keeps career coaching', () => assert.equal(helpIntent('Quero um passo a passo para negociar meu salário'), null));
   check('interview preparation keeps career coaching', () => assert.equal(helpIntent('Quero um tutorial para me preparar para uma entrevista'), null));
