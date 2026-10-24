@@ -28,6 +28,7 @@ export type ContextoPdiClassificado = {
 const SECOES_BASE = new Set([
   'swot',
   'metas_smart',
+  'metas_semanais',
   'habilidades_tecnicas',
   'competencias_comportamentais',
   'planejamento_futuro',
