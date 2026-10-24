@@ -28,7 +28,7 @@ test('precificação SaaS é apenas vitrine e mentoria mantém checkout e trial'
   assert.match(pricing, /avulso: 2490/);
   assert.match(pricing, /essencial: 3490/);
   assert.match(pricing, /pro: 6990/);
-  assert.match(saas, /calcularPrecoSaas/);
+  assert.match(saas, /calcularResumoSaas/);
   assert.match(saas, /Contratação disponível após validação de segurança/);
   assert.doesNotMatch(saas, /href=.*\/checkout|fetch\(.*mercadopago/);
 });
