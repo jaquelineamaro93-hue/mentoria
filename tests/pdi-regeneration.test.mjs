@@ -33,3 +33,22 @@ test('novas metas têm prioridade e tarefas concluídas não são recicladas', (
   assert.match(prompt, /NÃO replique essas ações como pendências/);
   assert.match(prompt, /1 e 5 pilares/);
 });
+
+test('regeneração com plano ativo não bloqueia usuários com guia parcialmente preenchido', () => {
+  const api = read('app/api/pdi/gerar-plano/route.ts');
+  const ui = read('components/pdi/PlanoGerado.tsx');
+  assert.match(api, /!planoAnterior && !permitePdiParcial && totalSecoes/);
+  assert.match(api, /planoAnterior && totalSecoes && respostasRaw.length < totalSecoes/);
+  assert.match(ui, /disabled=\{gerando \|\| respondidas === 0\}/);
+  assert.match(api, /\.eq\("concluida", true\)/);
+  assert.match(api, /\.order\("concluida_em"/);
+});
+
+test('marcação de ações só altera a UI quando o servidor confirma o salvamento', () => {
+  const ui = read('components/pdi/AcaoItem.tsx');
+  assert.match(ui, /if \(!resposta.ok\)/);
+  assert.match(ui, /setConcluida\(novoValor\)/);
+  assert.ok(ui.indexOf('setConcluida(novoValor)') > ui.indexOf('if (!resposta.ok)'));
+  assert.match(ui, /role="alert"/);
+  assert.match(ui, /disabled=\{salvando\}/);
+});
