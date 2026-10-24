@@ -13,19 +13,25 @@ export type Acao = {
 export function AcaoItem({ acao }: { acao: Acao }) {
   const [concluida, setConcluida] = useState(acao.concluida);
   const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   async function alternar() {
+    if (salvando) return;
     const novoValor = !concluida;
-    setConcluida(novoValor);
+    setErro(null);
     setSalvando(true);
     try {
-      await fetch("/api/pdi/acoes", {
+      const resposta = await fetch("/api/pdi/acoes", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ acaoId: acao.id, concluida: novoValor }),
       });
+      if (!resposta.ok) {
+        throw new Error("Não foi possível salvar a conclusão. Tente novamente.");
+      }
+      setConcluida(novoValor);
     } catch {
-      setConcluida(!novoValor); // desfaz se der erro
+      setErro("Não foi possível salvar a conclusão. Tente novamente.");
     } finally {
       setSalvando(false);
     }
@@ -43,7 +49,10 @@ export function AcaoItem({ acao }: { acao: Acao }) {
       }}
     >
       <button
+        type="button"
         onClick={alternar}
+        disabled={salvando}
+        aria-pressed={concluida}
         aria-label={concluida ? "Marcar como não feita" : "Marcar como feita"}
         style={{
           width: 22,
@@ -77,6 +86,7 @@ export function AcaoItem({ acao }: { acao: Acao }) {
             Prazo: {new Date(acao.prazo).toLocaleDateString("pt-BR")}
           </p>
         )}
+        {erro && <p role="alert" style={{ fontSize: 12, color: "#b42318", margin: "6px 0 0" }}>{erro}</p>}
       </div>
     </li>
   );
