@@ -23,7 +23,7 @@ test('Uma vez aceito, o texto longo de privacidade não ocupa mais espaço', () 
   assert.match(ui, /!historicoAceito && \(/);
 });
 
-test('Ao abrir/recarregar, começa uma conversa limpa sem apagar a lista de mensagens antigas', () => {
+test('Recarregar começa nova sessão; minimizar preserva a conversa sem excluir o histórico', () => {
   assert.match(ui, /fetch\('\/api\/copiloto\/historico\?list_only=1'/);
   assert.match(ui, /setConversas\(d\.conversas \?\? \[\]\)/);
   assert.match(ui, /setConversationId\(null\)/);
@@ -32,15 +32,16 @@ test('Ao abrir/recarregar, começa uma conversa limpa sem apagar a lista de mens
   assert.match(ui, /function fecharConversa\(\) \{/);
   assert.match(ui, /limparConversaVisivel\(\)/);
   assert.match(ui, /function novaConversa\(\)/);
-  assert.match(ui, /setMostrarHistorico\(false\)/);
-  assert.match(ui, /aria-label="Ver histórico da Íris"/);
+  assert.match(ui, /setAba\('conversa'\)/);
+  assert.match(ui, /label: 'Histórico', Icon: History/);
   assert.match(ui, /onClick=\{\(\) => void abrirConversa\(c\.id\)\}/);
   assert.match(history, /const listOnly = request\.nextUrl\.searchParams\.get\('list_only'\) === '1'/);
   assert.match(history, /const selected = conversationId \|\| \(listOnly \? null : threads\?\.\[0\]\?\.id\)/);
   assert.match(history, /if \(!selected\) return json\(\{ conversas: threads \?\? \[\], mensagens: \[\], conversation_id: null, nome, \.\.\.privacidade \}\)/);
   // Fechar a UI não faz DELETE; a exclusão só existe em gesto separado.
   const close = ui.slice(ui.indexOf('function fecharConversa()'), ui.indexOf('async function atualizarPrivacidade'));
-  assert.doesNotMatch(close, /DELETE|excluirConversa|\/api\/copiloto\/historico/);
+  assert.doesNotMatch(close, /DELETE|excluirConversa|limparConversaVisivel|setTexto|setMensagens|\/api\/copiloto\/historico/);
+  assert.match(close, /setAberto\(false\)/);
 });
 
 test('A resposta tardia de uma sessão fechada não reabre o chat anterior', () => {

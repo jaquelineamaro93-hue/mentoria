@@ -60,6 +60,8 @@ jobs:
         run: node --experimental-strip-types --test tests/iris-pesquisa-publica.test.mjs
       - name: Install
         run: npm ci
+      - name: Verify widget state and administrative destinations
+        run: node tests/iris-widget-navigation.cjs
       - name: Build
         run: npm run build
         env:

@@ -1,7 +1,8 @@
 # Íris e navegação administrativa
 
-Base: af9bbc9b365d5436b72e50c304c740033caf8dce.
-Backup remoto: backup/pre-iris-admin-clean-20261024-af9bbc9.
+Base atualizada: b62af83f4ad5d273af2cb571d934a51d4980d1f4.
+Backup remoto antes do merge: backup/pre-iris-admin-clean-20261024-b62af83.
+Backup inicial: backup/pre-iris-admin-clean-20261024-af9bbc9.
 
 ## Comportamento
 
