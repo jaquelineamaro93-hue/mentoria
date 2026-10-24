@@ -161,3 +161,45 @@ export async function buscarPagamentoAssinaturaMercadoPago(id: string) {
   if (!response.ok) throw new Error(`Erro ao buscar cobrança: ${response.status}`);
   return response.json();
 }
+
+/** Assinatura SaaS mensal, distinta do parcelamento fixo da mentoria.
+ * Não habilita acesso na criação; somente confirmação verificada do webhook.
+ */
+export async function criarAssinaturaSaasMercadoPago(input: {
+  email: string;
+  valorMensal: number;
+  titulo: string;
+  externalReference: string;
+}): Promise<{ init_point: string; id: string }> {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) throw new Error('Mercado Pago indisponível.');
+  const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://somamentoria.com';
+  const response = await fetch(`${MP_API}/preapproval`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      reason: input.titulo,
+      external_reference: input.externalReference,
+      payer_email: input.email,
+      back_url: `${appUrl}/minha-assinatura-saas`,
+      auto_recurring: {
+        frequency: 1, frequency_type: 'months',
+        transaction_amount: input.valorMensal, currency_id: 'BRL',
+      },
+      status: 'pending',
+    }),
+    cache: 'no-store',
+  });
+  if (!response.ok) throw new Error('Falha ao criar assinatura SaaS no Mercado Pago.');
+  const data = await response.json();
+  if (typeof data.id !== 'string' || typeof data.init_point !== 'string')
+    throw new Error('Resposta incompleta do Mercado Pago.');
+  const url = new URL(data.init_point);
+  const host = url.hostname.toLowerCase();
+  if (url.protocol !== 'https:' ||
+    !(host === 'mercadopago.com' || host.endsWith('.mercadopago.com') ||
+      host === 'mercadopago.com.br' || host.endsWith('.mercadopago.com.br'))) {
+    throw new Error('Endereço de pagamento não reconhecido.');
+  }
+  return { id: data.id, init_point: url.href };
+}
