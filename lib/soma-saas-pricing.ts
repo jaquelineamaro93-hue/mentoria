@@ -15,6 +15,33 @@ export type AdicionaisSaas = { iris: boolean; whatsapp: boolean };
 export const ADICIONAL_IA_CENTAVOS = 15000;
 export const DOIS_AGENTES_CENTAVOS = 25000;
 export const ADICIONAL_MENTORIA_EXISTENTE_CENTAVOS = 5000;
+/** Compra única opcional, não recorrente. Não deve ser duplicada em contratos
+ * humanos nos quais o kit já consta expressamente como item incluso.
+ */
+export const KIT_ONBOARDING_CENTAVOS = 18990;
+
+export type ModalidadeMentoria = 'nenhuma' | 'grupo' | 'online-1-1' | 'presencial' | 'carreira-completa';
+
+export const MODALIDADES_MENTORIA = {
+  grupo: { nome: 'Mentoria em grupo', descricao: 'Trocas e encontros coletivos, com acompanhamento humano.' },
+  'online-1-1': { nome: 'Mentoria individual online', descricao: 'Acompanhamento individual de carreira por videochamada.' },
+  presencial: { nome: 'Mentoria presencial', descricao: 'Encontros presenciais sujeitos a local e agenda.' },
+  'carreira-completa': { nome: 'SOMA Carreira completa', descricao: 'Jornada completa com encontros individuais, coletivos e ferramentas conforme o plano.' },
+} as const;
+
+export function calcularResumoSaas(
+  plano: PlanoSaas,
+  agentes: AdicionaisSaas,
+  kitOnboarding: boolean
+) {
+  const mensal = calcularPrecoSaas(plano, agentes);
+  return {
+    ...mensal,
+    kitAvulso: kitOnboarding ? KIT_ONBOARDING_CENTAVOS : 0,
+    estimativaPrimeiroMes: mensal.total + (kitOnboarding ? KIT_ONBOARDING_CENTAVOS : 0),
+  };
+}
+
 
 export function calcularPrecoSaas(plano: PlanoSaas, adicionais: AdicionaisSaas) {
   const base = BASE_SAAS_CENTAVOS[plano];
