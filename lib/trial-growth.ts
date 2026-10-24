@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { enviarEmail } from '@/lib/sendgrid';
 
@@ -17,7 +18,7 @@ function safe(text: string) {
   })[c] || c);
 }
 type Stage = 'd3' | 'd1' | 'd0' | 'p2';
-function buildEmail(firstName: string, stage: Stage, end: string, onboarding: boolean) {
+function buildEmail(firstName: string, stage: Stage, end: string, onboarding: boolean, optOutUrl: string) {
   const first = safe(firstName);
   const date = new Intl.DateTimeFormat('pt-BR', {
     timeZone: TZ, day: '2-digit', month: 'long',
@@ -44,7 +45,7 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
     ${stage === 'p2' ? '' : `<p>Seu acesso gratuito termina em ${date}.</p>`}
     <p>Se precisar de ajuda para começar, responda a este e-mail.</p>
     <p>Um abraço,<br>Jaqueline Amaro<br>Fundadora da SOMA Mentoria</p>
-    <p style="font-size:12px;color:#68746a">Você recebeu este e-mail porque iniciou um teste na SOMA. Para deixar de receber mensagens comerciais, responda com “descadastrar”.</p>
+    <p style="font-size:12px;color:#68746a">Você recebeu este e-mail porque iniciou um teste na SOMA. <a href="${optOutUrl}">Cancelar comunicações comerciais</a>.</p>
   </div>`;
   return { subject: subjects[stage], html };
 }
@@ -52,6 +53,10 @@ export async function executarTrialGrowth() {
   const summary = { sent: 0, eligible: 0, skipped: 0, errors: [] as string[] };
   if (!process.env.SENDGRID_API_KEY || !process.env.SENDGRID_FROM_EMAIL) {
     summary.errors.push('SendGrid não configurado.');
+    return summary;
+  }
+  if (process.env.TRIAL_GROWTH_ENABLED !== 'true' || !process.env.CRON_SECRET) {
+    summary.errors.push('Campanha desativada até homologação.');
     return summary;
   }
   const db = createAdminClient();
@@ -72,6 +77,13 @@ export async function executarTrialGrowth() {
     const stage: Stage | null = days === 3 ? 'd3' : days === 1 ? 'd1'
       : days === 0 ? 'd0' : days === -2 ? 'p2' : null;
     if (!stage) { summary.skipped++; continue; }
+    // A campanha não deve incluir clientes com qualquer módulo SaaS pago.
+    const { data: paidModules, error: moduleError } = await db.from('soma_module_subscriptions')
+      .select('id').eq('user_id', profile.id).in('status', ['active','ativo','authorized','paid']).limit(1);
+    if (moduleError || paidModules?.length) { summary.skipped++; continue; }
+    const { data: optOut, error: optError } = await db.from('trial_growth_opt_out')
+      .select('user_id').eq('user_id',profile.id).maybeSingle();
+    if (optError || optOut) { summary.skipped++; continue; }
     summary.eligible++;
     const type = 'trial_growth_' + stage;
     const { data: logged, error: logCheckError } = await db.from('emails_enviados')
@@ -87,9 +99,21 @@ export async function executarTrialGrowth() {
       summary.skipped++; continue;
     }
     const firstName = (profile.nome || 'Olá').trim().split(/\s+/)[0];
-    const msg = buildEmail(firstName, stage, profile.trial_ends_at, !profile.onboarding_concluido);
+    // Reserva atômica: unique(user_id,stage) impede concorrência.
+    const { error: reservationError } = await db.from('trial_growth_dispatches')
+      .insert({user_id:profile.id,stage,status:'reserved'});
+    if (reservationError) { summary.skipped++; continue; }
+    const signature = createHmac('sha256', process.env.CRON_SECRET).update(profile.id).digest('hex');
+    const optOutUrl = 'https://somamentoria.com/api/trial-growth/unsubscribe?u=' +
+      encodeURIComponent(profile.id) + '&sig=' + signature;
+    const msg = buildEmail(firstName, stage, profile.trial_ends_at, !profile.onboarding_concluido, optOutUrl);
     const accepted = await enviarEmail({ to: email, subject: msg.subject, html: msg.html });
-    if (!accepted) { summary.errors.push('SendGrid rejeitou um envio.'); continue; }
+    if (!accepted) {
+      await db.from('trial_growth_dispatches').delete().eq('user_id',profile.id).eq('stage',stage).eq('status','reserved');
+      summary.errors.push('SendGrid rejeitou um envio.'); continue;
+    }
+    await db.from('trial_growth_dispatches').update({status:'sent',sent_at:new Date().toISOString()})
+      .eq('user_id',profile.id).eq('stage',stage);
     const { error: writeError } = await db.from('emails_enviados')
       .insert({ user_id: profile.id, tipo: type });
     if (writeError) summary.errors.push('Email enviado, mas falha ao registrar deduplicação.');
