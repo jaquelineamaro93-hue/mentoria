@@ -5,6 +5,6 @@ export function helpIntent(message: string): 'news' | 'tutorial' | null {
     /^(?:o que (?:ha|tem) de novo(?: na soma)?|novidades(?: da soma)?|ultimas atualizacoes(?: da soma)?)[?!\.]*$/.test(value);
   if (news) return 'news';
   const asksHow = /(?:tutorial|passo a passo|como (?:usar|utilizar|funciona|acessar|encontrar)|onde (?:fica|encontro|acesso))/.test(value);
-  const productContext = /\b(?:soma|plataforma|portal|central de ajuda|esta ferramenta|essa ferramenta|este recurso|esse recurso|pdi|perguntas[- ]guia|diario de bordo|passaporte soma|mapa quem sou eu|iris)\b/.test(value);
+  const productContext = /\b(?:soma|central de ajuda|esta ferramenta|essa ferramenta|este recurso|esse recurso|pdi|perguntas[- ]guia|diario de bordo|passaporte soma|mapa quem sou eu|iris)\b/.test(value);
   return asksHow && productContext ? 'tutorial' : null;
 }
