@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -126,6 +127,8 @@ function autenticarAcao(userId: string, planoId: string, proposta: Proposta, tok
 }
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('iris');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) {
     return json({ erro: 'Origem não permitida.' }, 403);
@@ -161,11 +164,13 @@ export async function POST(request: NextRequest) {
   if (pausaResp.data && !(saasAccess?.saas && saasAccess.iris)) {
     return json({ erro: 'Sua mentoria está pausada. Consulte Meu Plano.', href: '/meu-plano' }, 403);
   }
+  const {data:careerContract,error:careerError}=await db.rpc('soma_has_career_contract');
+  if(careerError)return json({erro:'Não foi possível validar seu contrato.'},503);
   const { data: aceiteVigente, error: erroAceite } = await db.from('termos_aceites')
     .select('id').eq('user_id', user.id).eq('termo_id', termoResp.data.id)
     .limit(1).maybeSingle();
   if (erroAceite) return json({ erro: 'Não foi possível validar seu aceite.' }, 503);
-  if (!aceiteVigente && !(saasAccess?.saas && saasAccess.iris)) {
+  if (!aceiteVigente && !careerContract && !(saasAccess?.saas && saasAccess.iris)) {
     return json({ erro: 'Aceite os termos vigentes antes de usar o Copiloto.', href: '/termos' }, 403);
   }
 
@@ -353,7 +358,7 @@ export async function POST(request: NextRequest) {
     podePdi ? db.from('pdi_acoes').select('titulo,concluida').eq('mentorado_id', user.id).limit(100) : Promise.resolve({ data: [], error: null }),
     podeCurriculo && intencao === 'vaga' ? db.from('cv_simulacoes').select('curriculo_texto').eq('user_id', user.id)
       .order('created_at', { ascending: false }).limit(1).maybeSingle() : Promise.resolve({ data: null, error: null }),
-    db.from('entrevistas_iniciais').select('objetivo_principal,momento_profissional,maior_desafio,prioridade_90_dias,comunicacao_preferida').eq('user_id', user.id).maybeSingle(),
+    saasAccess?.mentorship || !saasAccess?.saas ? db.from('entrevistas_iniciais').select('objetivo_principal,momento_profissional,maior_desafio,prioridade_90_dias,comunicacao_preferida').eq('user_id', user.id).maybeSingle() : Promise.resolve({ data: null, error: null }),
   ]);
   if (respostas.error || bussola.error || planoResponse.error ||
       acoesResponse.error || cvResponse.error || entrevistaResponse.error) {
@@ -450,7 +455,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const curriculo = texto(cvResponse.data?.curriculo_texto || perfil.raw_resume, 7000);
+  const curriculo = podeCurriculo ? texto(cvResponse.data?.curriculo_texto || perfil.raw_resume, 7000) : '';
   // Uma análise de compatibilidade exige CV, mas uma orientação sobre como
   // encontrar vagas, currículo ou networking pode começar sem ele.
   const pedeComparacaoComCV = /(?:compar[ae]|analisa?r?|avalie|ader[êe]ncia|compatibilidade|fit)[\s\S]{0,80}(?:curr[íi]culo|cv|vaga)|(?:curr[íi]culo|cv)[\s\S]{0,80}(?:compatibilidade|ader[êe]ncia|compar[ae])/i.test(pedido);

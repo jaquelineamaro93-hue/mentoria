@@ -40,8 +40,8 @@ test('subscription charge topic resolves payment before processing',async()=>{
  assert.equal(r.status,200);assert.equal(called,'789');
 });
 test('legacy preference rejects arbitrary client items',async()=>{
- const mocks={'next/server':next,'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user:{id:'user',email:'user@example.com'}}})}})},'@/lib/security/rate-limit':{consumeSecurityRateLimit:async()=>true},'@/lib/mercadopago-orders':{},'@/lib/mercadopago':{}};
+ const mocks={'@/lib/product-contracts':{PRODUCT_CONTRACTS:{carreira:{version:'carreira-2026-10-24'}}},'next/server':next,'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user:{id:'user',email:'user@example.com'}}})}})},'@/lib/security/rate-limit':{consumeSecurityRateLimit:async()=>true},'@/lib/mercadopago-orders':{},'@/lib/mercadopago':{}};
  const checkout=load('app/api/mercadopago/criar-assinatura/route.ts',mocks);
- const r=await checkout.POST(new Request('https://test.invalid',{method:'POST',body:JSON.stringify({items:[{unit_price:.01}],external_reference:'victim'})}));
+ const r=await checkout.POST(new Request('https://test.invalid',{method:'POST',body:JSON.stringify({contractAccepted:true,contractVersion:'carreira-2026-10-24',items:[{unit_price:.01}],external_reference:'victim'})}));
  assert.equal(r.status,400);
 });

@@ -1,4 +1,6 @@
 'use client';
+import PurchaseContractConsent from '@/components/PurchaseContractConsent';
+import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
 
 import { useState } from 'react';
 import {
@@ -39,6 +41,7 @@ export default function SimuladorCVClient({
   const [curriculo, setCurriculo] = useState('');
   const [vaga, setVaga] = useState('');
   const [gerando, setGerando] = useState(false);
+  const [contractAccepted,setContractAccepted]=useState(false);
   const [comprando, setComprando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [limiteAtingido, setLimiteAtingido] = useState(false);
@@ -95,7 +98,7 @@ export default function SimuladorCVClient({
     setComprando(true);
     setErro(null);
     try {
-      const res = await fetch('/api/mercadopago/comprar-simulacao-cv', { method: 'POST' });
+      const res = await fetch('/api/mercadopago/comprar-simulacao-cv', { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contractAccepted,contractVersion:PRODUCT_CONTRACTS.adicionais.version}) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       posthog.capture('compra_simulacao_cv_iniciada');
@@ -155,13 +158,14 @@ export default function SimuladorCVClient({
             </span>
           )}
           {!acessoAdminTeste && restantesGratis === 0 && creditos === 0 && (
+            <><PurchaseContractConsent accepted={contractAccepted} onChange={setContractAccepted}/>
             <button
               onClick={comprarSimulacaoExtra}
-              disabled={comprando}
+              disabled={comprando||!contractAccepted}
               className="text-xs px-3 py-1.5 rounded-full bg-brown text-white hover:bg-mint-deep transition-colors disabled:opacity-60"
             >
               {comprando ? 'Abrindo...' : 'Comprar crédito extra (R$ 5)'}
-            </button>
+            </button></>
           )}
           
         </div>
@@ -233,9 +237,10 @@ export default function SimuladorCVClient({
               <p className="text-black mb-1">Limite gratuito deste mês atingido</p>
               <p className="text-sm text-gray-text">{erro}</p>
             </div>
+            <PurchaseContractConsent accepted={contractAccepted} onChange={setContractAccepted}/>
             <button
               onClick={comprarSimulacaoExtra}
-              disabled={comprando}
+              disabled={comprando||!contractAccepted}
               className="shrink-0 flex items-center gap-2 bg-mint-deep hover:opacity-90 disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
             >
               {comprando ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}

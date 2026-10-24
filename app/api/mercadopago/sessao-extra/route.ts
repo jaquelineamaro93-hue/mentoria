@@ -1,3 +1,5 @@
+import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { criarPagamentoUnicoMercadoPago } from '@/lib/mercadopago';
@@ -5,6 +7,8 @@ import { registrarPedido, vincularCobranca } from '@/lib/mercadopago-orders';
 import { consumeSecurityRateLimit } from '@/lib/security/rate-limit';
 
 export async function POST(request: Request) {
+  const productAuthorization = await requireProductAccess('mentorship');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.email) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
@@ -24,9 +28,11 @@ export async function POST(request: Request) {
     );
   }
 
+  const body=await request.json().catch(()=>null);
+  if(body?.contractAccepted!==true||body?.contractVersion!==PRODUCT_CONTRACTS.adicionais.version) return NextResponse.json({error:'Leia e aceite as condições desta compra.'},{status:400});
   try {
     const pedido = await registrarPedido({ user_id: user.id, email: user.email,
-      tipo: 'sessao_extra', valor: 200, forma_pagamento: 'avista' });
+      tipo: 'sessao_extra', valor: 200, forma_pagamento: 'avista', terms_version: PRODUCT_CONTRACTS.adicionais.version, terms_accepted_at:new Date().toISOString(), contract_snapshot:{quantidade:1} });
     const pagamento = await criarPagamentoUnicoMercadoPago({
       titulo: 'Sessão Individual Extra — SOMA', valor: 200, externalReference: pedido.id,
     });

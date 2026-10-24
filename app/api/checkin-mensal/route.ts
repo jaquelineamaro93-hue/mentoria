@@ -1,7 +1,10 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
+  const productAuthorization = await requireProductAccess('mentorship');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const supabase = await createClient();
   const {
     data: { user },

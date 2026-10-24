@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
@@ -10,6 +11,8 @@ const json = (dados: object, status = 200) =>
   NextResponse.json(dados, { status, headers: { 'Cache-Control': 'no-store' } });
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('curriculo-ats');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) return json({ error: 'Origem inválida.' }, 403);
 

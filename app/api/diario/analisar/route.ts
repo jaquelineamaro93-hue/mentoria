@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import Anthropic from '@anthropic-ai/sdk';
@@ -6,6 +7,8 @@ import { createClient } from '@/lib/supabase/server';
 export const maxDuration = 120;
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('mentorship');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const supabase = await createClient();
     const {

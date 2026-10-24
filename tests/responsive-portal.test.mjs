@@ -30,8 +30,8 @@ test('Íris adapta painel para celular e notebook, sem ocultar compositor', () =
   assert.match(ui, /matchMedia\('\(max-width: 639px\)'\)/);
   assert.match(ui, /window\.visualViewport/);
   assert.match(ui, /viewport\.addEventListener\('resize'/);
-  assert.match(ui, /role=\{mobile \? 'dialog' : 'region'\}/);
-  assert.match(ui, /aria-modal=\{mobile \? true : undefined\}/);
+  assert.match(ui, /role=\{mobile \|\| expandido \? 'dialog' : 'region'\}/);
+  assert.match(ui, /aria-modal=\{mobile \|\| expandido \? true : undefined\}/);
   assert.match(ui, /env\(safe-area-inset-bottom\)/);
   assert.match(ui, /text-base text-\[#312b27\]/);
   assert.match(ui, /min-h-0 flex-1/);

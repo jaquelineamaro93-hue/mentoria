@@ -30,7 +30,7 @@ export default function SaasRecoveryDialog({ source, offer, serverOffset, busy, 
     <p className="text-sm">O desconto vale só para o software. Os agentes escolhidos mantêm seu preço. Não há novo período grátis.</p>
     <p role="timer">{offer.accepted_at ? 'Oferta confirmada. Continue no Mercado Pago.' : remaining>0 ? `Confirme em ${Math.floor(remaining/60).toString().padStart(2,'0')}:${(remaining%60).toString().padStart(2,'0')}` : 'O prazo desta oferta terminou.'}</p>
     <p className="text-xs">Oferta única por conta. O prazo para confirmar não reinicia ao fechar ou atualizar esta página. Após confirmar dentro do prazo, conclua a autorização no Mercado Pago.</p>
-    <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} className="mt-1"/><span>Aceito a primeira mensalidade de {formatarReais(price.primeira)}, as seguintes de {formatarReais(price.recorrente)} e os <Link href="/termos" className="underline">termos de uso</Link>.</span></label>
+    <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} className="mt-1"/><span>Aceito a primeira mensalidade de {formatarReais(price.primeira)}, as seguintes de {formatarReais(price.recorrente)} e os <Link href="/contratos?produto=plataforma&oferta=recuperacao" className="underline">termos de uso</Link>.</span></label>
     <button disabled={busy||!accepted||(!offer.accepted_at&&remaining===0)} onClick={onAccept} className="w-full rounded-xl bg-emerald-200 p-3 font-semibold text-black disabled:opacity-50">{busy?'Aguarde…':'Confirmar e continuar no Mercado Pago'}</button>
    </>}
    {error&&<p role="alert" className="text-red-800">{error}</p>}

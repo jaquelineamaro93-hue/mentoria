@@ -15,6 +15,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Faça login para iniciar seu teste.' }, { status: 401 });
   }
 
+  const { data: productState, error: productError } = await supabase.rpc('soma_saas_state');
+  if (productError || !productState) return NextResponse.json({ error: 'Não foi possível validar seu acesso.' }, { status: 503 });
+  if (productState.saas) return NextResponse.json({ error: 'Gerencie seu teste da plataforma na SOMA Plataforma.' }, { status: 403 });
+
   const body = (await request.json().catch(() => null)) as
     | { planId?: string; source?: string }
     | null;

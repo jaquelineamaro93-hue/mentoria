@@ -15,7 +15,8 @@ export async function iniciarTrialParaUsuario(
   planId: string,
   source = 'portal'
 ) {
-  const [{ data: profile }, { data: plan }, { data: experiment }] = await Promise.all([
+  const [{ data: saasAccount, error: saasError }, { data: profile }, { data: plan }, { data: experiment }] = await Promise.all([
+    admin.from('soma_saas_accounts').select('user_id').eq('user_id',userId).maybeSingle(),
     admin
       .from('profiles')
       .select(
@@ -34,6 +35,9 @@ export async function iniciarTrialParaUsuario(
       .eq('key', TRIAL_EXPERIMENT_KEY)
       .maybeSingle(),
   ]);
+
+  if(saasError)return {ok:false as const,status:503,error:'Não foi possível validar o produto desta conta.'};
+  if(saasAccount)return {ok:false as const,status:409,error:'Gerencie seu teste na SOMA Plataforma.'};
 
   if (!profile) {
     return { ok: false as const, status: 404, error: 'Perfil não encontrado.' };

@@ -1,4 +1,6 @@
 'use client';
+import PurchaseContractConsent from '@/components/PurchaseContractConsent';
+import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -22,6 +24,7 @@ export default function SessaoExtraClient({
     router.refresh();
   }
 
+  const [contractAccepted,setContractAccepted]=useState(false);
   async function comprarSessaoExtra() {
     setProcessando(true);
 
@@ -30,7 +33,7 @@ export default function SessaoExtraClient({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          preco: 200,
+          preco: 200, contractAccepted, contractVersion: PRODUCT_CONTRACTS.adicionais.version,
           tipo: 'sessao-extra',
         }),
       });
@@ -82,9 +85,10 @@ export default function SessaoExtraClient({
             </div>
           </div>
 
+          <PurchaseContractConsent accepted={contractAccepted} onChange={setContractAccepted}/>
           <button
             onClick={comprarSessaoExtra}
-            disabled={processando}
+            disabled={processando||!contractAccepted}
             className="w-full bg-brown-deep text-white font-medium py-3 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
           >
             {processando ? 'Processando...' : 'Pagar R$ 200,00'}

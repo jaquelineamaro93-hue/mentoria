@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -6,6 +7,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const productAuthorization = await requireProductAccess('vagas');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -38,6 +41,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const productAuthorization = await requireProductAccess('vagas');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -86,6 +91,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const productAuthorization = await requireProductAccess('vagas');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const { id } = await params;
     const supabase = await createClient();

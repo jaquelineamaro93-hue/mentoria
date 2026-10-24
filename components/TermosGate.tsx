@@ -63,6 +63,8 @@ export default function TermosGate() {
         .limit(1).maybeSingle();
       if(cancelado || erroPausa || pausa)return;
 
+      const {data:careerContract,error:careerError}=await supabase.rpc('soma_has_career_contract');
+      if(cancelado||careerError||careerContract)return;
       const {data:ultimoTermo,error:erroTermo}=await supabase.from('termos_versoes')
         .select('*').eq('ativo',true)
         .order('publicado_em',{ascending:false}).limit(1)

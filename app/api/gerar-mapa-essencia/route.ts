@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
@@ -9,6 +10,8 @@ import {
 } from '@/lib/mapa-interpretativo';
 
 export async function POST(request: Request) {
+  const productAuthorization = await requireProductAccess('autoconhecimento');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const supabase = await createClient();
   const {
     data: { user },
