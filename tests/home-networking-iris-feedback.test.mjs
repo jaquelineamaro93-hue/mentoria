@@ -50,16 +50,16 @@ test('Feedback exige usuário autenticado, evita dados de outros mentorados e n�
 });
 
 
-test('13 empresas de mentorados aparecem com marca, site oficial e sem confundir patrocínio', () => {
+test('17 empresas de mentorados aparecem com marca, site oficial e sem confundir patrocínio', () => {
   const home = read('app/(public)/page.tsx');
   const networking = read('components/public/SomaNetworking.tsx');
   const empresas = [
     'Porte', 'Credsystem', 'Lojas Torra', 'Whirlpool', 'O Boticário',
     'Monks', 'Cielo', 'Samsung', 'LWSA', 'Embraer',
-    'Gupy', 'PicPay', 'Loft',
+    'Gupy', 'PicPay', 'Loft', 'Capgemini', 'Mercado Livre', 'RD Saúde', 'Itaú',
   ];
   const bloco = networking.split('const EMPRESAS_MENTORADOS:')[1]?.split('const AREAS_REDE')[0] ?? '';
-  assert.equal((bloco.match(/nome: '/g) ?? []).length, 13, 'Devem existir 13 logos de mentorados');
+  assert.equal((bloco.match(/nome: '/g) ?? []).length, 17, 'Devem existir 17 logos de mentorados');
   for (const nome of empresas) {
     assert.ok(bloco.includes(`nome: '${nome}'`), 'Marca ausente: ' + nome);
   }
@@ -87,4 +87,25 @@ test('Cielo usa imagem local baseada no logo fornecido, sem depender do favicon 
   assert.match(localLogo, /data:image\/webp;base64,/);
   assert.ok(localLogo.length > 1000, 'Imagem da Cielo incompleta');
   assert.match(source, /id="rede-soma"/);
+});
+
+
+test('Whirlpool, Samsung e marcas adicionadas usam logotipos completos em vez de favicons', () => {
+  const source = read('components/public/SomaNetworking.tsx');
+  const entries = [
+    ['Whirlpool', 'Whirlpool_Corporation_Logo.png'],
+    ['Samsung', 'Samsung_wordmark.svg'],
+    ['Capgemini', 'Capgemini_201x_logo.svg'],
+    ['Mercado Livre', 'Mercado_Livre_wordmark_'],
+    ['RD Saúde', 'Logo_RD_Saude.png'],
+    ['Itaú', 'ITAU_LOGO.svg'],
+  ];
+  for (const [brand, image] of entries) {
+    const line = source.split('\n').find(item => item.includes(`nome: '${brand}'`));
+    assert.ok(line?.includes('logoUrl:'), `${brand} precisa de logo completa`);
+    assert.ok(line?.includes(image), `${brand} precisa da imagem correta`);
+  }
+  assert.match(source, /empresa\.logoUrl \?\?/);
+  assert.match(source, /EMPRESAS_MENTORADOS\.length} empresas onde atuam mentorados/);
+  assert.match(source, /object-contain/);
 });
