@@ -41,7 +41,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
         </p>
       </div>
 
-      <div className="grid gap-3" aria-label="Escolha um plano de base">
+      <div className="grid gap-3 xl:grid-cols-2" aria-label="Escolha um plano de base">
         {TIPOS.map(codigo => {
           const oferta = CATALOGO_SAAS[codigo];
           const Icone = ICONES[codigo];
@@ -49,7 +49,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
           return (
             <button
               key={codigo} type="button" aria-pressed={marcado} onClick={() => setPlano(codigo)}
-              className={'flex min-w-0 flex-col rounded-2xl border-2 bg-white p-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] sm:p-5 ' +
+              className={'flex min-w-0 flex-col rounded-2xl border-2 bg-white p-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] sm:p-4 ' +
                 (marcado ? 'border-[#0D8071] bg-[#f5fbf8]' : 'border-[#e2e9e5] hover:border-[#91c8b7]')}
             >
               <span className="mb-2 inline-flex items-center gap-3">

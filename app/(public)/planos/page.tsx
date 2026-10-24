@@ -69,13 +69,13 @@ export default async function PlanosPage() {
 
         <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
         <section id="soma-carreira" aria-labelledby="soma-carreira-heading" className="min-w-0 rounded-3xl border border-[#dce8df] bg-[#fcfdfb] p-5 sm:p-7">
-          <header className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-mint-deep">Mentoria · acompanhamento humano</p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#183F37]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#4a645c]">Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês.</p></header>
-        <div className="grid gap-4">
+          <header className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-mint-deep">Mentoria · acompanhamento humano</p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#183F37]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#4a645c]">Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês.</p></header>
+        <div className="grid gap-4 xl:grid-cols-2">
           {(planos || []).map((plano: PlanoMentoria) => (
-            <div key={plano.id} className="bg-white border-2 border-[#e2e9e5] hover:border-[#91c8b7] transition-colors rounded-2xl p-5 sm:p-6 flex flex-col">
-              <div className="mb-6">
+            <div key={plano.id} className="bg-white border-2 border-[#e2e9e5] hover:border-[#91c8b7] transition-colors rounded-2xl p-4 sm:p-5 flex flex-col">
+              <div className="mb-4">
                 <p className="text-xs font-medium text-[#0D8071] mb-2">{plano.duracao_meses} MESES</p>
-                <h2 className="text-2xl font-display text-[#183F37] mb-1">{plano.nome}</h2>
+                <h2 className="text-xl font-display text-[#183F37] mb-1">{plano.nome}</h2>
                 <p className="text-sm mb-4">
                   {plano.codigo.includes('online') ? (
                     <span className="text-[#0D8071] font-medium">100% Online</span>
@@ -97,15 +97,15 @@ export default async function PlanosPage() {
 
               <div className="border-t border-gray-faint pt-6 mb-6">
                 <div className="space-y-2 mb-4">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm">
+                  <div className="flex flex-col gap-1 2xl:flex-row 2xl:justify-between text-sm">
                     <span className="text-gray-text">PIX</span>
                     <span className="font-bold text-black">R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm">
+                  <div className="flex flex-col gap-1 2xl:flex-row 2xl:justify-between text-sm">
                     <span className="text-gray-text">Cartão (1x)</span>
                     <span className="font-bold text-black">R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm">
+                  <div className="flex flex-col gap-1 2xl:flex-row 2xl:justify-between text-sm">
                     <span className="text-gray-text">Recorrente</span>
                     <span className="font-bold text-black">{plano.parcelas_recorrente}x R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
