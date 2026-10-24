@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { ArrowUpRight, CheckCircle2, Layers3, MessageCircle, Sparkles, Workflow, UsersRound, UserRound, MapPin, PackageCheck } from 'lucide-react';
 import {
-  BASE_SAAS_CENTAVOS, CATALOGO_SAAS, calcularPrecoSaas,
+  BASE_SAAS_CENTAVOS, CATALOGO_SAAS,
   formatarReais, ADICIONAL_IA_CENTAVOS, DOIS_AGENTES_CENTAVOS,
   calcularResumoSaas, KIT_ONBOARDING_CENTAVOS, MODALIDADES_MENTORIA,
   type ModalidadeMentoria, type PlanoSaas,
