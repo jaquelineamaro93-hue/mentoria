@@ -45,7 +45,8 @@ export function detectarPesquisaIris(pedido: string, contexto = ''): TipoPesquis
   const consultoria = /\b(consultori\w*|agenci\w*|parceir\w* de crm|empresas? especializad\w*)\b/.test(p);
   const vaga = /\b(vagas?|empregos?|oportunidades|posicoes|processos seletivos)\b/.test(p);
   const busca = /\b(bus(c|q)\w*|procur\w*|encontr\w*|pesquis\w*|list\w*|mostre|traga|indique|quais|onde|tem|existem|abert\w*|quero|preciso|mais|outras)\b/.test(p);
-  if (consultoria && (/\b(crm|salesforce|hubspot|rd station|relacionamento|consultori|agenci)\b/.test(p))) return 'consultorias';
+  // Consultoria de carreira ou ERP sem CRM não é pesquisa de fornecedores CRM.
+  if (consultoria && /\b(crm|salesforce|hubspot|rd station|relacionamento|lifecycle|retencao|revops)\b/.test(p)) return 'consultorias';
   // Pedidos para escrever currículos, analisar compatibilidade ou orientar não são busca externa.
   if (/\b(curricul\w*|\bcv\b|reescrev\w*|analis\w*|compar\w*|compatibilidade|aderencia)\b/.test(p) &&
     !/\b(?:busque|buscar|encontre|encontrar|pesquise|pesquisar|procure|procurar|traga|liste|mostre)\b/.test(p)) return null;
