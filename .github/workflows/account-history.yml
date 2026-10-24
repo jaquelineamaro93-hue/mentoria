@@ -1,0 +1,30 @@
+name: Preserve student history
+on:
+  pull_request:
+    paths:
+      - 'app/api/admin/delete-user/**'
+      - 'tests/admin-delete-history.test.cjs'
+      - 'supabase/migrations/*safe_test_account_deletion*'
+      - '.github/workflows/account-history.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/api/admin/delete-user/**'
+      - 'tests/admin-delete-history.test.cjs'
+      - '.github/workflows/account-history.yml'
+permissions:
+  contents: read
+jobs:
+  history-preservation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: node --test tests/admin-delete-history.test.cjs

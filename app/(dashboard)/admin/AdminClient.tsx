@@ -212,7 +212,7 @@ export default function AdminClient({
 
   async function deletarUsuario(userId: string, nome: string) {
     const confirmado = window.confirm(
-      `ATENÇÃO: Tem certeza que quer deletar ${nome}? Esta ação não pode ser desfeita. O usuário terá que criar uma nova conta.`
+      `Excluir a conta de ${nome}? A exclusão só será permitida para uma conta nova sem histórico ou assinatura. Contas de alunos e conteúdos salvos serão preservados.`
     );
     if (!confirmado) return;
 

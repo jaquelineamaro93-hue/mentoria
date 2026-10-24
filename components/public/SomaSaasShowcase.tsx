@@ -37,7 +37,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
         </h2>
         <p className="mt-3 text-sm leading-7 text-[#000000]">
           Você escolhe as ferramentas que precisa. Íris Copiloto e agente no WhatsApp são opcionais e cobrados à parte,
-          porque utilizam recursos adicionais de inteligência artificial.
+          conforme sua escolha.
         </p>
       </div>
 
@@ -108,13 +108,13 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
                 className="mt-1 h-5 w-5 shrink-0 accent-[#0D8071]" />
               <span className="flex-1 text-sm leading-6 text-[#000000]">
                 <strong className="block text-[#000000]">Agente de carreira no WhatsApp</strong>
-                Acompanhamento automatizado, mediante autorização e limites de uso.
+                Apoio de carreira pelo WhatsApp, com seu consentimento.
                 <span className="mt-1 block font-semibold text-[#000000]">+ {formatarReais(ADICIONAL_IA_CENTAVOS)}/mês, se contratado sozinho</span>
               </span>
             </label>
             <p className="text-xs leading-5 text-[#000000]">
               Se escolher os dois agentes, o adicional combinado é de {formatarReais(DOIS_AGENTES_CENTAVOS)}/mês, em vez de R$ 300,00.
-              Valores de uso, franquia e disponibilidade são confirmados antes da contratação.
+
             </p>
           </fieldset>
         </div>
@@ -133,7 +133,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
 
           </dl>
           <div className="mt-5 border-t border-[#C8DED4] pt-4" aria-live="polite" aria-atomic="true">
-            <p className="text-xs text-[#000000]">Total mensal simulado</p>
+            <p className="text-xs text-[#000000]">Total mensal</p>
             <p className="mt-1 text-3xl font-bold tracking-tight text-[#000000]">{formatarReais(calculo.total)}<span className="ml-1 text-sm font-normal">/mês</span></p>
           </div>
           <a href={linkPlataforma} onClick={() => { document.cookie = `soma_saas_intent=${encodeURIComponent(linkPlataforma)}; Path=/; Max-Age=3600; SameSite=Lax; Secure`; }}
