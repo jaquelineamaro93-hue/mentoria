@@ -54,7 +54,7 @@ test('Íris oferece continuidade clicável e não empurra link genérico para da
   assert.match(api, /sugestoes\?: string\[\]/);
   assert.match(api, /intencao === 'vaga' \? LINKS\.vaga : undefined/);
   assert.doesNotMatch(api, /href: LINKS\[intencao\].*\n.*\}\);\s*\} catch/);
-  assert.match(ui, /Monte um plano prático de 7 dias/);
+  assert.match(ui, /Quero um plano para 7 dias/);
 });
 
 test('Janela pode expandir e reduzir no desktop mantendo mobile em tela cheia', () => {
