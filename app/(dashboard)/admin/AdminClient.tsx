@@ -315,65 +315,26 @@ export default function AdminClient({
             </div>
           </section>
         )}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-          <div>
-            
+        <section aria-label="Áreas administrativas" className="mb-8 space-y-4">
+          <div><h1 className="text-2xl font-semibold text-black">Administração</h1><p className="mt-1 text-sm text-gray-600">Pessoas, produtos e resultados em um só lugar.</p></div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              {href:'/admin/usuarios',title:'Pessoas e acessos',description:'Contas, permissões e acompanhamento',Icon:Users},
+              {href:'/admin/gerenciar-planos',title:'Planos e contratos',description:'Produtos, vigências e pagamentos',Icon:CreditCard},
+              {href:'/admin/financeiro',title:'Financeiro',description:'Receitas e movimentações',Icon:Wallet},
+              {href:'/admin/acompanhamentos',title:'Íris e WhatsApp',description:'Conversas e acompanhamentos',Icon:MessageSquare},
+              {href:'/admin/analytics',title:'Resultados',description:'Analytics e testes A/B',Icon:BarChart3},
+              {href:'/admin/crescimento',title:'Crescimento',description:'Ações para aquisição e retenção',Icon:Rocket},
+              {href:'/admin/enquetes',title:'Votações',description:'Perguntas e respostas da comunidade',Icon:Send},
+              {href:'/admin/feedbacks',title:'Feedbacks do PDI',description:'Devolutivas e evolução dos alunos',Icon:MessageSquare},
+            ].map(({href,title,description,Icon})=><Link key={href} href={href} className="flex min-h-24 items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-black transition hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700"><Icon size={20} className="mt-1 shrink-0"/><span><strong className="block text-sm">{title}</strong><span className="mt-1 block text-xs leading-5">{description}</span></span></Link>)}
           </div>
-          <div className="flex flex-col gap-2 shrink-0">
-            <Link
-              href="/admin/analytics"
-              className="flex items-center justify-center gap-2 bg-mint-deep hover:opacity-90 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <BarChart3 size={15} />
-              Analytics & testes A/B
-            </Link>
-            <Link href="/admin/acompanhamentos" className="flex items-center justify-center gap-2 bg-brown-deep text-white text-sm font-medium px-4 py-2.5 rounded-lg">Acompanhamento Inteligente · WhatsApp</Link>
-            <Link
-              href="/admin/financeiro"
-              className="flex items-center justify-center gap-2 bg-brown-deep hover:bg-brown text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Wallet size={15} />
-              Financeiro
-            </Link>
-            <Link
-              href="/admin/gerenciar-planos"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-black hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <CreditCard size={15} />
-              Gerenciar planos e pagamentos
-            </Link>
-            <Link
-              href="/admin/crescimento"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-black hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Rocket size={15} />
-              Boas práticas de crescimento
-            </Link>
-            <Link
-              href="/admin/enquetes"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-black hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Send size={15} />
-              Gerenciar votações
-            </Link>
-            <Link
-              href="/admin/feedbacks"
-              className="flex items-center justify-center gap-2 border border-brown-deep text-black hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <MessageSquare size={15} />
-              Feedbacks do PDI
-            </Link>
-
-            <button
-              onClick={enviarLembretesAgora}
-              disabled={enviandoLembretes}
-              className="flex items-center justify-center gap-2 border border-brown-deep text-black hover:bg-brown-deep/10 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap disabled:opacity-60"
-            >
-              {enviandoLembretes ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
-              Enviar lembretes agora
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button onClick={enviarLembretesAgora} disabled={enviandoLembretes} className="inline-flex items-center gap-2 rounded-lg border bg-white px-4 py-2.5 text-sm text-black disabled:opacity-60">{enviandoLembretes?<Loader2 size={15} className="animate-spin"/>:<Send size={15}/>}Enviar lembretes agora</button>
+            <Link href="/admin/vagas" className="rounded-lg border bg-white px-4 py-2.5 text-sm text-black">Gerenciar vagas</Link>
+            <Link href="/admin/indicacoes" className="rounded-lg border bg-white px-4 py-2.5 text-sm text-black">Indicações</Link>
           </div>
-        </div>
+        </section>
 
         {resultadoLembretes && (
           <div className="mb-6 text-sm bg-mint-light border border-mint rounded-lg px-4 py-3 text-black whitespace-pre-wrap font-mono">

@@ -1,4 +1,6 @@
 'use client';
+import PurchaseContractConsent from '@/components/PurchaseContractConsent';
+import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -17,6 +19,7 @@ export default function CheckoutClient({
   planoAtualCodigo: string | null;
   trialEligible: boolean;
 }) {
+  const [contractAccepted,setContractAccepted]=useState(false);
   const searchParams = useSearchParams();
   const [planoSelecionado, setPlanoSelecionado] = useState<string | null>(null);
   const [formaEscolhida, setFormaEscolhida] = useState<'avista' | 'cartao' | 'recorrente' | null>(null);
@@ -68,7 +71,7 @@ export default function CheckoutClient({
   }
 
   async function irParaMercadoPago() {
-    if (!plano || !formaEscolhida) return;
+    if (!plano || !formaEscolhida || !contractAccepted) return;
     setProcessando(true);
     try {
       const res = await fetch('/api/mercadopago/criar-assinatura', {
@@ -76,6 +79,7 @@ export default function CheckoutClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planoCodigo: planoSafe.codigo,
+          contractAccepted, contractVersion: PRODUCT_CONTRACTS.carreira.version,
           formaPagamento: formaEscolhida,
         }),
       });
@@ -236,10 +240,11 @@ export default function CheckoutClient({
                 </p>
               </button>
             </div>
+            <PurchaseContractConsent product="carreira" accepted={contractAccepted} onChange={setContractAccepted}/>
             {formaEscolhida && (
               <button
                 onClick={irParaMercadoPago}
-                disabled={processando}
+                disabled={processando||!contractAccepted}
                 className="w-full bg-brown-deep text-white font-medium py-3.5 sm:py-4 rounded-lg hover:bg-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {processando ? 'Processando...' : planoAtualCodigo ? 'Renovar com Mercado Pago' : 'Continuar com Mercado Pago'}

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export async function registrarPedido(input: {
   user_id: string | null; email: string; tipo: 'plano' | 'credito_simulacao_cv' | 'sessao_extra';
   valor: number; plano_id?: string; forma_pagamento: string;
+  terms_version?: string; terms_accepted_at?: string; contract_snapshot?: Record<string,unknown>;
 }) {
   if (!Number.isFinite(input.valor) || input.valor <= 0) throw new Error('Valor do pedido inválido.');
   const admin = createAdminClient();

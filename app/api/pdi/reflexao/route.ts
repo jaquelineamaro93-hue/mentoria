@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -10,6 +11,8 @@ import { createClient } from "@/lib/supabase/server";
 // Usa o client autenticado para garantir que o usuário só salva reflexão dele mesmo.
 
 export async function POST(req: NextRequest) {
+  const productAuthorization = await requireProductAccess('desenvolvimento');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const {
     planoId,
     mesReferencia,

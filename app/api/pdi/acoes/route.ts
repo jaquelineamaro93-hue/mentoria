@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -7,6 +8,8 @@ import { createClient } from "@/lib/supabase/server";
 // (cookie da sessão) para que a RLS garanta que o mentorado só mexe no que é dele.
 
 export async function PATCH(req: NextRequest) {
+  const productAuthorization = await requireProductAccess('desenvolvimento');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const { acaoId, concluida } = await req.json();
 
   if (!acaoId || typeof concluida !== "boolean") {

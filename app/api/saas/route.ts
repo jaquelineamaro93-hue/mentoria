@@ -1,3 +1,4 @@
+import { PRODUCT_CONTRACTS, RECOVERY_CONTRACT_VERSION } from '@/lib/product-contracts';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
     }
     if (!['trial','checkout','recovery_checkout'].includes(body.action) || body.accepted !== true) return reply({ error: 'Aceite as condições para continuar.' }, 400);
     const recoveryCheckout = body.action === 'recovery_checkout';
+    if(body.contractVersion !== (recoveryCheckout?RECOVERY_CONTRACT_VERSION:PRODUCT_CONTRACTS.plataforma.version)) return reply({error:'Leia e aceite o contrato atualizado antes de continuar.'},400);
     if (recoveryCheckout) {
       const { data: offer } = await admin.from('soma_saas_recovery_offers').select('source_order_id').eq('user_id', user.id).maybeSingle();
       if (!offer) return reply({ error: 'Oferta indisponível.' }, 409);

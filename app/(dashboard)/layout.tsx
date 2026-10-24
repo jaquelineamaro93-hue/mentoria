@@ -35,6 +35,7 @@ export default async function DashboardLayout({
       const elegivel = access?.saas && !access.mentorship ? access.iris : initialProfile.is_admin || planoAtivo || trialAtivo;
 
       if (elegivel) {
+        const {data:careerContract}=await supabase.rpc('soma_has_career_contract');
         const [pausa, termo] = await Promise.all([
           supabase.from('mentoria_pausas').select('id').eq('user_id', user.id)
             .eq('status', 'ativa').limit(1).maybeSingle(),
@@ -45,7 +46,7 @@ export default async function DashboardLayout({
           const { data: aceite, error: aceiteError } = await supabase
             .from('termos_aceites').select('id').eq('user_id', user.id)
             .eq('termo_id', termo.data.id).limit(1).maybeSingle();
-          copilotoLiberado = !aceiteError && (!!aceite || (access?.saas && access.iris));
+          copilotoLiberado = !aceiteError && (!!aceite || careerContract === true || (access?.saas && access.iris));
         }
       }
     }

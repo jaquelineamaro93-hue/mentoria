@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -11,6 +12,8 @@ type RankingRow = {
 };
 
 export async function GET() {
+  const productAuthorization = await requireProductAccess('mentorship');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const supabase = await createClient();
     const {

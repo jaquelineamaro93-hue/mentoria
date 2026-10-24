@@ -129,7 +129,7 @@ export async function proxy(request: NextRequest) {
               {status:423,headers:{'Cache-Control':'no-store'}});
         }else{
           const permitida=path==='/meu-plano'||path.startsWith('/meu-plano/') ||
-            path==='/termos'||path.startsWith('/termos/') ||
+            path==='/contratos'||path==='/termos'||path.startsWith('/termos/') ||
             path==='/perfil'||path.startsWith('/perfil/') ||
             path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/plataforma') ||
     path.startsWith('/login') ||

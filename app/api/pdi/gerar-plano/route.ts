@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
@@ -51,6 +52,8 @@ function isPlanoGerado(valor: unknown): valor is PlanoGerado {
 }
 
 export async function POST(req: NextRequest) {
+  const productAuthorization = await requireProductAccess('desenvolvimento');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const supabase = await createServerClient();
     const {

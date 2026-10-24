@@ -34,13 +34,14 @@ function checkoutApi({expired=false,user={id:'owner',email:'fixture@example.inva
   if(name.endsWith('supabase/server'))return {createClient:async()=>({auth:{getUser:async()=>({data:{user}})}})};
   if(name.endsWith('supabase/admin'))return {createAdminClient:()=>admin};
   if(name.includes('rate-limit'))return {consumeIdentifierRateLimit:async()=>true};
+  if(name.includes('product-contracts'))return compile('lib/product-contracts.ts',()=>{});
   if(name.includes('soma-saas-pricing'))return pricing;
   if(name.includes('saas-access'))return {SAAS_MODULES:['vagas','curriculo-ats']};
   return {criarAssinaturaSaasMercadoPago:async()=>{throw Error('Unexpected provider creation');}};
  },{URL,Date});
  return {...handlers,calls};
 }
-const recoveryRequest=()=>({url:'https://somamentoria.com/api/saas',headers:{get:()=>null},json:async()=>({action:'recovery_checkout',accepted:true,plan:'avulso',iris:false,whatsapp:false,amount:1})});
+const recoveryRequest=()=>({url:'https://somamentoria.com/api/saas',headers:{get:()=>null},json:async()=>({action:'recovery_checkout',contractVersion:'saas-recovery-2026-10-24-v2',accepted:true,plan:'avulso',iris:false,whatsapp:false,amount:1})});
 test('checkout ignores forged prices/configuration and uses the owned server offer',async()=>{
  const h=checkoutApi();const response=await h.POST(recoveryRequest());assert.equal(response.status,200);
  const register=h.calls.find(c=>c[0]==='soma_saas_register');assert.equal(register[1].p_config.plan_code,'pro');assert.equal(register[1].p_config.iris,true);assert.equal(register[1].p_trial,false);

@@ -1,11 +1,12 @@
 import crypto from 'crypto';
+import { isIP } from 'node:net';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-function getClientIp(request: Request) {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown';
-
-  return request.headers.get('x-real-ip')?.trim() || 'unknown';
+export function getClientIp(request: Request) {
+  // Vercel sets this value at its edge. Never trust a caller's generic forwarding chain.
+  if (process.env.VERCEL !== '1') return 'unknown';
+  const ip = request.headers.get('x-vercel-forwarded-for')?.trim() || '';
+  return isIP(ip) ? ip : 'unknown';
 }
 
 function hmac(value: string) {
@@ -51,7 +52,9 @@ export async function consumeSecurityRateLimit(input: {
     return false;
   }
 
-  return data === true;
+  if(data !== true)return false;
+  if(input.identifier?.trim())return consumeIdentifierRateLimit({scope:input.scope+':identity',identifier:input.identifier,limit:input.limit,windowSeconds:input.windowSeconds});
+  return true;
 }
 
 

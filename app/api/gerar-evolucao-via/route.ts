@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
@@ -225,6 +226,8 @@ A resposta estruturada anterior falhou. Agora responda em texto corrido, curto e
 }
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('diagnostico');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const supabase = await createClient();
   const {
     data: { user },

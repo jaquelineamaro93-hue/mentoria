@@ -31,6 +31,8 @@ export async function GET() {
     ?await db.from('termos_aceites').select('id').eq('user_id',user.id).eq('termo_id',termo.id).limit(1).maybeSingle()
     :{data:null,error:null};
   if(aceiteError)return NextResponse.json({error:'Falha ao consultar o aceite do termo'},{status:503,headers:noStore});
+  const {data:careerContract,error:careerError}=await db.rpc('soma_has_career_contract');
+  if(careerError)return NextResponse.json({error:'Falha ao consultar seu contrato'},{status:503,headers:noStore});
   const ativa=(pausa??[]).find(p=>p.status==='ativa')??null;
   const disponiveis=60-(recente?.dias_utilizados??0);
   return NextResponse.json({
@@ -39,7 +41,7 @@ export async function GET() {
     assinaturaRecorrente:perfil?.origem_assinatura==='mercadopago',
     elegivel:!perfil?.is_admin&&perfil?.status_assinatura==='ativo'&&!!perfil?.data_fim_acesso &&
       perfil.data_fim_acesso>=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),
-    termoAtualizado:termo?.versao==='2.1',termoAceito:!!aceite,
+    termoAtualizado:careerContract===true||termo?.versao==='2.1',termoAceito:careerContract===true||!!aceite,
   },{headers:noStore});
 }
 

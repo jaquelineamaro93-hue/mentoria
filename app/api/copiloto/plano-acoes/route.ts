@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -50,10 +51,12 @@ async function autenticarMentorado() {
   if (pausa.error || versao.error || !versao.data)
     return { erro: resposta({ erro: 'Não foi possível validar as permissões.' }, 503) };
   if (pausa.data && !(access?.saas && access.iris)) return { erro: resposta({ erro: 'Sua mentoria está pausada.' }, 403) };
+  const {data:careerContract,error:careerError}=await db.rpc('soma_has_career_contract');
+  if(careerError)return {erro:resposta({erro:'Não foi possível validar seu contrato.'},503)};
   const { data: aceite, error: erroAceite } = await db.from('termos_aceites')
     .select('id').eq('user_id', user.id).eq('termo_id', versao.data.id).limit(1).maybeSingle();
   if (erroAceite) return { erro: resposta({ erro: 'Não foi possível validar seus termos.' }, 503) };
-  if (!aceite && !(access?.saas && access.iris)) return { erro: resposta({ erro: 'Aceite os termos vigentes para continuar.' }, 403) };
+  if (!aceite && !careerContract && !(access?.saas && access.iris)) return { erro: resposta({ erro: 'Aceite os termos vigentes para continuar.' }, 403) };
   return { db, user, perfil };
 }
 
@@ -76,6 +79,8 @@ function etapasNormalizadas(items: EtapaIris[], preservarEstado = false) {
 }
 
 export async function GET() {
+  const productAuthorization = await requireProductAccess('iris');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const a = await autenticarMentorado();
   if ('erro' in a) return a.erro;
   const [lista, entrevista] = await Promise.all([
@@ -91,6 +96,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('iris');
+  if (!productAuthorization.ok) return productAuthorization.response;
   if (!mesmaOrigem(request)) return resposta({ erro: 'Origem inválida.' }, 403);
   const a = await autenticarMentorado();
   if ('erro' in a) return a.erro;
@@ -171,6 +178,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('iris');
+  if (!productAuthorization.ok) return productAuthorization.response;
   if (!mesmaOrigem(request)) return resposta({ erro:'Origem inválida.' }, 403);
   const a = await autenticarMentorado();
   if ('erro' in a) return a.erro;
@@ -195,6 +204,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('iris');
+  if (!productAuthorization.ok) return productAuthorization.response;
   if (!mesmaOrigem(request)) return resposta({ erro:'Origem inválida.' }, 403);
   const a = await autenticarMentorado();
   if ('erro' in a) return a.erro;

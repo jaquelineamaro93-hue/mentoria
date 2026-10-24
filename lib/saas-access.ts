@@ -15,7 +15,7 @@ export function moduleForPath(path: string, search = ''): string | null {
   if (['/vagas','/api/vagas','/api/download-template-vagas'].some(is)) return 'vagas';
   return null;
 }
-const shared = ['/plataforma','/como-funciona','/depoimentos','/payment-success','/payment-pending','/payment-failure','/perfil','/faq','/termos','/planos','/renovar','/login','/checkout','/reset-password','/magic-login','/auth','/api/saas','/api/auth','/api/perfil','/api/activity','/api/product-events','/api/hero-collage','/api/social','/api/webhooks','/api/mercadopago/webhook','/api/mercadopago/criar-assinatura','/api/mercadopago/create-preference'];
+const shared = ['/contratos','/plataforma','/como-funciona','/depoimentos','/payment-success','/payment-pending','/payment-failure','/perfil','/faq','/termos','/planos','/renovar','/login','/checkout','/reset-password','/magic-login','/auth','/api/saas','/api/auth','/api/perfil','/api/activity','/api/product-events','/api/hero-collage','/api/social','/api/webhooks','/api/mercadopago/webhook','/api/mercadopago/criar-assinatura','/api/mercadopago/create-preference'];
 export function saasCanVisit(access: SaasAccess, path: string, search = '') {
   if (!access.saas || access.mentorship) return true;
   if (path === '/' || shared.some(prefix => path === prefix || path.startsWith(prefix + '/'))) return true;

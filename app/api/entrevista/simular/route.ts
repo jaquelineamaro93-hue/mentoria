@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
@@ -30,6 +31,8 @@ function extrairJson(texto: string) {
 }
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('entrevistas');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const supabase = await createClient();
     const {

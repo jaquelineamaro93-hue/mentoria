@@ -1,7 +1,10 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('vagas');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -29,6 +32,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const productAuthorization = await requireProductAccess('vagas');
+  if (!productAuthorization.ok) return productAuthorization.response;
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

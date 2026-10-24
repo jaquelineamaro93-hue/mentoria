@@ -1,3 +1,4 @@
+import { requireProductAccess } from '@/lib/security/require-product-access';
 import { NextResponse } from 'next/server';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { createClient } from '@/lib/supabase/server';
@@ -5,6 +6,8 @@ import { chamarClaudeJson } from '@/lib/ai-json';
 import { VIA_FORCAS } from '@/lib/prompts';
 
 export async function POST(request: Request) {
+  const productAuthorization = await requireProductAccess('diagnostico');
+  if (!productAuthorization.ok) return productAuthorization.response;
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,3 +1,4 @@
+import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
 import { registrarPedido, vincularCobranca } from '@/lib/mercadopago-orders';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
   try { body = await request.json(); } catch {
     return NextResponse.json({ error: 'JSON inválido.' }, { status: 400 });
   }
+  if (body?.contractAccepted !== true || body?.contractVersion !== PRODUCT_CONTRACTS.carreira.version) return NextResponse.json({ error:'Leia e aceite o contrato desta contratação.' },{status:400});
   const planoCodigo = body?.planoCodigo;
   const formaPagamento = body?.formaPagamento;
   if (typeof planoCodigo !== 'string' || !['avista', 'cartao', 'recorrente'].includes(formaPagamento)) {
@@ -63,6 +65,8 @@ export async function POST(request: Request) {
       ? Math.round(Number(plano.preco_recorrente_total) / parcelas * 100) / 100
       : Number(formaPagamento === 'avista' ? plano.preco_avista : plano.preco_cartao);
     const pedido = await registrarPedido({ user_id: userId || null, email, tipo: 'plano',
+      terms_version: PRODUCT_CONTRACTS.carreira.version, terms_accepted_at: new Date().toISOString(),
+      contract_snapshot: { plano:plano.nome, duracao_meses:plano.duracao_meses, parcelas:formaPagamento==='recorrente'?parcelas:1, valor_total:formaPagamento==='recorrente'?Number(plano.preco_recorrente_total):valorPedido },
       valor: valorPedido, plano_id: plano.id, forma_pagamento: formaPagamento });
     const externalReference = pedido.id;
 

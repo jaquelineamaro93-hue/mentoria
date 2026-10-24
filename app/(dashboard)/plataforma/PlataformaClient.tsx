@@ -1,6 +1,7 @@
  'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { PRODUCT_CONTRACTS, RECOVERY_CONTRACT_VERSION } from '@/lib/product-contracts';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { calcularPrecoSaas, CATALOGO_SAAS, formatarReais, type PlanoSaas } from '@/lib/soma-saas-pricing';
 import SaasRecoveryDialog, { type RecoveryOffer } from '@/components/SaasRecoveryDialog';
@@ -36,7 +37,7 @@ export default function PlataformaClient({modules,initialAccess}:{modules:Module
  async function act(action:string,orderId?:string) {
   setBusy(true);setError('');
   try {
-   const response=await fetch('/api/saas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,plan,module,iris,whatsapp,accepted:action==='recovery_checkout'?true:accepted,orderId})});
+   const response=await fetch('/api/saas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contractVersion:action==='recovery_checkout'?RECOVERY_CONTRACT_VERSION:PRODUCT_CONTRACTS.plataforma.version,action,plan,module,iris,whatsapp,accepted:action==='recovery_checkout'?true:accepted,orderId})});
    const result=await response.json();if(!response.ok) throw new Error(result.error);
    if(result.checkoutUrl){try{sessionStorage.setItem('soma_checkout_return','1');}catch{}window.location.assign(result.checkoutUrl);return;}
    await refresh();router.refresh();
@@ -58,7 +59,7 @@ export default function PlataformaClient({modules,initialAccess}:{modules:Module
    <p className="text-sm text-gray-600">Os dois agentes juntos custam R$ 250,00/mês. Uso sujeito aos limites da plataforma e, no WhatsApp, ao consentimento de contato.</p>
    <p className="text-3xl font-semibold">{formatarReais(total)}<span className="text-base font-normal">/mês</span></p>
    <div className="rounded-xl bg-emerald-50 p-4 text-sm leading-6"><strong>7 dias grátis, sem cartão.</strong> O teste vale uma vez por conta e libera somente os módulos e agentes escolhidos. O teste não gera cobrança automática. Ao assinar durante o teste, a recorrência começa após o término dele. Assinatura mensal até cancelar em Minhas assinaturas. O cancelamento encerra o acesso pago. Acompanhamento humano é contratado na SOMA Carreira.</div>
-   <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} className="mt-1"/><span>Li e aceito as condições acima e os <Link href="/termos" className="underline">termos de uso</Link>.</span></label>
+   <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} className="mt-1"/><span>Li e aceito as condições acima e os <Link href="/contratos?produto=plataforma" className="underline">termos de uso</Link>.</span></label>
    {error&&<p role="alert" className="text-red-700">{error}</p>}
    <div className="flex flex-wrap gap-3">{!access.trialEndsAt&&<button disabled={busy||!accepted} onClick={()=>void act('trial')} className="rounded-xl bg-mint-deep px-5 py-3 font-semibold text-white disabled:opacity-50">Experimentar 7 dias grátis</button>}
    <button disabled={busy||!accepted} onClick={()=>void act('checkout')} className="rounded-xl border border-mint-deep px-5 py-3 text-mint-deep disabled:opacity-50">{busy?'Aguarde…':'Assinar com Mercado Pago'}</button></div>
