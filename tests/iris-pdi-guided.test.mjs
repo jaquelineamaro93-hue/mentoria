@@ -9,7 +9,7 @@ test('Íris distingue perguntas-guia de criação de ação no PDI', () => {
   const guided = read('lib/iris-pdi-guided.ts');
   assert.match(route, /querPreencherPdi/);
   assert.match(route, /executarPdiGuiado/);
-  assert.ok(route.indexOf('const acaoPdiGuiado') < route.indexOf("body.acao === 'confirmar_pdi'"));
+  assert.ok(route.indexOf('const acaoPdiGuiado') < route.indexOf("if (body.acao === 'confirmar_pdi')"));
   assert.match(guided, /preencher\|responder\|revisar\|atualizar/);
   assert.match(guided, /pdi_iniciar/);
   assert.match(guided, /pdi_preparar/);
