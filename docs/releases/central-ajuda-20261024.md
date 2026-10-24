@@ -39,7 +39,7 @@ para tentar recuperar a interface.
 ## Verificações desta entrega
 
 - Build Next.js com as dependências do lockfile.
-- 32 verificações de permissões e validação da central.
+- 39 verificações de permissões e validação da central.
 - 42 testes existentes de Íris, privacidade, produtos e isolamento de módulos.
 - 10 verificações HTTP locais, com usuários e serviços fictícios, cobrindo
   autenticação, central, publicação administrativa, novidades e Íris.

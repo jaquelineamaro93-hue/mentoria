@@ -246,13 +246,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  try {
-    const help = await helpForIris(body, user.id);
-    if (help) return help.status === 200 ? responderComHistorico(help.payload) : json(help.payload, help.status);
-  } catch {
-    return json({ erro: 'Não foi possível carregar a orientação da Central de Ajuda. Tente novamente.' }, 503);
-  }
-
   // Preenchimento conversacional do PDI é separado do plano de ações da Íris.
   // Nenhuma resposta é persistida na etapa de rascunho: só após token assinado.
   const acaoPdiGuiado = typeof body.acao === 'string' && [
@@ -267,6 +260,13 @@ export async function POST(request: NextRequest) {
     return resultado.status === 200
       ? responderComHistorico(resultado.payload)
       : json(resultado.payload, resultado.status);
+  }
+
+  try {
+    const help = await helpForIris(body, user.id);
+    if (help) return help.status === 200 ? responderComHistorico(help.payload) : json(help.payload, help.status);
+  } catch {
+    return json({ erro: 'Não foi possível carregar a orientação da Central de Ajuda. Tente novamente.' }, 503);
   }
 
   // Esta operação é determinística: exige confirmação explícita e token assinado.

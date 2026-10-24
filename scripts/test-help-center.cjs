@@ -9,7 +9,7 @@ const temp = mkdtempSync(join(tmpdir(), 'soma-help-test-'));
 let checks = 0;
 function check(label, fn) { fn(); checks++; console.log('PASS', label); }
 try {
-  for (const file of ['lib/saas-access.ts', 'lib/help-center/types.ts', 'lib/help-center/access.ts', 'lib/help-center/validation.ts']) {
+  for (const file of ['lib/saas-access.ts', 'lib/help-center/types.ts', 'lib/help-center/access.ts', 'lib/help-center/validation.ts', 'lib/help-center/intent.ts']) {
     const out = join(temp, file.replace(/\.ts$/, '.js'));
     mkdirSync(dirname(out), { recursive: true });
     const source = readFileSync(join(root, file), 'utf8').replace(/@\/lib\/saas-access/g, join(temp, 'lib/saas-access.js'));
@@ -19,6 +19,14 @@ try {
   const { safeHelpPath } = require(join(temp, 'lib/help-center/types.js'));
   const { parseHelpArticle, parseHelpRelease, isHelpId } = require(join(temp, 'lib/help-center/validation.js'));
   const { saasCanVisit } = require(join(temp, 'lib/saas-access.js'));
+  const { helpIntent } = require(join(temp, 'lib/help-center/intent.js'));
+  check('leadership job search keeps career coaching', () => assert.equal(helpIntent('Como encontrar vagas de liderança?'), null));
+  check('salary negotiation keeps career coaching', () => assert.equal(helpIntent('Quero um passo a passo para negociar meu salário'), null));
+  check('interview preparation keeps career coaching', () => assert.equal(helpIntent('Quero um tutorial para me preparar para uma entrevista'), null));
+  check('market news keeps career coaching', () => assert.equal(helpIntent('Quais são as novidades do mercado de trabalho?'), null));
+  check('PDI how-to uses documentation', () => assert.equal(helpIntent('Como usar o PDI?'), 'tutorial'));
+  check('explicit portal help uses documentation', () => assert.equal(helpIntent('Onde encontro minhas ferramentas no portal da SOMA?'), 'tutorial'));
+  check('SOMA updates use release feed', () => assert.equal(helpIntent('O que há de novo na SOMA?'), 'news'));
   const base = { userId: 'account-a', admin: false, access: { saas: true, mentorship: false, iris: false, modules: ['curriculo-ats'], whatsapp: false, trialEndsAt: null } };
   const article = { status: 'published', published_at: '2026-01-01T00:00:00Z', audience: 'all', requires_iris: false };
   check('general guide visible to authenticated SaaS account', () => assert.equal(canReadArticle(article, base), true));

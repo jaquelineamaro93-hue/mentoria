@@ -2,12 +2,14 @@ import 'server-only';
 import { getHelpAccess, getHelpArticle, listHelpArticles, listHelpReleases } from './server';
 import { searchHelpArticles, canOpenFeature } from './access';
 import { isHelpId } from './validation';
+import { helpIntent } from './intent';
 
 export async function helpForIris(body: Record<string, unknown>, userId: string) {
   const message = typeof body.mensagem === 'string' ? body.mensagem.slice(0, 1000) : '';
-  const news = !body.acao && /(?:o que (?:h[aá]|tem) de novo|novidades(?: da soma)?|[uú]ltimas atualiza[cç][õo]es|releases da soma)/i.test(message);
+  const intent = !body.acao ? helpIntent(message) : null;
+  const news = intent === 'news';
   // Explicit help requests only: career advice and PDI execution retain their flows.
-  const tutorial = body.acao === 'ajuda_artigo' || (!body.acao && /(?:tutorial|passo a passo|como (?:usar|utilizar|funciona|acessar|encontrar)|onde (?:fica|encontro|acesso))/i.test(message));
+  const tutorial = body.acao === 'ajuda_artigo' || intent === 'tutorial';
   if (!news && !tutorial) return null;
   const context = await getHelpAccess();
   if (!context || context.userId !== userId) return { status: 403, payload: { erro: 'Acesso à ajuda indisponível.' } };
@@ -22,7 +24,7 @@ export async function helpForIris(body: Record<string, unknown>, userId: string)
     : searchHelpArticles(await listHelpArticles(context), message)[0];
   if (!article) return body.acao === 'ajuda_artigo'
     ? { status: 404, payload: { erro: 'Este tutorial não está disponível para sua conta.' } }
-    : { status: 200, payload: { resposta: 'Ainda não encontrei um tutorial publicado para essa pergunta. Você pode buscar na Central de Ajuda ou me contar qual etapa está tentando realizar.', href: '/ajuda' } };
+    : null; // Without a relevant tutorial, retain the existing coaching flow.
   // Published content is read directly, never sent to an external model.
   const bodyWithoutImages = article.body.replace(/!\[[^\]]*\]\([^)]*\)/g, '').slice(0, 6000);
   return { status: 200, payload: {
