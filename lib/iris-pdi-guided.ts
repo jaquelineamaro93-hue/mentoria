@@ -31,8 +31,8 @@ function verificar(userId: string, rascunho: Rascunho, token: string) {
 }
 
 export function querPreencherPdi(mensagem: string) {
-  return /(?:preencher|responder|revisar|atualizar|alterar|editar|refazer|completar|continuar)[\\s\\S]{0,65}(?:perguntas?[- ]guia|respostas? do pdi|meu pdi|o pdi|perguntas? do pdi)/i.test(mensagem) ||
-    /(?:pdi|perguntas?[- ]guia)[\\s\\S]{0,55}(?:pela [íi]ris|com a [íi]ris|conversando|pergunta por pergunta)/i.test(mensagem);
+  return /(?:preencher|responder|revisar|atualizar|alterar|editar|refazer|completar|continuar)[\s\S]{0,65}(?:perguntas?[- ]guia|respostas? do pdi|meu pdi|o pdi|perguntas? do pdi)/i.test(mensagem) ||
+    /(?:pdi|perguntas?[- ]guia)[\s\S]{0,55}(?:pela [íi]ris|com a [íi]ris|conversando|pergunta por pergunta)/i.test(mensagem);
 }
 
 export async function executarPdiGuiado(db: Db, userId: string, body: Body) {
