@@ -122,12 +122,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Regenerar um PDI existente não exige preencher novamente todo o guia.
+    // As respostas disponíveis já são suficientes para revisar as metas do ciclo.
+    const { data: planoAnterior, error: erroPlanoAnterior } = await supabaseAdmin
+      .from("pdi_planos")
+      .select("id, versao")
+      .eq("mentorado_id", mentoradoId)
+      .eq("status", "ativo")
+      .order("gerado_em", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (erroPlanoAnterior) {
+      return NextResponse.json({ erro: "não consegui verificar o plano atual" }, { status: 500 });
+    }
+
     const permitePdiParcial = mentoradoId === KARINY_MORE_ID;
     const { count: totalSecoes } = await supabaseAdmin
       .from("pdi_guia_secoes")
       .select("id", { count: "exact", head: true });
 
-    if (!permitePdiParcial && totalSecoes && respostasRaw.length < totalSecoes) {
+    if (!planoAnterior && !permitePdiParcial && totalSecoes && respostasRaw.length < totalSecoes) {
       return NextResponse.json(
         { erro: `complete as ${totalSecoes} seções do PDI antes de gerar o plano` },
         { status: 400 }
@@ -192,24 +206,14 @@ export async function POST(req: NextRequest) {
       ]);
 
     // O plano anterior é histórico: ações concluídas não podem virar tarefas novas.
-    const { data: planoAnterior } = await supabaseAdmin
-      .from("pdi_planos")
-      .select("id, versao")
+    // Considera entregas concluídas em TODAS as versões, inclusive as arquivadas.
+    const { data: acoesConcluidas } = await supabaseAdmin
+      .from("pdi_acoes")
+      .select("titulo, descricao")
       .eq("mentorado_id", mentoradoId)
-      .eq("status", "ativo")
-      .order("gerado_em", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const { data: acoesConcluidas } = planoAnterior
-      ? await supabaseAdmin
-          .from("pdi_acoes")
-          .select("titulo, descricao")
-          .eq("mentorado_id", mentoradoId)
-          .eq("plano_id", planoAnterior.id)
-          .eq("concluida", true)
-          .order("ordem", { ascending: true })
-      : { data: [] };
+      .eq("concluida", true)
+      .order("concluida_em", { ascending: false })
+      .limit(100);
 
     const partesContexto: string[] = [];
     if (acoesConcluidas?.length) {
@@ -252,10 +256,10 @@ export async function POST(req: NextRequest) {
       partesContexto.push(`### Bússola de Posicionamento\n${linhas.join("\n")}`);
     }
 
-    if (permitePdiParcial) {
+    if (permitePdiParcial || (planoAnterior && totalSecoes && respostasRaw.length < totalSecoes)) {
       partesContexto.unshift(
-        `### Contexto deste plano inicial
-Este é um plano inicial autorizado com ${respostasRaw.length} de ${totalSecoes ?? 20} seções do PDI respondidas. Use somente o que está disponível. Não trate perguntas ainda não respondidas como lacunas de competência e não invente conteúdo para completá-las. O plano deve poder ser refinado depois, quando novas respostas forem adicionadas.`
+        `### Contexto de respostas disponíveis
+Este plano considera ${respostasRaw.length} de ${totalSecoes ?? 20} seções do PDI respondidas. ${planoAnterior ? "É uma atualização de um plano já existente." : "É um plano inicial autorizado."} Use somente o que está disponível. Não trate perguntas ainda não respondidas como lacunas de competência e não invente conteúdo para completá-las. O plano deve poder ser refinado depois.`
       );
     }
 
