@@ -34,6 +34,9 @@ export function normalizarRespostasRapidas(valor: unknown): string[] {
     if (typeof item !== 'string') continue;
     const texto = formatarTextoIris(item).replace(/[.?!]+$/, '').trim();
     if (texto.length < 3 || texto.length > 80) continue;
+    // Escolhas rápidas não substituem confirmações de ações persistentes.
+    if (/\b(?:salvar|salve|cadastre|registrar|automaticamente|sem meu consentimento)\b/i.test(texto) ||
+      /\b(?:crie|criar|adicione|adicionar)\b.{0,55}\b(?:pdi|tarefa no plano)\b/i.test(texto)) continue;
     let escolha: string;
     if (diretas.test(texto)) {
       escolha = texto;
