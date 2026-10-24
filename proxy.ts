@@ -1,3 +1,4 @@
+import { safeSaasNext, isCheckoutAccessPath } from '@/lib/auth/saas-return';
 import { saasCanVisit, type SaasAccess } from '@/lib/saas-access';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -31,6 +32,11 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  // An explicit mentorship selection replaces a previous SaaS navigation intent.
+  if ((path === '/checkout' && request.nextUrl.searchParams.has('plan')) ||
+      (path === '/login' && request.nextUrl.searchParams.has('trial_plan'))) {
+    supabaseResponse.cookies.delete('soma_saas_intent');
+  }
 
   // Bloqueia requisições mutáveis iniciadas por outra origem no navegador.
   // Webhooks/server-to-server normalmente não enviam Origin e continuam válidos.
@@ -72,14 +78,16 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!user && path === '/plataforma') {
-    const response = NextResponse.redirect(new URL('/login', request.url));
+    const login = new URL('/login', request.url);
+    login.searchParams.set('next', '/plataforma' + request.nextUrl.search);
+    const response = NextResponse.redirect(login);
     response.cookies.set('soma_saas_intent', encodeURIComponent('/plataforma' + request.nextUrl.search), { path: '/', maxAge: 3600, sameSite: 'lax', secure: true, httpOnly: true });
     return response;
   }
   // Preserve the selected SaaS configuration through password, Google and email login.
-  if (user && path === '/dashboard' && request.cookies.get('soma_saas_intent')?.value) {
+  if (user && (path === '/dashboard' || path === '/renovar') && request.cookies.get('soma_saas_intent')?.value) {
     let intent = '/plataforma';
-    try { const value = decodeURIComponent(request.cookies.get('soma_saas_intent')!.value); if (value.startsWith('/plataforma?')) intent = value; } catch {}
+    try { const value = decodeURIComponent(request.cookies.get('soma_saas_intent')!.value); intent = safeSaasNext(value) || '/plataforma'; } catch {}
     const response = NextResponse.redirect(new URL(intent, request.url));
     response.cookies.delete('soma_saas_intent');
     return response;
@@ -137,14 +145,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const rotaLiberada =
-    path.startsWith('/login') ||
-    path.startsWith('/checkout') ||
-    path === '/planos' ||
-    path === '/reset-password' ||
-    path === '/renovar' ||
-    path.startsWith('/api') ||
-    path.startsWith('/auth');
+  const rotaLiberada = isCheckoutAccessPath(path);
 
   if (user && !saasOnly && !rotaLiberada) {
     const { data: profile } = await supabase

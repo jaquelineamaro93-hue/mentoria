@@ -1,5 +1,6 @@
 'use client';
 
+import { safeSaasNext } from '@/lib/auth/saas-return';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -14,6 +15,14 @@ function AuthConfirmContent() {
     let isSubscribed = true;
 
     const handleAuth = async () => {
+      const nextPath = safeSaasNext(new URLSearchParams(window.location.search).get('next'));
+      let navegando = false;
+      const concluirAcesso = () => {
+        if (!isSubscribed || navegando) return;
+        navegando = true;
+        if (nextPath) router.push(nextPath);
+        else router.push('/dashboard');
+      };
       const registrarLogin = async () => {
         const { error } = await supabase.rpc('registrar_login_portal');
         if (error) {
@@ -23,7 +32,7 @@ function AuthConfirmContent() {
 
       // Só ativa trial depois que a sessão foi estabelecida. A rota valida usuário e plano.
       const concluirTrial = async () => {
-        const planId = new URLSearchParams(window.location.search).get('trial_plan');
+        const planId = nextPath ? null : new URLSearchParams(window.location.search).get('trial_plan');
         if (!planId) return true;
         try {
           const response = await fetch('/api/trial/start', {
@@ -53,7 +62,7 @@ function AuthConfirmContent() {
           router.push('/reset-password'); 
         } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
           await registrarLogin();
-          if (await concluirTrial()) router.push('/dashboard');
+          if (await concluirTrial()) concluirAcesso();
         }
       });
 
@@ -67,7 +76,7 @@ function AuthConfirmContent() {
           const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tokenType as any });
           if (otpError) { router.push('/login?error=token_invalid'); return; }
           await registrarLogin();
-          if (await concluirTrial()) router.push('/dashboard');
+          if (await concluirTrial()) concluirAcesso();
           return;
         }
       }
@@ -96,7 +105,7 @@ function AuthConfirmContent() {
             if (type === 'recovery') {
               router.push('/reset-password');
             } else {
-              if (await concluirTrial()) router.push('/dashboard');
+              if (await concluirTrial()) concluirAcesso();
             }
             return;
           }

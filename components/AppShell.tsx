@@ -35,7 +35,7 @@ function SectionNavigationCards({
     candidate.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch))
   );
 
-  if (!group) return null;
+  if (!group || (pathname === '/plataforma' && !access?.mentorship)) return null;
 
   // A página /carreira já possui um fluxo próprio em cards com CV, vagas e entrevistas.
   // Nas demais ferramentas de mercado, mantemos o seletor para conectar todo o ecossistema.
@@ -97,9 +97,10 @@ function SectionNavigationCards({
 
 function AppShellContent({ children, initialProfile, copilotoLiberado }: { children: React.ReactNode; initialProfile: Profile | null; copilotoLiberado: boolean }) {
   const access = useSaasAccess();
-  const saasOnly = !!access?.saas && !access.mentorship;
+
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const saasOnly = (!!access?.saas || pathname === '/plataforma') && !access?.mentorship;
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
   const location = getPortalLocation(pathname, currentSearch);

@@ -16,9 +16,11 @@ import styles from './PortalShell.module.css';
 export default function CollapsibleSidebar() {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
   const access = useSaasAccess();
-  const visible = (item: PortalNavItem) => !access || saasCanVisit(access, item.href.split('?')[0], item.href.split('?')[1]);
-  const { profile, initials, isLoading } = useUser();
   const pathname = usePathname();
+  const platformEntry = pathname === '/plataforma' && !access?.mentorship;
+  const navigationAccess = platformEntry && !access?.saas ? { saas: true, mentorship: false, modules: [], iris: false, whatsapp: false, trialEndsAt: null } : access;
+  const visible = (item: PortalNavItem) => !navigationAccess || saasCanVisit(navigationAccess, item.href.split('?')[0], item.href.split('?')[1]);
+  const { profile, initials, isLoading } = useUser();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
   const router = useRouter();
@@ -113,7 +115,7 @@ export default function CollapsibleSidebar() {
 
       <nav id="soma-menu-items" className={styles.navigation} aria-label="Menu principal">
         <div className={styles.primaryLinks}>
-          {navLink(access?.saas && !access.mentorship ? { ...overviewItem, href: '/plataforma', label: 'Minha plataforma' } : overviewItem)}
+          {navLink((platformEntry || (access?.saas && !access.mentorship)) ? { ...overviewItem, href: '/plataforma', label: 'Minha plataforma' } : overviewItem)}
           {profile?.is_admin === true && navLink(adminItem)}
         </div>
         {portalNavGroups.map(group => ({ ...group, items: group.items.filter(visible) })).filter(group => group.items.length).map((group) => {
@@ -136,7 +138,7 @@ export default function CollapsibleSidebar() {
       <footer className={styles.sidebarFooter}>
         <Link href="/perfil" onClick={closeMobileSidebar} className={styles.profileLink} aria-label="Meu perfil" title={compact ? 'Meu perfil' : undefined}>
           {profile?.foto_url ? <img src={profile.foto_url} alt="" className={styles.avatar} /> : <span className={styles.avatar}>{initials || <UserRound size={18} />}</span>}
-          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : access?.saas && !access.mentorship ? 'SOMA Plataforma' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
+          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : (platformEntry || (access?.saas && !access.mentorship)) ? 'SOMA Plataforma' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
         </Link>
         <button type="button" className={styles.signOut} onClick={handleSignOut} disabled={signingOut} title="Sair da conta" aria-label={signingOut ? 'Saindo da conta' : 'Sair da conta'}><LogOut size={18} /></button>
         {signOutError && <p role="alert" className={styles.signOutError}>{signOutError}</p>}
