@@ -29,6 +29,10 @@ try {
   const candidates = [current,{ id:'other', title:'Outro recurso', category:'Conta' },{ id:'related', title:'Suas metas', category:'Jornada' }];
   check('related articles prefer the same collection', () => assert.equal(relatedHelpArticles(candidates,current)[0].id, 'related'));
   check('related articles exclude the current guide and honor limits', () => assert.deepEqual(relatedHelpArticles(candidates,current,1).map(a=>a.id), ['related']));
+  check('PDI topic is more relevant than an unrelated article in the same collection', () => assert.equal(relatedHelpArticles([
+    { id:'diary', title:'Registre seus aprendizados no Diário de Bordo', category:'Jornada' },
+    { id:'pdi', title:'Responda às perguntas do PDI com a Íris', category:'Íris' },
+  ], { id:'current', title:'Preencha e acompanhe seu PDI', category:'Jornada' })[0].id, 'pdi'));
   check('leadership job search keeps career coaching', () => assert.equal(helpIntent('Como encontrar vagas de liderança?'), null));
   check('salary negotiation keeps career coaching', () => assert.equal(helpIntent('Quero um passo a passo para negociar meu salário'), null));
   check('interview preparation keeps career coaching', () => assert.equal(helpIntent('Quero um tutorial para me preparar para uma entrevista'), null));

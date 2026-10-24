@@ -35,9 +35,10 @@ export function helpReadingMinutes(body: string) {
 
 /** Receives only metadata already authorized by the server. */
 export function relatedHelpArticles(articles: HelpEntry[], current: HelpEntry, limit = 3) {
-  const terms = new Set(normalizeHelpText(current.title).split(/\W+/).filter(term => term.length > 3));
+  const common = new Set(['como','para','com','seu','sua','suas','seus','meu','minha','soma','uma','por','que','das','dos','nos','nas','conheca','entenda','usar','preencha','acompanhe','consulte','converse','encontre','registre','responda']);
+  const terms = new Set(normalizeHelpText(current.title).split(/\W+/).filter(term => term.length > 2 && !common.has(term)));
   return articles.filter(article => article.id !== current.id).map(article => ({ article,
-    score: (article.category === current.category ? 10 : 0) + normalizeHelpText(article.title).split(/\W+/).filter(term => terms.has(term)).length,
+    score: (article.category === current.category ? 3 : 0) + normalizeHelpText(article.title).split(/\W+/).filter(term => terms.has(term)).length * 4,
   })).sort((a, b) => b.score - a.score || a.article.title.localeCompare(b.article.title, 'pt-BR'))
     .slice(0, limit).map(item => item.article);
 }
