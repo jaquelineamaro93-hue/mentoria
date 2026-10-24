@@ -4,7 +4,7 @@ import { canOpenFeature } from '@/lib/help-center/access';
 import { getHelpAccess, getHelpArticle, helpWatermark, listHelpReleases, listHelpArticles } from '@/lib/help-center/server';
 import HelpArticleNavigation from '@/components/help/HelpArticleNavigation';
 import { helpHeadings, helpReadingMinutes, relatedHelpArticles } from '@/lib/help-center/navigation';
-import { ArrowLeft, ArrowRight, BookOpen, Clock3 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronRight, Clock3 } from 'lucide-react';
 import HelpMarkdown from '@/components/help/HelpMarkdown';
 import HelpWatermark from '@/components/help/HelpWatermark';
 import AskIris from '@/components/help/AskIris';
@@ -62,15 +62,15 @@ export default async function ArticlePage({ params, searchParams }: { params: Pr
           </div>
           <p className="mt-6 text-xs text-[#53685e]">Conteúdo de uso restrito à sua conta.</p>
         </article>
-        {(previous || next) && <nav aria-label="Continuar explorando os tutoriais" className="mt-4 grid gap-3 sm:grid-cols-2">
-          {previous ? <Link href={'/ajuda/' + previous.slug} prefetch={false} className="rounded-xl border border-[#d7e3dc] bg-white p-4 text-[#183f37] hover:border-[#24594b]"><span className="mb-2 flex items-center gap-2 text-xs text-[#53685e]"><ArrowLeft size={14} aria-hidden="true" /> Artigo anterior</span><span className="text-sm font-semibold">{previous.title}</span></Link> : <span aria-hidden="true" className="hidden sm:block" />}
-          {next && <Link href={'/ajuda/' + next.slug} prefetch={false} className="rounded-xl border border-[#d7e3dc] bg-white p-4 text-[#183f37] hover:border-[#24594b]"><span className="mb-2 flex items-center gap-2 text-xs text-[#53685e]">Próximo artigo <ArrowRight size={14} aria-hidden="true" /></span><span className="text-sm font-semibold">{next.title}</span></Link>}
+        {(previous || next) && <nav aria-label="Continuar explorando os tutoriais" className="mt-5 flex flex-col gap-3 border-t border-[#d7e3dc] pt-4 sm:flex-row sm:justify-between sm:gap-8">
+          {previous && <Link href={'/ajuda/' + previous.slug} prefetch={false} className="group flex min-h-11 min-w-0 items-center gap-2 py-2 text-sm text-[#53685e] hover:text-[#183f37] focus-visible:outline-2 focus-visible:outline-offset-2"><ArrowLeft size={15} className="shrink-0" aria-hidden="true" /><span><span className="block text-xs">Anterior</span><span className="group-hover:underline underline-offset-4">{previous.title}</span></span></Link>}
+          {next && <Link href={'/ajuda/' + next.slug} prefetch={false} className="group flex min-h-11 min-w-0 items-center gap-2 py-2 text-sm text-[#53685e] hover:text-[#183f37] focus-visible:outline-2 focus-visible:outline-offset-2 sm:ml-auto sm:text-right"><span><span className="block text-xs">Próximo</span><span className="group-hover:underline underline-offset-4">{next.title}</span></span><ArrowRight size={15} className="shrink-0" aria-hidden="true" /></Link>}
         </nav>}
-        {related.length > 0 && <section aria-labelledby="help-related-title" className="mt-8">
-          <h2 id="help-related-title" className="mb-4 text-lg font-semibold text-[#183f37]">Artigos relacionados</h2>
-          <div className="grid gap-3 sm:grid-cols-2">{related.map(item => <Link key={item.id} href={'/ajuda/' + item.slug} prefetch={false} className="rounded-xl border border-[#d7e3dc] bg-white p-4 hover:border-[#24594b]">
-            <BookOpen size={17} aria-hidden="true" className="mb-3 text-[#24594b]" /><span className="block text-sm font-semibold text-[#183f37]">{item.title}</span><span className="mt-2 block text-xs leading-5 text-[#53685e]">{item.summary}</span>
-          </Link>)}</div>
+        {related.length > 0 && <section aria-labelledby="help-related-title" className="mt-8 border-t border-[#d7e3dc] pt-6">
+          <h2 id="help-related-title" className="mb-4 text-base font-semibold text-[#183f37]">Artigos relacionados</h2>
+          <ul className="overflow-hidden rounded-lg border border-[#d7e3dc] bg-white divide-y divide-[#edf2ef]">{related.map(item => <li key={item.id}><Link href={'/ajuda/' + item.slug} prefetch={false} className="flex min-h-11 items-center justify-between gap-4 px-4 py-3 text-sm text-[#213d34] hover:bg-[#f5f8f6] focus-visible:outline-2 focus-visible:-outline-offset-2">
+            <span>{item.title}</span><ChevronRight size={15} className="shrink-0 text-[#24594b]" aria-hidden="true" />
+          </Link></li>)}</ul>
         </section>}
         <footer className="mt-8 flex flex-wrap gap-4 border-t border-[#d7e3dc] pt-5 text-sm text-[#24594b]"><Link href="/ajuda" className="underline underline-offset-4">Central de Ajuda</Link><Link href="/novidades" className="underline underline-offset-4">Novidades da SOMA</Link></footer>
       </div>
