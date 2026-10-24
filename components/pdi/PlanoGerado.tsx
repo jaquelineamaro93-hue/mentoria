@@ -191,14 +191,14 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
           <div className="mb-8 rounded-xl border border-[#cce5d9] bg-[#f5faf7] p-5">
             <p className="text-sm font-semibold text-[#204D3B]">Seus objetivos mudaram?</p>
             <p className="mt-1 text-sm leading-6 text-[#526760]">
-              Atualize suas respostas nas Perguntas Guia e gere uma nova versão do PDI.
+              Atualize suas respostas nas Perguntas Guia e gere uma nova versão do PDI, sem precisar refazer o que já foi respondido.
               A nova versão considera as metas atuais e o que você já concluiu.
               Seu plano anterior e as ações realizadas ficam preservados no histórico.
             </p>
             {erro && <p role="alert" className="mt-3 text-sm text-red-700">{erro}</p>}
             {!confirmarAtualizacao ? (
               <button type="button" onClick={() => setConfirmarAtualizacao(true)}
-                disabled={gerando || (!permitePdiParcial && !pdiCompleto)}
+                disabled={gerando || respondidas === 0}
                 className="mt-4 rounded-full bg-[#245e4e] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
                 Atualizar meu PDI com minhas novas metas
               </button>
