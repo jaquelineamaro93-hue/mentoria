@@ -25,6 +25,9 @@ export interface EstadoAcessoSaas {
   expiraEm: string | null;
   planoTrial: PlanoSaasCodigo | null;
   modulosPermitidos: string[];
+  irisPermitida: boolean;
+  whatsappPermitido: boolean;
+  assinaturaSaasAtiva: boolean;
 }
 
 /** Estritamente server-side. NUNCA usa o fallback permissivo de soma_has_module.
@@ -33,7 +36,7 @@ export interface EstadoAcessoSaas {
 export async function resolverAcessoSaas(userId: string): Promise<EstadoAcessoSaas> {
   const admin = createAdminClient();
   const now = new Date();
-  const [profile, trials, subs, grants] = await Promise.all([
+  const [profile, trials, subs, grants, contracts] = await Promise.all([
     admin.from('profiles')
       .select('is_admin,plano_id,status_assinatura,data_fim_acesso,trial_status,trial_ends_at')
       .eq('id', userId).single(),
@@ -46,8 +49,11 @@ export async function resolverAcessoSaas(userId: string): Promise<EstadoAcessoSa
     admin.from('soma_user_module_access')
       .select('module_slug,status,starts_at,expires_at')
       .eq('user_id', userId),
+    admin.from('soma_saas_orders')
+      .select('status,paid_through,iris_enabled,whatsapp_enabled')
+      .eq('user_id', userId),
   ]);
-  if (profile.error || !profile.data || trials.error || subs.error || grants.error) {
+  if (profile.error || !profile.data || trials.error || subs.error || grants.error || contracts.error) {
     throw new Error('Não foi possível conferir suas permissões.');
   }
   const p = profile.data;
@@ -70,12 +76,19 @@ export async function resolverAcessoSaas(userId: string): Promise<EstadoAcessoSa
     Date.parse(item.starts_at) <= now.getTime() &&
     (!item.expires_at || Date.parse(item.expires_at) > now.getTime())
   ).map(item => item.module_slug);
+  const atuais = (contracts.data || []).filter(item =>
+    item.status === 'ACTIVE' && !!item.paid_through &&
+    Date.parse(item.paid_through) > now.getTime()
+  );
   return {
     temMentoria,
     emTrialSaas: ativo,
     trialJaUsado: !!t,
     expiraEm: t?.ends_at || null,
     planoTrial: (t?.plan_code as PlanoSaasCodigo | undefined) ?? null,
+    irisPermitida: temMentoria || atuais.some(item => item.iris_enabled),
+    whatsappPermitido: atuais.some(item => item.whatsapp_enabled),
+    assinaturaSaasAtiva: atuais.length > 0,
     modulosPermitidos: temMentoria
       ? [...MODULOS_PRO]
       : [...new Set([...trialModules,...pagos,...concedidos])]
