@@ -44,6 +44,14 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
   // Canal comercial já utilizado no portal SOMA. Nenhum dado pessoal é incluído
   // no link; a pessoa escolhe se quer enviar a mensagem no WhatsApp.
   const linkContato = 'https://wa.me/5511959561795?text=' + encodeURIComponent(mensagem);
+  const parametrosSaas = new URLSearchParams({
+    plano,
+    ...(plano==='avulso' ? {modulo:selecionado?.slug || ''} : {}),
+    iris:iris?'1':'0',
+    whatsapp:whatsapp?'1':'0',
+    kit:kitOnboarding?'1':'0',
+  });
+  const linkSaas = '/minha-assinatura-saas?' + parametrosSaas.toString();
 
   return (
     <section id="soma-saas" className="mt-12 border-t border-gray-faint pt-11 sm:mt-16 sm:pt-14" aria-labelledby="soma-saas-titulo">
@@ -192,13 +200,13 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
             {kitOnboarding && <p className="mt-2 text-sm font-medium text-[#365b4a]">Plataforma e kit no primeiro mês: {formatarReais(calculo.estimativaPrimeiroMes)}</p>}
             {mentoria !== 'nenhuma' && <p className="mt-2 text-xs leading-5 text-[#61766a]">O valor da mentoria humana é contratado à parte e não está incluído neste total.</p>}
           </div>
-          <a href={linkContato} target="_blank" rel="noopener noreferrer"
+          <a href={linkSaas}
             className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0D8071] px-4 py-3 text-center text-sm font-semibold text-white hover:bg-[#096b5e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071]">
-            <MessageCircle size={18} aria-hidden="true" /> Solicitar contratação <ArrowUpRight size={15} aria-hidden="true" />
+            Continuar com Mercado Pago <ArrowUpRight size={15} aria-hidden="true" />
           </a>
           <p className="mt-3 text-xs leading-5 text-[#64796f]">
-            Abre o WhatsApp com sua seleção e o valor calculado para a equipe SOMA confirmar.
-            Nenhuma cobrança acontece ao clicar.
+            Acesse sua conta para revisar o plano e os agentes antes do pagamento.
+            {kitOnboarding && ' O Kit Onboarding tem pagamento único separado da assinatura mensal.'}
           </p>
         </aside>
       </div>
