@@ -11,6 +11,23 @@ import { limparIdentidade } from '@/lib/posthog';
 import { overviewItem, adminItem, portalNavGroups, supportItems, isPortalRouteActive, type PortalNavItem } from '@/lib/config/portalNavigation';
 import styles from './PortalShell.module.css';
 
+type SaasAccess = {
+  temMentoria: boolean; trialJaUsado: boolean; emTrialSaas: boolean;
+  assinaturaSaasAtiva: boolean; modulosPermitidos: string[];
+};
+// Apenas navegação: APIs e RLS precisam aplicar a autorização novamente.
+function moduloParaRota(href: string): string | null {
+  if (/^\/quem-sou-eu/.test(href)) return 'autoconhecimento';
+  if (/^\/exercicios/.test(href)) return 'diagnostico';
+  if (/^\/percepcao-360/.test(href)) return 'percepcao-360';
+  if (/^\/(meu-pdi|pdi|primeiros-90-dias|leitura-cenario)/.test(href)) return 'desenvolvimento';
+  if (/^\/(gupy|carreira\?etapa=cv)/.test(href)) return 'curriculo-ats';
+  if (/^\/(linkedin|conteudo-linkedin)/.test(href)) return 'linkedin';
+  if (/^\/network/.test(href)) return 'networking';
+  if (/^\/carreira\?etapa=vagas/.test(href)) return 'vagas';
+  if (/^\/carreira\?etapa=entrevista/.test(href)) return 'entrevistas';
+  return null;
+}
 export default function CollapsibleSidebar() {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
   const { profile, initials, isLoading } = useUser();
@@ -22,6 +39,7 @@ export default function CollapsibleSidebar() {
   const sidebar = useRef<HTMLElement>(null);
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({});
   const [signingOut, setSigningOut] = useState(false);
+  const [saasAccess,setSaasAccess] = useState<SaasAccess | null>(null);
   const [signOutError, setSignOutError] = useState('');
 
   useEffect(() => {
@@ -32,6 +50,27 @@ export default function CollapsibleSidebar() {
       }
     } catch { /* Ignore invalid preferences. */ }
   }, []);
+
+  useEffect(() => {
+    let ativo=true;
+    fetch('/api/saas/acesso',{credentials:'same-origin',cache:'no-store'})
+      .then(res=>res.ok?res.json():null)
+      .then(data=>{if(ativo && data) setSaasAccess(data as SaasAccess);})
+      .catch(()=>{/* mantém a navegação legada quando o serviço está indisponível */});
+    return ()=>{ativo=false;};
+  }, []);
+  const somenteSaas = !!saasAccess && !saasAccess.temMentoria &&
+    (saasAccess.trialJaUsado || saasAccess.assinaturaSaasAtiva);
+  const gruposVisiveis = somenteSaas
+    ? portalNavGroups.map(group=>({
+      ...group,
+      items: group.items.filter(item=>
+        item.href==='/minha-assinatura-saas' ||
+        (!!moduloParaRota(item.href) &&
+          saasAccess.modulosPermitidos.includes(moduloParaRota(item.href)!))
+      ),
+    })).filter(group=>group.items.length>0)
+    : portalNavGroups;
 
   useEffect(() => { closeMobileSidebar(); }, [pathname, closeMobileSidebar]);
 
@@ -93,7 +132,7 @@ export default function CollapsibleSidebar() {
       inert={isMobile && !isMobileOpen ? true : undefined}
       className={`${styles.sidebar} ${compact ? styles.compact : ''} ${isMobileOpen ? styles.mobileOpen : ''}`}>
       <div className={styles.brandRow}>
-        <Link href="/dashboard" onClick={closeMobileSidebar} aria-label="SOMA — Visão geral" className={styles.brand}>
+        <Link href={somenteSaas ? "/minha-assinatura-saas" : "/dashboard"} onClick={closeMobileSidebar} aria-label="SOMA — Visão geral" className={styles.brand}>
           <span className={styles.wordmark}>SOMA<span>.</span></span>
           <span className={styles.brandCaption}>MENTORIA & CARREIRA</span>
           <span className={styles.smallMark} aria-hidden="true">S<span>.</span></span>
@@ -108,10 +147,10 @@ export default function CollapsibleSidebar() {
 
       <nav id="soma-menu-items" className={styles.navigation} aria-label="Menu principal">
         <div className={styles.primaryLinks}>
-          {navLink(overviewItem)}
+          {!somenteSaas && navLink(overviewItem)}
           {profile?.is_admin === true && navLink(adminItem)}
         </div>
-        {portalNavGroups.map((group) => {
+        {gruposVisiveis.map((group) => {
           // A group containing the current page stays discoverable, even after a saved collapse.
           const containsActive = group.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch));
           const open = compact || containsActive || !closedGroups[group.id];
@@ -131,7 +170,7 @@ export default function CollapsibleSidebar() {
       <footer className={styles.sidebarFooter}>
         <Link href="/perfil" onClick={closeMobileSidebar} className={styles.profileLink} aria-label="Meu perfil" title={compact ? 'Meu perfil' : undefined}>
           {profile?.foto_url ? <img src={profile.foto_url} alt="" className={styles.avatar} /> : <span className={styles.avatar}>{initials || <UserRound size={18} />}</span>}
-          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
+          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : somenteSaas ? 'SOMA Plataforma' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
         </Link>
         <button type="button" className={styles.signOut} onClick={handleSignOut} disabled={signingOut} title="Sair da conta" aria-label={signingOut ? 'Saindo da conta' : 'Sair da conta'}><LogOut size={18} /></button>
         {signOutError && <p role="alert" className={styles.signOutError}>{signOutError}</p>}

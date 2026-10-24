@@ -1,0 +1,52 @@
+name: SaaS checkout and access validation
+on:
+  pull_request:
+    paths:
+      - 'lib/soma-saas-entitlements.ts'
+      - 'lib/mercadopago.ts'
+      - 'app/api/saas/**'
+      - 'app/api/mercadopago/webhook/route.ts'
+      - 'app/(dashboard)/minha-assinatura-saas/**'
+      - 'components/saas/**'
+      - 'lib/config/portalNavigation.ts'
+      - 'supabase/migrations/20261023*_soma_saas*'
+      - 'supabase/migrations/20261024*_soma_saas*'
+      - 'tests/soma-saas-billing-access.test.mjs'
+      - 'tests/soma-saas-route-isolation.test.mjs'
+      - 'proxy.ts'
+      - 'lib/soma-saas-routes.ts'
+      - 'components/CollapsibleSidebar.tsx'
+      - 'components/public/SomaSaasShowcase.tsx'
+      - '.github/workflows/soma-saas-access.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Contract and privacy safety checks
+        run: node --test tests/soma-saas-billing-access.test.mjs
+      - name: Verify SaaS route and mentorship isolation
+        run: node --experimental-strip-types --test tests/soma-saas-route-isolation.test.mjs
+      - name: Existing Mercado Pago and pricing regressions
+        run: node --experimental-strip-types --test tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          ANTHROPIC_API_KEY: placeholder
+          SENDGRID_API_KEY: placeholder
+          SENDGRID_FROM_EMAIL: contato@example.com
+          NEXT_PUBLIC_POSTHOG_KEY: placeholder
+          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com

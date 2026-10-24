@@ -11,7 +11,8 @@ test('Menu lateral possui seção própria Íris Copiloto com acesso ao plano', 
   assert.ok(grupo, 'Seção de navegação Íris Copiloto ausente');
   assert.match(nav, /label: 'Íris Copiloto'/);
   assert.match(grupo[1], /href: '\/plano-acoes-iris', label: 'Plano de Ação Íris', icon: ClipboardList/);
-  assert.match(sidebar, /portalNavGroups\.map\(\(group\) =>/);
+  assert.match(sidebar, /gruposVisiveis\.map\(\(group\) =>/);
+  assert.match(sidebar, /const gruposVisiveis = somenteSaas/);
   assert.match(sidebar, /aria-expanded=\{open\}/);
   assert.match(sidebar, /containsActive \|\| !closedGroups\[group\.id\]/);
   assert.match(sidebar, /group\.items\.map\(navLink\)/);

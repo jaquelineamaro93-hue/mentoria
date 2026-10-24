@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { moduloSaasParaRota, rotaBasicaSaas } from '@/lib/soma-saas-routes';
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -103,6 +104,60 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  let exclusivamenteSaas = false;
+  // SOMA Plataforma nunca implica mentoria. Para contas exclusivamente SaaS,
+  // bloquear por padrão páginas e APIs que não estejam no contrato.
+  if (user) {
+    const [perfilSaas,trialSaas,pedidosSaas] = await Promise.all([
+      supabase.from('profiles')
+        .select('is_admin,plano_id,status_assinatura,trial_status,trial_ends_at,data_fim_acesso')
+        .eq('id',user.id).maybeSingle(),
+      supabase.from('soma_saas_trials').select('user_id')
+        .eq('user_id',user.id).maybeSingle(),
+      supabase.from('soma_saas_orders').select('id')
+        .eq('user_id',user.id).limit(1),
+    ]);
+    if (perfilSaas.error || trialSaas.error || pedidosSaas.error) {
+      return NextResponse.json({error:'Não foi possível validar o tipo de assinatura.'},
+        {status:503,headers:{'Cache-Control':'no-store'}});
+    }
+    const p=perfilSaas.data;
+    const agora=Date.now();
+    const mentorPago=!!p?.plano_id && p.status_assinatura==='ativo' &&
+      (!p.data_fim_acesso || Date.parse(p.data_fim_acesso+'T23:59:59-03:00')>=agora);
+    const mentorTrial=p?.trial_status==='active' && !!p.trial_ends_at &&
+      Date.parse(p.trial_ends_at)>agora;
+    const somenteSaas=(!!trialSaas.data || !!pedidosSaas.data?.length) &&
+      !p?.is_admin && !mentorPago && !mentorTrial;
+    exclusivamenteSaas = somenteSaas;
+    if (somenteSaas && !rotaBasicaSaas(path)) {
+      let permitido=false;
+      if(path.startsWith('/api/copiloto')) {
+        const {data:assinaturas,error} = await supabase.from('soma_saas_orders')
+          .select('iris_enabled,status,paid_through')
+          .eq('user_id',user.id).eq('status','ACTIVE');
+        permitido=!error && !!assinaturas?.some(s=>s.iris_enabled &&
+          !!s.paid_through && Date.parse(s.paid_through)>agora);
+      } else {
+        const modulo=moduloSaasParaRota(path,request.nextUrl.search);
+        if(modulo) {
+          const {data,error}=await supabase.rpc('soma_has_module',{p_slug:modulo});
+          permitido=!error && data===true;
+        }
+      }
+      if(!permitido) {
+        if(path.startsWith('/api/')) {
+          return NextResponse.json({error:'Recurso não incluído no seu plano SaaS.'},
+            {status:403,headers:{'Cache-Control':'no-store'}});
+        }
+        const destino=request.nextUrl.clone();
+        destino.pathname='/minha-assinatura-saas';
+        destino.search='';
+        return NextResponse.redirect(destino);
+      }
+    }
+  }
+
   const rotaLiberada =
     path.startsWith('/login') ||
     path.startsWith('/checkout') ||
@@ -112,7 +167,7 @@ export async function proxy(request: NextRequest) {
     path.startsWith('/api') ||
     path.startsWith('/auth');
 
-  if (user && !rotaLiberada) {
+  if (user && !rotaLiberada && !exclusivamenteSaas) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at')

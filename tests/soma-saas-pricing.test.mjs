@@ -49,8 +49,9 @@ test('seleção funciona na UI e envia simulação comercial sem cobrar',()=>{
  assert.match(ui,/setModulo\(e.target.value\)/);
  assert.match(ui,/calcularResumoSaas\(plano, \{ iris, whatsapp \}, kitOnboarding\)/);
  assert.match(ui,/linkContato/);
- assert.match(ui,/Solicitar contratação/);
- assert.match(ui,/Nenhuma cobrança acontece ao clicar/);
+ assert.match(ui,/Continuar com Mercado Pago/);
+ assert.match(ui,/minha-assinatura-saas\?/);
+ assert.match(ui,/Acesse sua conta para revisar o plano e os agentes antes do pagamento/);
  assert.match(ui,/Sem agentes de IA inclusos|sem agentes de IA/);
  assert.doesNotMatch(ui,/Contratação disponível após validação de segurança/);
 });

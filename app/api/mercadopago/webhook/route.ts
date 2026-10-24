@@ -20,6 +20,29 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
     if (tipo === 'subscription_preapproval' || tipo === 'preapproval') {
       const subscription = await buscarPreapprovalMercadoPago(id);
+      // SaaS tem pedidos e permissões separados da mentoria.
+      const { data: saasOrder, error: saasError } = await admin.from('soma_saas_orders')
+        .select('id,status,provider_subscription_id')
+        .eq('id', subscription.external_reference).maybeSingle();
+      if (saasError) throw saasError;
+      if (saasOrder) {
+        if (saasOrder.provider_subscription_id !== String(subscription.id))
+          throw new Error('Assinatura SaaS divergente.');
+        // Pré-aprovação ou autorização não comprovam pagamento.
+        if (saasOrder.status === 'PENDING' && subscription.status === 'authorized') {
+          const {error: e} = await admin.from('soma_saas_orders')
+            .update({status:'AUTHORIZED',updated_at:new Date().toISOString()})
+            .eq('id',saasOrder.id).eq('status','PENDING');
+          if(e) throw e;
+        } else if (['cancelled','paused'].includes(subscription.status) &&
+          ['PENDING','AUTHORIZED'].includes(saasOrder.status)) {
+          const {error: e} = await admin.from('soma_saas_orders')
+            .update({status:'CANCELED',updated_at:new Date().toISOString()})
+            .eq('id',saasOrder.id).in('status',['PENDING','AUTHORIZED']);
+          if(e) throw e;
+        }
+        return NextResponse.json({ok:true,produto:'saas'});
+      }
       const { data: pedido, error } = await admin.from('mp_pedidos').select('id, mp_resource_id')
         .eq('id', subscription.external_reference).eq('forma_pagamento', 'recorrente').maybeSingle();
       if (error) throw error;
@@ -38,15 +61,44 @@ export async function POST(request: Request) {
       paymentId = String(charge.payment.id);
       const subscription = await buscarPreapprovalMercadoPago(String(charge.preapproval_id));
       subscriptionReference = subscription.external_reference;
-      const { data: pedido, error } = await admin.from('mp_pedidos').select('mp_resource_id')
-        .eq('id', subscriptionReference).maybeSingle();
-      if (error || !pedido || pedido.mp_resource_id !== String(subscription.id)) throw new Error('Assinatura divergente.');
+      const {data: saasOrder,error: saasError} = await admin.from('soma_saas_orders')
+        .select('id,provider_subscription_id').eq('id',subscriptionReference).maybeSingle();
+      if (saasError) throw saasError;
+      if (saasOrder) {
+        if (saasOrder.provider_subscription_id !== String(subscription.id))
+          throw new Error('Assinatura SaaS divergente.');
+      } else {
+        const { data: pedido, error } = await admin.from('mp_pedidos').select('mp_resource_id')
+          .eq('id', subscriptionReference).maybeSingle();
+        if (error || !pedido || pedido.mp_resource_id !== String(subscription.id))
+          throw new Error('Assinatura divergente.');
+      }
     } else if (tipo !== 'payment') return NextResponse.json({ ignorado: true });
     const payment = await buscarPagamentoMercadoPago(paymentId);
     if (String(payment.id) !== paymentId) throw new Error('Pagamento divergente.');
     if (subscriptionReference && payment.external_reference && payment.external_reference !== subscriptionReference) throw new Error('Referência divergente.');
     const reference = subscriptionReference || payment.external_reference;
     if (!reference) return NextResponse.json({ ignorado: true });
+    const {data: saasOrder, error: saasErr} = await admin.from('soma_saas_orders')
+      .select('id,provider_subscription_id')
+      .eq('id',reference).maybeSingle();
+    if (saasErr) throw saasErr;
+    if (saasOrder) {
+      // Somente cobrança de assinatura com preapproval validada concede acesso.
+      if (!subscriptionReference) return NextResponse.json({ignorado:true});
+      if (!saasOrder.provider_subscription_id) throw new Error('Assinatura SaaS sem vínculo.');
+      const {data:resultado,error:erroSaas} = await admin.rpc('soma_process_saas_payment',{
+        p_order:saasOrder.id,
+        p_preapproval:saasOrder.provider_subscription_id,
+        p_payment_id:paymentId,
+        p_status:payment.status,
+        p_amount:payment.transaction_amount,
+        p_currency:payment.currency_id,
+        p_paid_at:payment.date_approved || null,
+      });
+      if(erroSaas || resultado==='unknown_order') throw new Error('Pagamento SaaS não reconciliado.');
+      return NextResponse.json({ok:true,produto:'saas',resultado});
+    }
     const { data, error } = await admin.rpc('processar_mp_pagamento', {
       p_pedido: reference, p_payment_id: paymentId,
       p_status: payment.status, p_valor: payment.transaction_amount, p_currency: payment.currency_id,
