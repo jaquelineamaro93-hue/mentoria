@@ -1,3 +1,4 @@
+import { reconcileSaasRecovery } from '@/lib/saas-recovery';
 import { createAdminClient } from '@/lib/supabase/admin';
 /** Called only after signature validation and provider-side resource retrieval. */
 export async function syncSaasSubscription(subscription: { id: string; external_reference: string; status: string }) {
@@ -28,5 +29,6 @@ export async function syncSaasPayment(payment: { id: string | number; status: st
     p_paid_at: payment.date_approved || null,
   });
   if (result.error || result.data === 'unknown_order') throw new Error('Pagamento não reconciliado.');
+  if (payment.status === 'approved') await reconcileSaasRecovery(order.id);
   return true;
 }

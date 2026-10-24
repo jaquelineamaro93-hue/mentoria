@@ -163,13 +163,13 @@ export async function buscarPagamentoAssinaturaMercadoPago(id: string) {
 }
 
 /** Monthly SaaS recurrence has no fixed installment/end date. */
-export async function criarAssinaturaSaasMercadoPago(input: { email: string; valor: number; externalReference: string; startDate?: string }) {
+export async function criarAssinaturaSaasMercadoPago(input: { email: string; valor: number; externalReference: string; startDate?: string; regularAmount?: number }) {
   const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!token) throw new Error('Mercado Pago indisponível.');
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://somamentoria.com';
   const response = await fetch(`${MP_API}/preapproval`, { method: 'POST', headers: {
     Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Idempotency-Key': input.externalReference,
-  }, body: JSON.stringify({ reason: 'SOMA Plataforma · assinatura mensal', payer_email: input.email,
+  }, body: JSON.stringify({ reason: input.regularAmount ? `SOMA Plataforma: primeiro mês R$ ${input.valor.toFixed(2)}; próximos R$ ${input.regularAmount.toFixed(2)}/mês` : 'SOMA Plataforma · assinatura mensal', payer_email: input.email,
     external_reference: input.externalReference, back_url: `${site}/plataforma?retorno=1`, status: 'pending',
     auto_recurring: { frequency: 1, frequency_type: 'months', transaction_amount: input.valor, currency_id: 'BRL',
       ...(input.startDate ? { start_date: input.startDate } : {}) },
@@ -202,4 +202,18 @@ export async function buscarCheckoutSaasMercadoPago(reference: string) {
   const matches = data.results.filter((item: { external_reference?: string; status?: string }) => item.external_reference === reference && item.status !== 'cancelled');
   if (matches.length > 1) throw new Error('Mais de uma assinatura: requer conciliação.');
   return matches[0] as { id: string; init_point: string } | undefined;
+}
+
+/** Idempotent restoration of the agreed recurring price after the introductory charge. */
+export async function restaurarPrecoAssinaturaSaas(id: string, amount: number) {
+ const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+ if (!token || !Number.isFinite(amount) || amount <= 0) throw new Error('Recorrência indisponível.');
+ const response = await fetch(`${MP_API}/preapproval/${encodeURIComponent(id)}`, {
+  method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ auto_recurring: { transaction_amount: amount, currency_id: 'BRL' } }),
+  signal: AbortSignal.timeout(15000),
+ });
+ if (!response.ok) throw new Error('Não foi possível atualizar a recorrência.');
+ const result = await response.json();
+ if (String(result.id) !== id || Math.round(Number(result.auto_recurring?.transaction_amount)*100) !== Math.round(amount*100)) throw new Error('Recorrência não confirmada.');
 }

@@ -71,3 +71,10 @@ export const CATALOGO_SAAS = {
     itens: ['Todos os módulos SaaS', 'Currículo, LinkedIn e vagas', 'Entrevistas e networking', 'Sem agentes de IA inclusos'],
   },
 } as const;
+
+/** Recovery discounts apply once to software only. Agents retain full price. */
+export const RECOVERY_BASE_CENTAVOS = { avulso: 1990, essencial: 2790, pro: 5590 } as const;
+export function calcularRecuperacaoSaas(plano: PlanoSaas, adicionais: AdicionaisSaas) {
+ const regular = calcularPrecoSaas(plano, adicionais);
+ return { primeira: RECOVERY_BASE_CENTAVOS[plano] + regular.adicionais, recorrente: regular.total };
+}
