@@ -33,7 +33,8 @@ test('adicional de R$50 para avaliação de mentoria existente não altera preç
  assert.equal(ADICIONAL_MENTORIA_EXISTENTE_CENTAVOS,5000);
  const module=file('components/public/SomaSaasShowcase.tsx');
  const checkout=file('app/api/mercadopago/criar-assinatura/route.ts');
- assert.match(module,/Os planos de mentoria com encontros humanos são contratos separados/);
+ assert.match(module,/Planos de mentoria com encontros humanos continuam separados/);
+ assert.match(module,/R\$ 50,00 por agente de IA/);
  assert.doesNotMatch(module,/api\/mercadopago\/criar-assinatura/);
  assert.match(checkout,/\.from\('planos_mentoria'\)/);
  assert.doesNotMatch(checkout,/ADICIONAL_IA_CENTAVOS|DOIS_AGENTES_CENTAVOS/);
