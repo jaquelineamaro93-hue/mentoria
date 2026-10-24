@@ -48,7 +48,7 @@ test('Especialista entrega ação concreta, preserva contexto e não repete perg
 });
 
 test('Íris oferece continuidade clicável e não empurra link genérico para dashboard', () => {
-  assert.match(ui, /Próximos passos sugeridos pela Íris/);
+  assert.match(ui, /Como quer continuar\?/);
   assert.match(ui, /onClick=\{\(\) => void enviar\(sugestao\)\}/);
   assert.match(ui, /indice === mensagens\.length - 1/);
   assert.match(api, /sugestoes\?: string\[\]/);
