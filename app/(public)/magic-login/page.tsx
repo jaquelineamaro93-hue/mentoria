@@ -1,5 +1,6 @@
 'use client';
 
+import { safeSaasNext } from '@/lib/auth/saas-return';
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
@@ -9,6 +10,7 @@ function MagicLoginContent() {
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get('email')?.trim().toLowerCase() ?? '';
   const trialPlanId = searchParams.get('trial_plan');
+  const nextPath = safeSaasNext(searchParams.get('next'));
   const codeAlreadySent = searchParams.get('sent') === '1' && Boolean(initialEmail);
 
   const [stage, setStage] = useState<'email' | 'code'>(codeAlreadySent ? 'code' : 'email');
@@ -53,7 +55,7 @@ function MagicLoginContent() {
       const res = await fetch('/api/auth/verify-magic-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, trialPlanId }),
+        body: JSON.stringify({ email, code, trialPlanId: nextPath ? null : trialPlanId, nextPath }),
       });
 
       const data = await res.json();
@@ -64,7 +66,7 @@ function MagicLoginContent() {
         if (data.loginUrl) {
           window.location.href = data.loginUrl;
         } else {
-          router.push('/dashboard');
+          router.push(nextPath || '/dashboard');
         }
       }, 1500);
     } catch (err) {
@@ -136,7 +138,7 @@ function MagicLoginContent() {
               </form>
 
               <p className="text-xs text-gray-text text-center mt-6">
-                <a href="/login" className="text-black hover:underline font-medium">
+                <a href={nextPath ? '/login?next=' + encodeURIComponent(nextPath) : '/login'} className="text-black hover:underline font-medium">
                   Voltar ao login
                 </a>
               </p>

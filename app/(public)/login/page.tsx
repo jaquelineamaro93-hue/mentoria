@@ -1,5 +1,6 @@
 'use client';
 
+import { safeSaasNext } from '@/lib/auth/saas-return';
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Check, Circle } from 'lucide-react';
@@ -16,6 +17,8 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const codigoIndicacao = searchParams.get('ref');
   const trialPlanId = searchParams.get('trial_plan');
+  const nextPath = safeSaasNext(searchParams.get('next'));
+  const saasSignup = !!nextPath;
   const supabase = createClient();
 
   const [modo, setModo] = useState<Modo>(
@@ -33,7 +36,7 @@ function LoginPageContent() {
   const criteriosSenha = requisitosSenha(senha);
 
   async function iniciarTrialSeSolicitado() {
-    if (!trialPlanId) return true;
+    if (saasSignup || !trialPlanId) return true;
 
     const response = await fetch('/api/trial/start', {
       method: 'POST',
@@ -77,7 +80,7 @@ function LoginPageContent() {
           if (!error && data.user) {
             identificarMentorado(data.user.id, { email: data.user.email });
             posthog.capture('magic_login_realizado');
-            router.push('/dashboard');
+            router.push(nextPath || '/dashboard');
             router.refresh();
           }
         } catch {
@@ -118,7 +121,7 @@ function LoginPageContent() {
       }
     }
 
-    router.push('/dashboard');
+    router.push(nextPath || '/dashboard');
     router.refresh();
   }
 
@@ -193,7 +196,7 @@ function LoginPageContent() {
 
         if (res.ok) {
           setLoading(false);
-          router.push(`/magic-login?email=${encodeURIComponent(email)}&sent=1${trialPlanId ? `&trial_plan=${encodeURIComponent(trialPlanId)}` : ''}`);
+          router.push(`/magic-login?email=${encodeURIComponent(email)}&sent=1${trialPlanId ? `&trial_plan=${encodeURIComponent(trialPlanId)}` : ''}${nextPath ? `&next=${encodeURIComponent(nextPath)}` : ''}`);
           return;
         }
       } catch {
@@ -216,6 +219,7 @@ function LoginPageContent() {
 
       <div className="w-full max-w-md relative z-20">
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
+          {saasSignup && <p className="mb-3 text-sm text-white">SOMA Plataforma: entre ou crie sua conta para continuar com o plano escolhido.</p>}
           <p className="font-display text-3xl sm:text-4xl tracking-wide text-white">
             SOMA <span className="text-mint">MENTORIA</span>
           </p>
@@ -304,7 +308,7 @@ function LoginPageContent() {
                 <button
                   type="button"
                   className="text-xs text-gray-text hover:text-orange transition-colors text-center mt-1"
-                  onClick={() => router.push('/magic-login')}
+                  onClick={() => router.push('/magic-login' + (nextPath ? '?next=' + encodeURIComponent(nextPath) : ''))}
                 >
                   Esqueci a senha
                 </button>
@@ -318,7 +322,7 @@ function LoginPageContent() {
                   </div>
                 </div>
 
-                <OAuthButtons trialPlanId={trialPlanId} />
+                <OAuthButtons trialPlanId={trialPlanId} nextPath={nextPath} />
               </form>
             ) : (
               <form onSubmit={handleCadastrar} className="flex flex-col gap-4">
@@ -346,7 +350,7 @@ function LoginPageContent() {
                     placeholder="voce@email.com"
                   />
                 </Field>
-                <Field label="Tipo de pacote">
+                {!saasSignup && <Field label="Tipo de pacote">
                   <select
                     value={tipoPacote}
                     onChange={(e) => setTipoPacote(e.target.value as TipoPacote)}
@@ -355,7 +359,7 @@ function LoginPageContent() {
                     <option value="online">Online</option>
                     <option value="presencial">Presencial</option>
                   </select>
-                </Field>
+                </Field>}
                 <Field label="Senha">
                   <div className="relative">
                     <input

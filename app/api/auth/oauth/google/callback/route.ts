@@ -1,3 +1,4 @@
+import { safeSaasNext } from '@/lib/auth/saas-return';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { iniciarTrialParaUsuario } from '@/lib/trial';
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json().catch(() => null)) as
-      | { token?: string; trialPlanId?: string | null }
+      | { token?: string; trialPlanId?: string | null; nextPath?: string | null }
       | null;
 
     const token = body?.token?.trim();
@@ -121,7 +122,8 @@ export async function POST(request: NextRequest) {
     }
 
     let trialStarted = false;
-    const trialPlanId = body?.trialPlanId?.trim();
+    const nextPath = safeSaasNext(body?.nextPath);
+    const trialPlanId = nextPath ? null : body?.trialPlanId?.trim();
     if (trialPlanId) {
       const trialResult = await iniciarTrialParaUsuario(
         admin,
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${siteUrl}/auth/confirm`,
+        redirectTo: `${siteUrl}/auth/confirm${nextPath ? '?next=' + encodeURIComponent(nextPath) : ''}`,
       },
     });
 

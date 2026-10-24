@@ -32,4 +32,4 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: node --experimental-strip-types --test tests/saas-access.test.mjs tests/saas-webhook.test.cjs tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs
+      - run: node --experimental-strip-types --test tests/saas-access.test.mjs tests/saas-webhook.test.cjs tests/saas-auth-flow.test.cjs tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs

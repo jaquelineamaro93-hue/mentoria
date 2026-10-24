@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-export default function OAuthButtons({ trialPlanId }: { trialPlanId?: string | null }) {
+export default function OAuthButtons({ trialPlanId, nextPath }: { trialPlanId?: string | null; nextPath?: string | null }) {
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export default function OAuthButtons({ trialPlanId }: { trialPlanId?: string | n
           const response = await fetch('/api/auth/oauth/google/callback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: credential, trialPlanId: trialPlanId || null }),
+            body: JSON.stringify({ token: credential, trialPlanId: nextPath ? null : trialPlanId || null, nextPath }),
           });
           const result = await response.json();
           if (!response.ok || !result.loginUrl) throw new Error(result.error || 'Não foi possível concluir o login com Google.');
@@ -61,7 +61,7 @@ export default function OAuthButtons({ trialPlanId }: { trialPlanId?: string | n
     button.replaceChildren();
     google.accounts.id.renderButton(button, { theme: 'outline', size: 'large', text: 'signin_with' });
     return () => { button.replaceChildren(); };
-  }, [ready, clientId, trialPlanId]);
+  }, [ready, clientId, trialPlanId, nextPath]);
 
   return (
     <div className="space-y-3 my-6">
