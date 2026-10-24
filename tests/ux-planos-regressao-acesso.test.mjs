@@ -18,7 +18,7 @@ test('login Google, magic link, recovery e trial preservam os fluxos existentes'
   assert.doesNotMatch(auth, /F12|console\.(?:log|warn|error)|Hash encontrada|Access token:/);
 });
 
-test('precificação SaaS é apenas vitrine e mentoria mantém checkout e trial', () => {
+test('SaaS tem teste separado e mentoria mantém checkout e trial', () => {
   const page = file('app/(public)/planos/page.tsx');
   const saas = file('components/public/SomaSaasShowcase.tsx');
   assert.match(page, /SomaSaasShowcase/);
@@ -29,7 +29,7 @@ test('precificação SaaS é apenas vitrine e mentoria mantém checkout e trial'
   assert.match(pricing, /essencial: 3490/);
   assert.match(pricing, /pro: 6990/);
   assert.match(saas, /calcularResumoSaas/);
-  assert.match(saas, /Nenhuma cobrança acontece ao clicar/);
+  assert.match(saas, /Começar meus 7 dias grátis/);
   assert.doesNotMatch(saas, /Contratação disponível após validação de segurança|Preços de referência mensais|Na revisão de novas ofertas/);
   assert.doesNotMatch(saas, /href=.*\/checkout|fetch\(.*mercadopago/);
 });

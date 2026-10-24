@@ -37,7 +37,9 @@ async function autenticarMentorado() {
     (!perfil.data_fim_acesso || perfil.data_fim_acesso >= hoje);
   const trial = perfil.trial_status === 'active' && !!perfil.trial_ends_at &&
     Date.parse(perfil.trial_ends_at) > Date.now();
-  if (!perfil.is_admin && !assinante && !trial)
+  const { data: access, error: accessError } = await db.rpc('soma_saas_state');
+  if (accessError || (access?.saas && !access.mentorship && !access.iris)) return { erro: resposta({ erro: 'Íris não está incluída no seu plano.' }, 403) };
+  if (!access?.iris && !perfil.is_admin && !assinante && !trial)
     return { erro: resposta({ erro: 'Seu acesso à mentoria está inativo.' }, 403) };
   const [pausa, versao] = await Promise.all([
     db.from('mentoria_pausas').select('id').eq('user_id', user.id)
@@ -47,11 +49,11 @@ async function autenticarMentorado() {
   ]);
   if (pausa.error || versao.error || !versao.data)
     return { erro: resposta({ erro: 'Não foi possível validar as permissões.' }, 503) };
-  if (pausa.data) return { erro: resposta({ erro: 'Sua mentoria está pausada.' }, 403) };
+  if (pausa.data && !(access?.saas && access.iris)) return { erro: resposta({ erro: 'Sua mentoria está pausada.' }, 403) };
   const { data: aceite, error: erroAceite } = await db.from('termos_aceites')
     .select('id').eq('user_id', user.id).eq('termo_id', versao.data.id).limit(1).maybeSingle();
   if (erroAceite) return { erro: resposta({ erro: 'Não foi possível validar seus termos.' }, 503) };
-  if (!aceite) return { erro: resposta({ erro: 'Aceite os termos vigentes para continuar.' }, 403) };
+  if (!aceite && !(access?.saas && access.iris)) return { erro: resposta({ erro: 'Aceite os termos vigentes para continuar.' }, 403) };
   return { db, user, perfil };
 }
 

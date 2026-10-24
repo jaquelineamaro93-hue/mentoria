@@ -1,3 +1,4 @@
+import { syncSaasSubscription, syncSaasPayment } from '@/lib/saas-webhook';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { buscarPreapprovalMercadoPago, buscarPagamentoMercadoPago, buscarPagamentoAssinaturaMercadoPago } from '@/lib/mercadopago';
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
     if (tipo === 'subscription_preapproval' || tipo === 'preapproval') {
       const subscription = await buscarPreapprovalMercadoPago(id);
+      if (await syncSaasSubscription(subscription)) return NextResponse.json({ ok: true });
       const { data: pedido, error } = await admin.from('mp_pedidos').select('id, mp_resource_id')
         .eq('id', subscription.external_reference).eq('forma_pagamento', 'recorrente').maybeSingle();
       if (error) throw error;
@@ -32,21 +34,30 @@ export async function POST(request: Request) {
     }
     let paymentId = id;
     let subscriptionReference: string | undefined;
+    let saasSubscriptionId: string | undefined;
     if (tipo === 'subscription_authorized_payment') {
       const charge = await buscarPagamentoAssinaturaMercadoPago(id);
       if (!charge.payment?.id) return NextResponse.json({ ignorado: true });
       paymentId = String(charge.payment.id);
       const subscription = await buscarPreapprovalMercadoPago(String(charge.preapproval_id));
       subscriptionReference = subscription.external_reference;
+      const { data: saasOrder, error: saasError } = await admin.from('soma_module_orders').select('provider_subscription_id').eq('id', subscriptionReference).maybeSingle();
+      if (saasError) throw saasError;
+      if (saasOrder) {
+        if (saasOrder.provider_subscription_id !== String(subscription.id)) throw new Error('Assinatura divergente.');
+        saasSubscriptionId = String(subscription.id);
+      } else {
       const { data: pedido, error } = await admin.from('mp_pedidos').select('mp_resource_id')
         .eq('id', subscriptionReference).maybeSingle();
       if (error || !pedido || pedido.mp_resource_id !== String(subscription.id)) throw new Error('Assinatura divergente.');
+      }
     } else if (tipo !== 'payment') return NextResponse.json({ ignorado: true });
     const payment = await buscarPagamentoMercadoPago(paymentId);
     if (String(payment.id) !== paymentId) throw new Error('Pagamento divergente.');
     if (subscriptionReference && payment.external_reference && payment.external_reference !== subscriptionReference) throw new Error('Referência divergente.');
     const reference = subscriptionReference || payment.external_reference;
     if (!reference) return NextResponse.json({ ignorado: true });
+    if (await syncSaasPayment(payment, reference, saasSubscriptionId)) return NextResponse.json({ ok: true });
     const { data, error } = await admin.rpc('processar_mp_pagamento', {
       p_pedido: reference, p_payment_id: paymentId,
       p_status: payment.status, p_valor: payment.transaction_amount, p_currency: payment.currency_id,

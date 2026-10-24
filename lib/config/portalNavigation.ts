@@ -85,6 +85,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     items: [
       { href: '/passaporte', label: 'Meu Passaporte', icon: Award },
       { href: '/meu-plano', label: 'Meu Plano', icon: CreditCard },
+      { href: '/plataforma', label: 'SOMA Plataforma', icon: CreditCard },
     ],
   },
 ];

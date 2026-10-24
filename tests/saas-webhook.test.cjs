@@ -1,0 +1,11 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const ts=require('typescript');
+function helpers({order={id:'order',provider_subscription_id:'sub'},known=null,rpcError=null}={}) {
+ const calls=[];const admin={from:table=>({select:()=>{const chain={eq:()=>chain,maybeSingle:async()=>({data:table==='soma_module_orders'?order:known,error:null})};return chain;}}),rpc:async(name,args)=>{calls.push({name,args});return {data:'processed',error:rpcError};}};
+ const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/saas-webhook.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports,require:()=>({createAdminClient:()=>admin})});return {...exports,calls};
+}
+const payment={id:'payment',status:'approved',transaction_amount:24.9,currency_id:'BRL',date_approved:'2026-10-24T00:00:00Z'};
+test('subscription authorization never calls payment grant',async()=>{const h=helpers();assert.equal(await h.syncSaasSubscription({id:'sub',external_reference:'order',status:'authorized'}),true);assert.equal(h.calls[0].name,'soma_sync_module_preapproval');});
+test('initial charge requires verified linked subscription and uses provider amount/date',async()=>{const h=helpers();await h.syncSaasPayment(payment,'order','sub');assert.equal(h.calls[0].name,'soma_process_module_payment');assert.equal(h.calls[0].args.p_amount,24.9);assert.equal(h.calls[0].args.p_paid_at,payment.date_approved);await assert.rejects(h.syncSaasPayment(payment,'order','wrong'));});
+test('unlinked direct approvals cannot grant a SaaS subscription',async()=>{const h=helpers();await h.syncSaasPayment(payment,'order');assert.equal(h.calls.length,0);});
+test('refund for a known payment is processed and database errors propagate for retry',async()=>{const h=helpers({known:{order_id:'order'}});await h.syncSaasPayment({...payment,status:'refunded'},'order');assert.equal(h.calls[0].args.p_status,'refunded');await assert.rejects(helpers({rpcError:{message:'failed'}}).syncSaasPayment(payment,'order','sub'));});
+test('mentorship references fall through untouched',async()=>{const h=helpers({order:null});assert.equal(await h.syncSaasPayment(payment,'mentorship','sub'),false);assert.equal(h.calls.length,0);});

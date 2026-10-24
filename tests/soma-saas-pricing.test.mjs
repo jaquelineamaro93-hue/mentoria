@@ -41,7 +41,7 @@ test('adicional de R$50 para avaliação de mentoria existente não altera preç
  assert.doesNotMatch(checkout,/ADICIONAL_IA_CENTAVOS|DOIS_AGENTES_CENTAVOS/);
 });
 
-test('seleção funciona na UI e envia simulação comercial sem cobrar',()=>{
+test('seleção abre a plataforma com teste separado e checkout autenticado',()=>{
  const ui=file('components/public/SomaSaasShowcase.tsx');
  assert.match(ui,/setPlano\(codigo\)/);
  assert.match(ui,/setIris\(e.target.checked\)/);
@@ -49,19 +49,19 @@ test('seleção funciona na UI e envia simulação comercial sem cobrar',()=>{
  assert.match(ui,/setModulo\(e.target.value\)/);
  assert.match(ui,/calcularResumoSaas\(plano, \{ iris, whatsapp \}, kitOnboarding\)/);
  assert.match(ui,/linkContato/);
- assert.match(ui,/Solicitar contratação/);
- assert.match(ui,/Nenhuma cobrança acontece ao clicar/);
+ assert.match(ui,/Começar meus 7 dias grátis/);
+ assert.match(ui,/linkPlataforma/);
  assert.match(ui,/Sem agentes de IA inclusos|sem agentes de IA/);
  assert.doesNotMatch(ui,/Contratação disponível após validação de segurança/);
 });
 
-test('nenhuma compra SaaS é disponibilizada enquanto o backend não garante entitlements',()=>{
+test('checkout SaaS usa rota própria e não altera o checkout de mentoria',()=>{
  const ui=file('components/public/SomaSaasShowcase.tsx');
  const audit=file('docs/soma-saas-auditoria-seguranca-20261021.md');
  assert.doesNotMatch(ui,/href=.*\/checkout\?plan=/);
  assert.doesNotMatch(ui,/fetch\(.*mercadopago/);
- assert.match(audit,/enforce_access=false/);
- assert.match(audit,/Não liberar cobranças SaaS/);
+ assert.match(file('app/api/saas/route.ts'),/calcularPrecoSaas/);
+ assert.match(file('proxy.ts'),/saasCanVisit/);
 });
 
 test('kit tem cobrança única de R$ 189,90 e não altera mensalidade',()=>{

@@ -161,3 +161,45 @@ export async function buscarPagamentoAssinaturaMercadoPago(id: string) {
   if (!response.ok) throw new Error(`Erro ao buscar cobrança: ${response.status}`);
   return response.json();
 }
+
+/** Monthly SaaS recurrence has no fixed installment/end date. */
+export async function criarAssinaturaSaasMercadoPago(input: { email: string; valor: number; externalReference: string; startDate?: string }) {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) throw new Error('Mercado Pago indisponível.');
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://somamentoria.com';
+  const response = await fetch(`${MP_API}/preapproval`, { method: 'POST', headers: {
+    Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Idempotency-Key': input.externalReference,
+  }, body: JSON.stringify({ reason: 'SOMA Plataforma · assinatura mensal', payer_email: input.email,
+    external_reference: input.externalReference, back_url: `${site}/plataforma?retorno=1`, status: 'pending',
+    auto_recurring: { frequency: 1, frequency_type: 'months', transaction_amount: input.valor, currency_id: 'BRL',
+      ...(input.startDate ? { start_date: input.startDate } : {}) },
+  }), signal: AbortSignal.timeout(15000) });
+  if (!response.ok) throw new Error('Não foi possível criar a assinatura.');
+  const data = await response.json();
+  const url = new URL(data.init_point);
+  if (url.protocol !== 'https:' || !['www.mercadopago.com.br','www.mercadopago.com','www.mercadopago.com.ar'].includes(url.hostname) || typeof data.id !== 'string') throw new Error('Checkout inválido.');
+  return { id: data.id as string, init_point: url.toString() };
+}
+export async function cancelarAssinaturaSaasMercadoPago(id: string) {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) throw new Error('Mercado Pago indisponível.');
+  const response = await fetch(`${MP_API}/preapproval/${encodeURIComponent(id)}`, { method: 'PUT', headers: {
+    Authorization: `Bearer ${token}`, 'Content-Type': 'application/json',
+  }, body: JSON.stringify({ status: 'cancelled' }), signal: AbortSignal.timeout(15000) });
+  if (!response.ok) throw new Error('Não foi possível cancelar a assinatura.');
+}
+
+/** Recover a checkout after a timeout without creating another recurrence. */
+export async function buscarCheckoutSaasMercadoPago(reference: string) {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) throw new Error('Mercado Pago indisponível.');
+  const response = await fetch(`${MP_API}/preapproval/search?external_reference=${encodeURIComponent(reference)}`, {
+    headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error('Não foi possível reconciliar o checkout.');
+  const data = await response.json();
+  if (!Array.isArray(data.results)) throw new Error('Resposta de conciliação inválida.');
+  const matches = data.results.filter((item: { external_reference?: string; status?: string }) => item.external_reference === reference && item.status !== 'cancelled');
+  if (matches.length > 1) throw new Error('Mais de uma assinatura: requer conciliação.');
+  return matches[0] as { id: string; init_point: string } | undefined;
+}

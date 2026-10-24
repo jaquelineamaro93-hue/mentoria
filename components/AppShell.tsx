@@ -1,4 +1,6 @@
 'use client';
+import { SaasAccessContext, useSaasAccess } from '@/lib/contexts/SaasAccessContext';
+import { saasCanVisit, type SaasAccess } from '@/lib/saas-access';
 
 import { Suspense, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -28,6 +30,7 @@ function SectionNavigationCards({
   pathname: string;
   currentSearch: string;
 }) {
+  const access = useSaasAccess();
   const group = portalNavGroups.find((candidate) =>
     candidate.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch))
   );
@@ -50,7 +53,7 @@ function SectionNavigationCards({
       </div>
 
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
-        {group.items.map((item) => {
+        {group.items.filter(item => !access || saasCanVisit(access, item.href.split('?')[0], item.href.split('?')[1])).map((item) => {
           const Icon = item.icon;
           const active = isPortalRouteActive(pathname, item.href, currentSearch);
 
@@ -93,6 +96,8 @@ function SectionNavigationCards({
 }
 
 function AppShellContent({ children, initialProfile, copilotoLiberado }: { children: React.ReactNode; initialProfile: Profile | null; copilotoLiberado: boolean }) {
+  const access = useSaasAccess();
+  const saasOnly = !!access?.saas && !access.mentorship;
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -190,7 +195,7 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
 
       <CollapsibleSidebar />
       <ConfirmacaoContatoModal profile={initialProfile} />
-      <EntrevistaInicialModal profile={initialProfile} />
+      {!saasOnly && <EntrevistaInicialModal profile={initialProfile} />}
 
       <div className={styles.workspace} inert={isMobile && isMobileOpen ? true : undefined}>
         <header className={styles.topbar}>
@@ -221,7 +226,7 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
         <main ref={main} id="portal-content" tabIndex={-1} className={styles.main}>
           <div className={styles.pageContent}>
             <InspecaoBanner />
-            {!pathname.startsWith('/admin') && <TrialBanner pathname={pathname} />}
+            {!saasOnly && !pathname.startsWith('/admin') && <TrialBanner pathname={pathname} />}
             <SectionNavigationCards pathname={pathname} currentSearch={currentSearch} />
             {children}
           </div>
@@ -236,18 +241,20 @@ export default function AppShell({
   children,
   initialProfile = null,
   copilotoLiberado = false,
+  access = null,
 }: {
   children: React.ReactNode;
   initialProfile?: Profile | null;
   copilotoLiberado?: boolean;
+  access?: SaasAccess | null;
 }) {
   return (
-    <UserProvider initialProfile={initialProfile}>
+    <SaasAccessContext.Provider value={access}><UserProvider initialProfile={initialProfile}>
       <SidebarProvider>
         <Suspense fallback={<div className="min-h-screen bg-white" />}>
           <AppShellContent initialProfile={initialProfile} copilotoLiberado={copilotoLiberado}>{children}</AppShellContent>
         </Suspense>
       </SidebarProvider>
-    </UserProvider>
+    </UserProvider></SaasAccessContext.Provider>
   );
 }

@@ -43,6 +43,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
   ].join('\n');
   // Canal comercial já utilizado no portal SOMA. Nenhum dado pessoal é incluído
   // no link; a pessoa escolhe se quer enviar a mensagem no WhatsApp.
+  const linkPlataforma = '/plataforma?' + new URLSearchParams({ plano, modulo: selecionado?.slug || '', iris: iris ? '1' : '0', whatsapp: whatsapp ? '1' : '0' }).toString();
   const linkContato = 'https://wa.me/5511959561795?text=' + encodeURIComponent(mensagem);
 
   return (
@@ -192,13 +193,12 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
             {kitOnboarding && <p className="mt-2 text-sm font-medium text-[#365b4a]">Plataforma e kit no primeiro mês: {formatarReais(calculo.estimativaPrimeiroMes)}</p>}
             {mentoria !== 'nenhuma' && <p className="mt-2 text-xs leading-5 text-[#61766a]">O valor da mentoria humana é contratado à parte e não está incluído neste total.</p>}
           </div>
-          <a href={linkContato} target="_blank" rel="noopener noreferrer"
+          <a href={linkPlataforma} onClick={() => { document.cookie = `soma_saas_intent=${encodeURIComponent(linkPlataforma)}; Path=/; Max-Age=3600; SameSite=Lax; Secure`; }}
             className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0D8071] px-4 py-3 text-center text-sm font-semibold text-white hover:bg-[#096b5e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071]">
-            <MessageCircle size={18} aria-hidden="true" /> Solicitar contratação <ArrowUpRight size={15} aria-hidden="true" />
+            <MessageCircle size={18} aria-hidden="true" /> Começar meus 7 dias grátis <ArrowUpRight size={15} aria-hidden="true" />
           </a>
           <p className="mt-3 text-xs leading-5 text-[#64796f]">
-            Abre o WhatsApp com sua seleção e o valor calculado para a equipe SOMA confirmar.
-            Nenhuma cobrança acontece ao clicar.
+            Teste as ferramentas escolhidas por 7 dias, sem cartão. Depois, assine pelo Mercado Pago. Kit e mentoria são contratados separadamente.
           </p>
         </aside>
       </div>

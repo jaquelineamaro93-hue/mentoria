@@ -1,3 +1,4 @@
+import { saasCanVisit, type SaasAccess } from '@/lib/saas-access';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -70,9 +71,41 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  if (!user && path === '/plataforma') {
+    const response = NextResponse.redirect(new URL('/login', request.url));
+    response.cookies.set('soma_saas_intent', encodeURIComponent('/plataforma' + request.nextUrl.search), { path: '/', maxAge: 3600, sameSite: 'lax', secure: true, httpOnly: true });
+    return response;
+  }
+  // Preserve the selected SaaS configuration through password, Google and email login.
+  if (user && path === '/dashboard' && request.cookies.get('soma_saas_intent')?.value) {
+    let intent = '/plataforma';
+    try { const value = decodeURIComponent(request.cookies.get('soma_saas_intent')!.value); if (value.startsWith('/plataforma?')) intent = value; } catch {}
+    const response = NextResponse.redirect(new URL(intent, request.url));
+    response.cookies.delete('soma_saas_intent');
+    return response;
+  }
+  let saasOnly = false;
+  if (user && !path.startsWith('/api/admin')) {
+    const { data: access, error: accessError } = await supabase.rpc('soma_saas_state');
+    if (accessError) return NextResponse.json({ error: 'Não foi possível validar seu acesso.' }, { status: 503 });
+    const state = access as SaasAccess;
+    saasOnly = state.saas && !state.mentorship;
+    let allowed = saasCanVisit(state, path, request.nextUrl.search);
+    // This shared endpoint chooses its module from a validated request body.
+    if (saasOnly && path === '/api/ferramentas-soma/analisar' && request.method === 'POST') {
+      const body = await request.clone().json().catch(() => null);
+      const module = ({ linkedin: 'linkedin', gupy: 'curriculo-ats', cenario: 'desenvolvimento' } as Record<string,string>)[body?.ferramenta];
+      allowed = !!module && state.modules.includes(module);
+    }
+    if (!allowed) {
+      if (path.startsWith('/api/')) return NextResponse.json({ error: 'Este recurso não está incluído no seu plano.', href: '/plataforma' }, { status: 403 });
+      return NextResponse.redirect(new URL('/plataforma', request.url));
+    }
+  }
+
   // Uma pausa voluntária interrompe a participação, não a consulta dos
   // termos, plano e privacidade. Também impede escrita por rotas internas.
-  if (user && !path.startsWith('/api/admin')) {
+  if (user && !saasOnly && !path.startsWith('/api/admin')) {
     const {data:identidade}=await supabase.from('profiles')
       .select('is_admin,status_assinatura').eq('id',user.id).maybeSingle();
     if(!identidade?.is_admin && identidade?.status_assinatura==='ativo') {
@@ -90,7 +123,8 @@ export async function proxy(request: NextRequest) {
           const permitida=path==='/meu-plano'||path.startsWith('/meu-plano/') ||
             path==='/termos'||path.startsWith('/termos/') ||
             path==='/perfil'||path.startsWith('/perfil/') ||
-            path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/login') ||
+            path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/plataforma') ||
+    path.startsWith('/login') ||
             path.startsWith('/checkout');
           if(!permitida){
             const destino=request.nextUrl.clone();
@@ -112,7 +146,7 @@ export async function proxy(request: NextRequest) {
     path.startsWith('/api') ||
     path.startsWith('/auth');
 
-  if (user && !rotaLiberada) {
+  if (user && !saasOnly && !rotaLiberada) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at')
