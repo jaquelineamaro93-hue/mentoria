@@ -9,7 +9,7 @@ test('Íris inicia novo chat e permite recuperar e excluir conversas antigas pel
   assert.match(ui, /fetch\('\/api\/copiloto\/historico\?conversation_id=/);
   assert.match(ui, /conversation_id: conversationId/);
   assert.match(ui, /setMensagens\(converterMensagens\(d\.mensagens/);
-  assert.match(ui, /aria-label="Ver histórico da Íris"/);
+  assert.match(ui, /label: 'Histórico', Icon: History/);
   assert.match(ui, /aria-label="Nova conversa com a Íris"/);
   assert.match(ui, /method: 'DELETE'/);
   assert.match(ui, /aria-label=\{'Excluir conversa '/);

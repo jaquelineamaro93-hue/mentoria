@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ClipboardList, ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import { BookOpen, MessageCircle, ArrowUpRight, ClipboardList, ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import Link from 'next/link';
+import HelpWidget from '@/components/help/HelpWidget';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Mascot } from '@/components/soma/CareerJourney';
@@ -65,7 +66,8 @@ export default function IrisCopiloto() {
   const [historicoErro, setHistoricoErro] = useState<string | null>(null);
   const [conversas, setConversas] = useState<ConversaIris[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [mostrarHistorico, setMostrarHistorico] = useState(false);
+  const [aba, setAba] = useState<'conversa' | 'ajuda' | 'historico'>('conversa');
+  const mostrarHistorico = aba === 'historico';
   const [permitirHistorico, setPermitirHistorico] = useState(false);
   const [historicoAceito, setHistoricoAceito] = useState(false);
   const [preferenciaCarregando, setPreferenciaCarregando] = useState(false);
@@ -82,7 +84,7 @@ export default function IrisCopiloto() {
   const painel = useRef<HTMLDivElement>(null);
   const acionador = useRef<HTMLButtonElement>(null);
   const abertoUmaVez = useRef(false);
-  // Invalidar callbacks de requisições anteriores ao fechar a janela.
+  // Invalidar callbacks quando a pessoa inicia ou troca de conversa.
   const geracaoConversa = useRef(0);
 
   useEffect(() => {
@@ -90,6 +92,7 @@ export default function IrisCopiloto() {
       const detail = (event as CustomEvent<{ articleId: string; title: string }>).detail;
       if (!detail || typeof detail.articleId !== 'string' || typeof detail.title !== 'string') return;
       setAberto(true);
+      setAba('conversa');
       if (ocupada || perguntaAtiva || rascunhoPendente) return;
       setArtigoAjuda(detail.articleId);
       setTexto('Me ajude a usar este recurso: ' + detail.title.slice(0, 140));
@@ -144,7 +147,7 @@ export default function IrisCopiloto() {
       setConversationId(d.conversation_id ?? id);
       setConversas(d.conversas ?? []);
       setMensagensAntigasLimitadas(!!d.limite_atingido);
-      setMostrarHistorico(false);
+      setAba('conversa');
       setFeedbackEdicao(null);
     } catch (e) {
       if (geracao === geracaoConversa.current)
@@ -162,7 +165,7 @@ export default function IrisCopiloto() {
     setMensagens([saudacaoIris(nomeMentorado)]);
     setTexto('');
     setMensagensAntigasLimitadas(false);
-    setMostrarHistorico(false);
+    setAba('conversa');
     setFeedbackEdicao(null);
     setFeedbackTexto('');
     setFeedbackErro(null);
@@ -176,8 +179,6 @@ export default function IrisCopiloto() {
   }
 
   function fecharConversa() {
-    setArtigoAjuda(null);
-    limparConversaVisivel();
     setExpandido(false);
     setAberto(false);
   }
@@ -201,7 +202,7 @@ export default function IrisCopiloto() {
       setPermitirHistorico(!!d.historico_ativo);
       if (!d.historico_ativo && geracao === geracaoConversa.current) {
         limparConversaVisivel();
-        setMostrarHistorico(true);
+        setAba('historico');
       }
     } catch (e) {
       setHistoricoErro(e instanceof Error ? e.message : 'Falha ao salvar privacidade.');
@@ -275,7 +276,8 @@ export default function IrisCopiloto() {
   useEffect(() => {
     if (!aberto) return;
     if (mobile || expandido) painel.current?.focus();
-    else caixa.current?.focus();
+    else if (aba === 'conversa') caixa.current?.focus();
+    else painel.current?.focus();
     const teclado = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -300,7 +302,7 @@ export default function IrisCopiloto() {
     return () => {
       document.removeEventListener('keydown', teclado);
     };
-  }, [aberto, mobile, expandido, nomeMentorado]);
+  }, [aberto, mobile, expandido, nomeMentorado, aba]);
 
   async function enviar(pedidoExterno?: string, artigoId?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
@@ -510,7 +512,7 @@ export default function IrisCopiloto() {
           aria-label="Abrir Íris Copiloto"
           aria-expanded={false}
           onClick={() => setAberto(true)}
-          className="flex min-h-12 items-center gap-2 rounded-full border border-[#7b5c4c] bg-[#5B453E] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-[#45322c]"
+          className="flex min-h-12 items-center gap-2 rounded-full border border-[#24594b] bg-[#183f37] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-[#24594b]"
         >
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f0e9fa]" aria-hidden="true"><Mascot index={3} size={28} /></span>
           <span>Íris Copiloto</span>
@@ -533,7 +535,7 @@ export default function IrisCopiloto() {
           aria-modal={mobile || expandido ? true : undefined}
           aria-labelledby="iris-copiloto-title"
         >
-          <header className="flex shrink-0 items-center justify-between bg-[#5B453E] px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
+          <header className="flex shrink-0 items-center justify-between bg-[#183f37] px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
             <div className="flex items-center gap-2">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/30 bg-[#f3ecfc]" aria-hidden="true"><Mascot index={3} size={36} /></span>
               <div>
@@ -542,11 +544,6 @@ export default function IrisCopiloto() {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button type="button" onClick={() => setMostrarHistorico(a => !a)}
-                disabled={historicoCarregando || ocupada} aria-label="Ver histórico da Íris"
-                className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 disabled:opacity-50">
-                <History size={20} aria-hidden="true" />
-              </button>
               <button type="button" onClick={novaConversa}
                 disabled={historicoCarregando || ocupada} aria-label="Nova conversa com a Íris"
                 className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 disabled:opacity-50">
@@ -565,22 +562,19 @@ export default function IrisCopiloto() {
             <button
               type="button"
               onClick={fecharConversa}
-              aria-label="Fechar conversa"
+              aria-label="Minimizar Íris"
               className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15"
             >
               <X size={19} />
             </button>
             </div>
           </header>
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-[#dce6dd] bg-[#f6faf7] px-3 py-2 text-xs">
-            <span className="text-[#5c7467]">Uma conversa de cada vez, com direção</span>
-            <Link href="/plano-acoes-iris" className="inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#0D8071] underline-offset-2 hover:underline">
-              <ClipboardList size={15} aria-hidden="true" /> Plano de Ações da Íris <ArrowUpRight size={13} aria-hidden="true" />
-            </Link>
-          </div>
           {mostrarHistorico && (
-            <div className="max-h-[45%] shrink-0 overflow-y-auto border-b border-[#e8e0dc] bg-white p-3">
+            <div className="min-h-0 flex-1 overflow-y-auto bg-white p-4 [scrollbar-width:thin]">
               <h3 className="mb-2 text-sm font-semibold text-[#312b27]">Minhas conversas</h3>
+              {historicoErro && <p role="alert" className="mb-3 text-sm text-[#854938]">{historicoErro}</p>}
+              {historicoCarregando && <p role="status" className="mb-3 text-sm text-[#53685e]">Carregando conversas...</p>}
+              {!historicoAceito && <p className="mb-3 text-sm text-[#53685e]">Para guardar novas conversas, ative o salvamento na aba Conversar.</p>}
               {historicoAceito && (
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[#f2f8f4] px-3 py-2 text-xs text-[#426357]">
                   <span>{permitirHistorico ? 'Salvamento de novas conversas ativo' : 'Salvamento de novas conversas pausado'}</span>
@@ -595,7 +589,7 @@ export default function IrisCopiloto() {
               {conversas.map(c => (
                 <div key={c.id} className="flex items-center gap-1 rounded-lg hover:bg-[#f2f7f5]">
                   <button type="button" onClick={() => void abrirConversa(c.id)}
-                    className="min-h-11 min-w-0 flex-1 truncate px-3 text-left text-xs font-medium text-[#24483e]"
+                    className="min-h-11 min-w-0 flex-1 truncate px-3 text-left text-sm font-medium text-[#24483e]"
                     aria-current={conversationId === c.id ? 'true' : undefined}>{c.title}</button>
                   <button type="button" onClick={() => void excluirConversa(c.id)}
                     aria-label={'Excluir conversa ' + c.title}
@@ -606,6 +600,14 @@ export default function IrisCopiloto() {
               ))}
             </div>
           )}
+          {aba === 'ajuda' && <HelpWidget onNavigate={fecharConversa} />}
+          <div hidden={aba !== 'conversa'} className={aba === 'conversa' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-[#dce6dd] bg-[#f6faf7] px-3 py-2 text-xs">
+            <span className="text-[#5c7467]">Uma conversa de cada vez, com direção</span>
+            <Link href="/plano-acoes-iris" className="inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#0D8071] underline-offset-2 hover:underline">
+              <ClipboardList size={15} aria-hidden="true" /> Plano de Ações da Íris <ArrowUpRight size={13} aria-hidden="true" />
+            </Link>
+          </div>
           {!historicoAceito && !historicoCarregando && (
             <div className="shrink-0 border-b border-[#e8e0dc] bg-[#f5fbf8] px-3 py-2 text-xs leading-5 text-[#294d42]">
               <label className="flex cursor-pointer items-center gap-2.5 font-semibold">
@@ -636,14 +638,14 @@ export default function IrisCopiloto() {
           {historicoErro && <p role="alert" className="shrink-0 bg-[#fff3ec] px-3 py-2 text-xs text-[#854938]">{historicoErro}</p>}
           {historicoCarregando && <p role="status" className="shrink-0 px-3 py-2 text-xs text-gray-600">Carregando seu histórico...</p>}
           {mensagensAntigasLimitadas && <p className="shrink-0 px-3 py-2 text-xs text-gray-600">Exibindo as últimas 150 mensagens desta conversa.</p>}
-          <div ref={historico} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#fbfaf8] p-3 sm:p-4" aria-live="polite" aria-relevant="additions">
+          <div ref={historico} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain [scrollbar-width:thin] bg-white p-3 sm:p-4" aria-live="polite" aria-relevant="additions">
             {mensagens.map((m, indice) => (
               <div key={indice} className={m.tipo === 'mentorado'
                 ? 'ml-auto max-w-[72ch]'
                 : 'mr-auto max-w-[80ch]'}>
                 <div className={m.tipo === 'mentorado'
                   ? 'rounded-2xl rounded-tr-sm bg-[#e3f5f0] p-3 text-sm leading-relaxed text-[#28322e]'
-                  : 'rounded-2xl rounded-tl-sm border border-[#e8e0dc] bg-white p-3 text-sm leading-relaxed text-[#312b27]'
+                  : 'rounded-xl bg-[#f5f8f6] p-3 text-sm leading-relaxed text-[#312b27]'
                 }>
                   {m.tipo === 'iris' ? (
                     <div className="break-words text-sm leading-6 [&>*+*]:mt-3 [&_strong]:font-semibold [&_strong]:text-[#233f34]">
@@ -769,7 +771,7 @@ export default function IrisCopiloto() {
                           type="button"
                           disabled={ocupada}
                           onClick={() => void confirmar(indice, m.proposta as Proposta, m.token as string)}
-                          className="min-h-11 rounded-full bg-[#5B453E] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                          className="min-h-11 rounded-full bg-[#183f37] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                         >
                           Confirmar e salvar
                         </button>
@@ -841,8 +843,8 @@ export default function IrisCopiloto() {
             {ocupada && <p className="text-xs text-gray-600">Íris está preparando a resposta...</p>}
           </div>
           {mensagens.length === 1 && (
-            <section aria-label="Mensagens rápidas para começar" className="shrink-0 border-t border-[#eee6df] bg-[#f8faf8] px-3 py-3">
-              <p className="text-xs font-semibold text-[#365c4c]">Quer começar por algum destes assuntos?</p>
+            <details className="shrink-0 border-t border-[#d7e3dc] bg-white px-3 py-3">
+              <summary className="cursor-pointer py-1 text-sm font-medium text-[#24594b] focus-visible:outline-2 focus-visible:outline-offset-2">Sugestões para começar</summary>
               <p className="mt-1 text-xs text-[#687c70]">Toque para enviar sua escolha, ou escreva sua pergunta.</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {['O que há de novo na SOMA?', 'Quero preencher meu PDI com a Íris', 'Quero um plano para 7 dias', 'Quero entender meu próximo passo', 'Quero treinar uma entrevista'].map(sugestao => (
@@ -859,7 +861,7 @@ export default function IrisCopiloto() {
                   </button>
                 ))}
               </div>
-            </section>
+            </details>
           )}
           <form
             className="flex shrink-0 items-end gap-2 border-t border-[#eee6df] bg-white p-3"
@@ -891,7 +893,7 @@ export default function IrisCopiloto() {
               disabled={ocupada || historicoCarregando || preferenciaCarregando ||
                 (!!conversationId && !permitirHistorico) || rascunhoPendente || !texto.trim()}
               aria-label="Enviar mensagem"
-              className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#183f37] text-white disabled:opacity-40"
             >
               {ocupada ? <ChevronDown size={19} /> : <Send size={19} />}
             </button>
@@ -899,6 +901,10 @@ export default function IrisCopiloto() {
           <p className="shrink-0 bg-white px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center text-[11px] text-gray-600">
             {permitirHistorico ? 'Histórico ativo' : 'Conversa sem salvamento'} · Respostas e ações do PDI só são salvas após confirmação.
           </p>
+          </div>
+          <nav aria-label="Seções da Íris" className="grid shrink-0 grid-cols-3 border-t border-[#d7e3dc] bg-white pb-[env(safe-area-inset-bottom)]">
+            {([{ value: 'conversa', label: 'Conversar', Icon: MessageCircle }, { value: 'ajuda', label: 'Ajuda', Icon: BookOpen }, { value: 'historico', label: 'Histórico', Icon: History }] as const).map(({ value, label, Icon }) => <button key={value} type="button" aria-current={aba === value ? 'page' : undefined} onClick={() => setAba(value)} className={'flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#24594b] ' + (aba === value ? 'bg-[#edf5f0] font-semibold text-[#183f37]' : 'text-[#53685e] hover:bg-[#f5f8f6]')}><Icon size={18} aria-hidden="true" />{label}</button>)}
+          </nav>
         </div>
       )}
     </aside>
