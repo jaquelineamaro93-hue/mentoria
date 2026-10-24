@@ -1,5 +1,6 @@
 'use client';
 
+import { useSaasAccess } from '@/lib/contexts/SaasAccessContext';
 import { useEffect, useState } from 'react';
 import { BriefcaseBusiness, CheckCircle2, FileSearch, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -35,6 +36,8 @@ export default function CarreiraClient({
   latestCurriculo,
   latestVaga,
 }: Props) {
+  const access = useSaasAccess();
+  const canStep = (step: Etapa) => !access?.saas || access.mentorship || access.modules.includes(step === 'cv' ? 'curriculo-ats' : step === 'vagas' ? 'vagas' : 'entrevistas');
   const router = useRouter();
   const [etapa, setEtapa] = useState<Etapa>(initialStep);
 
@@ -76,6 +79,7 @@ export default function CarreiraClient({
   ];
 
   function mudarEtapa(nova: Etapa) {
+    if (!canStep(nova)) return;
     setEtapa(nova);
     router.replace(`/carreira?etapa=${nova}`, { scroll: false });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -93,7 +97,7 @@ export default function CarreiraClient({
       </header>
 
       <div className="grid lg:grid-cols-3 gap-3 mb-8" role="tablist" aria-label="Etapas da busca por novas oportunidades">
-        {steps.map((step) => {
+        {steps.filter(step => canStep(step.id)).map((step) => {
           const Icon = step.icon;
           const active = etapa === step.id;
           return (
@@ -138,29 +142,29 @@ export default function CarreiraClient({
 
       <div className="rounded-2xl border border-gray-faint bg-[#fbfcfd] p-4 md:p-6">
         <div hidden={etapa !== 'cv'}>
-          <SimuladorCVClient
+          {canStep('cv') && <SimuladorCVClient
             profile={profile}
             userId={userId}
             simulacoesIniciais={simulacoes}
             usadasEsteMes={usadasEsteMes}
             onOpenSoar={() => mudarEtapa('entrevista')}
             onOpenVagas={() => mudarEtapa('vagas')}
-          />
+          />}
         </div>
 
         <div hidden={etapa !== 'vagas'}>
-          <VagasClient profile={profile} embedded />
+          {canStep('vagas') && <VagasClient profile={profile} embedded />}
         </div>
 
         <div hidden={etapa !== 'entrevista'}>
-          <EntrevistaClient
+          {canStep('entrevista') && <EntrevistaClient
             userId={userId}
             profile={profile}
             embedded
             initialCurriculo={latestCurriculo}
             initialDescricaoVaga={latestVaga}
             applications={vagas}
-          />
+          />}
         </div>
       </div>
     </div>

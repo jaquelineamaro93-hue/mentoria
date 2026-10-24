@@ -22,10 +22,12 @@ async function acessoPermitido(admin: ReturnType<typeof createAdminClient>, user
     admin.from('iris_estado').select('pausado,objetivo_atual,proximo_passo,ultimo_envio_em')
       .eq('user_id', userId).maybeSingle(),
   ]);
-  const permitido = !!perfil && !perfil.is_admin &&
+  const { data: saas, error: saasError } = await admin.from('soma_saas_accounts').select('user_id').eq('user_id', userId).maybeSingle();
+  const feature = saas ? await admin.rpc('soma_saas_feature_for', { p_user: userId, p_feature: 'whatsapp' }) : null;
+  const permitido = !saasError && (!saas || (!feature?.error && feature?.data === true)) && !!perfil && !perfil.is_admin &&
     !!perfil.whatsapp_numero && !!perfil.whatsapp_consentimento_em &&
     !!perfil.iris_ia_consentimento_em && !estado?.pausado &&
-    (perfil.status_assinatura === 'ativo' ||
+    (saas || perfil.status_assinatura === 'ativo' ||
       perfil.trial_status === 'active');
   return { perfil, estado, permitido };
 }

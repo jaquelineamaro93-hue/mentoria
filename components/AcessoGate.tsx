@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-const ROTAS_LIBERADAS = ['/login', '/renovar', '/magic-login', '/reset-password'];
+const ROTAS_LIBERADAS = ['/plataforma', '/login', '/renovar', '/magic-login', '/reset-password'];
 
 export default function AcessoGate() {
   const supabase = createClient();
@@ -27,6 +27,9 @@ export default function AcessoGate() {
         setChecando(false);
         return;
       }
+
+      const { data: saasAccount } = await supabase.from('soma_saas_accounts').select('user_id').eq('user_id', user.id).maybeSingle();
+      if (saasAccount) { setChecando(false); return; }
 
       const { data: perfil } = await supabase
         .from('profiles')

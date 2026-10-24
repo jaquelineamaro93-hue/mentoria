@@ -1,0 +1,35 @@
+name: SaaS checkout regression
+on:
+  pull_request:
+    paths:
+      - 'app/api/saas/**'
+      - 'app/api/mercadopago/**'
+      - 'lib/saas-*.ts'
+      - 'lib/mercadopago.ts'
+      - 'tests/saas-*'
+      - '.github/workflows/saas-checkout.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/api/saas/**'
+      - 'app/api/mercadopago/**'
+      - 'lib/saas-*.ts'
+      - 'lib/mercadopago.ts'
+      - 'tests/saas-*'
+      - '.github/workflows/saas-checkout.yml'
+permissions:
+  contents: read
+jobs:
+  saas-checkout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: node --experimental-strip-types --test tests/saas-access.test.mjs tests/saas-webhook.test.cjs tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs

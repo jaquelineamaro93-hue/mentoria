@@ -142,7 +142,10 @@ export async function POST(request: NextRequest) {
     (!perfil.data_fim_acesso || perfil.data_fim_acesso >= hojeSP);
   const trial = perfil.trial_status === 'active' &&
     !!perfil.trial_ends_at && Date.parse(perfil.trial_ends_at) > Date.now();
-  if (!perfil.is_admin && !assinante && !trial) {
+  const { data: saasAccess, error: saasError } = await db.rpc('soma_saas_state');
+  if (saasError) return json({ erro: 'Não foi possível validar seu acesso.' }, 503);
+  if (saasAccess?.saas && !saasAccess.mentorship && !saasAccess.iris) return json({ erro: 'Íris não está incluída no seu plano.' }, 403);
+  if (!saasAccess?.iris && !perfil.is_admin && !assinante && !trial) {
     return json({ erro: 'Seu acesso à mentoria está inativo.' }, 403);
   }
   // Segurança independentemente do botão: pausas e termos vigentes são verificados no servidor.
@@ -155,14 +158,14 @@ export async function POST(request: NextRequest) {
   if (pausaResp.error || termoResp.error || !termoResp.data) {
     return json({ erro: 'Não foi possível validar seu acesso ao Copiloto.' }, 503);
   }
-  if (pausaResp.data) {
+  if (pausaResp.data && !(saasAccess?.saas && saasAccess.iris)) {
     return json({ erro: 'Sua mentoria está pausada. Consulte Meu Plano.', href: '/meu-plano' }, 403);
   }
   const { data: aceiteVigente, error: erroAceite } = await db.from('termos_aceites')
     .select('id').eq('user_id', user.id).eq('termo_id', termoResp.data.id)
     .limit(1).maybeSingle();
   if (erroAceite) return json({ erro: 'Não foi possível validar seu aceite.' }, 503);
-  if (!aceiteVigente) {
+  if (!aceiteVigente && !(saasAccess?.saas && saasAccess.iris)) {
     return json({ erro: 'Aceite os termos vigentes antes de usar o Copiloto.', href: '/termos' }, 403);
   }
 

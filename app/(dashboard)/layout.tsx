@@ -13,6 +13,7 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: access } = user ? await supabase.rpc('soma_saas_state') : { data: null };
   let initialProfile: Profile | null = null;
   let copilotoLiberado = false;
 
@@ -31,7 +32,7 @@ export default async function DashboardLayout({
         (!initialProfile.data_fim_acesso || initialProfile.data_fim_acesso >= hojeSP);
       const trialAtivo = initialProfile.trial_status === 'active' &&
         !!initialProfile.trial_ends_at && new Date(initialProfile.trial_ends_at).getTime() > agora.getTime();
-      const elegivel = initialProfile.is_admin || planoAtivo || trialAtivo;
+      const elegivel = access?.saas && !access.mentorship ? access.iris : initialProfile.is_admin || planoAtivo || trialAtivo;
 
       if (elegivel) {
         const [pausa, termo] = await Promise.all([
@@ -40,19 +41,19 @@ export default async function DashboardLayout({
           supabase.from('termos_versoes').select('id').eq('ativo', true)
             .order('publicado_em', { ascending: false }).limit(1).maybeSingle(),
         ]);
-        if (!pausa.error && !pausa.data && !termo.error && termo.data) {
+        if (!pausa.error && (!pausa.data || (access?.saas && access.iris)) && !termo.error && termo.data) {
           const { data: aceite, error: aceiteError } = await supabase
             .from('termos_aceites').select('id').eq('user_id', user.id)
             .eq('termo_id', termo.data.id).limit(1).maybeSingle();
-          copilotoLiberado = !aceiteError && !!aceite;
+          copilotoLiberado = !aceiteError && (!!aceite || (access?.saas && access.iris));
         }
       }
     }
   }
 
   return (
-    <AppShell initialProfile={initialProfile} copilotoLiberado={copilotoLiberado}>
-      <TermosGate />
+    <AppShell initialProfile={initialProfile} copilotoLiberado={copilotoLiberado} access={access}>
+      {(!access?.saas || access.mentorship) && <TermosGate />}
       {children}
     </AppShell>
   );

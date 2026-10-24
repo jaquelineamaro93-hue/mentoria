@@ -1,5 +1,7 @@
 'use client';
 
+import { useSaasAccess } from '@/lib/contexts/SaasAccessContext';
+import { saasCanVisit } from '@/lib/saas-access';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -13,6 +15,8 @@ import styles from './PortalShell.module.css';
 
 export default function CollapsibleSidebar() {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
+  const access = useSaasAccess();
+  const visible = (item: PortalNavItem) => !access || saasCanVisit(access, item.href.split('?')[0], item.href.split('?')[1]);
   const { profile, initials, isLoading } = useUser();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -75,6 +79,7 @@ export default function CollapsibleSidebar() {
   }
 
   function navLink(item: PortalNavItem) {
+    if (!visible(item)) return null;
     const active = isPortalRouteActive(pathname, item.href, currentSearch);
     const Icon = item.icon;
     return <Link key={item.href} href={item.href} prefetch={false} onClick={closeMobileSidebar}
@@ -108,10 +113,10 @@ export default function CollapsibleSidebar() {
 
       <nav id="soma-menu-items" className={styles.navigation} aria-label="Menu principal">
         <div className={styles.primaryLinks}>
-          {navLink(overviewItem)}
+          {navLink(access?.saas && !access.mentorship ? { ...overviewItem, href: '/plataforma', label: 'Minha plataforma' } : overviewItem)}
           {profile?.is_admin === true && navLink(adminItem)}
         </div>
-        {portalNavGroups.map((group) => {
+        {portalNavGroups.map(group => ({ ...group, items: group.items.filter(visible) })).filter(group => group.items.length).map((group) => {
           // A group containing the current page stays discoverable, even after a saved collapse.
           const containsActive = group.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch));
           const open = compact || containsActive || !closedGroups[group.id];
@@ -131,7 +136,7 @@ export default function CollapsibleSidebar() {
       <footer className={styles.sidebarFooter}>
         <Link href="/perfil" onClick={closeMobileSidebar} className={styles.profileLink} aria-label="Meu perfil" title={compact ? 'Meu perfil' : undefined}>
           {profile?.foto_url ? <img src={profile.foto_url} alt="" className={styles.avatar} /> : <span className={styles.avatar}>{initials || <UserRound size={18} />}</span>}
-          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
+          <span className={styles.profileText}><strong>{isLoading ? 'Carregando perfil…' : profile?.nome || 'Meu perfil'}</strong><span>{profile?.is_admin ? 'Administração' : access?.saas && !access.mentorship ? 'SOMA Plataforma' : profile?.tipo_pacote === 'presencial' ? 'Mentoria presencial' : 'Mentoria online'}</span></span>
         </Link>
         <button type="button" className={styles.signOut} onClick={handleSignOut} disabled={signingOut} title="Sair da conta" aria-label={signingOut ? 'Saindo da conta' : 'Sair da conta'}><LogOut size={18} /></button>
         {signOutError && <p role="alert" className={styles.signOutError}>{signOutError}</p>}

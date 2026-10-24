@@ -62,9 +62,12 @@ export async function validarEnvioTopSend(db:Admin, turno:TopSendTurno) {
     .eq('id',turno.user_id).maybeSingle();
   const {data:estado,error:estadoError}=await db.from('iris_estado').select('pausado')
     .eq('user_id',turno.user_id).maybeSingle();
+  const { data: saas, error: saasError } = await db.from('soma_saas_accounts').select('user_id').eq('user_id', turno.user_id).maybeSingle();
+  const feature = saas ? await db.rpc('soma_saas_feature_for', { p_user: turno.user_id, p_feature: 'whatsapp' }) : null;
+  if (saasError || feature?.error || (saas && feature?.data !== true)) throw new Error('Agente WhatsApp não incluído no plano.');
   if(profileError||estadoError) throw new Error('Falha ao consultar autorização do contato.');
   if(!p || p.is_admin || !p.whatsapp_consentimento_em || !p.iris_ia_consentimento_em ||
-    estado?.pausado || (p.status_assinatura!=='ativo' && p.trial_status!=='active'))
+    estado?.pausado || (!saas && p.status_assinatura!=='ativo' && p.trial_status!=='active'))
     throw new Error('Contato sem autorização ou com acompanhamento pausado.');
   const telefone=normalizarNumero(p.whatsapp_numero||'');
   const msg=turno.resposta_gerada?.trim()||'';
