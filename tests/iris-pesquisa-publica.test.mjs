@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
- detectarPesquisaIris, areaDaBusca, filtrarConsultorias, filtrarVagas, pesquisarPublicamente,
+ detectarPesquisaIris, areaDaBusca, filtrarConsultorias, filtrarVagas, pesquisarPublicamente, querVagasLideranca,
 } from '../lib/iris-pesquisa-publica.ts';
 
 const read = p => readFileSync(new URL('../'+p,import.meta.url),'utf8');
@@ -114,4 +114,45 @@ test('Rota só compartilha contexto privado com a IA da própria SOMA, não com 
  const source=read('lib/iris-mentoria-voz.ts');
  assert.match(source,/CRM é gestão do relacionamento com clientes e é diferente de ERP/);
  assert.match(source,/REVISÃO EDITORIAL/);
+});
+
+
+test('Pedido liderança CRM só retorna cargos realmente de liderança', () => {
+ assert.equal(querVagasLideranca('me traga vagas recente de liderança em CRM'),true);
+ assert.equal(querVagasLideranca('Quero vagas de analista CRM'),false);
+ assert.equal(querVagasLideranca('Quero vagas de coordenadora CRM'),true);
+ const rows=[
+   {title:'Analista de CRM',categoria_slug:'crm',availability_status:'listed',published_at:today,availability_checked_at:today,url:'https://jobs.example.com/analista',job_origin:'automatic'},
+   {title:'Coordenadora de CRM',categoria_slug:'crm',availability_status:'listed',published_at:today,availability_checked_at:today,url:'https://jobs.example.com/coord',job_origin:'automatic'},
+   {title:'Especialista CRM',categoria_slug:'crm',senioridade_normalizada:'Liderança',availability_status:'listed',published_at:today,availability_checked_at:today,url:'https://jobs.example.com/especialista',job_origin:'automatic'},
+   {title:'Assistente de CRM',categoria_slug:'crm',senioridade_normalizada:'Liderança',availability_status:'listed',published_at:today,availability_checked_at:today,url:'https://jobs.example.com/assistente',job_origin:'automatic'},
+   {title:'Coordenador ERP',categoria_slug:'erp',availability_status:'listed',published_at:today,availability_checked_at:today,url:'https://jobs.example.com/erp',job_origin:'automatic'},
+ ];
+ const jobs=filtrarVagas(rows,'crm','',false,true);
+ assert.deepEqual(jobs.map(j=>j.titulo),['Coordenadora de CRM','Especialista CRM']);
+});
+
+test('Consulta de vagas usa apenas colunas publicadas, com nível, e não exporta dados privados', async () => {
+ const old=process.env.CONEXAO_CRM_PUBLIC_ANON_KEY;
+ process.env.CONEXAO_CRM_PUBLIC_ANON_KEY='a'.repeat(80);
+ const urls=[];
+ const mock=async url=>{urls.push(url);return{ok:true,json:async()=>[
+   {title:'Gerente de CRM',categoria_slug:'crm',availability_status:'listed',
+    published_at:new Date().toISOString(),availability_checked_at:new Date().toISOString(),
+    url:'https://jobs.example.com/gerente-crm',job_origin:'automatic'}
+ ]}};
+ try {
+  const result=await pesquisarPublicamente('vagas','me traga vagas recente de liderança em CRM','',mock);
+  assert.match(result.resposta,/liderança em CRM/);
+  assert.match(result.resposta,/Gerente de CRM/);
+  const u=new URL(urls[0]);
+  assert.equal(u.pathname,'/rest/v1/crm_radar_jobs_public');
+  assert.ok(u.searchParams.get('select').includes('senioridade_normalizada'));
+  for(const privateKey of ['user_id','email','curriculo','cpf','perfil','mentor','token']) {
+    assert.equal(u.search.includes(privateKey),false);
+  }
+ } finally {
+  if(old===undefined) delete process.env.CONEXAO_CRM_PUBLIC_ANON_KEY;
+  else process.env.CONEXAO_CRM_PUBLIC_ANON_KEY=old;
+ }
 });
