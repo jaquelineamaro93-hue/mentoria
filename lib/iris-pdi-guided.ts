@@ -49,7 +49,7 @@ export async function executarPdiGuiado(db: Db, userId: string, body: Body) {
     return { status: 503, payload: { erro: 'Não consegui carregar suas perguntas com segurança.' } };
   }
   const secoes = guia.data as Secao[];
-  const respostas = new Map((registros.data as Resposta[] ?? []).map(r => [r.secao, r]));
+  const respostas = new Map<string, Resposta>((registros.data as Resposta[] ?? []).map((r): [string, Resposta] => [r.secao, r]));
   const textoAtual = (codigo: string) => respostas.get(codigo)?.dados?.texto ?? '';
   const respondida = (codigo: string) => respostas.get(codigo)?.concluido === true && !!textoAtual(codigo).trim();
   const total = secoes.length;
