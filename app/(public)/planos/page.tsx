@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
 import { Mascot } from '@/components/soma/CareerJourney';
 import SomaSaasShowcase from '@/components/public/SomaSaasShowcase';
+import SomaCarreiraOptions from '@/components/public/SomaCarreiraOptions';
 
 export default async function PlanosPage() {
   const supabase = await createClient();
@@ -29,7 +30,7 @@ export default async function PlanosPage() {
 
   return (
     <div className="min-h-screen bg-white px-4 py-6 sm:p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1400px] mx-auto">
         <Link href="/" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6 sm:mb-8">
           <ArrowLeft size={20} />
           <span>Voltar</span>
@@ -39,9 +40,9 @@ export default async function PlanosPage() {
           <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-28 h-[420px] w-[420px] rounded-full border-[65px] border-white/[0.04]" />
           <div className="relative grid items-center gap-7 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="max-w-xl">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#FFCB9C]">SOMA Mentoria | Ferramentas de carreira</p>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#FFCB9C]">SOMA | Carreira e Plataforma</p>
               <h1 id="planos-titulo" className="font-display text-4xl leading-tight sm:text-5xl">Sua carreira merece novas possibilidades</h1>
-              <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base">Explore ferramentas para LinkedIn, currículo, Gupy e desenvolvimento profissional com o apoio da SOMA</p>
+              <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base">Escolha acompanhamento humano na SOMA Carreira ou monte sua assinatura de ferramentas na SOMA Plataforma.</p>
               <a href="#opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FFB366] px-6 py-3 text-sm font-semibold text-[#183F37] transition-colors hover:bg-[#FFD1A2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Conhecer opções de acesso</a>
             </div>
             <div className="relative grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4" aria-label="Lume, Norte, Brasa e Íris, mascotes oficiais da SOMA">
@@ -65,15 +66,18 @@ export default async function PlanosPage() {
           <p className="mt-2 text-sm text-[#527064]">Encontre o plano que faz sentido para o seu momento</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-5 sm:gap-8">
+        <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
+        <section id="soma-carreira" aria-labelledby="soma-carreira-heading" className="min-w-0 rounded-3xl border border-[#dce8df] bg-[#fcfdfb] p-5 sm:p-7">
+          <header className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-mint-deep">Mentoria · acompanhamento humano</p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#183F37]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#4a645c]">Uma jornada com mentores, encontros e ferramentas para apoiar sua evolução profissional.</p></header>
+        <div className="grid gap-4">
           {(planos || []).map((plano: PlanoMentoria) => (
-            <div key={plano.id} className="bg-white border-2 border-gray-faint rounded-2xl p-5 sm:p-8 flex flex-col">
+            <div key={plano.id} className="bg-white border-2 border-[#e2e9e5] hover:border-[#91c8b7] transition-colors rounded-2xl p-5 sm:p-6 flex flex-col">
               <div className="mb-6">
-                <p className="text-xs font-medium text-blue-600 mb-2">{plano.duracao_meses} MESES</p>
-                <h2 className="text-2xl font-display text-black mb-1">{plano.nome}</h2>
+                <p className="text-xs font-medium text-[#0D8071] mb-2">{plano.duracao_meses} MESES</p>
+                <h2 className="text-2xl font-display text-[#183F37] mb-1">{plano.nome}</h2>
                 <p className="text-sm mb-4">
                   {plano.codigo.includes('online') ? (
-                    <span className="text-blue-600 font-medium">100% Online</span>
+                    <span className="text-[#0D8071] font-medium">100% Online</span>
                   ) : (
                     <span className="text-gray-text">{plano.foco}</span>
                   )}
@@ -81,14 +85,14 @@ export default async function PlanosPage() {
                 <p className="text-xs text-gray-text mb-6">{plano.descricao_encontros}</p>
               </div>
 
-              <div className="space-y-2 mb-8 flex-grow">
+              <details className="mb-5 rounded-xl bg-[#f6faf7] p-4"><summary className="cursor-pointer text-sm font-semibold text-[#24473b]">Ver o que está incluído</summary><div className="mt-3 space-y-2">
                 {(plano.itens_inclusos || []).map((item: string, i: number) => (
                   <div key={i} className="flex gap-2 text-sm text-black">
                     <span>✓</span>
                     <span>{item}</span>
                   </div>
                 ))}
-              </div>
+              </div></details>
 
               <div className="border-t border-gray-faint pt-6 mb-6">
                 <div className="space-y-2 mb-4">
@@ -111,14 +115,14 @@ export default async function PlanosPage() {
                 {plano.trial_enabled && (
                   <Link
                     href={`/login?mode=cadastrar&trial_plan=${plano.id}`}
-                    className="w-full inline-flex items-center justify-center border border-mint-deep bg-mint-light text-black py-3 rounded-lg font-medium hover:bg-mint/30 text-center transition"
+                    className="w-full inline-flex items-center justify-center border border-[#bfd9c9] bg-[#f2faf5] text-[#174e3d] py-3 rounded-xl font-semibold hover:bg-[#e5f5ee] text-center transition"
                   >
                     {plano.trial_label || 'Teste grátis'} por até {plano.trial_days} dias
                   </Link>
                 )}
                 <Link
                   href={`/checkout?plan=${plano.id}`}
-                  className="w-full inline-flex items-center justify-center bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown text-center transition"
+                  className="w-full inline-flex items-center justify-center bg-[#0D8071] text-white py-3 rounded-xl font-semibold hover:bg-[#096b5e] text-center transition"
                 >
                   Comprar
                 </Link>
@@ -126,7 +130,10 @@ export default async function PlanosPage() {
             </div>
           ))}
         </div>
-        <SomaSaasShowcase modulos={modulosRaw ?? []} />
+        <div className="mt-5"><SomaCarreiraOptions /></div>
+        </section>
+        <div className="min-w-0 rounded-3xl border border-[#dce8df] bg-[#fcfdfb] p-5 sm:p-7"><SomaSaasShowcase modulos={modulosRaw ?? []} /></div>
+        </div>
       </div>
     </div>
   );

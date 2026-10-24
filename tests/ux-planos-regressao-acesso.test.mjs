@@ -28,7 +28,7 @@ test('SaaS tem teste separado e mentoria mantém checkout e trial', () => {
   assert.match(pricing, /avulso: 2490/);
   assert.match(pricing, /essencial: 3490/);
   assert.match(pricing, /pro: 6990/);
-  assert.match(saas, /calcularResumoSaas/);
+  assert.match(saas, /calcularPrecoSaas/);
   assert.match(saas, /Começar meus 7 dias grátis/);
   assert.doesNotMatch(saas, /Contratação disponível após validação de segurança|Preços de referência mensais|Na revisão de novas ofertas/);
   assert.doesNotMatch(saas, /href=.*\/checkout|fetch\(.*mercadopago/);
