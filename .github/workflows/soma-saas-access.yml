@@ -12,6 +12,11 @@ on:
       - 'supabase/migrations/20261023*_soma_saas*'
       - 'supabase/migrations/20261024*_soma_saas*'
       - 'tests/soma-saas-billing-access.test.mjs'
+      - 'tests/soma-saas-route-isolation.test.mjs'
+      - 'proxy.ts'
+      - 'lib/soma-saas-routes.ts'
+      - 'components/CollapsibleSidebar.tsx'
+      - 'components/public/SomaSaasShowcase.tsx'
       - '.github/workflows/soma-saas-access.yml'
 permissions:
   contents: read
@@ -30,6 +35,8 @@ jobs:
       - run: npm ci
       - name: Contract and privacy safety checks
         run: node --test tests/soma-saas-billing-access.test.mjs
+      - name: Verify SaaS route and mentorship isolation
+        run: node --experimental-strip-types --test tests/soma-saas-route-isolation.test.mjs
       - name: Existing Mercado Pago and pricing regressions
         run: node --experimental-strip-types --test tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs
       - run: npm audit --omit=dev --audit-level=high
