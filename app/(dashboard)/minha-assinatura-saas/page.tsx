@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { resolverAcessoSaas, SAAS_TRIAL_DIAS } from '@/lib/soma-saas-entitlements';
 import SaasTrialControl from '@/components/saas/SaasTrialControl';
+import SaasCheckoutControl from '@/components/saas/SaasCheckoutControl';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Minha assinatura SaaS | SOMA' };
@@ -25,6 +26,7 @@ export default async function MinhaAssinaturaSaasPage() {
   const cat = new Map((modulos||[]).map(m=>[m.slug,m.title]));
   const trialVenceu = acesso.trialJaUsado && !acesso.emTrialSaas;
   const liberado = process.env.SOMA_SAAS_TRIAL_GATES_READY === 'true';
+  const checkoutLiberado = process.env.SOMA_SAAS_CHECKOUT_GATES_READY === 'true';
 
   return <main className="mx-auto max-w-4xl px-5 py-8">
     <p className="text-xs font-semibold uppercase tracking-widest text-[#0D8071]">SOMA Plataforma</p>
@@ -56,6 +58,7 @@ export default async function MinhaAssinaturaSaasPage() {
     </section>
     {!acesso.temMentoria && !acesso.trialJaUsado &&
       <SaasTrialControl modulos={modulos||[]} liberado={liberado} />}
+    {!acesso.temMentoria && <SaasCheckoutControl modulos={modulos||[]} disponivel={checkoutLiberado} />}
     <p className="mt-6 text-sm text-[#5a7064]">
       Os planos da Plataforma e da Carreira possuem condições e acessos distintos.
     </p>
