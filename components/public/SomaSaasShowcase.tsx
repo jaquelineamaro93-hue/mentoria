@@ -274,11 +274,6 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
           </div>
         </div>
       )}
-      <div className="mt-4 space-y-1 text-xs leading-5 text-[#65756b]">
-        <p>Preços de referência mensais para novas contratações no Brasil. Os módulos sem IA não incluem acesso livre aos agentes nem consumo ilimitado.</p>
-        <p>Contratação disponível após validação de segurança. O simulador gera uma solicitação comercial; o checkout SaaS automático ainda não foi habilitado.</p>
-        <p>Planos de mentoria com encontros humanos continuam separados. Na revisão de novas ofertas de mentoria, a proposta é adicionar R$ 50,00 por agente de IA que estiver incluído, com opção sem agentes. Essa revisão não altera automaticamente o preço de contratos existentes.</p>
-      </div>
     </section>
   );
 }
