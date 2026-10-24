@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Mascot } from '@/components/soma/CareerJourney';
+import { formatarTextoIris, normalizarRespostasRapidas } from '@/lib/iris-comunicacao';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
 type Mensagem = {
@@ -323,7 +324,7 @@ export default function IrisCopiloto() {
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
         respostaRef: resposta.ok && dados.resposta ? (dados.resposta_ref || crypto.randomUUID()) : undefined,
-        sugestoes: resposta.ok && Array.isArray(dados.sugestoes) ? dados.sugestoes.slice(0, 2) : undefined,
+        sugestoes: resposta.ok ? normalizarRespostasRapidas(dados.sugestoes) : undefined,
       }]);
     } catch {
       if (geracao === geracaoConversa.current) setMensagens(anteriores => [...anteriores, {
@@ -571,21 +572,34 @@ export default function IrisCopiloto() {
                         table: ({children}) => <div className="overflow-x-auto"><table className="min-w-full border-collapse text-xs">{children}</table></div>,
                         th: ({children}) => <th className="border border-[#e1e7e0] bg-[#f1f7f2] px-2 py-2 text-left">{children}</th>,
                         td: ({children}) => <td className="border border-[#e1e7e0] px-2 py-2 align-top">{children}</td>,
-                      }}>{m.texto}</ReactMarkdown>
+                      }}>{formatarTextoIris(m.texto)}</ReactMarkdown>
                     </div>
                   ) : (
                     <p className="whitespace-pre-wrap break-words">{m.texto}</p>
                   )}
-                  {m.tipo === 'iris' && indice === mensagens.length - 1 && !!m.sugestoes?.length && (
-                    <div className="mt-3 flex flex-wrap gap-2" aria-label="Próximos passos sugeridos pela Íris">
-                      {m.sugestoes.map(sugestao => (
-                        <button key={sugestao} type="button" onClick={() => void enviar(sugestao)}
-                          disabled={ocupada || historicoCarregando || preferenciaCarregando}
-                          className="min-h-10 rounded-full border border-[#b8d7ca] bg-[#f3faf7] px-3 py-2 text-left text-xs font-medium text-[#215849] transition hover:bg-[#dff3ea] disabled:opacity-40">
-                          {sugestao}
-                        </button>
-                      ))}
-                    </div>
+                  {m.tipo === 'iris' && indice === mensagens.length - 1 &&
+                    normalizarRespostasRapidas(m.sugestoes).length > 0 && (
+                    <section aria-label="Respostas rápidas para continuar a conversa"
+                      className="mt-4 rounded-xl border border-[#d4e5dc] bg-[#f7faf8] p-3">
+                      <p className="text-xs font-semibold text-[#285c4a]">Como quer continuar?</p>
+                      <p id={'iris-escolhas-' + indice} className="mt-1 text-xs leading-5 text-[#567466]">
+                        Toque em uma opção para enviar sua resposta à Íris, ou escreva abaixo.
+                        Isso não cria tarefas nem salva ações
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {normalizarRespostasRapidas(m.sugestoes).map(sugestao => (
+                          <button key={sugestao} type="button" onClick={() => void enviar(sugestao)}
+                            aria-label={'Enviar resposta: ' + sugestao}
+                            aria-describedby={'iris-escolhas-' + indice}
+                            disabled={ocupada || historicoCarregando || preferenciaCarregando ||
+                              (!!conversationId && !permitirHistorico)}
+                            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#b8d7ca] bg-white px-3 py-2 text-left text-xs font-medium text-[#215849] transition hover:bg-[#e4f3ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] disabled:opacity-40">
+                            <Send size={13} aria-hidden="true" className="shrink-0" />
+                            {sugestao}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
                   )}
                   {m.href && !m.proposta && (
                     <a href={m.href} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#5B453E] underline">
@@ -678,19 +692,25 @@ export default function IrisCopiloto() {
             {ocupada && <p className="text-xs text-gray-600">Íris está preparando a resposta...</p>}
           </div>
           {mensagens.length === 1 && (
-            <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto border-t border-[#eee6df] px-3 py-2">
-              {['Monte um plano prático de 7 dias', 'Qual meu próximo passo?', 'Treinar uma entrevista'].map(sugestao => (
-                <button
-                  key={sugestao}
-                  type="button"
-                  disabled={ocupada}
-                  onClick={() => void enviar(sugestao)}
-                  className="min-h-10 rounded-full border border-[#d9d0c9] px-3 py-2 text-xs text-[#5B453E] disabled:opacity-50"
-                >
-                  {sugestao}
-                </button>
-              ))}
-            </div>
+            <section aria-label="Mensagens rápidas para começar" className="shrink-0 border-t border-[#eee6df] bg-[#f8faf8] px-3 py-3">
+              <p className="text-xs font-semibold text-[#365c4c]">Quer começar por algum destes assuntos?</p>
+              <p className="mt-1 text-xs text-[#687c70]">Toque para enviar sua escolha, ou escreva sua pergunta.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {['Quero um plano para 7 dias', 'Quero entender meu próximo passo', 'Quero treinar uma entrevista'].map(sugestao => (
+                  <button
+                    key={sugestao}
+                    type="button"
+                    disabled={ocupada || historicoCarregando || preferenciaCarregando}
+                    onClick={() => void enviar(sugestao)}
+                    aria-label={'Enviar resposta: ' + sugestao}
+                    className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-[#d9e5dc] bg-white px-3 py-2 text-xs text-[#275a48] hover:bg-[#eaf5ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] disabled:opacity-50"
+                  >
+                    <Send size={12} aria-hidden="true" />
+                    {sugestao}
+                  </button>
+                ))}
+              </div>
+            </section>
           )}
           <form
             className="flex shrink-0 items-end gap-2 border-t border-[#eee6df] bg-white p-3"
