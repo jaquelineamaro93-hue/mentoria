@@ -76,7 +76,7 @@ export async function executarTrialGrowth() {
     const days = daysUntil(profile.trial_ends_at, now);
     const stage: Stage | null = days === 3 ? 'd3' : days === 1 ? 'd1'
       : days === 0 ? 'd0' : days === -2 ? 'p2' : null;
-    if (!stage) { summary.skipped++; continue; }
+    if (!stage || (stage === 'd0' && now >= new Date(profile.trial_ends_at))) { summary.skipped++; continue; }
     // A campanha não deve incluir clientes com qualquer módulo SaaS pago.
     const { data: paidModules, error: moduleError } = await db.from('soma_module_subscriptions')
       .select('id').eq('user_id', profile.id).in('status', ['active','ativo','authorized','paid']).limit(1);
