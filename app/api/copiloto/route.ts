@@ -8,6 +8,7 @@ import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
 import { detectarPesquisaIris, pesquisarPublicamente } from '@/lib/iris-pesquisa-publica';
+import { resolverAcessoSaas } from '@/lib/soma-saas-entitlements';
 import { ownsIrisConversation, recentIrisContext, saveIrisTurn, validConversationId } from '@/lib/iris-web-history';
 
 export const runtime = 'nodejs';
@@ -142,8 +143,16 @@ export async function POST(request: NextRequest) {
     (!perfil.data_fim_acesso || perfil.data_fim_acesso >= hojeSP);
   const trial = perfil.trial_status === 'active' &&
     !!perfil.trial_ends_at && Date.parse(perfil.trial_ends_at) > Date.now();
+  // Assinatura SaaS independente: ser dono de uma conta não dá direito à Íris.
+  // Apenas pagamento confirmado com adicional Íris concede acesso.
+  let acessoSaas: Awaited<ReturnType<typeof resolverAcessoSaas>> | null = null;
   if (!perfil.is_admin && !assinante && !trial) {
-    return json({ erro: 'Seu acesso à mentoria está inativo.' }, 403);
+    try { acessoSaas = await resolverAcessoSaas(user.id); } catch {
+      return json({ erro: 'Não foi possível conferir sua assinatura.' }, 503);
+    }
+    if (!acessoSaas.irisPermitida) {
+      return json({ erro: 'Íris Copiloto não está incluída no seu plano.', href: '/minha-assinatura-saas' }, 403);
+    }
   }
   // Segurança independentemente do botão: pausas e termos vigentes são verificados no servidor.
   const [pausaResp, termoResp] = await Promise.all([
@@ -167,7 +176,10 @@ export async function POST(request: NextRequest) {
   }
 
   const permitido = await consumeIdentifierRateLimit({
-    scope: 'iris_copiloto', identifier: user.id, limit: 35, windowSeconds: 3600,
+    scope: acessoSaas ? 'iris_saas_copiloto' : 'iris_copiloto',
+    identifier: user.id,
+    limit: acessoSaas ? 10 : 35,
+    windowSeconds: acessoSaas ? 86400 : 3600,
   });
   if (!permitido) return json({ erro: 'Limite temporário de conversas atingido.' }, 429);
 
@@ -179,6 +191,10 @@ export async function POST(request: NextRequest) {
     return json({ erro: 'Solicitação inválida.' }, 400);
   }
 
+  if (acessoSaas && !acessoSaas.modulosPermitidos.includes('desenvolvimento') &&
+    body.acao === 'confirmar_pdi') {
+    return json({ erro: 'Esse recurso não está no seu plano SaaS.', href:'/minha-assinatura-saas' },403);
+  }
   const receivedId = body.conversation_id;
   if (receivedId != null && !validConversationId(receivedId)) {
     return json({ erro: 'Conversa inválida.' }, 400);
