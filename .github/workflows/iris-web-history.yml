@@ -40,6 +40,14 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.1'
+          cache: npm
+      - name: Enforce patched Node.js for Brotli security
+        run: |
+          node -e "const [major,minor,patch] = process.versions.node.split('.').map(Number); if (major !== 24 || minor < 22 || (minor === 22 && patch < 1)) { console.error('Node.js Brotli patch required: 24.22.1+'); process.exit(1); }"
       - name: Verify privacy and isolation source tests
         run: node --test tests/iris-historico-web.test.mjs tests/iris-coaching-ux.test.mjs tests/iris-voice-plan.test.mjs tests/iris-privacy-session.test.mjs
       - name: Verify Iris sidebar navigation
@@ -50,11 +58,6 @@ jobs:
         run: node --experimental-strip-types --test tests/iris-comunicacao-clara.test.mjs
       - name: Verify Iris public research safety
         run: node --experimental-strip-types --test tests/iris-pesquisa-publica.test.mjs
-      - name: Set up Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '24.22.1'
-          cache: npm
       - name: Install
         run: npm ci
       - name: Build
