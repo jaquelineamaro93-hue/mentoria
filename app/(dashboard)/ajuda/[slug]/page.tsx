@@ -35,7 +35,7 @@ export default async function ArticlePage({ params, searchParams }: { params: Pr
   const index = catalog.findIndex(item => item.id === article.id);
   const previous = index > 0 ? catalog[index - 1] : null;
   const next = index >= 0 && index + 1 < catalog.length ? catalog[index + 1] : null;
-  return <div className="mx-auto max-w-7xl text-black">
+  return <div className="w-full min-w-0 text-black">
     <nav aria-label="Caminho na Central de Ajuda" className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#53685e]">
       <Link href="/ajuda" className="text-[#24594b] underline underline-offset-4">Central de Ajuda</Link>
       <span aria-hidden="true">/</span><Link href={'/ajuda?categoria=' + encodeURIComponent(article.category)} className="text-[#24594b] underline underline-offset-4">{article.category}</Link>

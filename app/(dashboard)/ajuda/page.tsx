@@ -10,7 +10,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const articles = await listHelpArticles(context);
   const requestedCategory = (await searchParams).categoria;
   const category = articles.some(article => article.category === requestedCategory) ? requestedCategory : undefined;
-  return <div className="mx-auto max-w-7xl text-black">
+  return <div className="w-full min-w-0 text-black">
     <p className="text-xs uppercase tracking-widest text-[#53685e]">Aprenda no seu ritmo</p>
     <h1 className="mt-2 font-display text-3xl text-[#183f37]">Como podemos ajudar?</h1>
     <p className="mb-5 mt-3 max-w-2xl text-sm leading-6 text-[#53685e]">Encontre o passo a passo das ferramentas disponíveis para você e conecte cada recurso ao seu momento de carreira.</p>
