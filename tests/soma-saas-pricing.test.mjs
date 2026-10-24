@@ -47,7 +47,7 @@ test('seleção funciona na UI e envia simulação comercial sem cobrar',()=>{
  assert.match(ui,/setIris\(e.target.checked\)/);
  assert.match(ui,/setWhatsapp\(e.target.checked\)/);
  assert.match(ui,/setModulo\(e.target.value\)/);
- assert.match(ui,/calcularPrecoSaas\(plano, \{ iris, whatsapp \}\)/);
+ assert.match(ui,/calcularResumoSaas\(plano, \{ iris, whatsapp \}, kitOnboarding\)/);
  assert.match(ui,/linkContato/);
  assert.match(ui,/Solicitar contratação/);
  assert.match(ui,/Nenhuma cobrança acontece ao clicar/);
