@@ -122,12 +122,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Regenerar um PDI existente não exige preencher novamente todo o guia.
+    // As respostas disponíveis já são suficientes para revisar as metas do ciclo.
+    const { data: planoAnterior, error: erroPlanoAnterior } = await supabaseAdmin
+      .from("pdi_planos")
+      .select("id, versao")
+      .eq("mentorado_id", mentoradoId)
+      .eq("status", "ativo")
+      .order("gerado_em", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (erroPlanoAnterior) {
+      return NextResponse.json({ erro: "não consegui verificar o plano atual" }, { status: 500 });
+    }
+
     const permitePdiParcial = mentoradoId === KARINY_MORE_ID;
     const { count: totalSecoes } = await supabaseAdmin
       .from("pdi_guia_secoes")
       .select("id", { count: "exact", head: true });
 
-    if (!permitePdiParcial && totalSecoes && respostasRaw.length < totalSecoes) {
+    if (!planoAnterior && !permitePdiParcial && totalSecoes && respostasRaw.length < totalSecoes) {
       return NextResponse.json(
         { erro: `complete as ${totalSecoes} seções do PDI antes de gerar o plano` },
         { status: 400 }
@@ -192,15 +206,6 @@ export async function POST(req: NextRequest) {
       ]);
 
     // O plano anterior é histórico: ações concluídas não podem virar tarefas novas.
-    const { data: planoAnterior } = await supabaseAdmin
-      .from("pdi_planos")
-      .select("id, versao")
-      .eq("mentorado_id", mentoradoId)
-      .eq("status", "ativo")
-      .order("gerado_em", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
     const { data: acoesConcluidas } = planoAnterior
       ? await supabaseAdmin
           .from("pdi_acoes")
