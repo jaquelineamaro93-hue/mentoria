@@ -191,7 +191,35 @@ export async function POST(req: NextRequest) {
           .maybeSingle(),
       ]);
 
+    // O plano anterior é histórico: ações concluídas não podem virar tarefas novas.
+    const { data: planoAnterior } = await supabaseAdmin
+      .from("pdi_planos")
+      .select("id, versao")
+      .eq("mentorado_id", mentoradoId)
+      .eq("status", "ativo")
+      .order("gerado_em", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { data: acoesConcluidas } = planoAnterior
+      ? await supabaseAdmin
+          .from("pdi_acoes")
+          .select("titulo, descricao")
+          .eq("mentorado_id", mentoradoId)
+          .eq("plano_id", planoAnterior.id)
+          .eq("concluida", true)
+          .order("ordem", { ascending: true })
+      : { data: [] };
+
     const partesContexto: string[] = [];
+    if (acoesConcluidas?.length) {
+      partesContexto.push(
+        "### Histórico de entregas já concluídas\\n" +
+        acoesConcluidas.slice(0, 40).map((a) => "- " + a.titulo + (a.descricao ? ": " + a.descricao : "")).join("\\n") +
+        "\\nEstas entregas já foram realizadas. Reconheça a evolução e NÃO as recrie como ações pendentes no novo ciclo."
+      );
+    }
+
 
     if (blocosQuemSouEu && blocosQuemSouEu.length > 0) {
       const tituloPorCodigo = new Map(BLOCOS_QUEM_SOU_EU.map((b) => [b.codigo, b.titulo]));
@@ -260,17 +288,14 @@ Este é um plano inicial autorizado com ${respostasRaw.length} de ${totalSecoes 
       ? planoGerado.diagnostico.alertas_sobrecarga
       : [];
 
-    // Arquiva plano anterior (se existir) para manter histórico de versões
-    await supabaseAdmin
-      .from("pdi_planos")
-      .update({ status: "arquivado" })
-      .eq("mentorado_id", mentoradoId)
-      .eq("status", "ativo");
-
+    // Primeiro cria uma versão arquivada e suas ações; o plano ativo anterior
+    // permanece disponível até a nova versão estar completa.
     const { data: planoSalvo, error: erroSalvar } = await supabaseAdmin
       .from("pdi_planos")
       .insert({
         mentorado_id: mentoradoId,
+        status: "arquivado",
+        versao: (planoAnterior?.versao ?? 0) + 1,
         diagnostico: planoGerado.diagnostico,
         equacao: planoGerado.equacao,
         pilares: planoGerado.pilares,
@@ -298,10 +323,39 @@ Este é um plano inicial autorizado com ${respostasRaw.length} de ${totalSecoes 
     );
 
     if (acoesParaInserir.length > 0) {
-      await supabaseAdmin.from("pdi_acoes").insert(acoesParaInserir);
+      const { error: erroAcoes } = await supabaseAdmin.from("pdi_acoes").insert(acoesParaInserir);
+      if (erroAcoes) {
+        await supabaseAdmin.from("pdi_planos").delete().eq("id", planoSalvo.id).eq("mentorado_id", mentoradoId);
+        return NextResponse.json({ erro: "não consegui salvar as ações do novo plano; o plano anterior foi mantido" }, { status: 500 });
+      }
     }
 
-    return NextResponse.json({ plano: planoSalvo });
+    if (planoAnterior) {
+      const { error: erroArquivar } = await supabaseAdmin
+        .from("pdi_planos")
+        .update({ status: "arquivado" })
+        .eq("id", planoAnterior.id)
+        .eq("mentorado_id", mentoradoId)
+        .eq("status", "ativo");
+      if (erroArquivar) {
+        await supabaseAdmin.from("pdi_planos").delete().eq("id", planoSalvo.id).eq("mentorado_id", mentoradoId);
+        return NextResponse.json({ erro: "não consegui arquivar a versão anterior; nada foi substituído" }, { status: 500 });
+      }
+    }
+
+    const { error: erroAtivar } = await supabaseAdmin
+      .from("pdi_planos")
+      .update({ status: "ativo" })
+      .eq("id", planoSalvo.id)
+      .eq("mentorado_id", mentoradoId);
+    if (erroAtivar) {
+      if (planoAnterior) {
+        await supabaseAdmin.from("pdi_planos").update({ status: "ativo" }).eq("id", planoAnterior.id).eq("mentorado_id", mentoradoId);
+      }
+      return NextResponse.json({ erro: "não consegui ativar o novo plano; o histórico foi preservado" }, { status: 500 });
+    }
+
+    return NextResponse.json({ plano: { ...planoSalvo, status: "ativo" } });
   } catch (erro) {
     console.error("erro ao gerar plano de PDI", erro);
     return NextResponse.json({ erro: "erro interno ao gerar o plano" }, { status: 500 });
