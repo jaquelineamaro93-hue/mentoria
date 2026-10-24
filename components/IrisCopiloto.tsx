@@ -22,6 +22,7 @@ type Mensagem = {
   perguntaPdi?: PerguntaPdi;
   rascunhoPdi?: RascunhoPdi;
   tokenPdi?: string;
+  pdiCompleto?: boolean;
   respostaRef?: string;
   sugestoes?: string[];
   avaliacao?: 'util' | 'nao_util';
@@ -346,6 +347,7 @@ export default function IrisCopiloto() {
         perguntaPdi: resposta.ok ? dados.pergunta_pdi : undefined,
         rascunhoPdi: resposta.ok ? dados.rascunho_pdi : undefined,
         tokenPdi: resposta.ok ? dados.token_pdi : undefined,
+        pdiCompleto: resposta.ok ? dados.pdi_completo : undefined,
         respostaRef: resposta.ok && dados.resposta ? (dados.resposta_ref || crypto.randomUUID()) : undefined,
         sugestoes: resposta.ok ? normalizarRespostasRapidas(dados.sugestoes) : undefined,
       }]);
@@ -392,6 +394,7 @@ export default function IrisCopiloto() {
         tipo: 'iris', texto: data.resposta || data.erro || 'Não consegui concluir.',
         href: res.ok ? data.href : undefined,
         perguntaPdi: res.ok ? data.pergunta_pdi : undefined,
+        pdiCompleto: res.ok ? data.pdi_completo : undefined,
       }]);
     } catch {
       if (geracao === geracaoConversa.current) setMensagens(anteriores => [...anteriores, {
@@ -724,6 +727,18 @@ export default function IrisCopiloto() {
                         </button>
                       </div>
                     </section>
+                  )}
+                  {m.pdiCompleto && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button type="button" disabled={ocupada}
+                        onClick={() => void comandoPdi('pdi_iniciar', undefined, undefined, undefined, 'revisar')}
+                        className="min-h-11 rounded-full border border-[#b8d7ca] bg-[#f5faf7] px-4 text-xs font-semibold text-[#285c4a] disabled:opacity-50">
+                        Revisar minhas respostas
+                      </button>
+                      <a href="/meu-pdi" className="inline-flex min-h-11 items-center rounded-full border border-[#d6d0c9] px-4 text-xs font-semibold text-[#285c4a]">
+                        Abrir Meu PDI
+                      </a>
+                    </div>
                   )}
                   {m.proposta && m.token && (
                     <div className="mt-3 rounded-lg border border-[#cfc3bb] bg-[#faf7f3] p-3">
