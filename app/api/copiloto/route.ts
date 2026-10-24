@@ -10,6 +10,7 @@ import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
 import { detectarPesquisaIris, pesquisarPublicamente } from '@/lib/iris-pesquisa-publica';
 import { ownsIrisConversation, recentIrisContext, saveIrisTurn, validConversationId } from '@/lib/iris-web-history';
+import { helpForIris } from '@/lib/help-center/iris';
 import { executarPdiGuiado, querPreencherPdi } from '@/lib/iris-pdi-guided';
 
 export const runtime = 'nodejs';
@@ -259,6 +260,13 @@ export async function POST(request: NextRequest) {
     return resultado.status === 200
       ? responderComHistorico(resultado.payload)
       : json(resultado.payload, resultado.status);
+  }
+
+  try {
+    const help = await helpForIris(body, user.id);
+    if (help) return help.status === 200 ? responderComHistorico(help.payload) : json(help.payload, help.status);
+  } catch {
+    return json({ erro: 'Não foi possível carregar a orientação da Central de Ajuda. Tente novamente.' }, 503);
   }
 
   // Esta operação é determinística: exige confirmação explícita e token assinado.

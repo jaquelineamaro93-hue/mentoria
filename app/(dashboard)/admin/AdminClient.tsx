@@ -319,6 +319,7 @@ export default function AdminClient({
           <div><h1 className="text-2xl font-semibold text-black">Administração</h1><p className="mt-1 text-sm text-gray-600">Pessoas, produtos e resultados em um só lugar.</p></div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
+              {href:'/admin/ajuda',title:'Conteúdos e novidades',description:'Tutoriais, publicações e avisos no sino',Icon:MessageSquare},
               {href:'/admin/usuarios',title:'Pessoas e acessos',description:'Contas, permissões e acompanhamento',Icon:Users},
               {href:'/admin/gerenciar-planos',title:'Planos e contratos',description:'Produtos, vigências e pagamentos',Icon:CreditCard},
               {href:'/admin/financeiro',title:'Financeiro',description:'Receitas e movimentações',Icon:Wallet},

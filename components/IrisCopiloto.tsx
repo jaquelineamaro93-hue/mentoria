@@ -57,6 +57,7 @@ export default function IrisCopiloto() {
   const [nomeMentorado, setNomeMentorado] = useState('');
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
+  const [artigoAjuda, setArtigoAjuda] = useState<string | null>(null);
   const [perguntaAtiva, setPerguntaAtiva] = useState<PerguntaPdi | null>(null);
   const [rascunhoPendente, setRascunhoPendente] = useState(false);
   const [ocupada, setOcupada] = useState(false);
@@ -83,6 +84,19 @@ export default function IrisCopiloto() {
   const abertoUmaVez = useRef(false);
   // Invalidar callbacks de requisições anteriores ao fechar a janela.
   const geracaoConversa = useRef(0);
+
+  useEffect(() => {
+    const openHelp = (event: Event) => {
+      const detail = (event as CustomEvent<{ articleId: string; title: string }>).detail;
+      if (!detail || typeof detail.articleId !== 'string' || typeof detail.title !== 'string') return;
+      setAberto(true);
+      if (ocupada || perguntaAtiva || rascunhoPendente) return;
+      setArtigoAjuda(detail.articleId);
+      setTexto('Me ajude a usar este recurso: ' + detail.title.slice(0, 140));
+    };
+    window.addEventListener('soma:iris-help', openHelp);
+    return () => window.removeEventListener('soma:iris-help', openHelp);
+  }, [ocupada, perguntaAtiva, rascunhoPendente]);
 
   // Ler da SOMA, não do armazenamento do dispositivo. Funciona em sessões e
   // dispositivos diferentes, respeitando a autenticação e RLS por usuário.
@@ -162,6 +176,7 @@ export default function IrisCopiloto() {
   }
 
   function fecharConversa() {
+    setArtigoAjuda(null);
     limparConversaVisivel();
     setExpandido(false);
     setAberto(false);
@@ -287,11 +302,13 @@ export default function IrisCopiloto() {
     };
   }, [aberto, mobile, expandido, nomeMentorado]);
 
-  async function enviar(pedidoExterno?: string) {
+  async function enviar(pedidoExterno?: string, artigoId?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
     if (!pedido || ocupada || rascunhoPendente || historicoCarregando || preferenciaCarregando ||
         (!!conversationId && !permitirHistorico)) return;
     const geracao = geracaoConversa.current;
+    const helpId = artigoId ?? (!pedidoExterno ? artigoAjuda : null);
+    setArtigoAjuda(null);
     setTexto('');
     setOcupada(true);
     setMensagens(anteriores => [...anteriores, { tipo: 'mentorado', texto: pedido }]);
@@ -303,7 +320,8 @@ export default function IrisCopiloto() {
         cache: 'no-store',
         body: JSON.stringify({
           mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico,
-          ...(perguntaAtiva ? { acao: 'pdi_preparar', secao: perguntaAtiva.secao,
+          ...(helpId ? { acao: 'ajuda_artigo', artigo_id: helpId } : {}),
+          ...(!helpId && perguntaAtiva ? { acao: 'pdi_preparar', secao: perguntaAtiva.secao,
             modo: perguntaAtiva.modo } : {}),
           // Contexto da sessão apenas quando ainda não há conversa persistida.
           // Vai somente nesta requisição; não é salvo sem consentimento.
@@ -819,6 +837,7 @@ export default function IrisCopiloto() {
                 </div>
               </div>
             ))}
+            <div className="flex flex-wrap gap-3 text-xs text-[#24594b]"><Link href="/ajuda">Central de Ajuda</Link><Link href="/novidades">Novidades da SOMA</Link></div>
             {ocupada && <p className="text-xs text-gray-600">Íris está preparando a resposta...</p>}
           </div>
           {mensagens.length === 1 && (
@@ -826,7 +845,7 @@ export default function IrisCopiloto() {
               <p className="text-xs font-semibold text-[#365c4c]">Quer começar por algum destes assuntos?</p>
               <p className="mt-1 text-xs text-[#687c70]">Toque para enviar sua escolha, ou escreva sua pergunta.</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {['Quero preencher meu PDI com a Íris', 'Quero um plano para 7 dias', 'Quero entender meu próximo passo', 'Quero treinar uma entrevista'].map(sugestao => (
+                {['O que há de novo na SOMA?', 'Quero preencher meu PDI com a Íris', 'Quero um plano para 7 dias', 'Quero entender meu próximo passo', 'Quero treinar uma entrevista'].map(sugestao => (
                   <button
                     key={sugestao}
                     type="button"
@@ -851,7 +870,7 @@ export default function IrisCopiloto() {
               rows={2}
               maxLength={4000}
               value={texto}
-              onChange={event => setTexto(event.target.value)}
+              onChange={event => { setTexto(event.target.value); setArtigoAjuda(null); }}
               onKeyDown={event => {
                 if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
                   event.preventDefault();

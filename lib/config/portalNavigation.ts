@@ -91,7 +91,7 @@ export const portalNavGroups: PortalNavGroup[] = [
 ];
 
 export const supportItems: PortalNavItem[] = [
-  { href: '/faq', label: 'Ajuda', icon: HelpCircle },
+  { href: '/ajuda', label: 'Central de Ajuda', icon: HelpCircle },
   { href: '/termos', label: 'Termos da mentoria', icon: FileText },
 ];
 
@@ -143,6 +143,8 @@ export function getPortalLocation(pathname: string, currentSearch = '') {
   if (isPortalRouteActive(pathname, '/admin', currentSearch)) {
     return { group: 'Gestão', label: 'Administração' };
   }
+  if (pathname === '/novidades') return { group: 'Sua experiência na SOMA', label: 'Novidades' };
+  if (pathname.startsWith('/ajuda')) return { group: 'Sua experiência na SOMA', label: 'Central de Ajuda' };
   if (pathname === '/perfil') return { group: 'Meu espaço', label: 'Meu perfil' };
   if (pathname === '/sessao-extra') return { group: 'Minha jornada', label: 'Sessão extra' };
   if (pathname === '/renovar') return { group: 'Meu espaço', label: 'Renovar mentoria' };
