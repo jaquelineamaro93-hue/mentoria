@@ -19,6 +19,7 @@ import InspecaoBanner from '@/components/InspecaoBanner';
 import ConfirmacaoContatoModal from '@/components/ConfirmacaoContatoModal';
 import EntrevistaInicialModal from '@/components/EntrevistaInicialModal';
 import IrisCopiloto from '@/components/IrisCopiloto';
+import NewsBell from '@/components/help/NewsBell';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
 import type { Profile } from '@/lib/types';
@@ -100,6 +101,7 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
 
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const helpPage = pathname === '/ajuda' || pathname.startsWith('/ajuda/') || pathname === '/novidades';
   const saasOnly = (!!access?.saas || pathname === '/plataforma') && !access?.mentorship;
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
@@ -195,8 +197,8 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
       </a>
 
       <CollapsibleSidebar />
-      <ConfirmacaoContatoModal profile={initialProfile} />
-      {!saasOnly && <EntrevistaInicialModal profile={initialProfile} />}
+      {!helpPage && <ConfirmacaoContatoModal profile={initialProfile} />}
+      {!helpPage && !saasOnly && <EntrevistaInicialModal profile={initialProfile} />}
 
       <div className={styles.workspace} inert={isMobile && isMobileOpen ? true : undefined}>
         <header className={styles.topbar}>
@@ -221,7 +223,7 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
             </span>
           </nav>
 
-          <span className={styles.portalCaption}>Seu espaço de desenvolvimento</span>
+          <div className="ml-auto flex items-center gap-3"><span className={styles.portalCaption}>Seu espaço de desenvolvimento</span>{initialProfile && <NewsBell />}</div>
         </header>
 
         <main ref={main} id="portal-content" tabIndex={-1} className={styles.main}>

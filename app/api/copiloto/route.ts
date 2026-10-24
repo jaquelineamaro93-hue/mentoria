@@ -10,6 +10,7 @@ import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
 import { detectarPesquisaIris, pesquisarPublicamente } from '@/lib/iris-pesquisa-publica';
 import { ownsIrisConversation, recentIrisContext, saveIrisTurn, validConversationId } from '@/lib/iris-web-history';
+import { helpForIris } from '@/lib/help-center/iris';
 import { executarPdiGuiado, querPreencherPdi } from '@/lib/iris-pdi-guided';
 
 export const runtime = 'nodejs';
@@ -243,6 +244,13 @@ export async function POST(request: NextRequest) {
       return json({ ...saida,
         aviso_historico: 'Sua resposta foi gerada, mas o histórico não pôde ser salvo. Copie-a antes de sair.' }, status);
     }
+  }
+
+  try {
+    const help = await helpForIris(body, user.id);
+    if (help) return help.status === 200 ? responderComHistorico(help.payload) : json(help.payload, help.status);
+  } catch {
+    return json({ erro: 'Não foi possível carregar a orientação da Central de Ajuda. Tente novamente.' }, 503);
   }
 
   // Preenchimento conversacional do PDI é separado do plano de ações da Íris.

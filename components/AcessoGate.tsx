@@ -14,7 +14,7 @@ export default function AcessoGate() {
 
   useEffect(() => {
     async function checar() {
-      if (ROTAS_LIBERADAS.includes(pathname)) {
+      if (ROTAS_LIBERADAS.includes(pathname) || pathname === '/ajuda' || pathname.startsWith('/ajuda/') || pathname === '/novidades' || pathname === '/faq') {
         setChecando(false);
         return;
       }

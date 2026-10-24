@@ -32,6 +32,12 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  // Redirect before rendering any documentation shell, including streamed RSC.
+  if ((!user || user.is_anonymous) && (path === '/ajuda' || path.startsWith('/ajuda/') || path === '/novidades' || path === '/faq')) {
+    const login = new URL('/login', request.url);
+    login.searchParams.set('next', path);
+    return NextResponse.redirect(login, { headers: { 'Cache-Control': 'private, no-store' } });
+  }
   // An explicit mentorship selection replaces a previous SaaS navigation intent.
   if ((path === '/checkout' && request.nextUrl.searchParams.has('plan')) ||
       (path === '/login' && request.nextUrl.searchParams.has('trial_plan'))) {
@@ -123,12 +129,12 @@ export async function proxy(request: NextRequest) {
         if(path.startsWith('/api')) {
           const liberada=path.startsWith('/api/mentoria/pausa') ||
             path.startsWith('/api/auth/') || path.startsWith('/api/product-events') ||
-            path.startsWith('/api/trial/') || path.startsWith('/api/termos/');
+            path.startsWith('/api/trial/') || path.startsWith('/api/termos/') || path === '/api/ajuda/lidas';
           if(!liberada && !['GET','HEAD','OPTIONS'].includes(request.method))
             return NextResponse.json({error:'Sua mentoria está pausada. Retome no Meu Plano para continuar.'},
               {status:423,headers:{'Cache-Control':'no-store'}});
         }else{
-          const permitida=path==='/meu-plano'||path.startsWith('/meu-plano/') ||
+          const permitida=path==='/ajuda'||path.startsWith('/ajuda/')||path==='/novidades'||path==='/faq'||path==='/meu-plano'||path.startsWith('/meu-plano/') ||
             path==='/contratos'||path==='/termos'||path.startsWith('/termos/') ||
             path==='/perfil'||path.startsWith('/perfil/') ||
             path==='/renovar'||path.startsWith('/auth/')||path.startsWith('/plataforma') ||

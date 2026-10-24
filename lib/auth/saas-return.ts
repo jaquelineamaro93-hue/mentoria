@@ -8,6 +8,6 @@ export function safeSaasNext(value: unknown): string | null {
   } catch { return null; }
 }
 export function isCheckoutAccessPath(path: string) {
-  return ['/contratos','/termos','/login','/magic-login','/reset-password','/checkout','/planos','/renovar','/plataforma','/auth','/api']
+  return ['/ajuda','/novidades','/faq','/contratos','/termos','/login','/magic-login','/reset-password','/checkout','/planos','/renovar','/plataforma','/auth','/api']
     .some(route => path === route || path.startsWith(route + '/'));
 }

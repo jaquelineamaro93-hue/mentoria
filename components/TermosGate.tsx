@@ -30,7 +30,7 @@ export default function TermosGate() {
     // /termos já possui seu próprio botão de aceite e não precisa de modal.
     // Meu Plano também deve permitir consultar as condições da pausa sem
     // um bloqueio visual. O acesso à pausa exige o aceite na própria ação.
-    const rotaSemModal = ['/termos', '/meu-plano', '/perfil', '/renovar'].some(
+    const rotaSemModal = ['/ajuda', '/novidades', '/faq', '/termos', '/meu-plano', '/perfil', '/renovar'].some(
       (rota) => pathname === rota || pathname.startsWith(rota + '/')
     );
     setPrecisaAceitar(false);
