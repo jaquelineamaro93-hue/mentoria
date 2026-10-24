@@ -26,44 +26,44 @@ export default function SomaCarreiraOptions() {
 
   return (
     <section id="soma-carreira-extras" aria-label="Adicionais da SOMA Carreira"
-      className="rounded-2xl border border-[#DCCB9B] bg-[#FFF8E3] p-5 sm:p-6">
-      <h3 className="text-lg font-semibold text-[#3D291B]">Sua SOMA Carreira já é completa</h3>
-      <p className="mt-2 text-sm leading-6 text-[#3D291B]">Portal, ferramentas, encontros coletivos, Íris Copiloto e acompanhamento no WhatsApp já fazem parte do plano.</p>
-      <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-[#3D291B]"><CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden="true" />1 encontro individual 1:1 por mês incluído.</p>
+      className="rounded-2xl border border-[#C8DED4] bg-[#F4FAF7] p-5 sm:p-6">
+      <h3 className="text-lg font-semibold text-[#000000]">Sua SOMA Carreira já é completa</h3>
+      <p className="mt-2 text-sm leading-6 text-[#000000]">Portal, ferramentas, encontros coletivos, Íris Copiloto e acompanhamento no WhatsApp já fazem parte do plano.</p>
+      <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-[#000000]"><CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden="true" />1 encontro individual 1:1 por mês incluído.</p>
 
-      <fieldset className="mt-6 space-y-4 border-t border-[#DCCB9B] pt-5">
-        <legend className="text-base font-semibold text-[#3D291B]">Quer mais encontros individuais?</legend>
-        <p className="text-sm leading-6 text-[#3D291B]">Escolha o total de encontros por mês. O adicional varia conforme a quantidade e a duração do plano.</p>
-        <label className="block text-sm font-medium text-[#3D291B]">Duração do plano
-          <select value={duracao} onChange={e => setDuracao(Number(e.target.value) as 6 | 12)} className="mt-2 min-h-11 w-full rounded-xl border border-[#DCCB9B] bg-white px-3 py-2">
+      <fieldset className="mt-6 space-y-4 border-t border-[#C8DED4] pt-5">
+        <legend className="text-base font-semibold text-[#000000]">Quer mais encontros individuais?</legend>
+        <p className="text-sm leading-6 text-[#000000]">Escolha o total de encontros por mês. O adicional varia conforme a quantidade e a duração do plano.</p>
+        <label className="block text-sm font-medium text-[#000000]">Duração do plano
+          <select value={duracao} onChange={e => setDuracao(Number(e.target.value) as 6 | 12)} className="mt-2 min-h-11 w-full rounded-xl border border-[#C8DED4] bg-white px-3 py-2">
             <option value={6}>6 meses</option><option value={12}>12 meses</option>
           </select>
         </label>
-        <label className="block text-sm font-medium text-[#3D291B]">Total de encontros 1:1 por mês
+        <label className="block text-sm font-medium text-[#000000]">Total de encontros 1:1 por mês
           <input type="number" min={1} step={1} value={encontrosInput} inputMode="numeric" onChange={e => setEncontros(e.target.value)} onBlur={() => {
             if (!encontrosValidos) setEncontros('1');
-          }} className="mt-2 min-h-11 w-full rounded-xl border border-[#DCCB9B] bg-white px-3 py-2" />
+          }} className="mt-2 min-h-11 w-full rounded-xl border border-[#C8DED4] bg-white px-3 py-2" />
         </label>
-        <p aria-live="polite" className="rounded-xl border border-[#DCCB9B] bg-white p-4 text-sm leading-6 text-[#3D291B]">
+        <p aria-live="polite" className="rounded-xl border border-[#C8DED4] bg-white p-4 text-sm leading-6 text-[#000000]">
           {!encontrosValidos ? 'Digite a quantidade de encontros por mês.' : extras === 0 ? '1 encontro por mês, já incluído no plano. Sem adicional de encontros.' : `${encontros} encontros por mês: 1 incluído + ${extras} extra${extras > 1 ? 's' : ''}. Pacote para ${duracao} meses.`}
         </p>
-        <p aria-live="polite" className="text-sm font-semibold text-[#3D291B]">{!encontrosValidos ? '' : adicional === null ? 'Para 4 ou mais encontros por mês, consulte um pacote personalizado.' : adicional === 0 ? 'Encontro mensal incluído no plano.' : `+ ${formatarReais(adicional)} pelo pacote completo de ${duracao} meses.`}</p>
+        <p aria-live="polite" className="text-sm font-semibold text-[#000000]">{!encontrosValidos ? '' : adicional === null ? 'Para 4 ou mais encontros por mês, consulte um pacote personalizado.' : adicional === 0 ? 'Encontro mensal incluído no plano.' : `+ ${formatarReais(adicional)} pelo pacote completo de ${duracao} meses.`}</p>
       </fieldset>
 
-      <fieldset className="mt-6 border-t border-[#DCCB9B] pt-5">
-        <legend className="text-sm font-semibold text-[#3D291B]">Kit Onboarding opcional</legend>
-        <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-[#DCCB9B] bg-white p-4">
+      <fieldset className="mt-6 border-t border-[#C8DED4] pt-5">
+        <legend className="text-sm font-semibold text-[#000000]">Kit Onboarding opcional</legend>
+        <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-[#C8DED4] bg-white p-4">
           <input type="checkbox" checked={kitOnboarding} onChange={e => setKitOnboarding(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#0D8071]" />
-          <span className="flex-1 text-sm leading-6 text-[#3D291B]">
-            <strong className="flex items-center gap-2 text-[#3D291B]"><PackageCheck size={18} aria-hidden="true" />Kit Onboarding</strong>
+          <span className="flex-1 text-sm leading-6 text-[#000000]">
+            <strong className="flex items-center gap-2 text-[#000000]"><PackageCheck size={18} aria-hidden="true" />Kit Onboarding</strong>
             Kit de boas-vindas da sua mentoria SOMA Carreira.
-            <span className="mt-1 block font-semibold text-[#3D291B]">+ {formatarReais(KIT_ONBOARDING_CENTAVOS)}, pagamento único</span>
-            <span className="mt-1 block text-xs text-[#3D291B]">Contratos que já incluem o kit mantêm esse benefício, sem nova cobrança.</span>
+            <span className="mt-1 block font-semibold text-[#000000]">+ {formatarReais(KIT_ONBOARDING_CENTAVOS)}, pagamento único</span>
+            <span className="mt-1 block text-xs text-[#000000]">Contratos que já incluem o kit mantêm esse benefício, sem nova cobrança.</span>
           </span>
         </label>
       </fieldset>
-      {encontrosValidos && (extras > 0 || kitOnboarding) && totalAdicionais !== null && <div className="mt-5 rounded-xl border border-[#DCCB9B] bg-white p-4" aria-live="polite"><p className="text-sm text-[#3D291B]">Total dos adicionais</p><p className="mt-1 text-2xl font-semibold text-[#3D291B]">{formatarReais(totalAdicionais)}</p><p className="mt-1 text-xs leading-5 text-[#3D291B]">Adicional ao preço da mentoria. O pacote de encontros cobre {duracao} meses. O kit, se selecionado, é cobrado uma única vez.</p></div>}
-      {encontrosValidos && (extras > 0 || kitOnboarding) && <a href={linkContato} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#E6BE53] px-4 py-3 text-sm font-semibold text-[#3D291B] hover:bg-[#D5A83D]">
+      {encontrosValidos && (extras > 0 || kitOnboarding) && totalAdicionais !== null && <div className="mt-5 rounded-xl border border-[#C8DED4] bg-white p-4" aria-live="polite"><p className="text-sm text-[#000000]">Total dos adicionais</p><p className="mt-1 text-2xl font-semibold text-[#000000]">{formatarReais(totalAdicionais)}</p><p className="mt-1 text-xs leading-5 text-[#000000]">Adicional ao preço da mentoria. O pacote de encontros cobre {duracao} meses. O kit, se selecionado, é cobrado uma única vez.</p></div>}
+      {encontrosValidos && (extras > 0 || kitOnboarding) && <a href={linkContato} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#B8E2CE] px-4 py-3 text-sm font-semibold text-[#000000] hover:bg-[#9AD2B8]">
         <MessageCircle size={16} aria-hidden="true" />Consultar meus adicionais
       </a>}
     </section>
