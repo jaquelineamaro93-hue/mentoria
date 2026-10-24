@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import {
  BASE_SAAS_CENTAVOS, calcularPrecoSaas, formatarReais,
  ADICIONAL_IA_CENTAVOS, DOIS_AGENTES_CENTAVOS,
- ADICIONAL_MENTORIA_EXISTENTE_CENTAVOS,
+ ADICIONAL_MENTORIA_EXISTENTE_CENTAVOS, KIT_ONBOARDING_CENTAVOS,
+ calcularResumoSaas, MODALIDADES_MENTORIA,
 } from '../lib/soma-saas-pricing.ts';
 
 const file = path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
@@ -33,8 +34,8 @@ test('adicional de R$50 para avaliação de mentoria existente não altera preç
  assert.equal(ADICIONAL_MENTORIA_EXISTENTE_CENTAVOS,5000);
  const module=file('components/public/SomaSaasShowcase.tsx');
  const checkout=file('app/api/mercadopago/criar-assinatura/route.ts');
- assert.match(module,/Planos de mentoria com encontros humanos continuam separados/);
- assert.match(module,/R\$ 50,00 por agente de IA/);
+ assert.doesNotMatch(module,/Contratação disponível após validação de segurança/);
+ assert.doesNotMatch(module,/Na revisão de novas ofertas de mentoria/);
  assert.doesNotMatch(module,/api\/mercadopago\/criar-assinatura/);
  assert.match(checkout,/\.from\('planos_mentoria'\)/);
  assert.doesNotMatch(checkout,/ADICIONAL_IA_CENTAVOS|DOIS_AGENTES_CENTAVOS/);
@@ -51,7 +52,7 @@ test('seleção funciona na UI e envia simulação comercial sem cobrar',()=>{
  assert.match(ui,/Solicitar contratação/);
  assert.match(ui,/Nenhuma cobrança acontece ao clicar/);
  assert.match(ui,/Sem agentes de IA inclusos|sem agentes de IA/);
- assert.match(ui,/Contratação disponível após validação de segurança/);
+ assert.doesNotMatch(ui,/Contratação disponível após validação de segurança/);
 });
 
 test('nenhuma compra SaaS é disponibilizada enquanto o backend não garante entitlements',()=>{
@@ -61,4 +62,30 @@ test('nenhuma compra SaaS é disponibilizada enquanto o backend não garante ent
  assert.doesNotMatch(ui,/fetch\(.*mercadopago/);
  assert.match(audit,/enforce_access=false/);
  assert.match(audit,/Não liberar cobranças SaaS/);
+});
+
+test('kit tem cobrança única de R$ 189,90 e não altera mensalidade',()=>{
+ assert.equal(KIT_ONBOARDING_CENTAVOS,18990);
+ const monthly=calcularResumoSaas('essencial',{iris:true,whatsapp:false},true);
+ assert.equal(monthly.total,18490);
+ assert.equal(monthly.kitAvulso,18990);
+ assert.equal(monthly.estimativaPrimeiroMes,37480);
+ assert.equal(calcularResumoSaas('essencial',{iris:true,whatsapp:false},false).total,18490);
+});
+
+test('mentoria em grupo, individual online, presencial e carreira completa têm condições sob consulta',()=>{
+ const ui=file('components/public/SomaSaasShowcase.tsx');
+ for(const key of ['grupo','online-1-1','presencial','carreira-completa']){
+  assert.ok(Object.hasOwn(MODALIDADES_MENTORIA,key));
+ }
+ assert.match(ui,/SOMA Plataforma/);
+ assert.match(ui,/SOMA Carreira/);
+ assert.match(ui,/setMentoria\(item.tipo\)/);
+ assert.match(ui,/setKitOnboarding\(e.target.checked\)/);
+ assert.match(ui,/Kit Onboarding/);
+ assert.match(ui,/Sob consulta/);
+ assert.match(ui,/Pagamento único/);
+ assert.doesNotMatch(ui,/checkout SaaS automático ainda não foi habilitado/);
+ assert.doesNotMatch(ui,/Preços de referência mensais/);
+ assert.doesNotMatch(ui,/Na revisão de novas ofertas/);
 });
