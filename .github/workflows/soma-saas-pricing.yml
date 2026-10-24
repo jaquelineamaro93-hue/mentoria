@@ -1,0 +1,43 @@
+name: SaaS pricing validation
+on:
+  pull_request:
+    paths:
+      - 'components/public/SomaSaasShowcase.tsx'
+      - 'lib/soma-saas-pricing.ts'
+      - 'tests/soma-saas-pricing.test.mjs'
+      - 'tests/ux-planos-regressao-acesso.test.mjs'
+      - '.github/workflows/soma-saas-pricing.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/public/SomaSaasShowcase.tsx'
+      - 'lib/soma-saas-pricing.ts'
+      - 'tests/soma-saas-pricing.test.mjs'
+      - 'tests/ux-planos-regressao-acesso.test.mjs'
+permissions:
+  contents: read
+jobs:
+  pricing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: node --experimental-strip-types --test tests/soma-saas-pricing.test.mjs
+      - run: node --test tests/ux-planos-regressao-acesso.test.mjs
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          ANTHROPIC_API_KEY: placeholder
+          SENDGRID_API_KEY: placeholder
+          SENDGRID_FROM_EMAIL: contato@example.com
+          NEXT_PUBLIC_POSTHOG_KEY: placeholder
+          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
