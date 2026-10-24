@@ -7,13 +7,17 @@ import { BASE_SAAS_CENTAVOS, CATALOGO_SAAS,
 const PLANOS: PlanoSaas[]=['avulso','essencial','pro'];
 type Module={slug:string;title:string};
 
-export default function SaasCheckoutControl({modulos,disponivel}:{
-  modulos:Module[]; disponivel:boolean
+export default function SaasCheckoutControl({modulos,disponivel,escolha}:{
+  modulos:Module[]; disponivel:boolean;
+  escolha?: {plano?:string;modulo?:string;iris?:boolean;whatsapp?:boolean;kit?:boolean};
 }) {
-  const [plano,setPlano]=useState<PlanoSaas>('essencial');
-  const [modulo,setModulo]=useState(modulos[0]?.slug||'');
-  const [iris,setIris]=useState(false);
-  const [whatsapp,setWhatsapp]=useState(false);
+  const valorInicial: PlanoSaas = escolha?.plano==='avulso' || escolha?.plano==='essencial' ||
+    escolha?.plano==='pro' ? escolha.plano : 'essencial';
+  const [plano,setPlano]=useState<PlanoSaas>(valorInicial);
+  const [modulo,setModulo]=useState(modulos.some(m=>m.slug===escolha?.modulo)
+    ? escolha!.modulo! : modulos[0]?.slug||'');
+  const [iris,setIris]=useState(!!escolha?.iris);
+  const [whatsapp,setWhatsapp]=useState(!!escolha?.whatsapp);
   const [aceite,setAceite]=useState(false);
   const [ocupado,setOcupado]=useState(false);
   const [erro,setErro]=useState('');
@@ -83,6 +87,7 @@ export default function SaasCheckoutControl({modulos,disponivel}:{
     <p className="mt-1 text-xs leading-5 text-[#63796c]">
       O Kit Onboarding, quando escolhido, é uma compra avulsa e não entra na recorrência mensal.
     </p>
+    {escolha?.kit && <p className="mt-2 text-xs font-semibold text-[#385d4b]">Você selecionou o Kit Onboarding de R$ 189,90. O pagamento único será tratado separadamente da mensalidade.</p>}
     <label className="mt-4 flex items-start gap-2 text-xs leading-5">
       <input type="checkbox" checked={aceite} onChange={e=>setAceite(e.target.checked)}
         className="mt-1"/>
