@@ -10,6 +10,7 @@ import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
 import { detectarPesquisaIris, pesquisarPublicamente } from '@/lib/iris-pesquisa-publica';
 import { ownsIrisConversation, recentIrisContext, saveIrisTurn, validConversationId } from '@/lib/iris-web-history';
+import { executarPdiGuiado, querPreencherPdi } from '@/lib/iris-pdi-guided';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -217,7 +218,9 @@ export async function POST(request: NextRequest) {
   const usuarioAutenticadoId = user.id;
   const perguntaParaHistorico = body.acao === 'confirmar_pdi'
     ? 'Solicitei confirmação de uma ação do PDI'
-    : texto(body.mensagem, 4000);
+    : body.acao === 'pdi_confirmar'
+      ? 'Confirmei o salvamento de uma resposta das perguntas-guia do PDI'
+      : texto(body.mensagem, 4000);
   async function responderComHistorico(payload: Record<string, unknown>, status = 200) {
     // Texto legível já no servidor, para o chat e para a conversa persistida.
     // Nunca editar a mensagem original enviada pelo mentorado.
@@ -240,6 +243,22 @@ export async function POST(request: NextRequest) {
       return json({ ...saida,
         aviso_historico: 'Sua resposta foi gerada, mas o histórico não pôde ser salvo. Copie-a antes de sair.' }, status);
     }
+  }
+
+  // Preenchimento conversacional do PDI é separado do plano de ações da Íris.
+  // Nenhuma resposta é persistida na etapa de rascunho: só após token assinado.
+  const acaoPdiGuiado = typeof body.acao === 'string' && [
+    'pdi_iniciar', 'pdi_preparar', 'pdi_confirmar', 'pdi_proxima',
+  ].includes(body.acao);
+  const inicioPdiGuiado = !body.acao && querPreencherPdi(texto(body.mensagem, 4000));
+  if (acaoPdiGuiado || inicioPdiGuiado) {
+    const comando = inicioPdiGuiado ? { ...body, acao: 'pdi_iniciar',
+      modo: /revisar|atualizar|alterar|editar|refazer/i.test(texto(body.mensagem, 4000))
+        ? 'revisar' : 'pendentes' } : body;
+    const resultado = await executarPdiGuiado(db, user.id, comando);
+    return resultado.status === 200
+      ? responderComHistorico(resultado.payload)
+      : json(resultado.payload, resultado.status);
   }
 
   // Esta operação é determinística: exige confirmação explícita e token assinado.
