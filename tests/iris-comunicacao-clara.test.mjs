@@ -29,9 +29,9 @@ test('Opções rápidas representam falas do usuário, não deveres de casa', ()
 
 test('Respostas curtas ou escolhas sem sentido são descartadas; não executamos ações', () => {
   assert.deepEqual(normalizarRespostasRapidas({ acao: 'salvar' }), []);
-  assert.deepEqual(normalizarRespostasRapidas(['Crie uma tarefa no PDI e salve automaticamente sem meu consentimento']), [
-    'Quero que você crie uma tarefa no PDI e salve automaticamente sem meu consentimento',
-  ]);
+  assert.deepEqual(normalizarRespostasRapidas([
+    'Crie uma tarefa no PDI e salve automaticamente sem meu consentimento',
+  ]), []);
   // A frase enviada segue o fluxo de chat. A persistência no PDI exige
   // confirmação assinada adicional na API da Íris.
   const api = read('app/api/copiloto/route.ts');
