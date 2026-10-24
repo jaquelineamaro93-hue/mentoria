@@ -22,6 +22,9 @@ begin
   update soma_saas_recovery_offers set expires_at=now()-interval '1 second' where user_id=u;
   begin perform soma_saas_recovery_checkout(u); raise exception 'TEST: expired accepted'; exception when others then if SQLERRM like 'TEST:%' then raise; end if; end;
   update soma_saas_recovery_offers set expires_at=deadline where user_id=u;
+  r:=soma_saas_create_order(u,cfg,v_amount);
+  begin perform soma_saas_recovery_checkout(u); raise exception 'TEST: repriced an existing regular checkout'; exception when others then if SQLERRM like 'TEST:%' then raise; end if; end;
+  update soma_module_orders set status='CANCELED' where id=r;
   r:=soma_saas_recovery_checkout(u);
   if soma_saas_recovery_checkout(u)<>r then raise exception 'Duplicate recovery order'; end if;
   if (select intro_amount<>intro or soma_module_orders.amount<>v_amount from soma_module_orders where id=r) then raise exception 'Wrong software/agent price'; end if;
