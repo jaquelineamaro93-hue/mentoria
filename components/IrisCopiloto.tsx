@@ -9,12 +9,19 @@ import { Mascot } from '@/components/soma/CareerJourney';
 import { formatarTextoIris, normalizarRespostasRapidas } from '@/lib/iris-comunicacao';
 
 type Proposta = { titulo: string; descricao: string; pilar: string };
+type PerguntaPdi = { secao: string; titulo: string; instrucoes: string; atual: string;
+  numero: number; total: number; concluidas: number; modo: 'pendentes' | 'revisar' };
+type RascunhoPdi = { secao: string; titulo: string; texto: string; anterior: string;
+  modo: 'pendentes' | 'revisar' };
 type Mensagem = {
   tipo: 'iris' | 'mentorado';
   texto: string;
   href?: string;
   proposta?: Proposta;
   token?: string;
+  perguntaPdi?: PerguntaPdi;
+  rascunhoPdi?: RascunhoPdi;
+  tokenPdi?: string;
   respostaRef?: string;
   sugestoes?: string[];
   avaliacao?: 'util' | 'nao_util';
@@ -49,6 +56,8 @@ export default function IrisCopiloto() {
   const [nomeMentorado, setNomeMentorado] = useState('');
   const [mensagens, setMensagens] = useState<Mensagem[]>([SAUDACAO]);
   const [texto, setTexto] = useState('');
+  const [perguntaAtiva, setPerguntaAtiva] = useState<PerguntaPdi | null>(null);
+  const [rascunhoPendente, setRascunhoPendente] = useState(false);
   const [ocupada, setOcupada] = useState(false);
   const [historicoCarregando, setHistoricoCarregando] = useState(true);
   const [historicoErro, setHistoricoErro] = useState<string | null>(null);
@@ -114,6 +123,8 @@ export default function IrisCopiloto() {
         mensagens?: MensagemSalva[]; conversation_id?: string; limite_atingido?: boolean; nome?: string };
       if (!r.ok) throw new Error(d.erro || 'Conversa indisponível.');
       if (geracao !== geracaoConversa.current) return;
+      setPerguntaAtiva(null);
+      setRascunhoPendente(false);
       setMensagens(converterMensagens(d.mensagens ?? [], d.nome || nomeMentorado));
       setConversationId(d.conversation_id ?? id);
       setConversas(d.conversas ?? []);
@@ -131,6 +142,8 @@ export default function IrisCopiloto() {
   function limparConversaVisivel() {
     ++geracaoConversa.current;
     setConversationId(null);
+    setPerguntaAtiva(null);
+    setRascunhoPendente(false);
     setMensagens([saudacaoIris(nomeMentorado)]);
     setTexto('');
     setMensagensAntigasLimitadas(false);
@@ -275,7 +288,7 @@ export default function IrisCopiloto() {
 
   async function enviar(pedidoExterno?: string) {
     const pedido = (pedidoExterno ?? texto).trim();
-    if (!pedido || ocupada || historicoCarregando || preferenciaCarregando ||
+    if (!pedido || ocupada || rascunhoPendente || historicoCarregando || preferenciaCarregando ||
         (!!conversationId && !permitirHistorico)) return;
     const geracao = geracaoConversa.current;
     setTexto('');
@@ -289,6 +302,8 @@ export default function IrisCopiloto() {
         cache: 'no-store',
         body: JSON.stringify({
           mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico,
+          ...(perguntaAtiva ? { acao: 'pdi_preparar', secao: perguntaAtiva.secao,
+            modo: perguntaAtiva.modo } : {}),
           // Contexto da sessão apenas quando ainda não há conversa persistida.
           // Vai somente nesta requisição; não é salvo sem consentimento.
           contexto_temporario: !conversationId
@@ -302,6 +317,8 @@ export default function IrisCopiloto() {
       const dados = await resposta.json() as {
         resposta?: string; erro?: string; href?: string;
         proposta?: Proposta; token?: string; conversation_id?: string;
+        pergunta_pdi?: PerguntaPdi; rascunho_pdi?: RascunhoPdi; token_pdi?: string;
+        pdi_completo?: boolean;
         resposta_ref?: string; aviso_historico?: string; sugestoes?: string[];
       };
       if (resposta.ok && dados.conversation_id) {
@@ -317,12 +334,18 @@ export default function IrisCopiloto() {
       if (geracao !== geracaoConversa.current) return;
       if (resposta.ok && dados.conversation_id) setConversationId(dados.conversation_id);
       if (dados.aviso_historico) setHistoricoErro(dados.aviso_historico);
+      if (resposta.ok && dados.pergunta_pdi) setPerguntaAtiva(dados.pergunta_pdi);
+      if (resposta.ok && dados.rascunho_pdi) setRascunhoPendente(true);
+      if (resposta.ok && dados.pdi_completo) { setPerguntaAtiva(null); setRascunhoPendente(false); }
       setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
         texto: dados.resposta || dados.erro || 'Não consegui responder neste momento.',
         href: resposta.ok ? dados.href : undefined,
         proposta: resposta.ok ? dados.proposta : undefined,
         token: resposta.ok ? dados.token : undefined,
+        perguntaPdi: resposta.ok ? dados.pergunta_pdi : undefined,
+        rascunhoPdi: resposta.ok ? dados.rascunho_pdi : undefined,
+        tokenPdi: resposta.ok ? dados.token_pdi : undefined,
         respostaRef: resposta.ok && dados.resposta ? (dados.resposta_ref || crypto.randomUUID()) : undefined,
         sugestoes: resposta.ok ? normalizarRespostasRapidas(dados.sugestoes) : undefined,
       }]);
@@ -330,6 +353,49 @@ export default function IrisCopiloto() {
       if (geracao === geracaoConversa.current) setMensagens(anteriores => [...anteriores, {
         tipo: 'iris',
         texto: 'Houve uma falha de conexão. Você pode tentar novamente.',
+      }]);
+    } finally {
+      setOcupada(false);
+    }
+  }
+
+  async function comandoPdi(
+    acao: 'pdi_iniciar' | 'pdi_proxima' | 'pdi_confirmar',
+    indice?: number, rascunho?: RascunhoPdi, tokenPdi?: string,
+    modo?: 'pendentes' | 'revisar',
+  ) {
+    if (ocupada) return;
+    const geracao = geracaoConversa.current;
+    setOcupada(true);
+    try {
+      const res = await fetch('/api/copiloto', {
+        method: 'POST', credentials: 'same-origin', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acao, conversation_id: conversationId,
+          persistir_historico: permitirHistorico,
+          secao: perguntaAtiva?.secao, modo: modo || perguntaAtiva?.modo,
+          rascunho, token_pdi: tokenPdi }),
+      });
+      const data = await res.json() as { resposta?: string; erro?: string; href?: string;
+        pergunta_pdi?: PerguntaPdi; pdi_completo?: boolean; conversation_id?: string;
+        aviso_historico?: string };
+      if (geracao !== geracaoConversa.current) return;
+      if (res.ok && data.conversation_id) setConversationId(data.conversation_id);
+      if (data.aviso_historico) setHistoricoErro(data.aviso_historico);
+      if (res.ok) {
+        if (indice !== undefined) setMensagens(anteriores => anteriores.map((m, i) =>
+          i === indice ? { ...m, rascunhoPdi: undefined, tokenPdi: undefined } : m));
+        setRascunhoPendente(false);
+        setPerguntaAtiva(data.pergunta_pdi || null);
+      }
+      setMensagens(anteriores => [...anteriores, {
+        tipo: 'iris', texto: data.resposta || data.erro || 'Não consegui concluir.',
+        href: res.ok ? data.href : undefined,
+        perguntaPdi: res.ok ? data.pergunta_pdi : undefined,
+      }]);
+    } catch {
+      if (geracao === geracaoConversa.current) setMensagens(anteriores => [...anteriores, {
+        tipo: 'iris', texto: 'Falha de conexão. Nada foi confirmado. Tente novamente.',
       }]);
     } finally {
       setOcupada(false);
@@ -610,6 +676,55 @@ export default function IrisCopiloto() {
                             : 'Abrir ferramenta'} <ExternalLink size={12} aria-hidden="true" />
                     </a>
                   )}
+                  {m.perguntaPdi && perguntaAtiva?.secao === m.perguntaPdi.secao && !rascunhoPendente && (
+                    <section className="mt-3 rounded-xl border border-[#b8d7ca] bg-[#f5faf7] p-3">
+                      <p className="text-xs font-semibold text-[#285c4a]">
+                        Meu PDI · Pergunta {m.perguntaPdi.numero} de {m.perguntaPdi.total}
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-[#233f34]">{m.perguntaPdi.titulo}</p>
+                      {m.perguntaPdi.instrucoes && <p className="mt-1 whitespace-pre-wrap text-xs leading-5 text-[#53685f]">{m.perguntaPdi.instrucoes}</p>}
+                      {m.perguntaPdi.atual && (
+                        <div className="mt-3 rounded-lg border border-[#d4e5dc] bg-white p-3">
+                          <p className="text-xs font-semibold text-[#285c4a]">Resposta já salva</p>
+                          <p className="mt-1 whitespace-pre-wrap text-xs text-[#3c5147]">{m.perguntaPdi.atual}</p>
+                        </div>
+                      )}
+                      <p className="mt-2 text-xs text-[#53685f]">Escreva sua resposta no campo abaixo. A Íris mostrará uma prévia antes de salvar.</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button type="button" disabled={ocupada} onClick={() => void comandoPdi('pdi_proxima')}
+                          className="min-h-10 rounded-full border border-[#b8d7ca] px-3 text-xs font-semibold text-[#285c4a] disabled:opacity-50">
+                          Pular esta pergunta
+                        </button>
+                        <button type="button" disabled={ocupada} onClick={() => {setPerguntaAtiva(null); setRascunhoPendente(false);}}
+                          className="min-h-10 rounded-full border border-[#d6d0c9] px-3 text-xs text-[#53685f] disabled:opacity-50">
+                          Encerrar preenchimento
+                        </button>
+                      </div>
+                    </section>
+                  )}
+                  {m.rascunhoPdi && m.tokenPdi && (
+                    <section className="mt-3 rounded-xl border border-[#b8d7ca] bg-[#f5faf7] p-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[#285c4a]">Revisão antes de salvar no PDI</p>
+                      <p className="mt-2 text-sm font-semibold">{m.rascunhoPdi.titulo}</p>
+                      <p className="mt-2 whitespace-pre-wrap rounded-lg bg-white p-3 text-sm">{m.rascunhoPdi.texto}</p>
+                      <p className="mt-2 text-xs text-[#53685f]">Esta resposta ainda não foi salva.</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button type="button" disabled={ocupada} onClick={() => void comandoPdi('pdi_confirmar', indice, m.rascunhoPdi, m.tokenPdi)}
+                          className="min-h-11 rounded-full bg-[#245e4e] px-4 text-xs font-semibold text-white disabled:opacity-50">
+                          Confirmar e salvar resposta
+                        </button>
+                        <button type="button" disabled={ocupada} onClick={() => {
+                          setTexto(m.rascunhoPdi?.texto || '');
+                          setRascunhoPendente(false);
+                          setMensagens(anteriores => anteriores.map((item, i) => i === indice
+                            ? { ...item, rascunhoPdi: undefined, tokenPdi: undefined } : item));
+                          caixa.current?.focus();
+                        }} className="min-h-11 rounded-full border border-[#b8d7ca] px-4 text-xs font-semibold text-[#285c4a] disabled:opacity-50">
+                          Editar resposta
+                        </button>
+                      </div>
+                    </section>
+                  )}
                   {m.proposta && m.token && (
                     <div className="mt-3 rounded-lg border border-[#cfc3bb] bg-[#faf7f3] p-3">
                       <p className="text-xs font-semibold uppercase tracking-wide">Prévia da ação</p>
@@ -696,7 +811,7 @@ export default function IrisCopiloto() {
               <p className="text-xs font-semibold text-[#365c4c]">Quer começar por algum destes assuntos?</p>
               <p className="mt-1 text-xs text-[#687c70]">Toque para enviar sua escolha, ou escreva sua pergunta.</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {['Quero um plano para 7 dias', 'Quero entender meu próximo passo', 'Quero treinar uma entrevista'].map(sugestao => (
+                {['Quero preencher meu PDI com a Íris', 'Quero um plano para 7 dias', 'Quero entender meu próximo passo', 'Quero treinar uma entrevista'].map(sugestao => (
                   <button
                     key={sugestao}
                     type="button"
@@ -728,8 +843,10 @@ export default function IrisCopiloto() {
                   void enviar();
                 }
               }}
-              disabled={!!conversationId && !permitirHistorico}
-              placeholder={conversationId && !permitirHistorico
+              disabled={rascunhoPendente || (!!conversationId && !permitirHistorico)}
+              placeholder={rascunhoPendente ? 'Revise e confirme a resposta acima ou escolha Editar resposta'
+                : perguntaAtiva ? 'Escreva sua resposta para ' + perguntaAtiva.titulo
+                : conversationId && !permitirHistorico
                 ? 'Reative o histórico ou comece uma nova conversa'
                 : 'O que você precisa resolver na carreira agora?'}
               aria-label="Mensagem para Íris Copiloto"
@@ -738,7 +855,7 @@ export default function IrisCopiloto() {
             <button
               type="submit"
               disabled={ocupada || historicoCarregando || preferenciaCarregando ||
-                (!!conversationId && !permitirHistorico) || !texto.trim()}
+                (!!conversationId && !permitirHistorico) || rascunhoPendente || !texto.trim()}
               aria-label="Enviar mensagem"
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#5B453E] text-white disabled:opacity-40"
             >
@@ -746,7 +863,7 @@ export default function IrisCopiloto() {
             </button>
           </form>
           <p className="shrink-0 bg-white px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center text-[11px] text-gray-600">
-            {permitirHistorico ? 'Histórico ativo' : 'Conversa sem salvamento'} · Ações no PDI exigem confirmação.
+            {permitirHistorico ? 'Histórico ativo' : 'Conversa sem salvamento'} · Respostas e ações do PDI só são salvas após confirmação.
           </p>
         </div>
       )}
