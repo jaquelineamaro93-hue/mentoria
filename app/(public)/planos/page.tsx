@@ -69,7 +69,7 @@ export default async function PlanosPage() {
 
         <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
         <section id="soma-carreira" aria-labelledby="soma-carreira-heading" className="min-w-0 rounded-3xl border border-[#dce8df] bg-[#fcfdfb] p-5 sm:p-7">
-          <header className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-mint-deep">Mentoria · acompanhamento humano</p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#183F37]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#4a645c]">Uma jornada com mentores, encontros e ferramentas para apoiar sua evolução profissional.</p></header>
+          <header className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-mint-deep">Mentoria · acompanhamento humano</p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#183F37]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#4a645c]">Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês.</p></header>
         <div className="grid gap-4">
           {(planos || []).map((plano: PlanoMentoria) => (
             <div key={plano.id} className="bg-white border-2 border-[#e2e9e5] hover:border-[#91c8b7] transition-colors rounded-2xl p-5 sm:p-6 flex flex-col">
@@ -83,7 +83,7 @@ export default async function PlanosPage() {
                     <span className="text-gray-text">{plano.foco}</span>
                   )}
                 </p>
-                <p className="text-xs text-gray-text mb-6">{plano.descricao_encontros}</p>
+                <p className="text-xs text-gray-text mb-6">{plano.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
               </div>
 
               <details className="mb-5 rounded-xl bg-[#f6faf7] p-4"><summary className="cursor-pointer text-sm font-semibold text-[#24473b]">Ver o que está incluído</summary><div className="mt-3 space-y-2">

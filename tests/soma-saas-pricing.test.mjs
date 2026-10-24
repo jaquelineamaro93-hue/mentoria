@@ -73,17 +73,19 @@ test('kit tem cobrança única de R$ 189,90 e não altera mensalidade',()=>{
  assert.equal(calcularResumoSaas('essencial',{iris:true,whatsapp:false},false).total,18490);
 });
 
-test('mentoria em grupo, individual online, presencial e carreira completa têm condições sob consulta',()=>{
+test('Carreira inclui acompanhamento e oferece somente kit e encontros adicionais',()=>{
  const ui=file('components/public/SomaSaasShowcase.tsx')+file('components/public/SomaCarreiraOptions.tsx')+file('app/(public)/planos/page.tsx');
  for(const key of ['grupo','online-1-1','presencial','carreira-completa']){
   assert.ok(Object.hasOwn(MODALIDADES_MENTORIA,key));
  }
  assert.match(ui,/SOMA Plataforma/);
  assert.match(ui,/SOMA Carreira/);
- assert.match(ui,/setMentoria\(item.tipo\)/);
+ assert.match(ui,/1 encontro individual 1:1 por mês incluído/);
+ assert.match(ui,/setEncontros/);
+ assert.match(ui,/setDuracao/);
  assert.match(ui,/setKitOnboarding\(e.target.checked\)/);
  assert.match(ui,/Kit Onboarding/);
- assert.match(ui,/sob consulta/);
+ assert.match(ui,/Consultar meus adicionais/);
  assert.match(ui,/pagamento único/);
  assert.doesNotMatch(ui,/checkout SaaS automático ainda não foi habilitado/);
  assert.doesNotMatch(ui,/Preços de referência mensais/);

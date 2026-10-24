@@ -139,7 +139,7 @@ export default function CheckoutClient({
                   </div>
                   {isSelected && <Check size={24} className="text-green-600" />}
                 </div>
-                <p className="text-sm text-gray-text mb-6 leading-relaxed">{p.descricao_encontros}</p>
+                <p className="text-sm text-gray-text mb-6 leading-relaxed">{p.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
                 <div className="space-y-2 text-sm mb-6">
                   <p className="text-black font-medium">Opções de pagamento:</p>
                   <p className="text-gray-text">
