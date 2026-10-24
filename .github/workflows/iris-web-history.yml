@@ -6,6 +6,7 @@ on:
       - 'app/api/copiloto/**'
       - 'lib/iris-web-history.ts'
       - 'lib/iris-mentoria-voz.ts'
+      - 'lib/iris-comunicacao.ts'
       - 'lib/config/portalNavigation.ts'
       - 'lib/config/tipsConfig.ts'
       - 'lib/product-analytics.ts'
@@ -20,6 +21,7 @@ on:
       - 'tests/iris-coaching-ux.test.mjs'
       - 'tests/iris-voice-plan.test.mjs'
       - 'tests/iris-json-resilience.test.mjs'
+      - 'tests/iris-comunicacao-clara.test.mjs'
       - 'tests/iris-sidebar-navigation.test.mjs'
       - '.github/workflows/iris-web-history.yml'
   workflow_dispatch:
@@ -42,6 +44,8 @@ jobs:
         run: node --test tests/iris-sidebar-navigation.test.mjs
       - name: Validate free-text fallback and strict JSON boundaries
         run: node --experimental-strip-types --test tests/iris-json-resilience.test.mjs
+      - name: Check accessible Iris language and quick-reply semantics
+        run: node --experimental-strip-types --test tests/iris-comunicacao-clara.test.mjs
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
