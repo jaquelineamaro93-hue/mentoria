@@ -14,20 +14,24 @@ const EMPRESAS_REDE: ReadonlyArray<{ nome: string; logoUrl: string }> = [
  * A presença da marca não representa parceria, patrocínio ou endosso corporativo.
  * O domínio serve apenas para buscar o ícone de marca; nada vem da conta do mentorado.
  */
-const EMPRESAS_MENTORADOS: ReadonlyArray<{ nome: string; site: string; dominio: string }> = [
+const EMPRESAS_MENTORADOS: ReadonlyArray<{ nome: string; site: string; dominio: string; logoUrl?: string }> = [
   { nome: 'Porte', site: 'https://porte.com.br/', dominio: 'porte.com.br' },
   { nome: 'Credsystem', site: 'https://www.credsystem.com.br/', dominio: 'credsystem.com.br' },
   { nome: 'Lojas Torra', site: 'https://www.lojastorra.com.br/', dominio: 'lojastorra.com.br' },
-  { nome: 'Whirlpool', site: 'https://www.whirlpool.com.br/', dominio: 'whirlpool.com.br' },
+  { nome: 'Whirlpool', site: 'https://www.whirlpool.com.br/', dominio: 'whirlpool.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Whirlpool_Corporation_Logo.png' },
   { nome: 'O Boticário', site: 'https://www.boticario.com.br/', dominio: 'boticario.com.br' },
   { nome: 'Monks', site: 'https://www.monks.com/pt', dominio: 'monks.com' },
   { nome: 'Cielo', site: 'https://www.cielo.com.br/', dominio: 'cielo.com.br' },
-  { nome: 'Samsung', site: 'https://www.samsung.com/br/', dominio: 'samsung.com' },
+  { nome: 'Samsung', site: 'https://www.samsung.com/br/', dominio: 'samsung.com', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Samsung_wordmark.svg' },
   { nome: 'LWSA', site: 'https://lwsa.tech/', dominio: 'lwsa.tech' },
   { nome: 'Embraer', site: 'https://www.embraer.com/pt/', dominio: 'embraer.com' },
   { nome: 'Gupy', site: 'https://portal.gupy.io/', dominio: 'gupy.io' },
   { nome: 'PicPay', site: 'https://picpay.com/pt-br/pf', dominio: 'picpay.com' },
   { nome: 'Loft', site: 'https://loft.teamtailor.com/#jobs', dominio: 'loft.com.br' },
+  { nome: 'Capgemini', site: 'https://www.capgemini.com/br-pt/', dominio: 'capgemini.com', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Capgemini_201x_logo.svg' },
+  { nome: 'Mercado Livre', site: 'https://www.mercadolivre.com.br/', dominio: 'mercadolivre.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/16/Mercado_Livre_wordmark_%28Portuguese_version%29.svg' },
+  { nome: 'RD Saúde', site: 'https://rdsaude.com.br/', dominio: 'rdsaude.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Logo_RD_Saude.png' },
+  { nome: 'Itaú', site: 'https://www.itau.com.br/', dominio: 'itau.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/82/ITAU_LOGO.svg' },
 ];
 
 const AREAS_REDE = ['CRM', 'Customer Experience', 'Customer Success', 'Dados', 'Produto', 'Inteligência Artificial'];
@@ -60,7 +64,7 @@ export default function SomaNetworking() {
           </p>
           <div
             role="list"
-            aria-label="13 empresas onde atuam mentorados da SOMA"
+            aria-label={`${EMPRESAS_MENTORADOS.length} empresas onde atuam mentorados da SOMA`}
             className="mt-7 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-4 lg:grid-cols-5"
           >
             {EMPRESAS_MENTORADOS.map(empresa => (
@@ -75,21 +79,23 @@ export default function SomaNetworking() {
               >
                 <span className={empresa.nome === 'Cielo'
                   ? 'flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg bg-[#214880]'
-                  : 'flex h-14 w-14 items-center justify-center rounded-xl bg-[#f6faf8]'}>
-                  {/* Logo da Cielo fornecido pela criadora e hospedado pela SOMA; demais ícones por domínio. */}
+                  : empresa.logoUrl
+                    ? 'flex h-14 w-full max-w-36 items-center justify-center rounded-xl bg-white px-1'
+                    : 'flex h-14 w-14 items-center justify-center rounded-xl bg-[#f6faf8]'}>
+                  {/* Logos completas de origem verificada; favicon apenas como fallback para outras marcas. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={empresa.nome === 'Cielo'
                       ? '/images/cielo-mentorado.svg'
-                      : `https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`}
+                      : empresa.logoUrl ?? `https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`}
                     alt=""
                     aria-hidden="true"
-                    width={empresa.nome === 'Cielo' ? 112 : 48}
-                    height={empresa.nome === 'Cielo' ? 42 : 48}
+                    width={empresa.nome === 'Cielo' || empresa.logoUrl ? 144 : 48}
+                    height={empresa.nome === 'Cielo' || empresa.logoUrl ? 56 : 48}
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
-                    className={empresa.nome === 'Cielo' ? 'h-11 w-28 object-contain' : 'h-12 w-12 object-contain'}
+                    className={empresa.nome === 'Cielo' ? 'h-11 w-28 object-contain' : empresa.logoUrl ? 'h-12 max-w-full object-contain' : 'h-12 w-12 object-contain'}
                   />
                 </span>
                 <span className="text-center text-sm font-semibold leading-tight text-[#293b35] group-hover:text-[#0D8071]">
