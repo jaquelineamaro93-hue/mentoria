@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import styles from './HelpArticleNavigation.module.css';
 import Link from 'next/link';
 import { BookOpen, ChevronDown, Search } from 'lucide-react';
 import { normalizeHelpText, type HelpEntry, type HelpHeading } from '@/lib/help-center/navigation';
@@ -19,7 +20,7 @@ export default function HelpArticleNavigation({ articles, currentSlug, category,
       className="mb-3 flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-[#d7e3dc] bg-white px-4 py-3 text-sm font-semibold text-[#183f37] xl:hidden">
       <span className="inline-flex items-center gap-2"><BookOpen size={17} aria-hidden="true" /> Explorar outros artigos</span><ChevronDown size={17} aria-hidden="true" className={expanded ? 'rotate-180' : ''} />
     </button>
-    <div id="help-article-navigation" className={(expanded ? 'block' : 'hidden xl:block') + ' rounded-2xl border border-[#d7e3dc] bg-white p-5 xl:max-h-[calc(100dvh-8rem)] xl:overflow-y-auto'}>
+    <div id="help-article-navigation" className={styles.scrollArea + ' ' + (expanded ? 'block' : 'hidden xl:block') + ' rounded-2xl border border-[#d7e3dc] bg-white p-5 xl:max-h-[calc(100dvh-8rem)] xl:overflow-y-auto'}>
       <label className="flex items-center gap-2 rounded-lg border border-[#bbcfc5] px-3 py-2.5 focus-within:ring-2 focus-within:ring-[#24594b]">
         <Search size={16} aria-hidden="true" className="shrink-0 text-[#53685e]" /><span className="sr-only">Buscar outros artigos</span>
         <input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Pesquisar artigos" className="w-full min-w-0 bg-transparent text-base text-black outline-none xl:text-sm" />
