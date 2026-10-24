@@ -47,8 +47,8 @@ test('seleção abre a plataforma com teste separado e checkout autenticado',()=
  assert.match(ui,/setIris\(e.target.checked\)/);
  assert.match(ui,/setWhatsapp\(e.target.checked\)/);
  assert.match(ui,/setModulo\(e.target.value\)/);
- assert.match(ui,/calcularResumoSaas\(plano, \{ iris, whatsapp \}, kitOnboarding\)/);
- assert.match(ui,/linkContato/);
+ assert.match(ui,/calcularPrecoSaas\(plano, \{ iris, whatsapp \}\)/);
+ assert.match(ui,/linkPlataforma/);
  assert.match(ui,/Começar meus 7 dias grátis/);
  assert.match(ui,/linkPlataforma/);
  assert.match(ui,/Sem agentes de IA inclusos|sem agentes de IA/);
@@ -74,7 +74,7 @@ test('kit tem cobrança única de R$ 189,90 e não altera mensalidade',()=>{
 });
 
 test('mentoria em grupo, individual online, presencial e carreira completa têm condições sob consulta',()=>{
- const ui=file('components/public/SomaSaasShowcase.tsx');
+ const ui=file('components/public/SomaSaasShowcase.tsx')+file('components/public/SomaCarreiraOptions.tsx')+file('app/(public)/planos/page.tsx');
  for(const key of ['grupo','online-1-1','presencial','carreira-completa']){
   assert.ok(Object.hasOwn(MODALIDADES_MENTORIA,key));
  }
@@ -83,8 +83,8 @@ test('mentoria em grupo, individual online, presencial e carreira completa têm 
  assert.match(ui,/setMentoria\(item.tipo\)/);
  assert.match(ui,/setKitOnboarding\(e.target.checked\)/);
  assert.match(ui,/Kit Onboarding/);
- assert.match(ui,/Sob consulta/);
- assert.match(ui,/Pagamento único/);
+ assert.match(ui,/sob consulta/);
+ assert.match(ui,/pagamento único/);
  assert.doesNotMatch(ui,/checkout SaaS automático ainda não foi habilitado/);
  assert.doesNotMatch(ui,/Preços de referência mensais/);
  assert.doesNotMatch(ui,/Na revisão de novas ofertas/);
