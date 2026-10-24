@@ -1,0 +1,12 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const user='e9afccab-c9e4-403d-9263-1547c5f30921',actor='8b23c64f-43bb-401d-93fe-52944d3a8aa4';
+function route({authorized=true,admin=false,result={deleted:true},rpcError=null}={}){
+ const calls=[];const db={from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:{is_admin:admin},error:null})})})}),rpc:async(name,args)=>{calls.push({name,args});return {data:result,error:rpcError};},auth:{admin:{deleteUser:()=>{throw Error('Unsafe raw deletion must not be used');}}}};
+ const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('app/api/admin/delete-user/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports,console,require:name=>({'next/server':{NextResponse:{json:(data,init)=>Response.json(data,init)}},'@/lib/supabase/admin':{createAdminClient:()=>db},'@/lib/security/require-admin':{requireAdmin:async()=>authorized?{ok:true,userId:actor}:{ok:false,response:Response.json({error:'Denied'},{status:401})}}}[name])});return {post:exports.POST,calls};
+}
+const request=(id=user)=>new Request('https://soma.invalid/api/admin/delete-user',{method:'POST',body:JSON.stringify({userId:id})});
+test('unauthenticated deletion cannot reach persistence',async()=>{const h=route({authorized:false});assert.equal((await h.post(request())).status,401);assert.equal(h.calls.length,0);});
+test('self and other admin deletion are blocked',async()=>{assert.equal((await route().post(request(actor))).status,400);assert.equal((await route({admin:true}).post(request())).status,409);});
+test('saved student history returns a clear block without raw auth deletion',async()=>{const h=route({result:{deleted:false,reason:'saved_history'}});const response=await h.post(request());assert.equal(response.status,409);assert.match((await response.json()).error,/preservar o histórico/);});
+test('empty test account uses the atomic backend guard with verified actor',async()=>{const h=route();assert.equal((await h.post(request())).status,200);assert.equal(h.calls[0].name,'soma_delete_empty_account');assert.equal(h.calls[0].args.p_actor,actor);assert.equal(h.calls[0].args.p_user,user);});
+test('malformed input is rejected and database errors never report success',async()=>{assert.equal((await route().post(request('invalid'))).status,400);assert.equal((await route({rpcError:{code:'failure'}}).post(request())).status,500);});

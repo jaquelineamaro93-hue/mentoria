@@ -58,7 +58,7 @@ export default function SomaCarreiraOptions() {
             <strong className="flex items-center gap-2 text-[#000000]"><PackageCheck size={18} aria-hidden="true" />Kit Onboarding</strong>
             Kit de boas-vindas da sua mentoria SOMA Carreira.
             <span className="mt-1 block font-semibold text-[#000000]">+ {formatarReais(KIT_ONBOARDING_CENTAVOS)}, pagamento único</span>
-            <span className="mt-1 block text-xs text-[#000000]">Contratos que já incluem o kit mantêm esse benefício, sem nova cobrança.</span>
+            <span className="mt-1 block text-xs text-[#000000]">Se seu plano já inclui o kit, você não precisa adicioná-lo.</span>
           </span>
         </label>
       </fieldset>

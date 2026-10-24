@@ -6,9 +6,10 @@ export async function POST(request: Request) {
   const authorization = await requireAdmin();
   if (!authorization.ok) return authorization.response;
 
-  const { userId } = await request.json();
+  const body = await request.json().catch(() => null);
+  const userId = body?.userId;
 
-  if (!userId) {
+  if (typeof userId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
     return NextResponse.json({ error: 'userId é obrigatório' }, { status: 400 });
   }
 
@@ -21,11 +22,13 @@ export async function POST(request: Request) {
 
   try {
     const supabase = createAdminClient();
-    const { data: target } = await supabase
+    const { data: target, error: targetError } = await supabase
       .from('profiles')
       .select('is_admin')
       .eq('id', userId)
       .maybeSingle();
+
+    if (targetError) return NextResponse.json({ error: 'Não foi possível verificar a conta. Tente novamente.' }, { status: 503 });
 
     if (target?.is_admin) {
       return NextResponse.json(
@@ -34,10 +37,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error } = await supabase.auth.admin.deleteUser(userId);
+    const { data, error } = await supabase.rpc('soma_delete_empty_account', {
+      p_user: userId, p_actor: authorization.userId,
+    });
     if (error) {
-      console.error('[ADMIN-DELETE-USER] Falha ao excluir usuário:', error.message);
-      return NextResponse.json({ error: 'Erro ao deletar usuário' }, { status: 500 });
+      console.error('[ADMIN-DELETE-USER] Falha na exclusão protegida:', error.code);
+      return NextResponse.json({ error: 'Não foi possível excluir. Nenhum histórico foi apagado.' }, { status: 500 });
+    }
+    if (!data?.deleted) {
+      const messages: Record<string, string> = {
+        historical_account: 'Conta de aluno anterior ao lançamento do SaaS. A exclusão foi bloqueada para preservar o histórico.',
+        financial_history: 'Esta conta tem assinatura ou registros financeiros. A exclusão foi bloqueada para preservar os dados.',
+        saved_history: 'Esta conta possui conteúdo salvo. A exclusão foi bloqueada para preservar o histórico.',
+        saved_files: 'Esta conta possui arquivos salvos. A exclusão foi bloqueada para preservar os arquivos.',
+        protected_account: 'Esta conta não pode ser excluída por este atalho.',
+        not_found: 'Conta não encontrada.',
+      };
+      return NextResponse.json({ error: messages[data?.reason] || 'A exclusão foi bloqueada para preservar os dados.' }, { status: data?.reason === 'not_found' ? 404 : 409 });
     }
 
     return NextResponse.json(
