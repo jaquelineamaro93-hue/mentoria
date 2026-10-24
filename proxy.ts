@@ -104,6 +104,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  let exclusivamenteSaas = false;
   // SOMA Plataforma nunca implica mentoria. Para contas exclusivamente SaaS,
   // bloquear por padrão páginas e APIs que não estejam no contrato.
   if (user) {
@@ -128,6 +129,7 @@ export async function proxy(request: NextRequest) {
       Date.parse(p.trial_ends_at)>agora;
     const somenteSaas=(!!trialSaas.data || !!pedidosSaas.data?.length) &&
       !p?.is_admin && !mentorPago && !mentorTrial;
+    exclusivamenteSaas = somenteSaas;
     if (somenteSaas && !rotaBasicaSaas(path)) {
       let permitido=false;
       if(path.startsWith('/api/copiloto')) {
@@ -165,7 +167,7 @@ export async function proxy(request: NextRequest) {
     path.startsWith('/api') ||
     path.startsWith('/auth');
 
-  if (user && !rotaLiberada) {
+  if (user && !rotaLiberada && !exclusivamenteSaas) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('status_assinatura, origem_assinatura, is_admin, trial_status, trial_ends_at')
