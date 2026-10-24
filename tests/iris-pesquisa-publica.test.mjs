@@ -17,6 +17,8 @@ test('Detecta consultas concretas e continuação, mas não confunde análise pe
  assert.equal(detectarPesquisaIris('Você pode buscar vagas de CRM abertas?'),'vagas');
  assert.equal(detectarPesquisaIris('Como mudar minha carreira?'),null);
  assert.equal(detectarPesquisaIris('Quero um currículo para vagas de CRM'),null);
+ assert.equal(detectarPesquisaIris('Quero consultoria de carreira'),null);
+ assert.equal(detectarPesquisaIris('Me indique consultorias de ERP'),null);
  assert.equal(areaDaBusca('Encontre vagas de Customer Success'),'cs');
  assert.equal(areaDaBusca('Encontre vagas de CRM'),'crm');
 });
