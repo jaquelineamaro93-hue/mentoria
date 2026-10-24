@@ -102,7 +102,14 @@ async function lerColecao(
       cache: 'no-store', redirect: 'error', credentials: 'omit',
       signal: AbortSignal.timeout(6500),
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      // Diagnóstico sem URL, identificadores, credenciais ou dados pessoais.
+      console.warn('[IrisPesquisaPublica] consulta falhou', {
+        fonte: table === 'crm_radar_jobs_public' ? 'vagas_publicas' : 'agencias_aprovadas',
+        http_status: r.status,
+      });
+      return null;
+    }
     const data: unknown = await r.json();
     if (!Array.isArray(data)) return null;
     return data.slice(0, MAX_JOBS).filter(
@@ -140,15 +147,34 @@ export function filtrarConsultorias(linhas: Linha[], contexto = '', outras = fal
   );
   return (outras ? unicas.filter(c => !simplificar(contexto).includes(simplificar(c.nome))) : unicas).slice(0, 3);
 }
+/** Detecta senioridade explícita sem inferir dos dados pessoais do mentorado. */
+export function querVagasLideranca(pedido: string, contexto = ''): boolean {
+  const atual = simplificar(pedido);
+  if (/\b(junior|jovem aprendiz|estagio|estagiario|analista|assistente)\b/.test(atual)) return false;
+  if (/\b(lideranca|lider|liderar|gestao|gerencia|gerente|coordenacao|coordenador|coordenadora|head|diretor|diretora|supervisor|supervisora|lead)\b/.test(atual)) return true;
+  // Ao pedir "mais vagas", reaproveitar somente o recorte da própria conversa.
+  if (/\b(mais|outras|outros|novas|novos)\b/.test(atual))
+    return /vagas publicas encontradas para .*lideranca/i.test(simplificar(contexto.slice(-3400)));
+  return false;
+}
+const nivelLideranca = /\b(?:lideran[cç]a|coordenador(?:a)?|coordena[cç][aã]o|gerente|ger[eê]ncia|gestor(?:a)?|head|diretor(?:a)?|dire[cç][aã]o|supervisor(?:a)?|lead|lider|lideran[cç]a t[eé]cnica)\b/i;
+const nivelExecucao = /\b(?:analista|assistente|estagi[aá]ri[oa]|aprendiz|auxiliar|trainee)\b/i;
 export type VagaIris = { titulo: string; empresa?: string; local?: string; modelo?: string;
   url: string; origem: string; tipo: 'bot' | 'comunidade' };
-export function filtrarVagas(linhas: Linha[], area: Area, contexto = '', outras = false): VagaIris[] {
+export function filtrarVagas(linhas: Linha[], area: Area, contexto = '', outras = false, lideranca = false): VagaIris[] {
   const vagas: VagaIris[] = [], links = new Set<string>();
   for (const r of linhas) {
     if (r.availability_status !== 'listed') continue;
     const titulo = markdownSeguro(r.title || r.cargo, 100);
     const descricao = curto(r.descricao_resumo, 180);
     if (!titulo || !areas[area].filtro.test(titulo + ' ' + descricao + ' ' + campo(r.categoria_slug))) continue;
+    // Categoria CRM não transforma um cargo operacional em liderança.
+    // A descrição textual isolada também não prova senioridade.
+    if (lideranca) {
+      const tituloLideranca = nivelLideranca.test(titulo);
+      const nivelDeclarado = nivelLideranca.test(campo(r.nivel) + ' ' + campo(r.senioridade_normalizada));
+      if (nivelExecucao.test(titulo) || (!tituloLideranca && !nivelDeclarado)) continue;
+    }
     if (!recente(r.published_at || r.found_at || r.created_at, 25)) continue;
     const comunidade = r.job_origin === 'community';
     if (!comunidade && !recente(r.availability_checked_at, 2)) continue;
@@ -197,12 +223,13 @@ export async function pesquisarPublicamente(
   }
 
   const area = areaDaBusca(pedido, contexto), regra = areas[area];
+  const lideranca = querVagasLideranca(pedido, contexto);
   const urlLinkedin = linkedin(regra.termo);
   // Os filtros externos são genéricos. Nunca enviamos currículo ou pedido integral.
   const filtro = '(title.ilike.*' + regra.termo + '*,cargo.ilike.*' + regra.termo +
     '*,categoria_slug.ilike.*' + regra.termo.replace(/\s/g, '-') + '*)';
   const linhas = await lerColecao('crm_radar_jobs_public', {
-    select: 'title,cargo,company,empresa,descricao_resumo,url,categoria_slug,location,regiao,modelo,modalidade_normalizada,published_at,found_at,created_at,availability_status,availability_checked_at,job_origin',
+    select: 'title,cargo,company,empresa,descricao_resumo,url,categoria_slug,location,regiao,modelo,modalidade_normalizada,nivel,senioridade_normalizada,published_at,found_at,created_at,availability_status,availability_checked_at,job_origin',
     availability_status: 'eq.listed', or: filtro,
     order: 'published_at.desc.nullslast', limit: String(MAX_JOBS),
   }, fetcher);
@@ -211,10 +238,10 @@ export async function pesquisarPublicamente(
       urlLinkedin + ') está preparada como alternativa. Não consultei os resultados do LinkedIn nesta resposta.',
     sugestoes: ['Quero tentar buscar vagas novamente'], href: RADAR,
   };
-  const vagas = filtrarVagas(linhas, area, contexto, outras);
+  const vagas = filtrarVagas(linhas, area, contexto, outras, lideranca);
   if (!vagas.length) return {
     resposta: '**Consultei o Radar de Vagas da Conexão CRM e não encontrei ' +
-      (outras ? 'outras oportunidades diferentes das já indicadas' : 'anúncios recentes com foco em ' + regra.nome) +
+      (outras ? 'outras oportunidades diferentes das já indicadas' : 'anúncios recentes com foco em ' + (lideranca ? 'liderança em ' : '') + regra.nome) +
       ' que atendam aos critérios de publicação e disponibilidade.**\n\n' +
       'Também há uma [busca preparada no LinkedIn](' + urlLinkedin +
       '), mas esses resultados ainda não foram verificados pela Íris.',
@@ -227,7 +254,7 @@ export async function pesquisarPublicamente(
     '\n   Fonte: ' + v.origem + (v.tipo === 'bot'
       ? '. Anúncio checado recentemente.' : '. Publicada pela comunidade.')).join('\n\n');
   return {
-    resposta: '**Vagas públicas encontradas para ' + regra.nome + ':**\n\n' + lista +
+    resposta: '**Vagas públicas encontradas para ' + (lideranca ? 'liderança em ' : '') + regra.nome + ':**\n\n' + lista +
       '\n\nSão anúncios dos últimos 25 dias marcados como listados. Confirme no anúncio original antes de se candidatar. ' +
       '[Abrir Radar completo](' + RADAR + ').\n\n' +
       'Se quiser ampliar, há também a [busca do LinkedIn](' + urlLinkedin +
