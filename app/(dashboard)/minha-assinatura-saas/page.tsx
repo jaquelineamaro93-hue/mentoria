@@ -8,10 +8,19 @@ import SaasCheckoutControl from '@/components/saas/SaasCheckoutControl';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Minha assinatura SaaS | SOMA' };
 
-export default async function MinhaAssinaturaSaasPage() {
+export default async function MinhaAssinaturaSaasPage({
+  searchParams
+}: {searchParams: Promise<Record<string,string | undefined>>}) {
+  const params=await searchParams;
+  const destino=new URLSearchParams();
+  for(const key of ['plano','modulo','iris','whatsapp','kit'] as const) {
+    const value=params[key];
+    if(value && value.length<100)destino.set(key,value);
+  }
+  const next='/minha-assinatura-saas'+(destino.size?'?'+destino.toString():'');
   const db = await createClient();
   const { data: { user } } = await db.auth.getUser();
-  if (!user) redirect('/login?next=%2Fminha-assinatura-saas');
+  if (!user) redirect('/login?next='+encodeURIComponent(next));
 
   let acesso;
   try { acesso = await resolverAcessoSaas(user.id); } catch {
@@ -58,7 +67,12 @@ export default async function MinhaAssinaturaSaasPage() {
     </section>
     {!acesso.temMentoria && !acesso.trialJaUsado &&
       <SaasTrialControl modulos={modulos||[]} liberado={liberado} />}
-    {!acesso.temMentoria && <SaasCheckoutControl modulos={modulos||[]} disponivel={checkoutLiberado} />}
+    {!acesso.temMentoria && <SaasCheckoutControl modulos={modulos||[]}
+      disponivel={checkoutLiberado}
+      escolha={{
+        plano:params.plano,modulo:params.modulo,
+        iris:params.iris==='1',whatsapp:params.whatsapp==='1',kit:params.kit==='1',
+      }} />}
     <p className="mt-6 text-sm text-[#5a7064]">
       Os planos da Plataforma e da Carreira possuem condições e acessos distintos.
     </p>
