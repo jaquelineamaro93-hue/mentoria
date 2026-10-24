@@ -37,6 +37,8 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
   const [plano, setPlano] = useState<Plano | null>(null);
   const [acoesPorPilar, setAcoesPorPilar] = useState<Record<string, Acao[]>>({});
   const [erro, setErro] = useState<string | null>(null);
+  const [confirmarAtualizacao, setConfirmarAtualizacao] = useState(false);
+  const [versoesAnteriores, setVersoesAnteriores] = useState<Array<{ id: string; gerado_em: string; versao: number }>>([]);
   const [progressoPdi, setProgressoPdi] = useState<{ respondidas: number; total: number } | null>(null);
 
   useEffect(() => {
@@ -68,6 +70,14 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
       .limit(1)
       .maybeSingle();
 
+    const { data: anteriores } = await supabase
+      .from("pdi_planos")
+      .select("id, gerado_em, versao")
+      .eq("mentorado_id", mentoradoId)
+      .eq("status", "arquivado")
+      .order("gerado_em", { ascending: false });
+    setVersoesAnteriores(anteriores ?? []);
+
     if (planoAtivo) {
       setPlano(planoAtivo as Plano);
 
@@ -85,6 +95,7 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
       setAcoesPorPilar(agrupado);
     } else {
       setPlano(null);
+      setAcoesPorPilar({});
     }
 
     setCarregando(false);
@@ -104,7 +115,10 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
         setErro(dados.erro ?? "não consegui gerar o plano agora");
         return;
       }
+      setConfirmarAtualizacao(false);
       await carregarPlano();
+    } catch {
+      setErro("Não foi possível atualizar o PDI. Seu plano anterior foi preservado. Tente novamente.");
     } finally {
       setGerando(false);
     }
@@ -174,6 +188,41 @@ export function PlanoGerado({ mentoradoId }: { mentoradoId: string }) {
               </p>
             </div>
           )}
+          <div className="mb-8 rounded-xl border border-[#cce5d9] bg-[#f5faf7] p-5">
+            <p className="text-sm font-semibold text-[#204D3B]">Seus objetivos mudaram?</p>
+            <p className="mt-1 text-sm leading-6 text-[#526760]">
+              Atualize suas respostas nas Perguntas Guia e gere uma nova versão do PDI.
+              A nova versão considera as metas atuais e o que você já concluiu.
+              Seu plano anterior e as ações realizadas ficam preservados no histórico.
+            </p>
+            {erro && <p role="alert" className="mt-3 text-sm text-red-700">{erro}</p>}
+            {!confirmarAtualizacao ? (
+              <button type="button" onClick={() => setConfirmarAtualizacao(true)}
+                disabled={gerando || (!permitePdiParcial && !pdiCompleto)}
+                className="mt-4 rounded-full bg-[#245e4e] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                Atualizar meu PDI com minhas novas metas
+              </button>
+            ) : (
+              <div className="mt-4 rounded-lg border border-[#cce5d9] bg-white p-4">
+                <p className="text-sm text-[#293b35]">Criar uma nova versão? O plano anterior será arquivado, sem apagar as ações concluídas.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button type="button" onClick={gerarPlano} disabled={gerando}
+                    className="rounded-full bg-[#245e4e] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                    {gerando ? "Atualizando plano..." : "Confirmar atualização"}
+                  </button>
+                  <button type="button" onClick={() => setConfirmarAtualizacao(false)} disabled={gerando}
+                    className="rounded-full border border-[#cce5d9] bg-white px-5 py-3 text-sm font-medium text-[#293b35] disabled:opacity-50">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+            {versoesAnteriores.length > 0 && (
+              <p className="mt-3 text-xs text-[#526760]">
+                {versoesAnteriores.length} versão(ões) anterior(es) preservada(s) no histórico.
+              </p>
+            )}
+          </div>
           <header style={{ marginBottom: 40 }}>
             <p className="display" style={{ fontSize: 28, color: "#1A1A1A", margin: "0 0 6px" }}>
               Meu plano
