@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ScrollToSectionButton from '@/components/public/ScrollToSectionButton';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanoMentoria } from '@/lib/types';
@@ -43,7 +44,7 @@ export default async function PlanosPage() {
               <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#FFCB9C]">SOMA | Carreira e Plataforma</p>
               <h1 id="planos-titulo" className="font-display text-4xl leading-tight sm:text-5xl">Sua carreira merece novas possibilidades</h1>
               <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base">Escolha acompanhamento humano na SOMA Carreira ou monte sua assinatura de ferramentas na SOMA Plataforma.</p>
-              <a href="#opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FFB366] px-6 py-3 text-sm font-semibold text-[#183F37] transition-colors hover:bg-[#FFD1A2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Conhecer opções de acesso</a>
+              <ScrollToSectionButton targetId="opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FFB366] px-6 py-3 text-sm font-semibold text-[#183F37] transition-colors hover:bg-[#FFD1A2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Conhecer opções de acesso</ScrollToSectionButton>
             </div>
             <div className="relative grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4" aria-label="Lume, Norte, Brasa e Íris, mascotes oficiais da SOMA">
               {[
