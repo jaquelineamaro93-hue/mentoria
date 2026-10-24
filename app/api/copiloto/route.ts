@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { chamarClaudeJson } from '@/lib/ai-json';
 import { recuperarTextoLivreIris } from '@/lib/iris-ai-response';
+import { formatarTextoIris, normalizarRespostasRapidas } from '@/lib/iris-comunicacao';
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
@@ -209,20 +210,25 @@ export async function POST(request: NextRequest) {
     ? 'Solicitei confirmação de uma ação do PDI'
     : texto(body.mensagem, 4000);
   async function responderComHistorico(payload: Record<string, unknown>, status = 200) {
-    if (!manterHistorico || status !== 200 || typeof payload.resposta !== 'string' || !perguntaParaHistorico) {
-      return json(avisoPrivacidade ? { ...payload, aviso_historico: avisoPrivacidade } : payload, status);
+    // Texto legível já no servidor, para o chat e para a conversa persistida.
+    // Nunca editar a mensagem original enviada pelo mentorado.
+    const saida = typeof payload.resposta === 'string'
+      ? { ...payload, resposta: formatarTextoIris(payload.resposta) }
+      : payload;
+    if (!manterHistorico || status !== 200 || typeof saida.resposta !== 'string' || !perguntaParaHistorico) {
+      return json(avisoPrivacidade ? { ...saida, aviso_historico: avisoPrivacidade } : saida, status);
     }
     try {
       const salvo = await saveIrisTurn({
         userId: usuarioAutenticadoId,
         conversationId,
         question: perguntaParaHistorico,
-        answer: payload.resposta,
-        href: typeof payload.href === 'string' ? payload.href : undefined,
+        answer: saida.resposta,
+        href: typeof saida.href === 'string' ? saida.href : undefined,
       });
-      return json({ ...payload, ...salvo }, status);
+      return json({ ...saida, ...salvo }, status);
     } catch {
-      return json({ ...payload,
+      return json({ ...saida,
         aviso_historico: 'Sua resposta foi gerada, mas o histórico não pôde ser salvo. Copie-a antes de sair.' }, status);
     }
   }
@@ -477,10 +483,7 @@ export async function POST(request: NextRequest) {
     });
     // A orientação não deve ser descartada se o modelo omitir sugestões
     // ou devolver esse campo em um formato diferente do esperado.
-    const sugestoes = Array.isArray(ia.sugestoes)
-      ? ia.sugestoes.filter((item): item is string => typeof item === 'string')
-        .slice(0, 2).map(item => texto(item, 70)).filter(Boolean)
-      : [];
+    const sugestoes = normalizarRespostasRapidas(ia.sugestoes);
     return responderComHistorico({
       resposta: texto(ia.resposta, 1800),
       sugestoes,
@@ -491,7 +494,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return responderComHistorico({
       resposta: 'Tive uma falha ao elaborar a orientação. Não vou inventar uma análise. Podemos continuar com uma etapa concreta: escolha um cargo-alvo e reúna três requisitos reais de vagas desse cargo para priorizarmos currículo e networking.',
-      sugestoes: ['Priorizar um cargo-alvo', 'Organizar meu próximo passo'],
+      sugestoes: ['Quero priorizar um cargo-alvo', 'Prefiro organizar meu próximo passo'],
     });
   }
 }
