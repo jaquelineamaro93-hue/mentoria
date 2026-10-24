@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, CreditCard, Send, Wallet, Rocket, MailWarning, Shield, Lock, MessageSquare, MoreVertical, Search, BarChart3 } from 'lucide-react';
+import AdminAreaDirectory from '@/components/AdminAreaDirectory';
+import { Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, Send, MailWarning, Shield, Lock, MoreVertical, Search, BarChart3 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -317,23 +318,9 @@ export default function AdminClient({
         )}
         <section aria-label="Áreas administrativas" className="mb-8 space-y-4">
           <div><h1 className="text-2xl font-semibold text-black">Administração</h1><p className="mt-1 text-sm text-gray-600">Pessoas, produtos e resultados em um só lugar.</p></div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {[
-              {href:'/admin/ajuda',title:'Conteúdos e novidades',description:'Tutoriais, publicações e avisos no sino',Icon:MessageSquare},
-              {href:'/admin/usuarios',title:'Pessoas e acessos',description:'Contas, permissões e acompanhamento',Icon:Users},
-              {href:'/admin/gerenciar-planos',title:'Planos e contratos',description:'Produtos, vigências e pagamentos',Icon:CreditCard},
-              {href:'/admin/financeiro',title:'Financeiro',description:'Receitas e movimentações',Icon:Wallet},
-              {href:'/admin/acompanhamentos',title:'Íris e WhatsApp',description:'Conversas e acompanhamentos',Icon:MessageSquare},
-              {href:'/admin/analytics',title:'Resultados',description:'Analytics e testes A/B',Icon:BarChart3},
-              {href:'/admin/crescimento',title:'Crescimento',description:'Ações para aquisição e retenção',Icon:Rocket},
-              {href:'/admin/enquetes',title:'Votações',description:'Perguntas e respostas da comunidade',Icon:Send},
-              {href:'/admin/feedbacks',title:'Feedbacks do PDI',description:'Devolutivas e evolução dos alunos',Icon:MessageSquare},
-            ].map(({href,title,description,Icon})=><Link key={href} href={href} className="flex min-h-24 items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-black transition hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700"><Icon size={20} className="mt-1 shrink-0"/><span><strong className="block text-sm">{title}</strong><span className="mt-1 block text-xs leading-5">{description}</span></span></Link>)}
-          </div>
+          <AdminAreaDirectory />
           <div className="flex flex-wrap items-center gap-3">
             <button onClick={enviarLembretesAgora} disabled={enviandoLembretes} className="inline-flex items-center gap-2 rounded-lg border bg-white px-4 py-2.5 text-sm text-black disabled:opacity-60">{enviandoLembretes?<Loader2 size={15} className="animate-spin"/>:<Send size={15}/>}Enviar lembretes agora</button>
-            <Link href="/admin/vagas" className="rounded-lg border bg-white px-4 py-2.5 text-sm text-black">Gerenciar vagas</Link>
-            <Link href="/admin/indicacoes" className="rounded-lg border bg-white px-4 py-2.5 text-sm text-black">Indicações</Link>
           </div>
         </section>
 
