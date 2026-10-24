@@ -7,6 +7,7 @@ import { formatarTextoIris, normalizarRespostasRapidas } from '@/lib/iris-comuni
 import { consumeIdentifierRateLimit } from '@/lib/security/rate-limit';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import { montarPromptMentoriaIris } from '@/lib/iris-mentoria-voz';
+import { detectarPesquisaIris, pesquisarPublicamente } from '@/lib/iris-pesquisa-publica';
 import { ownsIrisConversation, recentIrisContext, saveIrisTurn, validConversationId } from '@/lib/iris-web-history';
 
 export const runtime = 'nodejs';
@@ -290,6 +291,24 @@ export async function POST(request: NextRequest) {
 
   const pedido = texto(body.mensagem, 4000);
   if (pedido.length < 3) return json({ erro: 'Escreva o que você precisa.' }, 400);
+
+  // Pesquisa verdadeira em fontes PÚBLICAS, com a conta SOMA já autenticada.
+  // Não transmitimos pedido, CV, histórico, nome ou dados do mentorado às fontes.
+  // Consultamos o histórico SOMENTE da própria conversa, e apenas para
+  // entender "outras" e não repetir nomes ou links apresentados anteriormente.
+  const continuaPesquisa = /^(?:me (?:traga|mostre|indique|busque|encontre) )?(?:mais|outras|outros|novas|novos|alternativas)\b/i
+    .test(pedido);
+  const contextoDaPesquisa = continuaPesquisa
+    ? (conversationId
+      ? await recentIrisContext(user.id, conversationId)
+      : contextoTemporarioNaoSalvo(body.contexto_temporario))
+    : '';
+  const tipoPesquisa = detectarPesquisaIris(pedido, contextoDaPesquisa);
+  if (tipoPesquisa) {
+    const resultado = await pesquisarPublicamente(tipoPesquisa, pedido, contextoDaPesquisa);
+    return responderComHistorico(resultado);
+  }
+
   const criarAcao = querCriarAcaoPdi(pedido);
   const perguntaDeStatus = /\b(complet[oa]|conclu[ií]d[oa]|finalizad[oa]|preenchi|progresso|pend[êe]ncia|quantas? (etapas|tarefas|a[cç][õo]es|se[cç][õo]es))\b/i.test(pedido);
   const orientacao = pedeOrientacao(pedido);
