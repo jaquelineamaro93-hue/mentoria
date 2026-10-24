@@ -56,6 +56,19 @@ Respostas do mentorado, seção por seção:
 
 ${blocoRespostas}
 
+REGRAS PARA ATUALIZAÇÃO DE OBJETIVOS:
+- Este PDI pode ser uma NOVA VERSÃO após a pessoa alterar metas. As metas SMART, metas semanais
+  e planejamento futuro mais recentes são a fonte prioritária do objetivo ATUAL. Se o histórico
+  mencionar tecnologias, cursos ou trilhas antigos que a pessoa decidiu despriorizar, NÃO
+  os transforme em novas ações apenas porque aparecem em respostas históricas.
+- Compare a direção atual com os demais registros: se a pessoa migrou de execução técnica
+  (por exemplo SQL, n8n ou automações) para RevOps, estratégia ou liderança, proponha ações
+  verificáveis voltadas ao objetivo novo, sem obrigar retorno à trilha antiga.
+- Se houver entregas já concluídas no contexto adicional, preserve o reconhecimento da
+  evolução, mas NÃO replique essas ações como pendências. Gere apenas próximos passos.
+- Se a pessoa estiver perto de concluir seu desenvolvimento anterior, gere um novo ciclo
+  enxuto, sem preencher artificialmente com tarefas irrelevantes.
+
 Devolva SOMENTE um JSON válido (sem markdown, sem texto antes ou depois), no formato exato abaixo.
 Escreva tudo em português, na segunda pessoa, direto para ${nomeMentorado}. Nada de jargão de
 mentoria genérico: cada frase precisa vir de algo que a pessoa efetivamente escreveu nas respostas.
@@ -91,7 +104,7 @@ mentoria genérico: cada frase precisa vir de algo que a pessoa efetivamente esc
 }
 
 Regras de conteúdo:
-- Gere entre 3 e 5 pilares. Cada pilar precisa ter entre 2 e 4 ações concretas, verificáveis (a pessoa
+- Gere entre 1 e 5 pilares, conforme o que realmente falta desenvolver. Cada pilar precisa ter entre 1 e 4 ações concretas, verificáveis (a pessoa
   precisa conseguir marcar como feita ou não feita sem ambiguidade).
 - Mantenha descrições curtas. O JSON inteiro precisa caber confortavelmente na resposta sem ser truncado.
 - O roadmap cobre o ciclo inteiro em 4 a 6 blocos de 1 a 3 meses.
