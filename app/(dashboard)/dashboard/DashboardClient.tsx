@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -268,11 +269,11 @@ export default function DashboardClient({
             <Flame size={22} aria-hidden="true"/>
           </span>
           <div>
-            <p className="font-semibold text-[#204D3B]">Ofensiva de carreira</p>
-            <p className="text-xs leading-5 text-[#446657]">Uma ação real por dia: inglês, currículo, networking ou entrevista. Sua evolução rende Impulsos.</p>
+            <p className="font-semibold text-[#204D3B]"><LocalizedText text={"Ofensiva de carreira"} /></p>
+            <p className="text-xs leading-5 text-[#446657]"><LocalizedText text={"Uma ação real por dia: inglês, currículo, networking ou entrevista. Sua evolução rende Impulsos."} /></p>
           </div>
         </div>
-        <span className="shrink-0 text-xs font-semibold text-[#295946]">Registrar hoje →</span>
+        <span className="shrink-0 text-xs font-semibold text-[#295946]"><LocalizedText text={"Registrar hoje →"} /></span>
       </Link>
       {/* SEÇÃO 1: Header de impacto e timeline dos 90 dias */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
@@ -335,8 +336,8 @@ export default function DashboardClient({
 
         {/* Canais de acompanhamento, juntos logo após o próximo capítulo */}
         <section className="mb-6" aria-labelledby="apoio-carreira">
-          <Eyebrow>Acompanhamento para sua carreira</Eyebrow>
-          <h2 id="apoio-carreira" className="sr-only">Fale com a Íris ou agende uma sessão com sua mentora</h2>
+          <Eyebrow><LocalizedText text={"Acompanhamento para sua carreira"} /></Eyebrow>
+          <h2 id="apoio-carreira" className="sr-only"><LocalizedText text={"Fale com a Íris ou agende uma sessão com sua mentora"} /></h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <a
               href="https://wa.me/5511959561795?text=Ol%C3%A1%2C%20%C3%8Dris.%20Sou%20mentorado%28a%29%20da%20SOMA%20e%20gostaria%20de%20conversar%20sobre%20minha%20carreira."
@@ -349,14 +350,9 @@ export default function DashboardClient({
                 <div className="flex items-start gap-3">
                   <MessageSquare className="mb-2 shrink-0 text-mint-deep" size={22} strokeWidth={1.5} />
                   <div>
-                    <p className="mb-1 font-medium text-lotus-brown group-hover:text-mint-deep">
-                      Falar com a Íris, agente de carreira
-                    </p>
-                    <p className="text-sm leading-5 text-gray-text">
-                      Converse pelo WhatsApp sobre suas dúvidas, próximos passos e desenvolvimento profissional.
-                    </p>
-                    <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-mint-deep group-hover:underline">
-                      Conversar no WhatsApp <ExternalLink size={14} />
+                    <p className="mb-1 font-medium text-lotus-brown group-hover:text-mint-deep"><LocalizedText text={"Falar com a Íris, agente de carreira"} /></p>
+                    <p className="text-sm leading-5 text-gray-text"><LocalizedText text={"Converse pelo WhatsApp sobre suas dúvidas, próximos passos e desenvolvimento profissional."} /></p>
+                    <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-mint-deep group-hover:underline"><LocalizedText text={"Conversar no WhatsApp"} /><ExternalLink size={14} />
                     </span>
                   </div>
                 </div>
@@ -374,14 +370,9 @@ export default function DashboardClient({
                 <div className="flex items-start gap-3">
                   <Calendar className="mb-2 shrink-0 text-lotus-brown" size={22} strokeWidth={1.5} />
                   <div>
-                    <p className="mb-1 font-medium text-lotus-brown group-hover:text-lotus-brown">
-                      Agendar Sessão Individual
-                    </p>
-                    <p className="text-sm leading-5 text-gray-text">
-                      Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos.
-                    </p>
-                    <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-lotus-brown group-hover:underline">
-                      Agendar agora <ExternalLink size={14} />
+                    <p className="mb-1 font-medium text-lotus-brown group-hover:text-lotus-brown"><LocalizedText text={"Agendar Sessão Individual"} /></p>
+                    <p className="text-sm leading-5 text-gray-text"><LocalizedText text={"Reserve um horário para conversar com sua mentora sobre sua jornada, dúvidas e próximos passos."} /></p>
+                    <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-lotus-brown group-hover:underline"><LocalizedText text={"Agendar agora"} /><ExternalLink size={14} />
                     </span>
                   </div>
                 </div>
@@ -412,16 +403,14 @@ export default function DashboardClient({
             <div className="flex items-center gap-3">
               <Target size={20} strokeWidth={1.5} className="text-lotus-brown shrink-0" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-0.5">Próximo marco</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-0.5"><LocalizedText text={"Próximo marco"} /></p>
                 <p className="text-sm text-lotus-brown">{proximoMarco}</p>
               </div>
             </div>
             <Link
               href={proximoMarcoHref}
               className="shrink-0 text-sm font-medium text-lotus-brown border border-lotus-brown/40 hover:bg-lotus-brown hover:text-white transition-colors px-4 py-2 rounded-lg"
-            >
-              Continuar
-            </Link>
+            ><LocalizedText text={"Continuar"} /></Link>
           </Panel>
         </section>
 
@@ -431,14 +420,12 @@ export default function DashboardClient({
           <section className="mb-10">
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
-                <Eyebrow>Feedbacks da Sua Mentora</Eyebrow>
+                <Eyebrow><LocalizedText text={"Feedbacks da Sua Mentora"} /></Eyebrow>
                 <span className="inline-flex items-center justify-center w-6 h-6 bg-mint text-white text-xs font-bold rounded-full">
                   {feedbacks.length}
                 </span>
               </div>
-              <Link href="/feedbacks" className="text-xs font-medium text-mint-deep hover:underline">
-                Ver todos
-              </Link>
+              <Link href="/feedbacks" className="text-xs font-medium text-mint-deep hover:underline"><LocalizedText text={"Ver todos"} /></Link>
             </div>
             <div className="space-y-3">
               {feedbacks.slice(0, 3).map((feedback) => (
@@ -477,8 +464,7 @@ export default function DashboardClient({
         {/* Resumo Estratégico */}
         <section className="mb-8">
           <Eyebrow>
-            <TrendingUp size={13} strokeWidth={1.5} /> Resumo estratégico
-          </Eyebrow>
+            <TrendingUp size={13} strokeWidth={1.5} /><LocalizedText text={"Resumo estratégico"} /></Eyebrow>
           <Panel className="p-6 border-gray-faint">
             <p className="text-sm text-black leading-relaxed mb-4">
               {viaResultado?.forcas?.length && bussolaCompleto
@@ -511,30 +497,29 @@ export default function DashboardClient({
         {/* Evolução integrada: autoconhecimento + carreira */}
         <section className="mb-8">
           <Eyebrow>
-            <TrendingUp size={13} strokeWidth={1.5} /> Evolução da sua jornada
-          </Eyebrow>
+            <TrendingUp size={13} strokeWidth={1.5} /><LocalizedText text={"Evolução da sua jornada"} /></Eyebrow>
           <Panel className="overflow-hidden border-gray-faint">
             <div className="grid lg:grid-cols-2">
               <div className="p-5 md:p-6 border-b lg:border-b-0 lg:border-r border-gray-faint">
                 <div className="flex items-center gap-2 mb-4">
                   <Compass size={18} className="text-mint-deep" />
-                  <p className="text-sm font-semibold text-black">Autoconhecimento</p>
+                  <p className="text-sm font-semibold text-black"><LocalizedText text={"Autoconhecimento"} /></p>
                 </div>
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-text">Forças VIA</span>
+                    <span className="text-gray-text"><LocalizedText text={"Forças VIA"} /></span>
                     <strong className="text-black">{viaResultado?.forcas?.length ? viaResultado.forcas.slice(0, 3).join(' · ') : 'A mapear'}</strong>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-text">Posicionamento do mapa</span>
+                    <span className="text-gray-text"><LocalizedText text={"Posicionamento do mapa"} /></span>
                     <strong className="text-black">{bussolaCompleto ? 'Definida' : 'Pendente'}</strong>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-text">Plano de desenvolvimento</span>
+                    <span className="text-gray-text"><LocalizedText text={"Plano de desenvolvimento"} /></span>
                     <strong className="text-black">{pdiConcluidas}/{pdiTotal || '—'} perguntas-guia respondidas</strong>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-gray-text">Reflexões</span>
+                    <span className="text-gray-text"><LocalizedText text={"Reflexões"} /></span>
                     <strong className="text-black">{journalNotes.length} registros recentes</strong>
                   </div>
                 </div>
@@ -543,7 +528,7 @@ export default function DashboardClient({
               <div className="p-5 md:p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <BriefcaseBusiness size={18} className="text-mint-deep" />
-                  <p className="text-sm font-semibold text-black">Aplicação na carreira</p>
+                  <p className="text-sm font-semibold text-black"><LocalizedText text={"Aplicação na carreira"} /></p>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div>
@@ -563,18 +548,16 @@ export default function DashboardClient({
                   href="/carreira"
                   className="inline-flex items-center gap-2 text-sm font-medium text-black hover:text-mint-deep transition"
                 >
-                  <FileSearch size={15} />
-                  Abrir jornada de carreira
-                </Link>
+                  <FileSearch size={15} /><LocalizedText text={"Abrir jornada de carreira"} /></Link>
               </div>
             </div>
 
             <div className="border-t border-gray-faint bg-mint-light/35 p-5 md:px-6">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1">Insight de evolução</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1"><LocalizedText text={"Insight de evolução"} /></p>
               <p className="text-sm text-black leading-relaxed">{insightEvolucao}</p>
               {ultimoInsightDiario && (
                 <p className="mt-3 pt-3 border-t border-mint/50 text-sm text-gray-text whitespace-pre-wrap line-clamp-4">
-                  <span className="font-medium text-black">Último insight do Diário: </span>
+                  <span className="font-medium text-black"><LocalizedText text={"Último insight do Diário:"} /></span>
                   {ultimoInsightDiario}
                 </p>
               )}
@@ -587,16 +570,15 @@ export default function DashboardClient({
           <div className="grid sm:grid-cols-2 gap-4">
             <Panel className="p-6 border-gray-faint flex flex-col justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1">Passaporte SOMA</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1"><LocalizedText text={"Passaporte SOMA"} /></p>
                 <p className="font-display text-4xl text-lotus-brown">{pontosTotais} <span className="text-lg">pts</span></p>
               </div>
               <Link href="/passaporte" className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-lotus-brown hover:underline">
-                <Award size={14} strokeWidth={1.5} /> Ver passaporte completo
-              </Link>
+                <Award size={14} strokeWidth={1.5} /><LocalizedText text={"Ver passaporte completo"} /></Link>
             </Panel>
             <Panel className="p-6 border-gray-faint flex flex-col justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1">Selos conquistados</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text mb-1"><LocalizedText text={"Selos conquistados"} /></p>
                 <p className="font-display text-4xl text-lotus-brown">{conquistasObtidas.length} <span className="text-lg">/ {SOMA_ACHIEVEMENTS.length}</span></p>
               </div>
               <p className="mt-4 text-[13px] text-gray-text">
@@ -611,8 +593,7 @@ export default function DashboardClient({
         {/* Pilares SOMA (cores vibrantes) */}
         <section className="mb-10">
           <Eyebrow>
-            <Gem size={13} strokeWidth={1.5} /> Raio-X dos 4 pilares SOMA
-          </Eyebrow>
+            <Gem size={13} strokeWidth={1.5} /><LocalizedText text={"Raio-X dos 4 pilares SOMA"} /></Eyebrow>
           <div className="grid sm:grid-cols-2 gap-4">
             {pilarConfig.map((p) => (
               <div key={p.key} className="p-5 rounded-xl border" style={p.style}>
@@ -629,11 +610,9 @@ export default function DashboardClient({
             <Panel className="flex items-center justify-between gap-4 border-lotus-coral/40 bg-lotus-coral/10 p-4">
               <div className="flex items-center gap-3">
                 <MapPin size={18} strokeWidth={1.5} className="shrink-0 text-lotus-brown" />
-                <p className="text-sm text-lotus-brown">Há uma votação de encontro em aberto para você.</p>
+                <p className="text-sm text-lotus-brown"><LocalizedText text={"Há uma votação de encontro em aberto para você."} /></p>
               </div>
-              <Link href="/votar-encontro" className="shrink-0 rounded-lg bg-lotus-brown px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lotus-brown/90">
-                Votar agora
-              </Link>
+              <Link href="/votar-encontro" className="shrink-0 rounded-lg bg-lotus-brown px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-lotus-brown/90"><LocalizedText text={"Votar agora"} /></Link>
             </Panel>
           </section>
         )}
@@ -644,13 +623,12 @@ export default function DashboardClient({
             <div className="flex min-w-0 items-start gap-3">
               <FolderOpen size={18} strokeWidth={1.5} className="mt-0.5 shrink-0 text-lotus-brown" />
               <div>
-                <p className="text-sm font-medium text-black">Materiais da Mentoria SOMA</p>
-                <p className="text-xs leading-5 text-gray-text">Gravações, conteúdos e templates para acompanhar sua jornada.</p>
+                <p className="text-sm font-medium text-black"><LocalizedText text={"Materiais da Mentoria SOMA"} /></p>
+                <p className="text-xs leading-5 text-gray-text"><LocalizedText text={"Gravações, conteúdos e templates para acompanhar sua jornada."} /></p>
               </div>
             </div>
             <a href={DRIVE_URL} target="_blank" rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg border border-lotus-brown/30 px-3 py-2 text-xs font-medium text-lotus-brown transition-colors hover:bg-lotus-brown hover:text-white sm:self-center">
-              Abrir Drive <ExternalLink size={13} strokeWidth={1.5} />
+              className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg border border-lotus-brown/30 px-3 py-2 text-xs font-medium text-lotus-brown transition-colors hover:bg-lotus-brown hover:text-white sm:self-center"><LocalizedText text={"Abrir Drive"} /><ExternalLink size={13} strokeWidth={1.5} />
             </a>
           </Panel>
         </section>
