@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { Compass, Loader2 } from 'lucide-react';
@@ -62,26 +63,20 @@ export default function LeituraCenarioClient({
   return (
     <main className="px-6 py-8 md:px-12 md:py-10 w-full">
       <header className="max-w-4xl mb-8">
-        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2">Crescimento na empresa</p>
-        <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Leitura de cenário</h1>
-        <p className="text-sm md:text-base text-gray-text leading-relaxed">
-          Organize uma situação real do trabalho antes de agir. A SOMA separa fatos de hipóteses, lê você, as outras
-          pessoas e o ambiente, mapeia riscos e oportunidades e transforma isso em próximos movimentos.
-        </p>
+        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2"><LocalizedText text={"Crescimento na empresa"} /></p>
+        <h1 className="font-display text-3xl md:text-4xl text-black mb-2"><LocalizedText text={"Leitura de cenário"} /></h1>
+        <p className="text-sm md:text-base text-gray-text leading-relaxed"><LocalizedText text={"Organize uma situação real do trabalho antes de agir. A SOMA separa fatos de hipóteses, lê você, as outras pessoas e o ambiente, mapeia riscos e oportunidades e transforma isso em próximos movimentos."} /></p>
       </header>
 
       <section className="rounded-2xl border border-gray-faint bg-white p-5 md:p-6">
         <div className="rounded-xl border border-mint bg-mint-light px-4 py-3 mb-5">
-          <p className="text-sm font-medium text-black">Não é leitura de mente.</p>
-          <p className="text-xs text-gray-text mt-1 leading-relaxed">
-            A ferramenta trabalha com fatos, hipóteses e sinais observáveis. O objetivo é aumentar clareza para tomar
-            decisões melhores, não adivinhar intenções ou ensinar manipulação.
-          </p>
+          <p className="text-sm font-medium text-black"><LocalizedText text={"Não é leitura de mente."} /></p>
+          <p className="text-xs text-gray-text mt-1 leading-relaxed"><LocalizedText text={"A ferramenta trabalha com fatos, hipóteses e sinais observáveis. O objetivo é aumentar clareza para tomar decisões melhores, não adivinhar intenções ou ensinar manipulação."} /></p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-4">
           <label className="block lg:col-span-2">
-            <span className="text-sm font-medium text-black">Título do cenário</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"Título do cenário"} /></span>
             <input
               value={titulo}
               onChange={(event) => setTitulo(event.target.value)}
@@ -91,7 +86,7 @@ export default function LeituraCenarioClient({
           </label>
 
           <label className="block lg:col-span-2">
-            <span className="text-sm font-medium text-black">O que está acontecendo? *</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"O que está acontecendo? *"} /></span>
             <textarea
               rows={6}
               value={situacao}
@@ -102,7 +97,7 @@ export default function LeituraCenarioClient({
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-black">O que você quer alcançar? *</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"O que você quer alcançar? *"} /></span>
             <textarea
               rows={4}
               value={objetivo}
@@ -113,7 +108,7 @@ export default function LeituraCenarioClient({
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-black">Quem está envolvido?</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"Quem está envolvido?"} /></span>
             <textarea
               rows={4}
               value={envolvidos}
@@ -124,7 +119,7 @@ export default function LeituraCenarioClient({
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-black">O que é dito ou combinado?</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"O que é dito ou combinado?"} /></span>
             <textarea
               rows={4}
               value={discurso}
@@ -135,7 +130,7 @@ export default function LeituraCenarioClient({
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-black">O que acontece na prática?</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"O que acontece na prática?"} /></span>
             <textarea
               rows={4}
               value={pratica}
@@ -146,7 +141,7 @@ export default function LeituraCenarioClient({
           </label>
 
           <label className="block lg:col-span-2">
-            <span className="text-sm font-medium text-black">Restrições, riscos ou sensibilidades já percebidas</span>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"Restrições, riscos ou sensibilidades já percebidas"} /></span>
             <textarea
               rows={3}
               value={restricoes}
