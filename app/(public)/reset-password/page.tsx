@@ -1,4 +1,6 @@
 'use client';
+import { useLocale } from '@/components/LocaleProvider';
+import { translateCopy } from '@/components/LocalizedText';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
 export default function ResetPasswordPage() {
+  const { locale } = useLocale();
   const router = useRouter();
   const supabase = createClient();
 
@@ -55,13 +58,13 @@ export default function ResetPasswordPage() {
     setCarregando(true);
 
     if (novaSenha !== confirmaSenha) {
-      setErro('Senhas não conferem');
+      setErro(translateCopy("Senhas não conferem",locale));
       setCarregando(false);
       return;
     }
 
     if (novaSenha.length < 8) {
-      setErro('Mínimo 8 caracteres');
+      setErro(translateCopy("Mínimo 8 caracteres",locale));
       setCarregando(false);
       return;
     }
