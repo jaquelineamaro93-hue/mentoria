@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -201,18 +202,15 @@ export default function PdiEvidenciasClient({ userId }: { userId: string }) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.14em] text-mint-deep mb-1">Evidências do desenvolvimento</p>
-        <h2 className="font-display text-2xl text-black">O que comprova sua evolução</h2>
-        <p className="text-sm text-gray-text mt-1 max-w-3xl">
-          Guarde aqui certificados, avaliações, relatórios, projetos ou materiais ligados ao seu plano de desenvolvimento.
-          Currículo e materiais de candidatura ficam em Mercado de trabalho.
-        </p>
+        <p className="text-xs uppercase tracking-[0.14em] text-mint-deep mb-1"><LocalizedText text={"Evidências do desenvolvimento"} /></p>
+        <h2 className="font-display text-2xl text-black"><LocalizedText text={"O que comprova sua evolução"} /></h2>
+        <p className="text-sm text-gray-text mt-1 max-w-3xl"><LocalizedText text={"Guarde aqui certificados, avaliações, relatórios, projetos ou materiais ligados ao seu plano de desenvolvimento. Currículo e materiais de candidatura ficam em Mercado de trabalho."} /></p>
       </div>
 
       <Panel className="p-5 md:p-6">
         <div className="grid md:grid-cols-2 gap-4">
           <label>
-            <span className="block text-sm font-medium text-black mb-2">Nome da evidência</span>
+            <span className="block text-sm font-medium text-black mb-2"><LocalizedText text={"Nome da evidência"} /></span>
             <input
               value={nome}
               onChange={(event) => setNome(event.target.value)}
@@ -222,16 +220,16 @@ export default function PdiEvidenciasClient({ userId }: { userId: string }) {
           </label>
 
           <label>
-            <span className="block text-sm font-medium text-black mb-2">Categoria</span>
+            <span className="block text-sm font-medium text-black mb-2"><LocalizedText text={"Categoria"} /></span>
             <select
               value={categoria}
               onChange={(event) => setCategoria(event.target.value)}
               className="w-full rounded-lg border border-gray-faint bg-white px-4 py-2.5 text-sm text-black focus:outline-none focus:border-mint-deep"
             >
-              <option>Certificado</option>
-              <option>Relatório ou projeto</option>
-              <option>Avaliação ou assessment</option>
-              <option>Material de apoio</option>
+              <option><LocalizedText text={"Certificado"} /></option>
+              <option><LocalizedText text={"Relatório ou projeto"} /></option>
+              <option><LocalizedText text={"Avaliação ou assessment"} /></option>
+              <option><LocalizedText text={"Material de apoio"} /></option>
               <option>Outro</option>
             </select>
           </label>
@@ -239,7 +237,7 @@ export default function PdiEvidenciasClient({ userId }: { userId: string }) {
 
         <div className="mt-5 grid lg:grid-cols-[1fr_auto_1fr] gap-3 items-end">
           <label>
-            <span className="block text-sm font-medium text-black mb-2">Enviar arquivo</span>
+            <span className="block text-sm font-medium text-black mb-2"><LocalizedText text={"Enviar arquivo"} /></span>
             <div className="rounded-lg border border-dashed border-gray-faint bg-[#fbfcfd] px-4 py-3">
               <input
                 type="file"
@@ -247,14 +245,14 @@ export default function PdiEvidenciasClient({ userId }: { userId: string }) {
                 onChange={(event) => setArquivo(event.target.files?.[0] ?? null)}
                 className="block w-full text-sm text-gray-text file:mr-3 file:rounded-md file:border-0 file:bg-mint-light file:px-3 file:py-2 file:text-sm file:font-medium file:text-black"
               />
-              <p className="text-[11px] text-gray-text mt-2">PDF, Word, PNG ou JPG · até 10 MB.</p>
+              <p className="text-[11px] text-gray-text mt-2"><LocalizedText text={"PDF, Word, PNG ou JPG · até 10 MB."} /></p>
             </div>
           </label>
 
           <div className="text-xs uppercase tracking-wide text-gray-text pb-4 text-center">ou</div>
 
           <label>
-            <span className="block text-sm font-medium text-black mb-2">Adicionar link externo</span>
+            <span className="block text-sm font-medium text-black mb-2"><LocalizedText text={"Adicionar link externo"} /></span>
             <div className="relative">
               <LinkIcon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
               <input
@@ -294,16 +292,16 @@ export default function PdiEvidenciasClient({ userId }: { userId: string }) {
 
       <div>
         <div className="flex items-center justify-between gap-3 mb-3">
-          <h3 className="text-sm font-semibold text-black">Evidências salvas</h3>
+          <h3 className="text-sm font-semibold text-black"><LocalizedText text={"Evidências salvas"} /></h3>
           <span className="text-xs text-gray-text">{documentos.length} item{documentos.length === 1 ? '' : 's'}</span>
         </div>
 
         {carregando ? (
-          <div className="rounded-xl border border-gray-faint bg-white p-6 text-sm text-gray-text">Carregando...</div>
+          <div className="rounded-xl border border-gray-faint bg-white p-6 text-sm text-gray-text"><LocalizedText text={"Carregando..."} /></div>
         ) : documentos.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-faint bg-white px-6 py-10 text-center">
             <FileText size={28} className="mx-auto text-gray-text mb-2" />
-            <p className="text-sm text-gray-text">Nenhuma evidência adicionada ainda.</p>
+            <p className="text-sm text-gray-text"><LocalizedText text={"Nenhuma evidência adicionada ainda."} /></p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -342,9 +340,7 @@ export default function PdiEvidenciasClient({ userId }: { userId: string }) {
                     onClick={() => remover(documento)}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-gray-faint px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-50"
                   >
-                    <Trash2 size={14} />
-                    Remover
-                  </button>
+                    <Trash2 size={14} /><LocalizedText text={"Remover"} /></button>
                 </div>
               </article>
             ))}
