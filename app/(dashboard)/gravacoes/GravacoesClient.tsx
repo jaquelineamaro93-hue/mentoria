@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -50,9 +51,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
         </div>
 
         {filtradas.length === 0 ? (
-          <div className="rounded-xl border border-gray-faint bg-white p-6 text-sm text-gray-text text-center">
-            Nenhuma gravação por aqui ainda. As gravações aparecerão nesta lista quando estiverem disponíveis.
-          </div>
+          <div className="rounded-xl border border-gray-faint bg-white p-6 text-sm text-gray-text text-center"><LocalizedText text={"Nenhuma gravação por aqui ainda. As gravações aparecerão nesta lista quando estiverem disponíveis."} /></div>
         ) : (
           <div className="flex flex-col gap-3">
             {filtradas.map((g) => (
@@ -86,7 +85,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
                     )}
                   </div>
                 </div>
-                <span className="text-xs text-brown-deep shrink-0">Abrir no Drive</span>
+                <span className="text-xs text-brown-deep shrink-0"><LocalizedText text={"Abrir no Drive"} /></span>
               </a>
             ))}
           </div>
