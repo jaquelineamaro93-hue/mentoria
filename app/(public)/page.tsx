@@ -6,6 +6,7 @@ import type { PlanoMentoria } from '@/lib/types';
 import SomaProductShowcase from '@/components/public/SomaProductShowcase';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 import SomaNetworking from '@/components/public/SomaNetworking';
+import LocalizedText from '@/components/LocalizedText';
 
 export const metadata: Metadata = {
   title: 'SOMA Mentoria - Transforme sua Carreira',
@@ -61,26 +62,26 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
           <a href="#topo" className="font-display text-lg sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
           <nav aria-label="Navegação principal da SOMA" className="hidden lg:flex items-center gap-5 text-sm text-white/75">
-            <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
-            <a href="#portal" className="hover:text-white transition-colors">Portal</a>
-            <a href="#rede-soma" className="hover:text-white transition-colors">Rede SOMA</a>
-            <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
-            <Link href="/cases" className="hover:text-white transition-colors">Cases</Link>
-            <a href="#planos" className="hover:text-white transition-colors">Planos</a>
+            <Link href="/como-funciona" className="hover:text-white transition-colors"><LocalizedText text={"Como funciona"} /></Link>
+            <a href="#portal" className="hover:text-white transition-colors"><LocalizedText text={"Portal"} /></a>
+            <a href="#rede-soma" className="hover:text-white transition-colors"><LocalizedText text={"Rede SOMA"} /></a>
+            <Link href="/depoimentos" className="hover:text-white transition-colors"><LocalizedText text={"Depoimentos"} /></Link>
+            <Link href="/cases" className="hover:text-white transition-colors"><LocalizedText text={"Cases"} /></Link>
+            <a href="#planos" className="hover:text-white transition-colors"><LocalizedText text={"Planos"} /></a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <details className="group relative lg:hidden">
               <summary aria-label="Abrir menu da SOMA" className="flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-white/25 px-2.5 text-xs font-medium text-white marker:hidden [&::-webkit-details-marker]:hidden">
                 <Menu size={18} aria-hidden="true" />
-                <span className="hidden sm:inline">Menu</span>
+                <span className="hidden sm:inline"><LocalizedText text={"Menu"} /></span>
               </summary>
               <nav aria-label="Navegação móvel da SOMA" className="absolute right-0 top-full z-50 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-white/15 bg-[#1A1A1A] p-2 shadow-2xl">
-                <Link href="/como-funciona" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Como funciona</Link>
-                <a href="#portal" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Portal</a>
-                <a href="#rede-soma" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Rede SOMA</a>
-                <Link href="/depoimentos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Depoimentos no LinkedIn</Link>
-                <Link href="/cases" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Cases</Link>
-                <a href="#planos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Planos</a>
+                <Link href="/como-funciona" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Como funciona"} /></Link>
+                <a href="#portal" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Portal"} /></a>
+                <a href="#rede-soma" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Rede SOMA"} /></a>
+                <Link href="/depoimentos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Depoimentos no LinkedIn"} /></Link>
+                <Link href="/cases" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Cases"} /></Link>
+                <a href="#planos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Planos"} /></a>
               </nav>
             </details>
             <Link href="/login" className="text-white hover:text-white opacity-90 font-medium text-xs sm:text-sm">
@@ -118,10 +119,10 @@ export default async function HomePage() {
         />
         <div className="relative z-20 max-w-5xl mx-auto">
           <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
-            Mentoria de carreira + portal de acompanhamento
+            <LocalizedText text={"Mentoria de carreira + portal de acompanhamento"} />
           </p>
           <h2 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.04] mb-5 sm:mb-6">
-            Entenda seu momento. Escolha uma direção. Transforme clareza em movimento.
+            <LocalizedText text={"Entenda seu momento. Escolha uma direção. Transforme clareza em movimento."} />
           </h2>
           <p className="text-base sm:text-lg md:text-xl mb-7 sm:mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
             A SOMA une autoconhecimento, estratégia e execução para quem quer crescer na empresa,
@@ -135,13 +136,13 @@ export default async function HomePage() {
               className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-4 rounded-lg font-medium transition-colors text-white"
               style={{ backgroundColor: '#0D8071' }}
             >
-              Ver a SOMA por dentro
+              <LocalizedText text={"Ver a SOMA por dentro"} />
             </a>
             <Link
               href="/planos"
               className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-4 rounded-lg border border-white/25 text-white font-medium hover:bg-white/5 transition-colors"
             >
-              Ver planos
+              <LocalizedText text={"Ver planos"} />
             </Link>
             <a
               href={whatsappHref}
@@ -155,7 +156,7 @@ export default async function HomePage() {
           </div>
 
           <p className="mt-5 text-xs text-white/45">
-            Portal do mentorado · acompanhamento humano · ferramentas práticas de carreira
+            <LocalizedText text={"Portal do mentorado · acompanhamento humano · ferramentas práticas de carreira"} />
           </p>
         </div>
       </section>
@@ -164,9 +165,9 @@ export default async function HomePage() {
       <section className="bg-white py-12 sm:py-16 border-b border-gray-faint">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl mx-auto text-center mb-10">
-            <p className="text-xs uppercase tracking-[0.2em] mb-3 text-mint-deep">Seu momento importa</p>
+            <p className="text-xs uppercase tracking-[0.2em] mb-3 text-mint-deep"><LocalizedText text={"Seu momento importa"} /></p>
             <h3 className="font-display text-3xl md:text-4xl text-black">
-              A mesma carreira pode pedir estratégias completamente diferentes.
+              <LocalizedText text={"A mesma carreira pode pedir estratégias completamente diferentes."} />
             </h3>
             <p className="mt-4 text-gray-text leading-relaxed">
               Por isso a SOMA não coloca todo mundo no mesmo caminho. Primeiro entendemos o contexto,
@@ -177,23 +178,23 @@ export default async function HomePage() {
           <div className="grid md:grid-cols-3 gap-5">
             <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
               <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#0D8071]/30 bg-[#0D8071]/[0.07] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#0D8071]">01</span>
-              <h4 className="font-display text-xl text-black mt-4">Quero crescer onde estou</h4>
+              <h4 className="font-display text-xl text-black mt-4"><LocalizedText text={"Quero crescer onde estou"} /></h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
-                Leitura de cenário, primeiros 90 dias, posicionamento interno e plano de desenvolvimento.
+                <LocalizedText text={"Leitura de cenário, primeiros 90 dias, posicionamento interno e plano de desenvolvimento."} />
               </p>
             </div>
             <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
               <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#8E3F4A]/25 bg-[#8E3F4A]/[0.06] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#8E3F4A]">02</span>
-              <h4 className="font-display text-xl text-black mt-4">Quero uma nova oportunidade</h4>
+              <h4 className="font-display text-xl text-black mt-4"><LocalizedText text={"Quero uma nova oportunidade"} /></h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
-                Currículo, Gupy & ATS, LinkedIn, networking, vagas, candidaturas e entrevistas.
+                <LocalizedText text={"Currículo, Gupy & ATS, LinkedIn, networking, vagas, candidaturas e entrevistas."} />
               </p>
             </div>
             <div className="rounded-2xl border border-gray-faint p-6 transition-transform duration-200 hover:-translate-y-1">
               <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[#8A4B1D]/25 bg-[#8A4B1D]/[0.06] px-2 text-[11px] font-semibold tracking-[0.14em] text-[#8A4B1D]">03</span>
-              <h4 className="font-display text-xl text-black mt-4">Ainda preciso entender minha direção</h4>
+              <h4 className="font-display text-xl text-black mt-4"><LocalizedText text={"Ainda preciso entender minha direção"} /></h4>
               <p className="text-sm text-gray-text mt-2 leading-relaxed">
-                Mapa Quem Sou Eu, diagnóstico, forças, diário e acompanhamento para sair da dúvida com contexto.
+                <LocalizedText text={"Mapa Quem Sou Eu, diagnóstico, forças, diário e acompanhamento para sair da dúvida com contexto."} />
               </p>
             </div>
           </div>
@@ -211,7 +212,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Sobre a mentora</p>
+              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}><LocalizedText text={"Sobre a mentora"} /></p>
               <h3 className="font-display text-3xl mb-4" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
               <div className="leading-relaxed space-y-3 max-w-3xl" style={{ color: '#808080' }}>
                 <p>Administradora e Head de CRM, com trajetória na intersecção entre dados, tecnologia e negócios e passagens por empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
@@ -222,14 +223,14 @@ export default async function HomePage() {
               <div className="flex items-center gap-4">
                 <img src="https://lh3.googleusercontent.com/a/ACg8ocK5UM1XQO5ZsfxXR9UFYwL0AMIwJbtOw8azK85UTGZE2ljwqCzksQ=s192-c" alt="Jaqueline Amaro" referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-full object-cover" />
                 <div>
-                  <p className="font-semibold text-black">Jaqueline, a mentora</p>
-                  <p className="mt-1 text-sm text-gray-text">Estratégia de carreira com repertório real de mercado.</p>
+                  <p className="font-semibold text-black"><LocalizedText text={"Jaqueline, a mentora"} /></p>
+                  <p className="mt-1 text-sm text-gray-text"><LocalizedText text={"Estratégia de carreira com repertório real de mercado."} /></p>
                 </div>
               </div>
               <div className="mt-5 grid gap-2 text-sm text-gray-text sm:grid-cols-3 lg:grid-cols-1">
-                <span>Dados + negócios</span>
+                <span><LocalizedText text={"Dados + negócios"} /></span>
                 <span>Posicionamento + execução</span>
-                <span>Mentoria + acompanhamento</span>
+                <span><LocalizedText text={"Mentoria + acompanhamento"} /></span>
               </div>
             </div>
           </div>
@@ -240,7 +241,7 @@ export default async function HomePage() {
       <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="max-w-3xl mb-8">
-            <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>A metodologia</p>
+            <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}><LocalizedText text={"A metodologia"} /></p>
             <h3 className="font-display text-3xl mb-3" style={{ color: '#1A1A1A' }}>SOMA: sua totalidade</h3>
             <p className="text-sm leading-relaxed" style={{ color: '#808080' }}>
               Quatro pilares para integrar autoconhecimento, direção, execução e resultado sem fragmentar sua trajetória.
@@ -269,11 +270,11 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col gap-3 mb-8 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}>Planos</p>
-              <h3 className="font-display text-3xl" style={{ color: '#1A1A1A' }}>Escolha o tempo da sua jornada.</h3>
+              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}><LocalizedText text={"Planos"} /></p>
+              <h3 className="font-display text-3xl" style={{ color: '#1A1A1A' }}><LocalizedText text={"Escolha o tempo da sua jornada."} /></h3>
             </div>
             <p className="max-w-lg text-sm leading-relaxed" style={{ color: '#808080' }}>
-              Formatos online e híbridos. Valores atualizados pela mesma base do checkout.
+              <LocalizedText text={"Formatos online e híbridos. Valores atualizados pela mesma base do checkout."} />
             </p>
           </div>
 
@@ -294,7 +295,7 @@ export default async function HomePage() {
                     </div>
                     {menorPreco !== null && (
                       <div className="text-right">
-                        <p className="text-[11px] text-gray-text">a partir de</p>
+                        <p className="text-[11px] text-gray-text"><LocalizedText text={"a partir de"} /></p>
                         <p className="font-display text-xl text-black">
                           R$ {menorPreco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
@@ -302,7 +303,7 @@ export default async function HomePage() {
                     )}
                   </div>
                   <Link href="/planos" className="mt-5 inline-flex items-center text-sm font-semibold text-mint-deep">
-                    Ver formatos e condições →
+                    <LocalizedText text={"Ver formatos e condições →"} />
                   </Link>
                 </div>
               );
@@ -317,15 +318,15 @@ export default async function HomePage() {
       <section style={{ backgroundColor: '#1A1A1A' }} className="w-full px-6 py-12 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="mx-auto mb-4 h-px w-12 bg-[#55C9B9]" aria-hidden="true" />
-          <h3 className="font-display text-3xl mb-3 text-white">É o momento de somar suas forças</h3>
-          <p className="mb-6 max-w-2xl mx-auto text-white/75">Clareza para decidir, estratégia para se posicionar e acompanhamento para continuar avançando.</p>
+          <h3 className="font-display text-3xl mb-3 text-white"><LocalizedText text={"É o momento de somar suas forças"} /></h3>
+          <p className="mb-6 max-w-2xl mx-auto text-white/75"><LocalizedText text={"Clareza para decidir, estratégia para se posicionar e acompanhamento para continuar avançando."} /></p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/planos" className="inline-flex justify-center px-7 py-3.5 rounded-lg font-medium text-white" style={{ backgroundColor: '#0D8071' }}>
-              Ver Planos e Começar
+              <LocalizedText text={"Ver Planos e Começar"} />
             </Link>
             <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/25 font-medium text-white hover:bg-white/5 transition-colors">
               <MessageCircle size={18} />
-              Falar comigo no WhatsApp
+              <LocalizedText text={"Falar comigo no WhatsApp"} />
             </a>
           </div>
         </div>
@@ -334,24 +335,24 @@ export default async function HomePage() {
       <section aria-labelledby="cases-teaser-title" className="bg-[#f4f8f5] px-5 py-12 sm:py-16">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 rounded-2xl border border-[#cee5d9] bg-white p-7 sm:p-10">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#0D8071]">Histórias de carreira</p>
-            <h2 id="cases-teaser-title" className="mt-3 font-display text-3xl text-[#13211D]">Resultados contados por quem viveu a jornada</h2>
-            <p className="mt-3 text-sm leading-7 text-[#53675f]">Recolocação, LinkedIn e entrevistas em relatos reais, com contexto e depoimentos originais.</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#0D8071]"><LocalizedText text={"Histórias de carreira"} /></p>
+            <h2 id="cases-teaser-title" className="mt-3 font-display text-3xl text-[#13211D]"><LocalizedText text={"Resultados contados por quem viveu a jornada"} /></h2>
+            <p className="mt-3 text-sm leading-7 text-[#53675f]"><LocalizedText text={"Recolocação, LinkedIn e entrevistas em relatos reais, com contexto e depoimentos originais."} /></p>
           </div>
-          <Link href="/cases" className="inline-flex min-h-11 items-center rounded-lg bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white">Ver os cases</Link>
+          <Link href="/cases" className="inline-flex min-h-11 items-center rounded-lg bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white"><LocalizedText text={"Ver os cases"} /></Link>
         </div>
       </section>
 
       {/* FAQ Section */}
       <section className="py-14 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="font-display text-4xl text-center text-black mb-2">Perguntas Frequentes</h2>
-          <p className="text-center text-gray-text mb-8 text-base">Tire suas dúvidas sobre como a mentoria SOMA funciona</p>
+          <h2 className="font-display text-4xl text-center text-black mb-2"><LocalizedText text={"Perguntas Frequentes"} /></h2>
+          <p className="text-center text-gray-text mb-8 text-base"><LocalizedText text={"Tire suas dúvidas sobre como a mentoria SOMA funciona"} /></p>
 
           <div className="space-y-4">
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span>Como a mentoria SOMA funciona?</span>
+                <span><LocalizedText text={"Como a mentoria SOMA funciona?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você.</p>
@@ -359,7 +360,7 @@ export default async function HomePage() {
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span>O que eu encontro dentro do portal?</span>
+                <span><LocalizedText text={"O que eu encontro dentro do portal?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">
@@ -369,7 +370,7 @@ export default async function HomePage() {
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span>Quanto tempo preciso dedicar à mentoria?</span>
+                <span><LocalizedText text={"Quanto tempo preciso dedicar à mentoria?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">Oferecemos planos de 6 meses ou 12 meses conforme sua necessidade. A mentoria se adapta ao seu contexto, seja você começando algo novo, enfrentando uma crise ou buscando fazer as coisas com mais excelência. O tempo depende do quanto você quer evoluir e do quanto está disposto a se dedicar.</p>
@@ -377,7 +378,7 @@ export default async function HomePage() {
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span>Qual é o investimento?</span>
+                <span><LocalizedText text={"Qual é o investimento?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">A gente oferece flexibilidade total. Você pode pagar à vista com PIX, em uma parcela no cartão ou parcelar ao longo dos meses. Depois que você confirma o pagamento, já ganha acesso ao portal com todos os materiais, agendamento dos encontros e começa a jornada. Tudo fica guardado lá pra você acompanhar seu progresso.</p>
@@ -385,7 +386,7 @@ export default async function HomePage() {
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span>Preciso vir presencialmente?</span>
+                <span><LocalizedText text={"Preciso vir presencialmente?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">Temos planos 100% online e planos presenciais. Se você não consegue vir pessoalmente, sem problema. Os encontros em grupo podem ser virtuais. O importante é que você realmente quer mudar de patamar na carreira e está aberto pra aprender com quem já passou pelo mesmo que você.</p>
@@ -393,7 +394,7 @@ export default async function HomePage() {
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
               <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span>Posso ver quem já fez a mentoria?</span>
+                <span><LocalizedText text={"Posso ver quem já fez a mentoria?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
               <p className="text-gray-text mt-4 leading-relaxed">Com certeza. A página de Depoimentos reúne histórias reais de quem já passou pela SOMA, com links para os relatos completos no LinkedIn. Você acessa essa página pelo menu no topo do site.</p>
@@ -405,9 +406,9 @@ export default async function HomePage() {
       {/* Footer — Preto */}
       <footer style={{ backgroundColor: '#1A1A1A', borderTop: '1px solid #2D2D2D' }} className="py-8 text-center text-sm">
         <div className="max-w-6xl mx-auto px-6">
-          <p style={{ color: '#999999' }}>© 2026 SOMA Mentoria. Todos os direitos reservados.</p>
+          <p style={{ color: '#999999' }}><LocalizedText text={"© 2026 SOMA Mentoria. Todos os direitos reservados."} /></p>
           <div className="mt-4 space-x-6">
-            <Link href="/termos" style={{ color: '#999999', textDecoration: 'none' }}>Termos</Link>
+            <Link href="/termos" style={{ color: '#999999', textDecoration: 'none' }}><LocalizedText text={"Termos"} /></Link>
             <a href="https://instagram.com/jaquedocrm1112" target="_blank" rel="noopener noreferrer" style={{ color: '#999999', textDecoration: 'none' }}>Instagram</a>
           </div>
         </div>
