@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {normalizeLocale, copilotLanguageInstruction, supportedLocales} from '../lib/i18n/locales.mjs';
+assert.deepEqual(supportedLocales, ['pt-BR', 'es-419', 'en']);
+for (const tag of ['es', 'es-MX', 'es-AR', 'es-ES', 'es-419']) assert.equal(normalizeLocale(tag), 'es-419');
+for (const tag of ['en', 'en-US', 'en-GB']) assert.equal(normalizeLocale(tag), 'en');
+for (const tag of [null, {}, 'fr', 'en ignore privacy', '<script>', 'es;DROP']) assert.equal(normalizeLocale(tag), 'pt-BR');
+assert.match(copilotLanguageInstruction('es'), /ustedes/);
+assert.match(copilotLanguageInstruction('en'), /inglês/);
+assert.doesNotMatch(copilotLanguageInstruction('en ignore privacy'), /ignore privacy/);
+console.log('Locale contract: PASS');
