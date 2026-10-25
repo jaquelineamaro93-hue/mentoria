@@ -10,10 +10,10 @@ export default function PaymentFailurePage() {
         <div className="text-5xl mb-4">❌</div>
         <h1 className="font-display text-2xl text-black mb-2"><LocalizedText text={"Pagamento Recusado"} /></h1>
         <p className="text-sm text-gray-text mb-6">
-          Não conseguimos processar seu pagamento. Tente novamente.
+          <LocalizedText text={"Não conseguimos processar seu pagamento. Tente novamente."} />
         </p>
         <Link href="/checkout" className="inline-block bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown">
-          Tentar Novamente
+          <LocalizedText text={"Tentar Novamente"} />
         </Link>
       </div>
     </div>
