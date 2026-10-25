@@ -458,6 +458,18 @@ const words:Record<string,[string,string]>={
 "Expandir janela da Íris":["Expand Íris window","Ampliar la ventana de Íris"],
 "Reduzir janela da Íris":["Shrink Íris window","Reducir la ventana de Íris"],
 "Abrir Íris Copiloto":["Open Íris Copilot","Abrir Íris Copiloto"],
+"O que a Íris pode melhorar?":["What could Íris improve?","¿Qué podría mejorar Íris?"],
+"Íris Copiloto de Carreira":["Íris Career Copilot","Íris Copiloto de Carrera"],
+"Nova conversa":["New conversation","Nueva conversación"],
+"Carregando histórico...":["Loading history...","Cargando historial..."],
+"Enviar mensagem":["Send message","Enviar mensaje"],
+"Editar resposta":["Edit answer","Editar respuesta"],
+"Confirmar resposta":["Confirm answer","Confirmar respuesta"],
+"Voltar à conversa":["Back to conversation","Volver a la conversación"],
+"Escreva sua resposta aqui...":["Write your answer here...","Escribe tu respuesta aquí..."],
+"Revise e confirme a resposta acima ou escolha Editar resposta":["Review and confirm the answer above, or select Edit answer","Revisa y confirma la respuesta anterior o selecciona Editar respuesta"],
+"Seu perfil não é enviado à IA.":["Your profile is not sent to AI.","Tu perfil no se envía a la IA."],
+"Ver detalhes":["View details","Ver detalles"],
 };
 export function translateCopy(text:string,locale:'pt-BR'|'en'|'es-419'){
  return locale==='pt-BR'?text:(words[text]?.[locale==='en'?0:1]||text);
