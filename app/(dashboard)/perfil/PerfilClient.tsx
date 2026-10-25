@@ -1,4 +1,6 @@
 'use client';
+import { useLocale } from '@/components/LocaleProvider';
+import { translateCopy } from '@/components/LocalizedText';
 import LocalizedText from '@/components/LocalizedText';
 
 import { useState, useRef } from 'react';
@@ -15,6 +17,7 @@ export default function PerfilClient({
   perfil: Profile | null;
   plano: PlanoMentoria | null;
 }) {
+  const { locale } = useLocale();
   const router = useRouter();
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,7 +49,7 @@ export default function PerfilClient({
 
       const digitos = whatsapp.replace(/\D/g, '');
       if (digitos && !/^(55)?[1-9][0-9]{9,10}$/.test(digitos)) {
-        setMensagem('Informe um WhatsApp válido com DDD.'); setSalvando(false); return;
+        setMensagem(translateCopy("Informe um WhatsApp válido com DDD.",locale)); setSalvando(false); return;
       }
       const numeroNormalizado = digitos ? (digitos.startsWith('55') && digitos.length >= 12 ? digitos : '55' + digitos) : null;
       updateData.whatsapp_numero = numeroNormalizado;
@@ -61,12 +64,12 @@ export default function PerfilClient({
 
       if (novaSenha) {
         if (novaSenha !== confirmaSenha) {
-          setMensagem('As senhas não conferem');
+          setMensagem(translateCopy("As senhas não conferem",locale));
           setSalvando(false);
           return;
         }
         if (novaSenha.length < 8) {
-          setMensagem('A senha deve ter no mínimo 8 caracteres');
+          setMensagem(translateCopy("A senha deve ter no mínimo 8 caracteres",locale));
           setSalvando(false);
           return;
         }
@@ -111,7 +114,7 @@ export default function PerfilClient({
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setMensagem('Arquivo muito grande. Máximo permitido é 5MB');
+      setMensagem(translateCopy("Arquivo muito grande. Máximo permitido é 5MB",locale));
       return;
     }
 
