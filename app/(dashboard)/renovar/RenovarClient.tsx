@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -85,18 +86,18 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
       <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/55 p-5 backdrop-blur-sm">
         <section role="dialog" aria-modal="true" aria-labelledby="trial-ended-title" className="my-auto w-full max-w-xl rounded-3xl bg-white px-6 py-10 text-center shadow-2xl sm:px-10">
           <Sparkles className="mx-auto mb-5 text-amber-400" size={40} aria-hidden="true" />
-          <h1 id="trial-ended-title" className="text-3xl font-bold text-black">Seu teste grátis acabou</h1>
-          <p className="mt-4 text-base leading-7 text-gray-text">Seu período gratuito terminou. Para voltar a usar as ferramentas da SOMA, escolha um plano.</p>
+          <h1 id="trial-ended-title" className="text-3xl font-bold text-black"><LocalizedText text={"Seu teste grátis acabou"} /></h1>
+          <p className="mt-4 text-base leading-7 text-gray-text"><LocalizedText text={"Seu período gratuito terminou. Para voltar a usar as ferramentas da SOMA, escolha um plano."} /></p>
           <div className="mt-8 space-y-3">
             {planos.map((plano, index) => (
               <Link key={plano.id} href={`/checkout?plan=${plano.id}`} className={`block rounded-xl px-5 py-4 text-base font-semibold transition ${index === 0 ? 'bg-brown-deep text-white hover:bg-brown' : 'border border-gray-faint text-black hover:bg-gray-50'}`}>
                 Assinar {plano.nome} · {Number(plano.preco_avista).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} à vista
               </Link>
             ))}
-            {planos.length === 0 && <p className="text-sm text-gray-text">Nenhum plano disponível no momento. Entre em contato com a SOMA.</p>}
+            {planos.length === 0 && <p className="text-sm text-gray-text"><LocalizedText text={"Nenhum plano disponível no momento. Entre em contato com a SOMA."} /></p>}
           </div>
-          <p className="mt-5 text-xs text-gray-text">Consulte parcelamento e detalhes no checkout. O acesso retorna após a aprovação do pagamento.</p>
-          <button onClick={() => void handleSignOut()} className="mt-8 text-sm text-gray-text underline">Assinou com outro e-mail? Entrar com outra conta</button>
+          <p className="mt-5 text-xs text-gray-text"><LocalizedText text={"Consulte parcelamento e detalhes no checkout. O acesso retorna após a aprovação do pagamento."} /></p>
+          <button onClick={() => void handleSignOut()} className="mt-8 text-sm text-gray-text underline"><LocalizedText text={"Assinou com outro e-mail? Entrar com outra conta"} /></button>
         </section>
       </div>
     );
@@ -110,9 +111,7 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
           <div className="w-14 h-14 rounded-full bg-mint-light border border-mint flex items-center justify-center mb-6">
             <Lock size={22} className="text-mint" />
           </div>
-          <p className="font-display text-4xl text-black mb-2">
-            Escolha seu plano na Mentoria SOMA
-          </p>
+          <p className="font-display text-4xl text-black mb-2"><LocalizedText text={"Escolha seu plano na Mentoria SOMA"} /></p>
           <p className="text-sm text-gray-text ">
             Olá, {profile?.nome?.split(' ')[0] ?? 'futura mentorada'}. Escolha o plano e a
             forma de pagamento que fazem mais sentido para você.
@@ -122,13 +121,13 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
 
         {trialElegivel && planosTrial.length > 0 && (
           <section className="mb-8 rounded-2xl border border-mint bg-mint-light/40 p-5 sm:p-7" aria-label="Boas-vindas ao teste gratuito">
-            <div className="mb-2 flex items-center gap-2 text-mint-deep"><Sparkles size={20} /><strong>Olá! Sua jornada na SOMA começa aqui</strong></div>
-            <h2 className="text-xl font-semibold text-black">Aproveite 7 dias gratuitos para conhecer a plataforma</h2>
-            <p className="mt-2 text-sm leading-6 text-gray-text">Percebemos que sua jornada ainda não foi iniciada. Explore as ferramentas por 7 dias, sem pagamento agora. Ao final, você decide se quer continuar com um plano.</p>
+            <div className="mb-2 flex items-center gap-2 text-mint-deep"><Sparkles size={20} /><strong><LocalizedText text={"Olá! Sua jornada na SOMA começa aqui"} /></strong></div>
+            <h2 className="text-xl font-semibold text-black"><LocalizedText text={"Aproveite 7 dias gratuitos para conhecer a plataforma"} /></h2>
+            <p className="mt-2 text-sm leading-6 text-gray-text"><LocalizedText text={"Percebemos que sua jornada ainda não foi iniciada. Explore as ferramentas por 7 dias, sem pagamento agora. Ao final, você decide se quer continuar com um plano."} /></p>
             <button type="button" disabled={iniciandoTrial} onClick={() => void iniciarTrial(planosTrial[0].id)} className="mt-4 inline-flex items-center justify-center rounded-xl bg-mint-deep px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
               {iniciandoTrial ? 'Preparando sua jornada...' : 'Ativar meus 7 dias grátis'}
             </button>
-            <p className="mt-2 text-xs text-gray-text">Nenhuma cobrança automática será iniciada por este botão.</p>
+            <p className="mt-2 text-xs text-gray-text"><LocalizedText text={"Nenhuma cobrança automática será iniciada por este botão."} /></p>
           </section>
         )}
 
@@ -173,7 +172,7 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
                     disabled={carregando !== null}
                     className="w-full flex items-center justify-between gap-2 bg-brown hover:bg-brown-deep disabled:opacity-60 text-white text-sm font-medium px-5 py-3 rounded-full transition-colors"
                   >
-                    <span>À vista</span>
+                    <span><LocalizedText text={"À vista"} /></span>
                     <span className="flex items-center gap-1.5">
                       {carregando === `${plano.codigo}-avista` && (
                         <Loader2 size={14} className="animate-spin" />
@@ -187,7 +186,7 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
                     disabled={carregando !== null}
                     className="w-full flex items-center justify-between gap-2 border border-brown text-black hover:bg-brown hover:text-white disabled:opacity-60 text-sm font-medium px-5 py-3 rounded-full transition-colors"
                   >
-                    <span>Cartão (1x)</span>
+                    <span><LocalizedText text={"Cartão (1x)"} /></span>
                     <span className="flex items-center gap-1.5">
                       {carregando === `${plano.codigo}-cartao` && (
                         <Loader2 size={14} className="animate-spin" />
@@ -216,9 +215,7 @@ export default function RenovarClient({ profile, planos, trialExpirado }: Props)
         </div>
 
         <div className="text-center mt-10">
-          <p className="text-xs text-gray-text mb-3">
-            Você vai ser levada ao Mercado Pago para concluir o pagamento.
-          </p>
+          <p className="text-xs text-gray-text mb-3"><LocalizedText text={"Você vai ser levada ao Mercado Pago para concluir o pagamento."} /></p>
           <button
             onClick={handleSignOut}
             className="text-xs text-gray-text hover:text-orange transition-colors"
