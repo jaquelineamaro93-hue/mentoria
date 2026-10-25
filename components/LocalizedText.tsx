@@ -501,6 +501,14 @@ const words:Record<string,[string,string]>={
 "Código inválido":["Invalid code","Código inválido"],
 "Novo código enviado!":["New code sent!","¡Nuevo código enviado!"],
 "Erro ao reenviar código":["Unable to resend code","No se pudo reenviar el código"],
+"Pagamento Aprovado!":["Payment approved!","¡Pago aprobado!"],
+"Sua conta foi criada e você já pode acessar a mentoria.":["Your account has been created. You can now access your mentoring.","Tu cuenta está creada. Ya puedes acceder a la mentoría."],
+"Ir para Dashboard":["Go to dashboard","Ir al panel"],
+"Pagamento Pendente":["Payment pending","Pago pendiente"],
+"Seu pagamento está sendo processado. Você receberá um email em breve.":["Your payment is being processed. You will receive an email shortly.","Tu pago se está procesando. Recibirás un correo pronto."],
+"Pagamento Recusado":["Payment declined","Pago rechazado"],
+"Não conseguimos processar seu pagamento. Tente novamente.":["We couldn't process your payment. Please try again.","No pudimos procesar tu pago. Vuelve a intentarlo."],
+"Tentar Novamente":["Try again","Volver a intentar"],
 };
 export function translateCopy(text:string,locale:'pt-BR'|'en'|'es-419'){
  return locale==='pt-BR'?text:(words[text]?.[locale==='en'?0:1]||text);
