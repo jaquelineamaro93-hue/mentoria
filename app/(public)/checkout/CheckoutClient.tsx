@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 import PurchaseContractConsent from '@/components/PurchaseContractConsent';
 import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
 
@@ -105,18 +106,16 @@ export default function CheckoutClient({
       <div className="max-w-5xl mx-auto">
         <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6">
           <ArrowLeft size={20} />
-          <span>Voltar</span>
+          <span><LocalizedText text={"Voltar"} /></span>
         </Link>
 
         <div className="text-center mb-8 sm:mb-12">
-          <h1 className="font-display text-3xl sm:text-4xl text-black mb-2">Soma — Mentoria de Carreira</h1>
-          <p className="text-base sm:text-lg text-gray-text">Escolha seu plano e comece sua jornada de transformação profissional.</p>
+          <h1 className="font-display text-3xl sm:text-4xl text-black mb-2"><LocalizedText text={"Soma — Mentoria de Carreira"} /></h1>
+          <p className="text-base sm:text-lg text-gray-text"><LocalizedText text={"Escolha seu plano e comece sua jornada de transformação profissional."} /></p>
         </div>
 
         {planoAtualCodigo && (
-          <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black">
-            Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
-          </div>
+          <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black"><LocalizedText text={"Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado."} /></div>
         )}
 
         <div className="grid md:grid-cols-2 gap-5 sm:gap-8 mb-8 sm:mb-12">
@@ -135,7 +134,7 @@ export default function CheckoutClient({
                     <h2 className="font-display text-2xl text-black">{p.nome}</h2>
                     <p className="text-sm">
                       {p.codigo.includes('online') ? (
-                        <span className="text-blue-600 font-medium">100% Online</span>
+                        <span className="text-blue-600 font-medium"><LocalizedText text={"100% Online"} /></span>
                       ) : (
                         <span className="text-gray-text">{p.foco}</span>
                       )}
@@ -145,7 +144,7 @@ export default function CheckoutClient({
                 </div>
                 <p className="text-sm text-gray-text mb-6 leading-relaxed">{p.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
                 <div className="space-y-2 text-sm mb-6">
-                  <p className="text-black font-medium">Opções de pagamento:</p>
+                  <p className="text-black font-medium"><LocalizedText text={"Opções de pagamento:"} /></p>
                   <p className="text-gray-text">
                     R$ {Number(p.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (PIX)
                   </p>
@@ -168,16 +167,11 @@ export default function CheckoutClient({
           <div className="bg-white border-2 border-brown-deep rounded-2xl p-5 sm:p-8">
             {plano.trial_enabled && trialEligible && (
               <div className="mb-6 rounded-xl border border-mint bg-mint-light/45 p-4">
-                <p className="text-xs uppercase tracking-[0.12em] text-mint-deep">
-                  Experimente antes de decidir
-                </p>
+                <p className="text-xs uppercase tracking-[0.12em] text-mint-deep"><LocalizedText text={"Experimente antes de decidir"} /></p>
                 <p className="mt-1 text-sm font-medium text-black">
                   {plano.trial_label || 'Teste grátis'} por até {plano.trial_days} dias
                 </p>
-                <p className="mt-1 text-xs leading-5 text-gray-text">
-                  Explore o portal durante todo o período. A SOMA pode mostrar a opção de continuar
-                  antes do último dia, mas seu acesso não é encurtado.
-                </p>
+                <p className="mt-1 text-xs leading-5 text-gray-text"><LocalizedText text={"Explore o portal durante todo o período. A SOMA pode mostrar a opção de continuar antes do último dia, mas seu acesso não é encurtado."} /></p>
                 {erroTrial && <p className="mt-2 text-xs text-red-700">{erroTrial}</p>}
                 <button
                   type="button"
@@ -194,7 +188,7 @@ export default function CheckoutClient({
               </div>
             )}
 
-            <h3 className="font-display text-xl text-black mb-6">Como você prefere pagar?</h3>
+            <h3 className="font-display text-xl text-black mb-6"><LocalizedText text={"Como você prefere pagar?"} /></h3>
             <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
               <button
                 onClick={() => setFormaEscolhida('avista')}
@@ -230,7 +224,7 @@ export default function CheckoutClient({
                     : 'border-gray-faint hover:border-brown-deep'
                 }`}
               >
-                <p className="font-medium text-black mb-2">Parcelado</p>
+                <p className="font-medium text-black mb-2"><LocalizedText text={"Parcelado"} /></p>
                 <p className="text-sm text-gray-text mb-1">{planoSafe.parcelas_recorrente}x de</p>
                 <p className="text-lg font-display text-black">
                   R${' '}
