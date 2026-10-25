@@ -470,6 +470,19 @@ const words:Record<string,[string,string]>={
 "Revise e confirme a resposta acima ou escolha Editar resposta":["Review and confirm the answer above, or select Edit answer","Revisa y confirma la respuesta anterior o selecciona Editar respuesta"],
 "Seu perfil não é enviado à IA.":["Your profile is not sent to AI.","Tu perfil no se envía a la IA."],
 "Ver detalhes":["View details","Ver detalles"],
+"Erro ao enviar":["Unable to send email","No se pudo enviar el correo"],
+"Erro ao processar":["Unable to process request","No se pudo procesar la solicitud"],
+"Esqueci minha senha":["Forgot my password","Olvidé mi contraseña"],
+"Email enviado!":["Email sent!","¡Correo enviado!"],
+"Verifica sua caixa de entrada":["Check your inbox","Revisa tu bandeja de entrada"],
+"Enviando...":["Sending...","Enviando..."],
+"Enviar link de reset":["Send reset link","Enviar enlace de recuperación"],
+"Senha redefinida!":["Password updated!","¡Contraseña actualizada!"],
+"Redirecionando...":["Redirecting...","Redirigiendo..."],
+"Redefinir senha":["Reset password","Restablecer contraseña"],
+"Nova senha":["New password","Nueva contraseña"],
+"Confirmar senha":["Confirm password","Confirmar contraseña"],
+"Processando...":["Processing...","Procesando..."],
 };
 export function translateCopy(text:string,locale:'pt-BR'|'en'|'es-419'){
  return locale==='pt-BR'?text:(words[text]?.[locale==='en'?0:1]||text);
