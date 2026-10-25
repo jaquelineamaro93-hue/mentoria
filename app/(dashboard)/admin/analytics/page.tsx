@@ -337,7 +337,7 @@ export default async function AdminAnalyticsPage({
 
   const trialsStarted = profiles.filter((profile) => Boolean(profile.trial_started_at));
   const trialsConverted = profiles.filter((profile) => profile.trial_status === 'converted');
-  const now = Date.now();
+  const now = new Date().getTime();
   const trialsActive = profiles.filter((profile) => profile.trial_status === 'active' && Boolean(profile.trial_ends_at) && new Date(profile.trial_ends_at!).getTime() > now);
   const trialsExpired = profiles.filter((profile) => profile.trial_status === 'expired' || (profile.trial_status === 'active' && Boolean(profile.trial_ends_at) && new Date(profile.trial_ends_at!).getTime() <= now));
   const trialsWithoutEnd = profiles.filter((profile) => profile.trial_status === 'active' && !profile.trial_ends_at);
