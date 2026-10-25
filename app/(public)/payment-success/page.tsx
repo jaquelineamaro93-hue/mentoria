@@ -10,10 +10,10 @@ export default function PaymentSuccessPage() {
         <div className="text-5xl mb-4">✅</div>
         <h1 className="font-display text-2xl text-black mb-2"><LocalizedText text={"Pagamento Aprovado!"} /></h1>
         <p className="text-sm text-gray-text mb-6">
-          Sua conta foi criada e você já pode acessar a mentoria.
+          <LocalizedText text={"Sua conta foi criada e você já pode acessar a mentoria."} />
         </p>
         <Link href="/dashboard" className="inline-block bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown">
-          Ir para Dashboard
+          <LocalizedText text={"Ir para Dashboard"} />
         </Link>
       </div>
     </div>
