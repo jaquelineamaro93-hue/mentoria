@@ -124,11 +124,7 @@ export default async function HomePage() {
           <h2 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[1.04] mb-5 sm:mb-6">
             <LocalizedText text={"Entenda seu momento. Escolha uma direção. Transforme clareza em movimento."} />
           </h2>
-          <p className="text-base sm:text-lg md:text-xl mb-7 sm:mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed">
-            A SOMA une autoconhecimento, estratégia e execução para quem quer crescer na empresa,
-            buscar uma nova oportunidade ou simplesmente parar de tomar decisões de carreira no escuro.
-            E o portal mantém sua jornada organizada entre um encontro e outro.
-          </p>
+          <p className="text-base sm:text-lg md:text-xl mb-7 sm:mb-8 max-w-3xl mx-auto text-white/80 leading-relaxed"><LocalizedText text={"A SOMA une autoconhecimento, estratégia e execução para quem quer crescer na empresa, buscar uma nova oportunidade ou simplesmente parar de tomar decisões de carreira no escuro. E o portal mantém sua jornada organizada entre um encontro e outro."} /></p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
@@ -169,10 +165,7 @@ export default async function HomePage() {
             <h3 className="font-display text-3xl md:text-4xl text-black">
               <LocalizedText text={"A mesma carreira pode pedir estratégias completamente diferentes."} />
             </h3>
-            <p className="mt-4 text-gray-text leading-relaxed">
-              Por isso a SOMA não coloca todo mundo no mesmo caminho. Primeiro entendemos o contexto,
-              depois organizamos a estratégia e as ferramentas certas para ele.
-            </p>
+            <p className="mt-4 text-gray-text leading-relaxed"><LocalizedText text={"Por isso a SOMA não coloca todo mundo no mesmo caminho. Primeiro entendemos o contexto, depois organizamos a estratégia e as ferramentas certas para ele."} /></p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
@@ -216,7 +209,7 @@ export default async function HomePage() {
               <h3 className="font-display text-3xl mb-4" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
               <div className="leading-relaxed space-y-3 max-w-3xl" style={{ color: '#808080' }}>
                 <p>Administradora e Head de CRM, com trajetória na intersecção entre dados, tecnologia e negócios e passagens por empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
-                <p>Na SOMA, transforma essa vivência em orientação prática para quem precisa ganhar clareza, se posicionar melhor e transformar estratégia em movimento de carreira.</p>
+                <p><LocalizedText text={"Na SOMA, transforma essa vivência em orientação prática para quem precisa ganhar clareza, se posicionar melhor e transformar estratégia em movimento de carreira."} /></p>
               </div>
             </div>
             <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-6">
@@ -243,9 +236,7 @@ export default async function HomePage() {
           <div className="max-w-3xl mb-8">
             <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}><LocalizedText text={"A metodologia"} /></p>
             <h3 className="font-display text-3xl mb-3" style={{ color: '#1A1A1A' }}>SOMA: sua totalidade</h3>
-            <p className="text-sm leading-relaxed" style={{ color: '#808080' }}>
-              Quatro pilares para integrar autoconhecimento, direção, execução e resultado sem fragmentar sua trajetória.
-            </p>
+            <p className="text-sm leading-relaxed" style={{ color: '#808080' }}><LocalizedText text={"Quatro pilares para integrar autoconhecimento, direção, execução e resultado sem fragmentar sua trajetória."} /></p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -256,8 +247,8 @@ export default async function HomePage() {
                   <div className="w-9 h-9 rounded-full text-white flex items-center justify-center font-display text-base mb-3" style={{ backgroundColor: cores[pilar.letra] }}>
                     {pilar.letra}
                   </div>
-                  <h4 className="font-display text-base mb-2" style={{ color: '#1A1A1A' }}>{pilar.titulo}</h4>
-                  <p className="text-xs leading-relaxed" style={{ color: '#808080' }}>{pilar.texto}</p>
+                  <h4 className="font-display text-base mb-2" style={{ color: '#1A1A1A' }}><LocalizedText text={pilar.titulo} /></h4>
+                  <p className="text-xs leading-relaxed" style={{ color: '#808080' }}><LocalizedText text={pilar.texto} /></p>
                 </div>
               );
             })}
@@ -355,7 +346,7 @@ export default async function HomePage() {
                 <span><LocalizedText text={"Como a mentoria SOMA funciona?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você.</p>
+              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você."} /></p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
@@ -363,9 +354,7 @@ export default async function HomePage() {
                 <span><LocalizedText text={"O que eu encontro dentro do portal?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">
-                O portal organiza sua jornada em três frentes: autoconhecimento, crescimento na empresa e mercado de trabalho. Você encontra diagnóstico, Mapa Quem Sou Eu, diário, PDI, primeiros 90 dias, leitura de cenário, currículo, Gupy & ATS, LinkedIn, acompanhamento de vagas e preparação para entrevistas. As ferramentas são apoio para a mentoria — não substituem o contexto humano dos encontros.
-              </p>
+              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"O portal organiza sua jornada em três frentes: autoconhecimento, crescimento na empresa e mercado de trabalho. Você encontra diagnóstico, Mapa Quem Sou Eu, diário, PDI, primeiros 90 dias, leitura de cenário, currículo, Gupy & ATS, LinkedIn, acompanhamento de vagas e preparação para entrevistas. As ferramentas são apoio para a mentoria — não substituem o contexto humano dos encontros."} /></p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
@@ -373,7 +362,7 @@ export default async function HomePage() {
                 <span><LocalizedText text={"Quanto tempo preciso dedicar à mentoria?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Oferecemos planos de 6 meses ou 12 meses conforme sua necessidade. A mentoria se adapta ao seu contexto, seja você começando algo novo, enfrentando uma crise ou buscando fazer as coisas com mais excelência. O tempo depende do quanto você quer evoluir e do quanto está disposto a se dedicar.</p>
+              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"Oferecemos planos de 6 meses ou 12 meses conforme sua necessidade. A mentoria se adapta ao seu contexto, seja você começando algo novo, enfrentando uma crise ou buscando fazer as coisas com mais excelência. O tempo depende do quanto você quer evoluir e do quanto está disposto a se dedicar."} /></p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
@@ -381,7 +370,7 @@ export default async function HomePage() {
                 <span><LocalizedText text={"Qual é o investimento?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">A gente oferece flexibilidade total. Você pode pagar à vista com PIX, em uma parcela no cartão ou parcelar ao longo dos meses. Depois que você confirma o pagamento, já ganha acesso ao portal com todos os materiais, agendamento dos encontros e começa a jornada. Tudo fica guardado lá pra você acompanhar seu progresso.</p>
+              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"A gente oferece flexibilidade total. Você pode pagar à vista com PIX, em uma parcela no cartão ou parcelar ao longo dos meses. Depois que você confirma o pagamento, já ganha acesso ao portal com todos os materiais, agendamento dos encontros e começa a jornada. Tudo fica guardado lá pra você acompanhar seu progresso."} /></p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
@@ -389,7 +378,7 @@ export default async function HomePage() {
                 <span><LocalizedText text={"Preciso vir presencialmente?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Temos planos 100% online e planos presenciais. Se você não consegue vir pessoalmente, sem problema. Os encontros em grupo podem ser virtuais. O importante é que você realmente quer mudar de patamar na carreira e está aberto pra aprender com quem já passou pelo mesmo que você.</p>
+              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"Temos planos 100% online e planos presenciais. Se você não consegue vir pessoalmente, sem problema. Os encontros em grupo podem ser virtuais. O importante é que você realmente quer mudar de patamar na carreira e está aberto pra aprender com quem já passou pelo mesmo que você."} /></p>
             </details>
 
             <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
@@ -397,7 +386,7 @@ export default async function HomePage() {
                 <span><LocalizedText text={"Posso ver quem já fez a mentoria?"} /></span>
                 <span className="text-gray-text">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed">Com certeza. A página de Depoimentos reúne histórias reais de quem já passou pela SOMA, com links para os relatos completos no LinkedIn. Você acessa essa página pelo menu no topo do site.</p>
+              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"Com certeza. A página de Depoimentos reúne histórias reais de quem já passou pela SOMA, com links para os relatos completos no LinkedIn. Você acessa essa página pelo menu no topo do site."} /></p>
             </details>
           </div>
         </div>
