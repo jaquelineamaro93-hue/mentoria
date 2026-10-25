@@ -1,0 +1,25 @@
+name: SOMA cases and languages regression
+on:
+  pull_request:
+    paths:
+      - 'components/LocaleProvider.tsx'
+      - 'components/LocalizedText.tsx'
+      - 'components/AppShell.tsx'
+      - 'components/CollapsibleSidebar.tsx'
+      - 'components/IrisCopiloto.tsx'
+      - 'app/(public)/cases/**'
+      - 'app/(public)/page.tsx'
+      - 'tests/i18n-cases.test.mjs'
+      - '.github/workflows/cases-i18n.yml'
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - run: node tests/i18n-cases.test.mjs
