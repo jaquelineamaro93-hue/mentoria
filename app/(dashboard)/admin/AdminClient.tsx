@@ -248,6 +248,9 @@ export default function AdminClient({
       <div><h1 className="text-2xl font-semibold">Acompanhamento dos mentorados</h1><p className="mt-2 text-sm text-[#53685e]">Localize uma pessoa, confira sua atividade e abra os detalhes para acompanhar.</p></div>
       <Link href="/admin/usuarios" className={acaoClass}>Pessoas e acessos</Link>
     </header>
+    <section aria-label="Lembretes da operação" className="mb-6 rounded-xl border border-[#d7e3dc] bg-white p-4">
+      <h2 className="mb-2 text-base font-semibold">Lembretes da operação</h2><p className="mb-3 text-sm text-[#53685e]">Executa as regras de lembretes existentes para a base elegível. Os filtros de acompanhamento não definem os destinatários.</p><button type="button" onClick={enviarLembretesAgora} disabled={enviandoLembretes} className={acaoClass}>{enviandoLembretes ? <Loader2 size={15} aria-hidden="true" className="mr-2 animate-spin" /> : <Send size={15} aria-hidden="true" className="mr-2" />}Enviar lembretes agora</button>{resultadoLembretes && <p role="status" className="mt-3 whitespace-pre-wrap text-sm leading-6">{resultadoLembretes}</p>}
+    </section>
     <section aria-label="Sinais para acompanhamento" className="mb-6">
       <h2 className="mb-3 text-base font-semibold">Onde olhar agora</h2>
       <div className="flex flex-wrap gap-2">{filtros.map(item => <button key={item.value} type="button" aria-pressed={filtroAtividade === item.value} onClick={() => { setFiltroAtividade(item.value); setBuscaMentorado(''); }} className={'min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 ' + (filtroAtividade === item.value ? 'border-[#24594b] bg-[#edf5f0] font-semibold' : 'border-[#d7e3dc] bg-white hover:bg-[#f5f8f6]')}><span className="mr-2 font-semibold">{item.count}</span>{item.title}</button>)}</div>
@@ -289,8 +292,6 @@ export default function AdminClient({
       </details>)}</div>
       {!linhasFiltradas.length && <p className="rounded-xl border border-[#d7e3dc] bg-white p-6 text-sm text-[#53685e]">Nenhuma pessoa corresponde a esta busca e filtro. <button type="button" onClick={() => { setFiltroAtividade('todos'); setBuscaMentorado(''); }} className="min-h-11 underline">Limpar filtros</button></p>}
     </section>
-    <footer className="mt-6 border-t border-[#d7e3dc] pt-4">
-      <details><summary className="cursor-pointer py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">Lembretes da operação</summary><p className="mb-3 text-sm text-[#53685e]">Executa as regras de lembretes existentes para a base elegível. Os filtros acima não definem os destinatários.</p><button type="button" onClick={enviarLembretesAgora} disabled={enviandoLembretes} className={acaoClass}>{enviandoLembretes ? <Loader2 size={15} aria-hidden="true" className="mr-2 animate-spin" /> : <Send size={15} aria-hidden="true" className="mr-2" />}Enviar lembretes agora</button>{resultadoLembretes && <p role="status" className="mt-3 whitespace-pre-wrap text-sm leading-6">{resultadoLembretes}</p>}</details>
-    </footer>
+
   </div>;
 }
