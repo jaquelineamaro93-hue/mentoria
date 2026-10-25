@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { calcularAdicionalCarreira } from '@/lib/soma-carreira-pricing';
@@ -27,20 +28,18 @@ export default function SomaCarreiraOptions() {
   return (
     <section id="soma-carreira-extras" aria-label="Adicionais da SOMA Carreira"
       className="rounded-2xl border border-[#C8DED4] bg-[#F4FAF7] p-5 sm:p-6">
-      <h3 className="text-lg font-semibold text-[#000000]">Sua SOMA Carreira já é completa</h3>
-      <p className="mt-2 text-sm leading-6 text-[#000000]">Portal, ferramentas, encontros coletivos, Íris Copiloto e acompanhamento no WhatsApp já fazem parte do plano.</p>
-      <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-[#000000]"><CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden="true" />1 encontro individual 1:1 por mês incluído.</p>
+      <h3 className="text-lg font-semibold text-[#000000]"><LocalizedText text={"Sua SOMA Carreira já é completa"} /></h3>
+      <p className="mt-2 text-sm leading-6 text-[#000000]"><LocalizedText text={"Portal, ferramentas, encontros coletivos, Íris Copiloto e acompanhamento no WhatsApp já fazem parte do plano."} /></p>
+      <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-[#000000]"><CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden="true" /><LocalizedText text={"1 encontro individual 1:1 por mês incluído."} /></p>
 
       <fieldset className="mt-6 space-y-4 border-t border-[#C8DED4] pt-5">
-        <legend className="text-base font-semibold text-[#000000]">Quer mais encontros individuais?</legend>
-        <p className="text-sm leading-6 text-[#000000]">Escolha o total de encontros por mês. O adicional varia conforme a quantidade e a duração do plano.</p>
-        <label className="block text-sm font-medium text-[#000000]">Duração do plano
-          <select value={duracao} onChange={e => setDuracao(Number(e.target.value) as 6 | 12)} className="mt-2 min-h-11 w-full rounded-xl border border-[#C8DED4] bg-white px-3 py-2">
-            <option value={6}>6 meses</option><option value={12}>12 meses</option>
+        <legend className="text-base font-semibold text-[#000000]"><LocalizedText text={"Quer mais encontros individuais?"} /></legend>
+        <p className="text-sm leading-6 text-[#000000]"><LocalizedText text={"Escolha o total de encontros por mês. O adicional varia conforme a quantidade e a duração do plano."} /></p>
+        <label className="block text-sm font-medium text-[#000000]"><LocalizedText text={"Duração do plano"} /><select value={duracao} onChange={e => setDuracao(Number(e.target.value) as 6 | 12)} className="mt-2 min-h-11 w-full rounded-xl border border-[#C8DED4] bg-white px-3 py-2">
+            <option value={6}>6 meses</option><option value={12}><LocalizedText text={"12 meses"} /></option>
           </select>
         </label>
-        <label className="block text-sm font-medium text-[#000000]">Total de encontros 1:1 por mês
-          <input type="number" min={1} step={1} value={encontrosInput} inputMode="numeric" onChange={e => setEncontros(e.target.value)} onBlur={() => {
+        <label className="block text-sm font-medium text-[#000000]"><LocalizedText text={"Total de encontros 1:1 por mês"} /><input type="number" min={1} step={1} value={encontrosInput} inputMode="numeric" onChange={e => setEncontros(e.target.value)} onBlur={() => {
             if (!encontrosValidos) setEncontros('1');
           }} className="mt-2 min-h-11 w-full rounded-xl border border-[#C8DED4] bg-white px-3 py-2" />
         </label>
@@ -51,21 +50,18 @@ export default function SomaCarreiraOptions() {
       </fieldset>
 
       <fieldset className="mt-6 border-t border-[#C8DED4] pt-5">
-        <legend className="text-sm font-semibold text-[#000000]">Kit Onboarding opcional</legend>
+        <legend className="text-sm font-semibold text-[#000000]"><LocalizedText text={"Kit Onboarding opcional"} /></legend>
         <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-[#C8DED4] bg-white p-4">
           <input type="checkbox" checked={kitOnboarding} onChange={e => setKitOnboarding(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#0D8071]" />
           <span className="flex-1 text-sm leading-6 text-[#000000]">
-            <strong className="flex items-center gap-2 text-[#000000]"><PackageCheck size={18} aria-hidden="true" />Kit Onboarding</strong>
-            Kit de boas-vindas da sua mentoria SOMA Carreira.
-            <span className="mt-1 block font-semibold text-[#000000]">+ {formatarReais(KIT_ONBOARDING_CENTAVOS)}, pagamento único</span>
-            <span className="mt-1 block text-xs text-[#000000]">Se seu plano já inclui o kit, você não precisa adicioná-lo.</span>
+            <strong className="flex items-center gap-2 text-[#000000]"><PackageCheck size={18} aria-hidden="true" /><LocalizedText text={"Kit Onboarding"} /></strong><LocalizedText text={"Kit de boas-vindas da sua mentoria SOMA Carreira."} /><span className="mt-1 block font-semibold text-[#000000]">+ {formatarReais(KIT_ONBOARDING_CENTAVOS)}, pagamento único</span>
+            <span className="mt-1 block text-xs text-[#000000]"><LocalizedText text={"Se seu plano já inclui o kit, você não precisa adicioná-lo."} /></span>
           </span>
         </label>
       </fieldset>
-      {encontrosValidos && (extras > 0 || kitOnboarding) && totalAdicionais !== null && <div className="mt-5 rounded-xl border border-[#C8DED4] bg-white p-4" aria-live="polite"><p className="text-sm text-[#000000]">Total dos adicionais</p><p className="mt-1 text-2xl font-semibold text-[#000000]">{formatarReais(totalAdicionais)}</p><p className="mt-1 text-xs leading-5 text-[#000000]">Adicional ao preço da mentoria. O pacote de encontros cobre {duracao} meses. O kit, se selecionado, é cobrado uma única vez.</p></div>}
+      {encontrosValidos && (extras > 0 || kitOnboarding) && totalAdicionais !== null && <div className="mt-5 rounded-xl border border-[#C8DED4] bg-white p-4" aria-live="polite"><p className="text-sm text-[#000000]"><LocalizedText text={"Total dos adicionais"} /></p><p className="mt-1 text-2xl font-semibold text-[#000000]">{formatarReais(totalAdicionais)}</p><p className="mt-1 text-xs leading-5 text-[#000000]">Adicional ao preço da mentoria. O pacote de encontros cobre {duracao} meses. O kit, se selecionado, é cobrado uma única vez.</p></div>}
       {encontrosValidos && (extras > 0 || kitOnboarding) && <a href={linkContato} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#B8E2CE] px-4 py-3 text-sm font-semibold text-[#000000] hover:bg-[#9AD2B8]">
-        <MessageCircle size={16} aria-hidden="true" />Consultar meus adicionais
-      </a>}
+        <MessageCircle size={16} aria-hidden="true" /><LocalizedText text={"Consultar meus adicionais"} /></a>}
     </section>
   );
 }
