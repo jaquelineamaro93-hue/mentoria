@@ -1,5 +1,6 @@
 'use client';
 import { useLocale } from '@/components/LocaleProvider';
+import { translateCopy } from '@/components/LocalizedText';
 
 import { useEffect, useRef, useState } from 'react';
 import { BookOpen, MessageCircle, ArrowUpRight, ClipboardList, ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react';
@@ -505,13 +506,13 @@ export default function IrisCopiloto() {
       style={aberto && mobile && visualHeight
         ? { height: visualHeight + 'px', top: visualTop + 'px' }
         : undefined}
-      aria-label="Íris Copiloto de Carreira"
+      aria-label={translateCopy('Íris Copiloto de Carreira',locale)}
     >
       {!aberto ? (
         <button
           ref={acionador}
           type="button"
-          aria-label="Abrir Íris Copiloto"
+          aria-label={translateCopy('Abrir Íris Copiloto',locale)}
           aria-expanded={false}
           onClick={() => setAberto(true)}
           className="flex min-h-12 items-center gap-2 rounded-full border border-[#24594b] bg-[#183f37] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-[#24594b]"
@@ -547,7 +548,7 @@ export default function IrisCopiloto() {
             </div>
             <div className="flex items-center gap-1">
               <button type="button" onClick={novaConversa}
-                disabled={historicoCarregando || ocupada} aria-label="Nova conversa com a Íris"
+                disabled={historicoCarregando || ocupada} aria-label={translateCopy('Nova conversa com a Íris',locale)}
                 className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/15 disabled:opacity-50">
                 <Plus size={20} aria-hidden="true" />
               </button>
@@ -605,9 +606,9 @@ export default function IrisCopiloto() {
           {aba === 'ajuda' && <HelpWidget onNavigate={fecharConversa} />}
           <div hidden={aba !== 'conversa'} className={aba === 'conversa' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-[#dce6dd] bg-[#f6faf7] px-3 py-2 text-xs">
-            <span className="text-[#5c7467]">Uma conversa de cada vez, com direção</span>
+            <span className="text-[#5c7467]">{translateCopy('Uma conversa de cada vez, com direção',locale)}</span>
             <Link href="/plano-acoes-iris" className="inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#0D8071] underline-offset-2 hover:underline">
-              <ClipboardList size={15} aria-hidden="true" /> Plano de Ações da Íris <ArrowUpRight size={13} aria-hidden="true" />
+              <ClipboardList size={15} aria-hidden="true" /> {translateCopy('Plano de Ações da Íris',locale)} <ArrowUpRight size={13} aria-hidden="true" />
             </Link>
           </div>
           {!historicoAceito && !historicoCarregando && (
@@ -818,7 +819,7 @@ export default function IrisCopiloto() {
                               </label>
                               <textarea id={`iris-feedback-${indice}`} rows={2} maxLength={300}
                                 value={feedbackTexto} onChange={event => setFeedbackTexto(event.target.value)}
-                                placeholder="O que a Íris pode melhorar?"
+                                placeholder={translateCopy('O que a Íris pode melhorar?',locale)}
                                 className="w-full resize-y rounded-lg border border-[#d8d0cb] bg-white p-2 text-sm text-[#312b27] outline-none focus:border-[#0D8071]" />
                               {feedbackErro && <p role="alert" className="text-xs text-red-700">{feedbackErro}</p>}
                               <div className="flex flex-wrap gap-2">
@@ -882,7 +883,7 @@ export default function IrisCopiloto() {
                 }
               }}
               disabled={rascunhoPendente || (!!conversationId && !permitirHistorico)}
-              placeholder={rascunhoPendente ? 'Revise e confirme a resposta acima ou escolha Editar resposta'
+              placeholder={rascunhoPendente ? translateCopy('Revise e confirme a resposta acima ou escolha Editar resposta',locale)
                 : perguntaAtiva ? 'Escreva sua resposta para ' + perguntaAtiva.titulo
                 : conversationId && !permitirHistorico
                 ? 'Reative o histórico ou comece uma nova conversa'
@@ -894,7 +895,7 @@ export default function IrisCopiloto() {
               type="submit"
               disabled={ocupada || historicoCarregando || preferenciaCarregando ||
                 (!!conversationId && !permitirHistorico) || rascunhoPendente || !texto.trim()}
-              aria-label="Enviar mensagem"
+              aria-label={translateCopy('Enviar mensagem',locale)}
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#183f37] text-white disabled:opacity-40"
             >
               {ocupada ? <ChevronDown size={19} /> : <Send size={19} />}
