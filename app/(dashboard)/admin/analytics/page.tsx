@@ -135,10 +135,12 @@ export default async function AdminAnalyticsPage({
 
   const params = await searchParams;
   const requestedDays = Number(params.period ?? 30);
-  const periodDays = [7, 14, 30, 90].includes(requestedDays) ? requestedDays : 30;
+  const selectedDays = [7, 14, 30, 90].includes(requestedDays) ? requestedDays : 30;
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
   const todayStart = new Date(`${today}T00:00:00-03:00`).getTime();
-  const cutoff = todayStart - (periodDays - 1) * 86400000;
+  const trackingStart = new Date('2026-10-06T00:00:00-03:00').getTime();
+  const cutoff = Math.max(trackingStart, todayStart - (selectedDays - 1) * 86400000);
+  const periodDays = Math.floor((todayStart - cutoff) / 86400000) + 1;
   const periodLabel = `${new Date(cutoff).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })} a ${new Date(todayStart).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`;
   const cutoffIso = new Date(cutoff).toISOString();
   const admin = createAdminClient();
@@ -447,10 +449,10 @@ export default async function AdminAnalyticsPage({
             <Link
               key={days}
               href={`/admin/analytics?period=${days}`}
-              aria-current={periodDays === days ? 'page' : undefined}
+              aria-current={selectedDays === days ? 'page' : undefined}
               className={[
                 'rounded-lg px-4 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep',
-                periodDays === days ? 'bg-mint-deep text-white' : 'text-gray-text hover:text-black',
+                selectedDays === days ? 'bg-mint-deep text-white' : 'text-gray-text hover:text-black',
               ].join(' ')}
             >
               {days} dias
