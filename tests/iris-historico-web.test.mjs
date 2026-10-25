@@ -10,7 +10,7 @@ test('Íris inicia novo chat e permite recuperar e excluir conversas antigas pel
   assert.match(ui, /conversation_id: conversationId/);
   assert.match(ui, /setMensagens\(converterMensagens\(d\.mensagens/);
   assert.match(ui, /label: 'Histórico', Icon: History/);
-  assert.match(ui, /aria-label="Nova conversa com a Íris"/);
+  assert.match(ui, /aria-label=\{translateCopy\(\x27Nova conversa com a Íris\x27,locale\)\}/);
   assert.match(ui, /method: 'DELETE'/);
   assert.match(ui, /aria-label=\{'Excluir conversa '/);
   assert.match(ui, /feedback_rating/);
