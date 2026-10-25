@@ -39,7 +39,7 @@ for(const file of translatedModules)assert.match(read(file),/LocalizedText|trans
 const videos=JSON.parse(read('public/cases/video-manifest.json'));
 assert.deepEqual(videos.videos,[],'Never publish videos without separate verified authorization');
 assert.match(read('components/public/CaseVideoShowcase.tsx'),/authorized===true/);
-assert.match(read('components/public/CaseVideoShowcase.tsx'),/\/cases\\/videos/);
+assert.match(read('components/public/CaseVideoShowcase.tsx'),/allowedMedia\(video\.src,'video'\)/);
 assert.match(read('app/(public)/cases/page.tsx'),/CaseVideoShowcase/);
 assert.match(read('app/(dashboard)/plano-acoes-iris/PlanoAcoesIrisClient.tsx'),/objetivo:objetivo\.trim\(\),locale/);
 assert.match(read('components/LocalizedText.tsx'),/export function translateCopy/);
