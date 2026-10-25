@@ -2,6 +2,9 @@ name: Iris Copilot web validation
 on:
   pull_request:
     paths:
+      - 'app/(dashboard)/admin/AdminClient.tsx'
+      - 'app/(dashboard)/admin/usuarios/UsuariosClient.tsx'
+      - 'tests/admin-operacao.cjs'
       - 'components/IrisCopiloto.tsx'
       - 'app/api/copiloto/**'
       - 'lib/iris-web-history.ts'
@@ -62,6 +65,8 @@ jobs:
         run: npm ci
       - name: Verify widget state and administrative destinations
         run: node tests/iris-widget-navigation.cjs
+      - name: Verify administrative filters and role updates
+        run: node tests/admin-operacao.cjs
       - name: Build
         run: npm run build
         env:

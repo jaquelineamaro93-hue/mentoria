@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
 import AdminAreaDirectory from '@/components/AdminAreaDirectory';
-import { Users, Activity, Clock, Loader2, Check, LogIn, Key, Trash2, Send, MailWarning, Shield, Lock, MoreVertical, Search, BarChart3 } from 'lucide-react';
-import { Panel, Eyebrow } from '@/components/Panel';
+import { Loader2, Send, Search } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { posthog, limparIdentidade } from '@/lib/posthog';
+import { posthog } from '@/lib/posthog';
 import type { Profile } from '@/lib/types';
 import type { LinhaMentorado } from './page';
 
@@ -20,68 +18,21 @@ interface Props {
 
 
 export default function AdminClient({
-  profile,
   linhas: linhasIniciais,
   totalBlocosQuemSouEu,
   totalSecoesPdi,
 }: Props) {
-  const router = useRouter();
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
   const [buscaMentorado, setBuscaMentorado] = useState('');
-  const [filtroAtividade, setFiltroAtividade] = useState<'todos' | 'ativos7' | 'inativos7' | 'nunca'>('todos');
+  const [filtroAtividade, setFiltroAtividade] = useState<'todos' | 'ativos7' | 'inativos7' | 'nunca' | 'email' | 'onboarding'>('todos');
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [enviandoLembretes, setEnviandoLembretes] = useState(false);
   const [resultadoLembretes, setResultadoLembretes] = useState<string | null>(null);
-  const [usuarios, setUsuarios] = useState<any[]>([]);
-  const [buscaUsuario, setBuscaUsuario] = useState('');
-  const [filtroUsuarios, setFiltroUsuarios] = useState<'todos' | 'admin' | 'geral'>('todos');
-  const [usuariosCarregando, setUsuariosCarregando] = useState(false);
-
-  async function carregarUsuarios() {
-    setUsuariosCarregando(true);
-    try {
-      const res = await fetch('/api/admin/listar-usuarios');
-      if (!res.ok) {
-        console.error('Erro ao carregar usuários:', res.status, res.statusText);
-        setUsuarios([]);
-        return;
-      }
-      const data = await res.json();
-      setUsuarios(Array.isArray(data?.profiles) ? data.profiles : []);
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
-      setUsuarios([]);
-    } finally {
-      setUsuariosCarregando(false);
-    }
-  }
-
-  useEffect(() => {
-    // Carrega a lista real de usuários ao abrir o backoffice, sem exigir
-    // um clique adicional em Recarregar para localizar contas de teste.
-    void carregarUsuarios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function toggleAdmin(userId: string, currentAdmin: boolean) {
-    try {
-      const res = await fetch('/api/admin/usuarios', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, is_admin: !currentAdmin }),
-      });
-      if (!res.ok) throw new Error('Erro ao atualizar');
-      carregarUsuarios();
-    } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao atualizar usuário');
-    }
-  }
-
+  const [agora] = useState(() => Date.now());
   async function confirmarEmailUsuario(userId: string, nome: string) {
     setConfirmandoId(userId);
     try {
@@ -238,17 +189,8 @@ export default function AdminClient({
     }
   }
 
-  async function handleSignOut() {
-    posthog.capture('logout_realizado');
-    await supabase.auth.signOut();
-    limparIdentidade();
-    router.push('/login');
-    router.refresh();
-  }
-
-  const linhasDeMentorados = linhas.filter((l) => !l.profile.is_admin);
+  const linhasDeMentorados = linhas;
   const total = linhasDeMentorados.length;
-  const agora = Date.now();
   const diasDesdeAtividade = (data: string | null | undefined) =>
     data ? Math.max(0, Math.floor((agora - new Date(data).getTime()) / 86400000)) : null;
 
@@ -287,462 +229,73 @@ export default function AdminClient({
     if (filtroAtividade === 'ativos7') return dias !== null && dias <= 7;
     if (filtroAtividade === 'inativos7') return dias !== null && dias > 7;
     if (filtroAtividade === 'nunca') return dias === null;
+    if (filtroAtividade === 'email') return !l.emailConfirmado;
+    if (filtroAtividade === 'onboarding') return !l.profile.onboarding_concluido;
 
     return true;
   });
-  const aguardandoLiberacao = linhasDeMentorados.filter(l => !l.profile.plano_id && l.profile.trial_status !== 'active' && l.profile.status_assinatura !== 'ativo');
-  const usuariosFiltrados = usuarios.filter((u) => {
-    if (filtroUsuarios === "admin" && !u.is_admin) return false;
-    if (filtroUsuarios === "geral" && u.is_admin) return false;
-    if (!combinaNomeOuEmail(u.nome, u.email, buscaUsuario)) return false;
-    return true;
-  });
+  const filtros = [
+    { value: 'todos', title: 'Todos', count: total },
+    { value: 'email', title: 'E-mail não confirmado', count: emailsNaoConfirmados.length },
+    { value: 'onboarding', title: 'Onboarding pendente', count: linhasDeMentorados.filter(l => !l.profile.onboarding_concluido).length },
+    { value: 'inativos7', title: 'Sem atividade há mais de 7 dias', count: inativos7dias },
+    { value: 'nunca', title: 'Sem acesso registrado', count: semAcessoNunca },
+    { value: 'ativos7', title: 'Ativos nos últimos 7 dias', count: ativos7dias },
+  ] as const;
+  const acaoClass = 'inline-flex min-h-11 items-center justify-center rounded-lg border border-[#bbcfc5] bg-white px-3 py-2 text-sm text-[#24594b] hover:bg-[#f5f8f6] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50';
 
-
-  return (
-    <>
-        {aguardandoLiberacao.length > 0 && (
-          <section className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="font-semibold text-amber-950">Cadastros aguardando liberação ({aguardandoLiberacao.length})</h2>
-                <p className="mt-1 text-sm text-amber-900">Contas criadas sem plano ou trial ativo. O cadastro não significa pagamento em atraso.</p>
-              </div>
-              <Link href="/admin/gerenciar-planos" className="rounded-lg bg-brown-deep px-4 py-2 text-sm font-medium text-white">Gerenciar acessos</Link>
+  return <div className="min-w-0 text-[#213d34]">
+    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div><h1 className="text-2xl font-semibold">Acompanhamento dos mentorados</h1><p className="mt-2 text-sm text-[#53685e]">Localize uma pessoa, confira sua atividade e abra os detalhes para acompanhar.</p></div>
+      <Link href="/admin/usuarios" className={acaoClass}>Pessoas e acessos</Link>
+    </header>
+    <details className="mb-6 rounded-xl border border-[#d7e3dc] bg-white">
+      <summary className="cursor-pointer px-4 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">Outras áreas da administração</summary>
+      <div className="space-y-4 border-t border-[#edf2ef] p-4"><AdminAreaDirectory /></div>
+    </details>
+    <section aria-label="Sinais para acompanhamento" className="mb-6">
+      <h2 className="mb-3 text-base font-semibold">Onde olhar agora</h2>
+      <div className="flex flex-wrap gap-2">{filtros.map(item => <button key={item.value} type="button" aria-pressed={filtroAtividade === item.value} onClick={() => { setFiltroAtividade(item.value); setBuscaMentorado(''); }} className={'min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 ' + (filtroAtividade === item.value ? 'border-[#24594b] bg-[#edf5f0] font-semibold' : 'border-[#d7e3dc] bg-white hover:bg-[#f5f8f6]')}><span className="mr-2 font-semibold">{item.count}</span>{item.title}</button>)}</div>
+      <p className="mt-3 text-xs leading-5 text-[#53685e]">Os sinais podem se sobrepor. Atividade e onboarding ajudam a orientar o acompanhamento; não indicam, sozinhos, pagamento pendente ou falta de evolução.</p>
+    </section>
+    <section aria-label="Lista de acompanhamento">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <label className="flex w-full max-w-xl items-center gap-2 rounded-lg border border-[#bbcfc5] bg-white px-3 py-3 focus-within:ring-2 focus-within:ring-[#24594b]"><Search size={17} aria-hidden="true" /><span className="sr-only">Buscar mentorado por nome ou e-mail</span><input type="search" value={buscaMentorado} onChange={event => setBuscaMentorado(event.target.value)} placeholder="Buscar pessoa por nome ou e-mail" className="w-full min-w-0 bg-transparent text-base outline-none" /></label>
+        <Link href="/admin/analytics" className="inline-flex min-h-11 items-center text-sm text-[#24594b] underline underline-offset-4">Ver indicadores de uso</Link>
+      </div>
+      <p role="status" className="mb-3 text-sm text-[#53685e]">{linhasFiltradas.length} {linhasFiltradas.length === 1 ? 'pessoa encontrada' : 'pessoas encontradas'} · {filtros.find(filtro => filtro.value === filtroAtividade)?.title}</p>
+      <div className="divide-y divide-[#d7e3dc] overflow-hidden rounded-xl border border-[#d7e3dc] bg-white">{linhasFiltradas.map(l => <details key={l.profile.id} className="group">
+        <summary className="cursor-pointer p-4 focus-visible:outline-2 focus-visible:-outline-offset-2">
+          <span className="inline-grid w-[calc(100%_-_1.5rem)] gap-3 align-top sm:grid-cols-[minmax(0,1fr)_12rem]">
+            <span className="min-w-0"><span className="block break-words font-semibold">{l.profile.nome || 'Sem nome'}{l.profile.is_admin && <span className="ml-2 text-xs font-normal text-[#53685e]">Conta de teste · admin</span>}</span><span className="mt-1 block break-all text-sm text-[#53685e]">{l.profile.email}</span>
+              <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#53685e]">{!l.emailConfirmado && <span className="text-amber-800">E-mail não confirmado</span>}{!l.profile.onboarding_concluido && <span>Onboarding pendente</span>}</span>
+            </span>
+            <span className="text-sm text-[#53685e]"><span className="block">{l.profile.last_activity_at ? 'Última atividade: ' + new Date(l.profile.last_activity_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'Sem acesso registrado'}</span><span className="mt-2 block font-medium text-[#24594b] group-open:hidden">Ver acompanhamento</span><span className="mt-2 hidden font-medium text-[#24594b] group-open:block">Recolher detalhes</span></span>
+          </span>
+        </summary>
+        <div className="border-t border-[#edf2ef] bg-[#fafcfb] p-4 sm:p-5">
+          <h3 className="mb-3 text-sm font-semibold">Registros na jornada</h3>
+          <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 lg:grid-cols-6">{[
+            ['Diagnósticos', l.diagnosticos], ['Diário de bordo', l.anotacoesDiario], ['Quem sou eu', `${l.blocosQuemSouEu}/${totalBlocosQuemSouEu}`], ['Respostas do PDI', `${l.secoesPdi}/${totalSecoesPdi || '-'}`], ['VIA', l.fezVia ? 'Registrado' : 'Sem registro'], ['Pontos', l.profile.pontos_total],
+          ].map(([label,value]) => <div key={label}><dt className="text-xs text-[#53685e]">{label}</dt><dd className="mt-1 font-semibold">{value}</dd></div>)}</dl>
+          <p className="mt-4 text-xs text-[#53685e]">Os números mostram registros disponíveis, não uma avaliação de desempenho.</p>
+          <div className="mt-5 flex flex-wrap gap-2"><button type="button" onClick={() => entrarComoUsuario(l.profile.id, l.profile.nome)} disabled={entrandoComoId === l.profile.id} className={acaoClass}>{entrandoComoId === l.profile.id ? 'Abrindo...' : 'Inspecionar jornada'}</button><Link href={'/admin/usuarios-permissoes/' + l.profile.id} className={acaoClass}>Permissões da pessoa</Link></div>
+          <details className="mt-5 border-t border-[#d7e3dc] pt-2">
+            <summary className="cursor-pointer py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">Ações de acesso da conta</summary>
+            <p className="mb-3 text-sm text-[#53685e]">E-mail {l.emailConfirmado ? 'confirmado' : 'não confirmado'}. Onboarding {l.profile.onboarding_concluido ? 'concluído' : 'pendente'}.{l.profile.tipo_pacote ? ' Pacote registrado: ' + l.profile.tipo_pacote + '.' : ''}</p>
+            <div className="flex flex-wrap gap-2">
+              {!l.emailConfirmado && <button type="button" onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)} disabled={confirmandoId === l.profile.id} className={acaoClass}>{confirmandoId === l.profile.id ? 'Confirmando...' : 'Confirmar e-mail'}</button>}
+              <button type="button" onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)} disabled={resetandoId === l.profile.id} className={acaoClass}>{resetandoId === l.profile.id ? 'Gerando...' : 'Gerar link de senha'}</button>
+              <button type="button" onClick={() => deletarUsuario(l.profile.id, l.profile.nome)} disabled={deletandoId === l.profile.id} className={acaoClass + ' border-red-200 text-red-800'}>{deletandoId === l.profile.id ? 'Excluindo...' : 'Excluir conta'}</button>
             </div>
-            <div className="mt-3 space-y-1 text-sm text-amber-950">
-              {aguardandoLiberacao.slice(0,12).map(l => <p key={l.profile.id}>{l.profile.nome || 'Sem nome'} · {l.profile.email}</p>)}
-              {aguardandoLiberacao.length > 12 && <p>Mais {aguardandoLiberacao.length - 12} cadastro(s) na lista de mentorados.</p>}
-            </div>
-          </section>
-        )}
-        <section aria-label="Áreas administrativas" className="mb-8 space-y-4">
-          <div><h1 className="text-2xl font-semibold text-black">Administração</h1><p className="mt-1 text-sm text-gray-600">Pessoas, produtos e resultados em um só lugar.</p></div>
-          <AdminAreaDirectory />
-          <div className="flex flex-wrap items-center gap-3">
-            <button onClick={enviarLembretesAgora} disabled={enviandoLembretes} className="inline-flex items-center gap-2 rounded-lg border bg-white px-4 py-2.5 text-sm text-black disabled:opacity-60">{enviandoLembretes?<Loader2 size={15} className="animate-spin"/>:<Send size={15}/>}Enviar lembretes agora</button>
-          </div>
-        </section>
-
-        {resultadoLembretes && (
-          <div className="mb-6 text-sm bg-mint-light border border-mint rounded-lg px-4 py-3 text-black whitespace-pre-wrap font-mono">
-            {resultadoLembretes}
-          </div>
-        )}
-
-        {emailsNaoConfirmados.length > 0 && (
-          <div className="mb-6 text-sm bg-red-50 border border-red-300 rounded-lg px-4 py-3 text-red-700">
-            <p className="flex items-center gap-1.5 font-medium mb-1">
-              <MailWarning size={14} />
-              {emailsNaoConfirmados.length} conta(s) sem confirmar o e-mail, ainda não conseguem
-              entrar:
-            </p>
-            <p>
-              {emailsNaoConfirmados.map((l) => l.profile.nome).join(', ')}. Confirma direto na
-              tabela &quot;Ações da conta&quot; mais abaixo.
-            </p>
-          </div>
-        )}
-
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
-          <Panel className="p-5">
-            <Users size={18} className="text-mint mb-2" />
-            <p className="font-display text-2xl text-black">{total}</p>
-            <p className="text-xs text-gray-text">Mentorados cadastrados</p>
-          </Panel>
-          <Panel className="p-5">
-            <Activity size={18} className="text-mint mb-2" />
-            <p className="font-display text-2xl text-black">{ativos7dias}</p>
-            <p className="text-xs text-gray-text">Ativos nos últimos 7 dias</p>
-          </Panel>
-          <Panel className="p-5">
-            <Clock size={18} className="text-mint mb-2" />
-            <p className="font-display text-2xl text-black">{inativos7dias}</p>
-            <p className="text-xs text-gray-text">Sem atividade há mais de 7 dias</p>
-          </Panel>
-          <Panel className="p-5">
-            <Clock size={18} className="text-mint mb-2" />
-            <p className="font-display text-2xl text-black">{semAcessoNunca}</p>
-            <p className="text-xs text-gray-text">Nunca acessaram de verdade</p>
-          </Panel>
+            <p className="mt-3 text-xs text-[#53685e]">Papéis e onboarding são gerenciados em <Link href="/admin/usuarios" className="underline">Pessoas e acessos</Link>. Condições da contratação ficam em <Link href="/admin/gerenciar-planos" className="underline">Planos e contratos</Link>.</p>
+          </details>
         </div>
-
-        <section className="mb-10">
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <Eyebrow>Atividade por mentorado</Eyebrow>
-            <Link
-              href="/admin/analytics"
-              className="flex items-center gap-1.5 text-xs text-mint-deep hover:text-black transition-colors"
-            >
-              Ver uso por feature <BarChart3 size={12} />
-            </Link>
-          </div>
-
-          <div className="mb-3">
-            <div className="flex flex-col sm:flex-row gap-3 max-w-3xl">
-              <label className="relative block flex-1">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />
-                <input
-                  type="search"
-                  value={buscaMentorado}
-                  onChange={(e) => setBuscaMentorado(e.target.value)}
-                  placeholder="Buscar mentorado por nome ou e-mail..."
-                  className="w-full rounded-lg border border-gray-faint bg-white py-2.5 pl-9 pr-3 text-sm text-black focus:outline-none focus:border-mint-deep"
-                />
-              </label>
-              <select
-                value={filtroAtividade}
-                onChange={(e) => setFiltroAtividade(e.target.value as typeof filtroAtividade)}
-                className="rounded-lg border border-gray-faint bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-mint-deep"
-                aria-label="Filtrar por atividade"
-              >
-                <option value="todos">Todos os acessos</option>
-                <option value="ativos7">Ativos em até 7 dias</option>
-                <option value="inativos7">Sem atividade há mais de 7 dias</option>
-                <option value="nunca">Nunca acessaram</option>
-              </select>
-            </div>
-            <p className="mt-1.5 text-xs text-gray-text">
-              {linhasFiltradas.filter((l) => !l.profile.is_admin).length} de {linhasDeMentorados.length} mentorados
-              {linhasFiltradas.some((l) => l.profile.is_admin) ? ' + conta de teste' : ''}
-            </p>
-          </div>
-
-          <div className="overflow-x-auto rounded-xl border border-gray-faint">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-white border-b border-gray-faint text-left">
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Nome
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Pacote
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Última atividade
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Onboarding
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    Diagnósticos
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    Diário
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    Quem Sou Eu
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    PDI
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    VIA
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    Pontos
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide" />
-                </tr>
-              </thead>
-              <tbody>
-                {linhasFiltradas.map((l) => (
-                  <tr key={l.profile.id} className="border-b border-gray-faint last:border-0 bg-white">
-                    <td className="px-4 py-3">
-                      <p className="text-black">{l.profile.nome}
-                        {l.profile.is_admin && <span className="ml-2 rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] text-amber-800">Conta de teste · admin</span>}
-                      </p>
-                      <p className="text-xs text-gray-text">{l.profile.email}</p>
-                    </td>
-                    <td className="px-4 py-3 text-gray-text capitalize">
-                      {l.profile.tipo_pacote}
-                    </td>
-                    <td className="px-4 py-3 text-gray-text whitespace-nowrap">
-                      {l.profile.last_activity_at ? (
-                        <>
-                          <p>
-                            {new Date(l.profile.last_activity_at).toLocaleDateString('pt-BR', {
-                              day: '2-digit',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
-                          <p className="text-[10px] mt-0.5">
-                            {(() => {
-                              const dias = diasDesdeAtividade(l.profile.last_activity_at);
-                              if (dias === null) return '';
-                              if (dias === 0) return 'Hoje';
-                              if (dias === 1) return 'Há 1 dia';
-                              return `Há ${dias} dias`;
-                            })()}
-                          </p>
-                        </>
-                      ) : (
-                        <span className="text-amber-700 font-medium">Nunca acessou</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={l.profile.onboarding_concluido}
-                          onChange={async () => {
-                            const { createClient } = await import('@/lib/supabase/client');
-                            const sb = createClient();
-                            await sb.from('profiles').update({ onboarding_concluido: !l.profile.onboarding_concluido }).eq('id', l.profile.id);
-                            window.location.reload();
-                          }}
-                          className="w-4 h-4 accent-green-600 cursor-pointer"
-                        />
-                        <span className={`text-[10px] uppercase ${l.profile.onboarding_concluido ? 'text-green-700' : 'text-amber-700'}`}>
-                          {l.profile.onboarding_concluido ? 'Feito' : 'Pendente'}
-                        </span>
-                      </label>
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-text">
-                      {l.diagnosticos}
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-text">
-                      {l.anotacoesDiario}
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-text">
-                      {l.blocosQuemSouEu}/{totalBlocosQuemSouEu}
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-text">
-                      {l.secoesPdi}/{totalSecoesPdi || '-'}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {l.fezVia ? (
-                        <span className="text-mint">✓</span>
-                      ) : (
-                        <span className="text-gray-text">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center text-black font-medium">
-                      {l.profile.pontos_total}
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => entrarComoUsuario(l.profile.id, l.profile.nome)}
-                        disabled={entrandoComoId === l.profile.id}
-                        className="flex items-center gap-1.5 text-xs text-mint hover:text-black transition-colors whitespace-nowrap disabled:opacity-60"
-                      >
-                        {entrandoComoId === l.profile.id ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <LogIn size={12} />
-                        )}
-                        Inspecionar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {linhasFiltradas.length === 0 && (
-                  <tr>
-                    <td colSpan={11} className="px-4 py-8 text-center text-sm text-gray-text bg-white">
-                      Nenhum mentorado ou conta de teste encontrado para “{buscaMentorado}”.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="mb-10">
-          <Eyebrow>Ações da conta</Eyebrow>
-          <p className="text-xs text-gray-text mb-4">
-            Plano, forma de pagamento, valor, status, próxima cobrança, data de fim de acesso e
-            observação de cada mentorado agora ficam todos juntos em{' '}
-            <Link href="/admin/gerenciar-planos" className="text-mint hover:underline">
-              Gerenciar planos e pagamentos
-            </Link>
-            . Aqui ficam só as ações de conta que não fazem sentido lá.
-          </p>
-          <div className="overflow-x-auto rounded-xl border border-gray-faint">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-white border-b border-gray-faint text-left">
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Nome
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    E-mail
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide">
-                    Tipo
-                  </th>
-                  <th className="px-4 py-3 font-medium text-gray-text text-xs uppercase tracking-wide text-center">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {linhas.map((l) => (
-                  <tr key={l.profile.id} className="border-b border-gray-faint last:border-0 bg-white">
-                    <td className="px-4 py-3 text-black">{l.profile.nome}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block text-[10px] uppercase px-2 py-0.5 rounded-full ${
-                        l.profile.is_admin
-                          ? 'bg-amber-100 text-amber-700 border border-amber-300'
-                          : 'bg-mint-50 text-mint-700 border border-mint-200'
-                      }`}>
-                        {l.profile.is_admin ? '👮 Admin' : '👤 Usuário'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {l.emailConfirmado ? (
-                        <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-300">
-                          Confirmado
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-300 w-fit">
-                          <MailWarning size={11} />
-                          Não confirmado
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="relative group inline-block">
-                        <button className="p-2 hover:bg-white rounded-lg transition-colors">
-                          <MoreVertical size={16} className="text-gray-text" />
-                        </button>
-                        <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-faint rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                          <button
-                            onClick={() => window.location.href = `/admin/usuarios-permissoes/${l.profile.id}`}
-                            className="w-full text-left px-3 py-2 text-sm text-black hover:bg-white border-b border-gray-faint"
-                          >
-                            ✏️ Editar Permissões
-                          </button>
-                          {!l.emailConfirmado && (
-                            <button
-                              onClick={() => confirmarEmailUsuario(l.profile.id, l.profile.nome)}
-                              disabled={confirmandoId === l.profile.id}
-                              className="w-full text-left px-4 py-2 text-sm text-black hover:bg-white border-b border-gray-faint disabled:opacity-60"
-                            >
-                              📧 Confirmar e-mail
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => resetarSenhaUsuario(l.profile.id, l.profile.email, l.profile.nome)}
-                          disabled={resetandoId === l.profile.id}
-                          className="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
-                        >
-                          {resetandoId === l.profile.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Key size={12} />
-                          )}
-                          Reset senha
-                        </button>
-                        <button
-                          onClick={() => deletarUsuario(l.profile.id, l.profile.nome)}
-                          disabled={deletandoId === l.profile.id}
-                          className="flex items-center gap-1.5 text-xs bg-red-800 hover:bg-red-900 text-white px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
-                        >
-                          {deletandoId === l.profile.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Trash2 size={12} />
-                          )}
-                          Deletar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-4">
-            <Eyebrow>Gerenciar usuários e permissões</Eyebrow>
-            <button
-              onClick={carregarUsuarios}
-              disabled={usuariosCarregando}
-              className="text-xs text-mint hover:text-black disabled:opacity-60"
-            >
-              {usuariosCarregando ? '⟳ Carregando...' : '⟳ Recarregar'}
-            </button>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl border border-gray-faint p-6">
-              <h3 className="flex items-center gap-2 font-medium text-black mb-4">
-                <Shield size={18} />
-                Usuários
-              </h3>
-              <p className="text-xs text-gray-text mb-4">
-                Clique para promover ou remover acesso de administrador
-              </p>
-              {usuariosCarregando ? (
-                <div className="text-center py-8 text-gray-text">Carregando usuários...</div>
-              ) : usuarios.length === 0 ? (
-                <div className="text-center py-8 text-gray-text">Nenhum usuário encontrado</div>
-              ) : (
-                <>
-                  <div className="mb-4 flex gap-3">
-                    <input
-                      type="text"
-                      value={buscaUsuario}
-                      onChange={(e) => setBuscaUsuario(e.target.value)}
-                      placeholder="Buscar por nome ou email..."
-                      className="flex-1 border border-gray-faint rounded px-3 py-2 text-sm bg-white"
-                    />
-                    <select
-                      value={filtroUsuarios}
-                      onChange={(e) => setFiltroUsuarios(e.target.value as any)}
-                      className="border border-gray-faint rounded px-3 py-2 text-sm bg-white"
-                    >
-                      <option value="todos">Todos</option>
-                      <option value="admin">Apenas Admins</option>
-                      <option value="geral">Apenas Geral</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {usuariosFiltrados.map((user) => (
-                      <div
-                        key={user.id}
-                        className="flex items-center justify-between p-3 bg-white rounded border border-gray-faint text-sm"
-                      >
-                        <div className="flex-1 text-left">
-                          <p className="font-medium text-black flex items-center gap-2">
-                            {user.nome}
-                            {user.is_admin && <Shield size={14} className="text-black" />}
-                          </p>
-                          <p className="text-xs text-gray-text mb-2">{user.email}</p>
-                          <span className={`inline-block text-[10px] uppercase px-2 py-1 rounded ${
-                            user.is_admin ? 'bg-amber-100 text-amber-700' : 'bg-mint-50 text-mint-700'
-                          }`}>
-                            {user.is_admin ? '👮 Admin' : '👤 Usuário'}
-                          </span>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => toggleAdmin(user.id, user.is_admin)}
-                            className="px-2 py-1 text-xs bg-brown text-white rounded hover:bg-brown-deep"
-                          >
-                            Toggle
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-
-          </div>
-        </section>
-    </>
-  );
+      </details>)}</div>
+      {!linhasFiltradas.length && <p className="rounded-xl border border-[#d7e3dc] bg-white p-6 text-sm text-[#53685e]">Nenhuma pessoa corresponde a esta busca e filtro. <button type="button" onClick={() => { setFiltroAtividade('todos'); setBuscaMentorado(''); }} className="min-h-11 underline">Limpar filtros</button></p>}
+    </section>
+    <footer className="mt-6 border-t border-[#d7e3dc] pt-4">
+      <details><summary className="cursor-pointer py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">Lembretes da operação</summary><p className="mb-3 text-sm text-[#53685e]">Executa as regras de lembretes existentes para a base elegível. Os filtros acima não definem os destinatários.</p><button type="button" onClick={enviarLembretesAgora} disabled={enviandoLembretes} className={acaoClass}>{enviandoLembretes ? <Loader2 size={15} aria-hidden="true" className="mr-2 animate-spin" /> : <Send size={15} aria-hidden="true" className="mr-2" />}Enviar lembretes agora</button>{resultadoLembretes && <p role="status" className="mt-3 whitespace-pre-wrap text-sm leading-6">{resultadoLembretes}</p>}</details>
+    </footer>
+  </div>;
 }
