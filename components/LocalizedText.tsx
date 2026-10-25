@@ -429,7 +429,6 @@ const words:Record<string,[string,string]>={
 "SOMA Plataforma: entre ou crie sua conta para continuar com o plano escolhido.":["SOMA Platform: sign in or create an account to continue with your selected plan.","SOMA Plataforma: ingresa o crea una cuenta para continuar con el plan elegido."],
 "MENTORIA":["MENTORING","MENTORÍA"],
 "Portal do Mentorado":["Mentoring portal","Portal de mentoría"],
-"Entrar":["Sign in","Ingresar"],
 "Criar Conta":["Create account","Crear cuenta"],
 "Esqueci a senha":["Forgot password","Olvidé mi contraseña"],
 "Online":["Online","En línea"],
