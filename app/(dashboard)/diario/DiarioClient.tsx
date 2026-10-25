@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -101,15 +102,12 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
         {/* Campo de nova anotação */}
         <section className="mb-10">
           <Eyebrow>
-            <NotebookPen size={13} /> Nova anotação
-          </Eyebrow>
+            <NotebookPen size={13} /><LocalizedText text={"Nova anotação"} /></Eyebrow>
           <Panel className="p-6">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <label className="flex flex-col gap-1.5 flex-1">
-                  <span className="text-xs uppercase tracking-wide text-gray-text">
-                    Data do encontro
-                  </span>
+                  <span className="text-xs uppercase tracking-wide text-gray-text"><LocalizedText text={"Data do encontro"} /></span>
                   <input
                     type="date"
                     value={encontroData}
@@ -118,25 +116,21 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
                   />
                 </label>
                 <label className="flex flex-col gap-1.5 flex-1">
-                  <span className="text-xs uppercase tracking-wide text-gray-text">
-                    Tipo de encontro
-                  </span>
+                  <span className="text-xs uppercase tracking-wide text-gray-text"><LocalizedText text={"Tipo de encontro"} /></span>
                   <select
                     value={tipoEncontro}
                     onChange={(e) => setTipoEncontro(e.target.value as TipoEncontro)}
                     className="bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                   >
-                    <option value="individual">Sessão individual</option>
-                    <option value="grupo">Encontro em grupo</option>
-                    <option value="pessoal">Dia a dia (pessoal)</option>
+                    <option value="individual"><LocalizedText text={"Sessão individual"} /></option>
+                    <option value="grupo"><LocalizedText text={"Encontro em grupo"} /></option>
+                    <option value="pessoal"><LocalizedText text={"Dia a dia (pessoal)"} /></option>
                   </select>
                 </label>
               </div>
 
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs uppercase tracking-wide text-gray-text">
-                  Anotações
-                </span>
+                <span className="text-xs uppercase tracking-wide text-gray-text"><LocalizedText text={"Anotações"} /></span>
                 <textarea
                   value={anotacoes}
                   onChange={(e) => setAnotacoes(e.target.value)}
@@ -165,12 +159,10 @@ export default function DiarioClient({ profile, notes, userId }: Props) {
 
         {/* Histórico */}
         <section>
-          <Eyebrow>Histórico</Eyebrow>
+          <Eyebrow><LocalizedText text={"Histórico"} /></Eyebrow>
 
           {notes.length === 0 ? (
-            <Panel className="p-6 text-sm text-gray-text">
-              Nenhuma anotação ainda. Registre a primeira acima.
-            </Panel>
+            <Panel className="p-6 text-sm text-gray-text"><LocalizedText text={"Nenhuma anotação ainda. Registre a primeira acima."} /></Panel>
           ) : (
             <div className="flex flex-col gap-4">
               {notes.map((note) => (
