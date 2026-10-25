@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { safeSaasNext } from '@/lib/auth/saas-return';
 import { Suspense, useState, useEffect } from 'react';
@@ -219,14 +220,12 @@ function LoginPageContent() {
 
       <div className="w-full max-w-md relative z-20">
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
-          {saasSignup && <p className="mb-3 text-sm text-white">SOMA Plataforma: entre ou crie sua conta para continuar com o plano escolhido.</p>}
+          {saasSignup && <p className="mb-3 text-sm text-white"><LocalizedText text={"SOMA Plataforma: entre ou crie sua conta para continuar com o plano escolhido."} /></p>}
           <p className="font-display text-3xl sm:text-4xl tracking-wide text-white">
-            SOMA <span className="text-mint">MENTORIA</span>
+            SOMA <span className="text-mint"><LocalizedText text={"MENTORIA"} /></span>
           </p>
           <div className="h-px w-12 bg-white/30 mx-auto my-3" />
-          <p className="text-xs uppercase tracking-[0.25em] text-white/65">
-            Portal do Mentorado
-          </p>
+          <p className="text-xs uppercase tracking-[0.25em] text-white/65"><LocalizedText text={"Portal do Mentorado"} /></p>
         </div>
 
         <div className="rounded-xl border border-white/15 bg-white/95 overflow-hidden shadow-2xl backdrop-blur-sm">
@@ -242,9 +241,7 @@ function LoginPageContent() {
                   ? 'text-black border-b-2 border-brown bg-mint-light'
                   : 'text-gray-text border-b border-gray-faint hover:text-gray-text'
               }`}
-            >
-              Entrar
-            </button>
+            ><LocalizedText text={"Entrar"} /></button>
             <button
               onClick={() => {
                 setModo('cadastrar');
@@ -256,9 +253,7 @@ function LoginPageContent() {
                   ? 'text-black border-b-2 border-brown bg-mint-light'
                   : 'text-gray-text border-b border-gray-faint hover:text-gray-text'
               }`}
-            >
-              Criar Conta
-            </button>
+            ><LocalizedText text={"Criar Conta"} /></button>
           </div>
 
           <div className="p-5 sm:p-6 md:p-8">
@@ -309,9 +304,7 @@ function LoginPageContent() {
                   type="button"
                   className="text-xs text-gray-text hover:text-orange transition-colors text-center mt-1"
                   onClick={() => router.push('/magic-login' + (nextPath ? '?next=' + encodeURIComponent(nextPath) : ''))}
-                >
-                  Esqueci a senha
-                </button>
+                ><LocalizedText text={"Esqueci a senha"} /></button>
 
                 <div className="my-4 relative">
                   <div className="absolute inset-0 flex items-center">
@@ -356,8 +349,8 @@ function LoginPageContent() {
                     onChange={(e) => setTipoPacote(e.target.value as TipoPacote)}
                     className="input"
                   >
-                    <option value="online">Online</option>
-                    <option value="presencial">Presencial</option>
+                    <option value="online"><LocalizedText text={"Online"} /></option>
+                    <option value="presencial"><LocalizedText text={"Presencial"} /></option>
                   </select>
                 </Field>}
                 <Field label="Senha">
@@ -388,7 +381,7 @@ function LoginPageContent() {
                     </button>
                   </div>
                   <div id="cadastro-senha-requisitos" className="mt-2 rounded-lg border border-gray-faint bg-[#F7FAF8] px-3 py-3" aria-label="Requisitos para criar uma senha">
-                    <p className="mb-2 text-xs font-semibold text-black">Sua senha precisa conter:</p>
+                    <p className="mb-2 text-xs font-semibold text-black"><LocalizedText text={"Sua senha precisa conter:"} /></p>
                     <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                       {([
                         ['tamanho', '8 caracteres ou mais'],
@@ -406,9 +399,7 @@ function LoginPageContent() {
                         );
                       })}
                     </div>
-                    <p className="mt-2 text-[11px] leading-4 text-gray-text">
-                      Evite senhas comuns ou já utilizadas em outros sites.
-                    </p>
+                    <p className="mt-2 text-[11px] leading-4 text-gray-text"><LocalizedText text={"Evite senhas comuns ou já utilizadas em outros sites."} /></p>
                   </div>
                 </Field>
 
@@ -494,7 +485,7 @@ function LoadingFallback() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center">
       <div className="text-center">
-        <p className="text-gray-text">Carregando...</p>
+        <p className="text-gray-text"><LocalizedText text={"Carregando..."} /></p>
       </div>
     </div>
   );

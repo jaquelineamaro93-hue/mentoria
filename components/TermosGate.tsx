@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -124,16 +125,12 @@ export default function TermosGate() {
         <div className="p-6 overflow-y-auto">
           <div className="mb-5 pb-5 border-b border-gray-faint grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-gray-text mb-0.5">
-                Programa
-              </p>
+              <p className="text-[10px] uppercase tracking-wide text-gray-text mb-0.5"><LocalizedText text={"Programa"} /></p>
               <p className="text-sm text-ink">SOMA Mentoria</p>
-              <p className="text-xs text-gray-text">Programa de Desenvolvimento de Carreira</p>
+              <p className="text-xs text-gray-text"><LocalizedText text={"Programa de Desenvolvimento de Carreira"} /></p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-gray-text mb-0.5">
-                Mentoranda
-              </p>
+              <p className="text-[10px] uppercase tracking-wide text-gray-text mb-0.5"><LocalizedText text={"Mentoranda"} /></p>
               <p className="text-sm text-ink">{nomeMentoranda || 'Carregando...'}</p>
               <p className="text-xs text-gray-text">{emailMentoranda}</p>
             </div>
@@ -150,9 +147,7 @@ export default function TermosGate() {
               onChange={(e) => setMarcado(e.target.checked)}
               className="mt-0.5"
             />
-            <span className="text-sm text-ink">
-              Li e concordo com os termos acima.
-            </span>
+            <span className="text-sm text-ink"><LocalizedText text={"Li e concordo com os termos acima."} /></span>
           </label>
           {erro && <p role="alert" className="mb-3 text-sm text-red-700">{erro}</p>}
           <button
@@ -164,11 +159,9 @@ export default function TermosGate() {
           </button>
           {podeAdiar && (
             <button type="button" onClick={()=>{if(chaveExibida.current)adiados.current.add(chaveExibida.current);setPrecisaAceitar(false);}} disabled={enviando}
-              className="mt-3 w-full rounded-full border border-gray-faint px-5 py-2.5 text-sm text-gray-text">
-              Agora não. Continuar sob os termos anteriores
-            </button>
+              className="mt-3 w-full rounded-full border border-gray-faint px-5 py-2.5 text-sm text-gray-text"><LocalizedText text={"Agora não. Continuar sob os termos anteriores"} /></button>
           )}
-          {podeAdiar && <p className="mt-2 text-xs text-gray-text">Sua participação atual não depende de aceitar a nova modalidade de pausa. Para utilizá-la, você poderá aceitar os termos atualizados em Meu Plano.</p>}
+          {podeAdiar && <p className="mt-2 text-xs text-gray-text"><LocalizedText text={"Sua participação atual não depende de aceitar a nova modalidade de pausa. Para utilizá-la, você poderá aceitar os termos atualizados em Meu Plano."} /></p>}
         </div>
       </div>
     </div>

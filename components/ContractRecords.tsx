@@ -1,8 +1,9 @@
+import LocalizedText from '@/components/LocalizedText';
 import ReactMarkdown from 'react-markdown';
 type Receipt={id:string;product:string;version:string|null;acceptedAt:string|null;amount:number|null;introAmount?:number|null;status:string;markdown?:string|null;details?:string};
 export default function ContractRecords({receipts,title="Meus contratos e aceites"}:{receipts:Receipt[];title?:string}) {
- return <section className="mb-8 space-y-3 text-black"><h2 className="text-xl font-semibold">{title}</h2><p className="text-sm">O aceite registra as condições escolhidas. A confirmação do pagamento é indicada separadamente.</p>
-  {!receipts.length&&<p className="rounded-xl border bg-white p-4 text-sm">Nenhum aceite de contratação registrado nesta conta.</p>}
+ return <section className="mb-8 space-y-3 text-black"><h2 className="text-xl font-semibold">{title}</h2><p className="text-sm"><LocalizedText text={"O aceite registra as condições escolhidas. A confirmação do pagamento é indicada separadamente."} /></p>
+  {!receipts.length&&<p className="rounded-xl border bg-white p-4 text-sm"><LocalizedText text={"Nenhum aceite de contratação registrado nesta conta."} /></p>}
   {receipts.map(receipt=><details key={receipt.id} className="rounded-xl border bg-white p-4"><summary className="cursor-pointer text-sm font-medium">{receipt.product} · {receipt.acceptedAt?new Date(receipt.acceptedAt).toLocaleString('pt-BR'):'Contratação anterior'} · {receipt.status}</summary><div className="mt-4 space-y-3 text-sm">
    {receipt.details&&<p>{receipt.details}</p>}
    {receipt.version&&<p>Versão aceita: {receipt.version}</p>}
