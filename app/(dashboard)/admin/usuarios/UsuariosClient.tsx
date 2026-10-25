@@ -16,33 +16,44 @@ export function UsuariosClient() {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
+  const [erro, setErro] = useState('');
+  const [salvandoPapel, setSalvandoPapel] = useState<string | null>(null);
 
   useEffect(() => {
     carregarUsuarios();
   }, []);
 
   async function carregarUsuarios() {
+    setLoading(true);
+    setErro('');
     try {
       const response = await fetch('/api/admin/usuarios');
       const data = await response.json();
-      setUsuarios(data || []);
+      if (!response.ok || !Array.isArray(data)) throw new Error(data?.error || 'Não foi possível carregar as pessoas.');
+      setUsuarios(data);
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
+      setErro(error instanceof Error ? error.message : 'Não foi possível carregar as pessoas.');
     } finally {
       setLoading(false);
     }
   }
 
   async function toggleAdmin(userId: string, currentAdmin: boolean) {
+    setSalvandoPapel(userId);
+    setErro('');
     try {
-      await fetch(`/api/admin/usuarios/${userId}`, {
+      const response = await fetch('/api/admin/usuarios', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_admin: !currentAdmin }),
+        body: JSON.stringify({ userId, is_admin: !currentAdmin }),
       });
-      carregarUsuarios();
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Não foi possível atualizar o papel.');
+      setUsuarios(prev => prev.map(user => user.id === userId ? { ...user, is_admin: !currentAdmin } : user));
     } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
+      setErro(error instanceof Error ? error.message : 'Não foi possível atualizar o papel.');
+    } finally {
+      setSalvandoPapel(null);
     }
   }
 
@@ -92,7 +103,7 @@ export function UsuariosClient() {
         <div>
           <h1 className="text-2xl font-display text-black flex items-center gap-2">
             <Users size={24} />
-            Gerenciar Usuários
+            Pessoas e acessos
           </h1>
           <p className="text-sm text-gray-text mt-1">
             {totalOnboarding} de {mentoradas.length} mentoradas fizeram o onboarding inicial
@@ -122,6 +133,7 @@ export function UsuariosClient() {
         <p className="mt-1.5 text-xs text-gray-text">{usuariosFiltrados.length} de {usuarios.length} usuários</p>
       </div>
 
+      {erro && <div role="alert" className="rounded-lg border border-red-200 p-4 text-sm text-red-800">{erro}<button onClick={carregarUsuarios} className="ml-3 min-h-11 underline">Recarregar lista</button></div>}
       {loading ? (
         <div className="text-center py-8 text-gray-text">Carregando...</div>
       ) : (
@@ -161,6 +173,9 @@ export function UsuariosClient() {
                   <td className="px-6 py-4 text-center">
                     <button
                       onClick={() => toggleAdmin(user.id, user.is_admin)}
+                      disabled={salvandoPapel !== null}
+                      aria-label={`Alterar papel de ${user.nome || user.email}`}
+                      aria-busy={salvandoPapel === user.id}
                       className={`inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border transition-colors ${
                         user.is_admin
                           ? 'bg-mint-light border-mint text-mint'
