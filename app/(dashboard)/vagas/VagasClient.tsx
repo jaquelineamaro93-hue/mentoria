@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState, useEffect } from 'react';
 import { BarChart3, Zap, TrendingUp, Briefcase } from 'lucide-react';
@@ -67,13 +68,9 @@ export default function VagasClient({
           {!embedded && (
             <div className="mb-8">
               <Eyebrow>
-                <Briefcase size={14} />
-                Gestão de candidaturas
-              </Eyebrow>
-              <h1 className="font-display text-4xl text-black mb-2">Controle de vagas</h1>
-              <p className="text-gray-text text-sm">
-                Acompanhe suas candidaturas durante sua jornada de carreira.
-              </p>
+                <Briefcase size={14} /><LocalizedText text={"Gestão de candidaturas"} /></Eyebrow>
+              <h1 className="font-display text-4xl text-black mb-2"><LocalizedText text={"Controle de vagas"} /></h1>
+              <p className="text-gray-text text-sm"><LocalizedText text={"Acompanhe suas candidaturas durante sua jornada de carreira."} /></p>
             </div>
           )}
 
@@ -87,9 +84,7 @@ export default function VagasClient({
                   : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
-              <Zap className="w-4 h-4" />
-              Análise de Fit
-            </button>
+              <Zap className="w-4 h-4" /><LocalizedText text={"Análise de Fit"} /></button>
 
             <button
               onClick={() => setTab('kanban')}
@@ -99,9 +94,7 @@ export default function VagasClient({
                   : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
-              <BarChart3 className="w-4 h-4" />
-              Kanban
-            </button>
+              <BarChart3 className="w-4 h-4" /><LocalizedText text={"Kanban"} /></button>
 
             <button
               onClick={() => setTab('ranking')}
@@ -111,16 +104,14 @@ export default function VagasClient({
                   : 'border-transparent text-gray-text hover:text-black'
               }`}
             >
-              <TrendingUp className="w-4 h-4" />
-              Ranking
-            </button>
+              <TrendingUp className="w-4 h-4" /><LocalizedText text={"Ranking"} /></button>
           </div>
 
           {/* Content */}
           <Panel className="p-6">
             {loading ? (
               <div className="text-center py-12">
-                <div className="text-gray-text">Carregando vagas...</div>
+                <div className="text-gray-text"><LocalizedText text={"Carregando vagas..."} /></div>
               </div>
             ) : (
               <>
