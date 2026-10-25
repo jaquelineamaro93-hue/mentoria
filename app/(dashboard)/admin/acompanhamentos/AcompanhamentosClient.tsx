@@ -57,7 +57,7 @@ export default function AcompanhamentosClient({mentorados,registros:iniciais}:{m
  }
  const filtrados=mentorados.filter(m=>(m.nome+' '+m.email).toLocaleLowerCase('pt-BR').includes(busca.toLocaleLowerCase('pt-BR'))&&(filtro==='todos'||(filtro==='com_numero'?!!m.whatsapp_numero:filtro==='autorizados'?!!m.whatsapp_consentimento_em:!m.whatsapp_numero)));
  return <main className="mx-auto max-w-6xl px-4 py-8">
-   <Link href="/admin" className="text-sm text-gray-text hover:underline">← Administração</Link>
+   
    <h1 className="mt-4 font-display text-3xl text-black">Acompanhamento Inteligente</h1>
    <p className="mt-2 text-sm text-gray-text">Contatos, consentimento e acompanhamento semanal por mentorado. Rascunhos precisam de revisão humana. A SOMA registra conversas do WhatsApp e da Íris. O atendimento pela TopSend pode ser registrado manualmente enquanto não houver integração de retorno.</p>
    <CueConnection />

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { Tooltip } from '@/components/Tooltip';
@@ -62,7 +62,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
       }
 
       alert('✅ Permissões salvas!');
-      router.push('/admin');
+      router.push('/admin/usuarios');
     } catch (err) {
       alert('❌ Erro: ' + (err instanceof Error ? err.message : 'desconhecido'));
     } finally {
@@ -73,9 +73,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
   return (
     <>
       <div className="">
-        <Link href="/admin" className="text-mint hover:text-black text-sm mb-6 inline-flex items-center gap-1">
-        <ArrowLeft size={14} /> Voltar
-      </Link>
+        
 
       <Eyebrow>Editar Permissões</Eyebrow>
       <h1 className="font-display text-3xl text-black mb-1">{usuario.nome}</h1>
@@ -117,7 +115,7 @@ export default function UsuarioPermissoesClient({ usuario, permissoesIniciais }:
           )}
         </button>
         <Link
-          href="/admin"
+          href="/admin/usuarios"
           className="px-4 py-2.5 rounded-lg border border-gray-faint hover:border-lotus-brown text-sm font-medium text-black hover:text-black transition-colors"
         >
           Cancelar

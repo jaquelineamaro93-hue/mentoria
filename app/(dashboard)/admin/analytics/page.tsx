@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
   Activity,
-  ArrowLeft,
   BarChart3,
   Beaker,
   Clock3,
@@ -429,12 +428,7 @@ export default async function AdminAnalyticsPage({
 
   return (
     <main className="px-6 py-8 md:px-10 md:py-10 w-full">
-      <Link
-        href="/admin"
-        className="mb-5 inline-flex items-center gap-2 text-sm text-gray-text hover:text-black"
-      >
-        <ArrowLeft size={15} /> Voltar ao admin
-      </Link>
+      
 
       <div className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
