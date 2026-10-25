@@ -10,9 +10,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
   }
 
+  // A régua de trial é sensível ao vencimento: processar antes de
+  // lembretes gerais e recuperação de pagamentos, que podem demorar.
+  const trialGrowth = await executarTrialGrowth().catch((error: unknown) => {
+    console.error('[trial-growth] Falha inesperada', error instanceof Error ? error.name : 'unknown');
+    return { sent: 0, eligible: 0, skipped: 0, errors: ['Falha inesperada na régua de trial.'] };
+  });
+  console.info('[trial-growth] Execução', {
+    sent: trialGrowth.sent, eligible: trialGrowth.eligible,
+    skipped: trialGrowth.skipped, errors: trialGrowth.errors,
+  });
   const pausa = await executarPausasProgramadas();
   const resultado = await executarLembretes();
   const recovery = await reconcileSaasRecovery();
-  const trialGrowth = await executarTrialGrowth();
   return NextResponse.json({...resultado,pausa,recovery,trialGrowth},{headers:{'Cache-Control':'no-store'}});
 }
