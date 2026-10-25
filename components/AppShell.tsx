@@ -22,6 +22,7 @@ import IrisCopiloto from '@/components/IrisCopiloto';
 import NewsBell from '@/components/help/NewsBell';
 import { getProductSessionId, resolveProductFeature } from '@/lib/product-analytics';
 import styles from './PortalShell.module.css';
+import { useLocale, translatedNav } from '@/components/LocaleProvider';
 import type { Profile } from '@/lib/types';
 
 function SectionNavigationCards({
@@ -32,6 +33,7 @@ function SectionNavigationCards({
   currentSearch: string;
 }) {
   const access = useSaasAccess();
+  const {locale} = useLocale();
   const group = portalNavGroups.find((candidate) =>
     candidate.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch))
   );
@@ -43,13 +45,13 @@ function SectionNavigationCards({
   if (group.id === 'mercado' && pathname === '/carreira') return null;
 
   return (
-    <section className="mb-7" aria-label={`Navegação de ${group.label}`}>
+    <section className="mb-7" aria-label={translatedNav(group.label,locale)}>
       <div className="flex items-center justify-between gap-3 mb-3">
         <div>
           <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text">
-            {group.label}
+            {translatedNav(group.label,locale)}
           </p>
-          <p className="text-sm text-black mt-0.5">Acesse os outros temas desta área</p>
+          <p className="text-sm text-black mt-0.5">{locale==='en'?'Explore more topics in this section':locale==='es-419'?'Explora otros temas de esta sección':'Acesse os outros temas desta área'}</p>
         </div>
       </div>
 
@@ -82,7 +84,7 @@ function SectionNavigationCards({
               </span>
               <span className="min-w-0">
                 <span className="block text-sm font-medium text-black leading-tight">
-                  {item.label}
+                  {translatedNav(item.label,locale)}
                 </span>
                 <span className="block text-[11px] text-gray-text mt-1">
                   {active ? 'Você está aqui' : 'Abrir'}
@@ -98,6 +100,7 @@ function SectionNavigationCards({
 
 function AppShellContent({ children, initialProfile, copilotoLiberado }: { children: React.ReactNode; initialProfile: Profile | null; copilotoLiberado: boolean }) {
   const access = useSaasAccess();
+  const {locale} = useLocale();
 
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar } = useSidebar();
   const pathname = usePathname();
@@ -216,10 +219,10 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
           <nav aria-label="Localização atual" className={styles.breadcrumb}>
             <Link href="/dashboard">SOMA</Link>
             <ChevronRight size={14} aria-hidden="true" />
-            <span className={styles.breadcrumbGroup}>{location.group}</span>
+            <span className={styles.breadcrumbGroup}>{translatedNav(location.group,locale)}</span>
             <ChevronRight className={styles.breadcrumbGroup} size={14} aria-hidden="true" />
             <span aria-current="page" className={styles.currentPage}>
-              {location.label}
+              {translatedNav(location.label,locale)}
             </span>
           </nav>
 

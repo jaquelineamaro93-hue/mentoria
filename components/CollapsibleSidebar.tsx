@@ -12,9 +12,11 @@ import { createClient } from '@/lib/supabase/client';
 import { limparIdentidade } from '@/lib/posthog';
 import { overviewItem, adminItem, portalNavGroups, supportItems, isPortalRouteActive, type PortalNavItem } from '@/lib/config/portalNavigation';
 import styles from './PortalShell.module.css';
+import { useLocale, translatedNav } from '@/components/LocaleProvider';
 
 export default function CollapsibleSidebar() {
   const { isCollapsed, isMobile, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
+  const { locale } = useLocale();
   const access = useSaasAccess();
   const pathname = usePathname();
   const platformEntry = pathname === '/plataforma' && !access?.mentorship;
@@ -86,10 +88,10 @@ export default function CollapsibleSidebar() {
     const Icon = item.icon;
     return <Link key={item.href} href={item.href} prefetch={false} onClick={closeMobileSidebar}
       className={`${styles.navLink} ${active ? styles.active : ''}`}
-      aria-current={active ? 'page' : undefined} aria-label={compact ? item.label : undefined}
-      title={compact ? item.label : undefined}>
+      aria-current={active ? 'page' : undefined} aria-label={compact ? translatedNav(item.label,locale) : undefined}
+      title={compact ? translatedNav(item.label,locale) : undefined}>
       <Icon size={20} strokeWidth={1.65} aria-hidden="true" />
-      <span className={styles.linkLabel}>{item.label}</span>
+      <span className={styles.linkLabel}>{translatedNav(item.label,locale)}</span>
     </Link>;
   }
 
@@ -122,12 +124,12 @@ export default function CollapsibleSidebar() {
           // A group containing the current page stays discoverable, even after a saved collapse.
           const containsActive = group.items.some((item) => isPortalRouteActive(pathname, item.href, currentSearch));
           const open = compact || containsActive || !closedGroups[group.id];
-          return <section key={group.id} className={styles.navGroup} aria-label={group.label}>
+          return <section key={group.id} className={styles.navGroup} aria-label={translatedNav(group.label,locale)}>
             {!compact && <button type="button" className={styles.groupToggle}
               aria-expanded={open} aria-controls={`nav-group-${group.id}`}
               onClick={() => toggleGroup(group.id, open)} disabled={containsActive}>
               <ChevronDown size={14} className={!open ? styles.chevronClosed : ''} aria-hidden="true" />
-              <span>{group.label}</span><span className={styles.groupRule} aria-hidden="true" />
+              <span>{translatedNav(group.label,locale)}</span><span className={styles.groupRule} aria-hidden="true" />
             </button>}
             <div id={`nav-group-${group.id}`} hidden={!open} className={styles.groupLinks}>{group.items.map(navLink)}</div>
           </section>;

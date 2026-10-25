@@ -123,6 +123,7 @@ export async function POST(request: NextRequest) {
     if (!objetivo || objetivo.length < 5)
       return resposta({ erro: 'Conte em uma frase o objetivo deste plano.' }, 400);
     const prompt = montarPromptPlanoIris({
+      locale: body.locale,
       tema, objetivo,
       nome: limpo(a.perfil.nome, 70).split(/\s+/)[0],
       hojeSP: new Date().toLocaleDateString('en-CA',{ timeZone:'America/Sao_Paulo' }),
