@@ -142,3 +142,14 @@ export function onboardingText(value:string,locale:SiteLocale):string {
   const translated=copy[value];
   return translated?translated[locale==='en'?0:1]:translateCopy(value,locale);
 }
+
+/** Localize progress counters without changing numeric values or member content. */
+export function onboardingProgress(value:string|undefined,locale:SiteLocale):string {
+  if(!value)return '';
+  if(locale==='pt-BR')return value;
+  const two=value.match(/^(\d+) de (\d+) (blocos preenchidos|seções preenchidas)$/);
+  if(two)return `${two[1]} ${locale==='en'?'of':'de'} ${two[2]} ${onboardingText(two[3],locale)}`;
+  const single=value.match(/^(\d+) (registros?|rodadas? criadas?|análises? registradas?)( no diário)?$/);
+  if(single)return `${single[1]} ${onboardingText(single[2],locale)}${single[3]?' '+onboardingText('no diário',locale):''}`;
+  return onboardingText(value,locale);
+}
