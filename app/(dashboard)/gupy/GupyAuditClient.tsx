@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { FileSearch, Loader2, Upload, ShieldCheck, Info, TrendingDown } from 'lucide-react';
@@ -83,19 +84,16 @@ export default function GupyAuditClient({
   return (
     <main className="min-w-0 w-full px-3 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
       <header className="max-w-4xl mb-8">
-        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2">Mercado de trabalho</p>
-        <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Gupy & ATS</h1>
-        <p className="text-sm md:text-base text-gray-text leading-relaxed">
-          Avalie o currículo que está dentro da Gupy contra vagas reais e veja onde a narrativa, as palavras-chave,
-          os requisitos e a leitura humana podem ser fortalecidos.
-        </p>
+        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2"><LocalizedText text={"Mercado de trabalho"} /></p>
+        <h1 className="font-display text-3xl md:text-4xl text-black mb-2"><LocalizedText text={"Gupy & ATS"} /></h1>
+        <p className="text-sm md:text-base text-gray-text leading-relaxed"><LocalizedText text={"Avalie o currículo que está dentro da Gupy contra vagas reais e veja onde a narrativa, as palavras-chave, os requisitos e a leitura humana podem ser fortalecidos."} /></p>
       </header>
 
       <section className="rounded-2xl border border-gray-faint bg-white p-5 md:p-6">
         <div className="grid lg:grid-cols-[minmax(0,360px)_1fr] gap-5">
           <div>
             <label className="block">
-              <span className="text-sm font-medium text-black">Cargo ou direção alvo</span>
+              <span className="text-sm font-medium text-black"><LocalizedText text={"Cargo ou direção alvo"} /></span>
               <input
                 value={cargoAlvo}
                 onChange={(event) => setCargoAlvo(event.target.value)}
@@ -107,7 +105,7 @@ export default function GupyAuditClient({
             <label className="mt-4 block rounded-xl border border-dashed border-gray-faint bg-[#fbfcfd] p-4 cursor-pointer">
               <div className="flex items-center gap-2 mb-2">
                 <Upload size={16} className="text-mint-deep" />
-                <span className="text-sm font-medium text-black">Currículo baixado da Gupy *</span>
+                <span className="text-sm font-medium text-black"><LocalizedText text={"Currículo baixado da Gupy *"} /></span>
               </div>
               <input
                 type="file"
@@ -121,18 +119,14 @@ export default function GupyAuditClient({
             </label>
 
             <div className="mt-4 rounded-xl border border-mint bg-mint-light px-4 py-3">
-              <p className="text-xs font-medium text-black mb-1">Antes de analisar</p>
-              <p className="text-xs text-gray-text leading-relaxed">
-                Confira também se o currículo está visível/compartilhável na plataforma e se os campos do perfil estão atualizados.
-              </p>
+              <p className="text-xs font-medium text-black mb-1"><LocalizedText text={"Antes de analisar"} /></p>
+              <p className="text-xs text-gray-text leading-relaxed"><LocalizedText text={"Confira também se o currículo está visível/compartilhável na plataforma e se os campos do perfil estão atualizados."} /></p>
             </div>
           </div>
 
           <label className="block">
-            <span className="text-sm font-medium text-black">Vaga(s) alvo *</span>
-            <p className="text-xs text-gray-text mt-1 mb-2">
-              Cole uma, duas ou até três descrições de vaga. Quanto mais específicas, melhor a comparação.
-            </p>
+            <span className="text-sm font-medium text-black"><LocalizedText text={"Vaga(s) alvo *"} /></span>
+            <p className="text-xs text-gray-text mt-1 mb-2"><LocalizedText text={"Cole uma, duas ou até três descrições de vaga. Quanto mais específicas, melhor a comparação."} /></p>
             <textarea
               rows={14}
               value={vagas}
@@ -144,7 +138,7 @@ export default function GupyAuditClient({
         </div>
 
         <div className="mt-5 rounded-xl bg-[#f8f9fa] border border-gray-faint px-4 py-3 text-xs text-gray-text leading-relaxed">
-          <span className="inline-flex items-center gap-1 font-semibold"><Info size={14} aria-hidden="true" /> Como ler suas notas</span>
+          <span className="inline-flex items-center gap-1 font-semibold"><Info size={14} aria-hidden="true" /><LocalizedText text={"Como ler suas notas"} /></span>
           <span className="mt-1 block">
             A SOMA não tem acesso às notas internas da Gupy nem aos pesos privados dos Agentes de IA.
             A nota de 0 a 100 exibida na análise é uma <strong>estimativa da SOMA para a vaga informada</strong>,
@@ -172,12 +166,12 @@ export default function GupyAuditClient({
 
       <section className="mt-5 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-gray-faint bg-white px-4 py-3">
-          <p className="flex items-center gap-2 text-sm font-semibold text-black"><TrendingDown size={17} className="text-[#ad634e]" aria-hidden="true" /> O que pode baixar sua aderência?</p>
-          <p className="mt-1 text-xs leading-relaxed text-gray-text">Requisitos essenciais ausentes, informações incompletas, experiência pouco demonstrada e currículo genérico. Confira os motivos na análise.</p>
+          <p className="flex items-center gap-2 text-sm font-semibold text-black"><TrendingDown size={17} className="text-[#ad634e]" aria-hidden="true" /><LocalizedText text={"O que pode baixar sua aderência?"} /></p>
+          <p className="mt-1 text-xs leading-relaxed text-gray-text"><LocalizedText text={"Requisitos essenciais ausentes, informações incompletas, experiência pouco demonstrada e currículo genérico. Confira os motivos na análise."} /></p>
         </div>
         <div className="rounded-xl border border-gray-faint bg-white px-4 py-3">
-          <p className="flex items-center gap-2 text-sm font-semibold text-black"><ShieldCheck size={17} className="text-mint-deep" aria-hidden="true" /> O que a SOMA não faz</p>
-          <p className="mt-1 text-xs leading-relaxed text-gray-text">Não acessa notas privadas, não altera candidaturas na Gupy e não promete aprovação ou reversão de avaliações internas.</p>
+          <p className="flex items-center gap-2 text-sm font-semibold text-black"><ShieldCheck size={17} className="text-mint-deep" aria-hidden="true" /><LocalizedText text={"O que a SOMA não faz"} /></p>
+          <p className="mt-1 text-xs leading-relaxed text-gray-text"><LocalizedText text={"Não acessa notas privadas, não altera candidaturas na Gupy e não promete aprovação ou reversão de avaliações internas."} /></p>
         </div>
       </section>
       <GupyAnalysisOutput
