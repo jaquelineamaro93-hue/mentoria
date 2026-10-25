@@ -1,5 +1,6 @@
 'use client';
 import LocalizedText from '@/components/LocalizedText';
+import { useLocale } from '@/components/LocaleProvider';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -29,6 +30,7 @@ async function requisitar<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export default function PlanoAcoesIrisClient() {
+  const { locale } = useLocale();
   const [nome, setNome] = useState('');
   const [planos, setPlanos] = useState<PlanoSalvo[]>([]);
   const [planoId, setPlanoId] = useState<string | null>(null);
@@ -94,7 +96,7 @@ export default function PlanoAcoesIrisClient() {
     try {
       const data = await requisitar<{rascunho:RascunhoPlanoIris}>('/api/copiloto/plano-acoes',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({acao:'gerar',tema,objetivo:objetivo.trim()}),
+        body:JSON.stringify({acao:'gerar',tema,objetivo:objetivo.trim(),locale}),
       });
       setRascunho(data.rascunho);
       setMensagem('Seu rascunho está pronto. Ajuste os passos antes de salvar.');
