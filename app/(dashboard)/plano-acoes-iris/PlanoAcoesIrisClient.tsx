@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -153,23 +154,21 @@ export default function PlanoAcoesIrisClient() {
     <div className="mx-auto max-w-6xl space-y-7 pb-14">
       <header className="rounded-[26px] border border-[#d8e5dd] bg-[#f4f8f4] p-5 sm:p-8">
         <Link href="/dashboard" className="mb-5 inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-[#426759] hover:underline">
-          <ArrowLeft size={15} aria-hidden="true" /> Voltar ao meu painel
-        </Link>
+          <ArrowLeft size={15} aria-hidden="true" /><LocalizedText text={"Voltar ao meu painel"} /></Link>
         <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.17em] text-[#0D8071]">
-          <Sparkles size={15} aria-hidden="true" /> Uma frente só sua
-        </p>
-        <h1 className="mt-3 font-display text-3xl leading-tight text-[#1c3029] sm:text-4xl">Plano de Ação Íris</h1>
+          <Sparkles size={15} aria-hidden="true" /><LocalizedText text={"Uma frente só sua"} /></p>
+        <h1 className="mt-3 font-display text-3xl leading-tight text-[#1c3029] sm:text-4xl"><LocalizedText text={"Plano de Ação Íris"} /></h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-[#485d53] sm:text-base">
           {nome ? nome+', ' : ''}vamos transformar suas conversas em movimentos reais
-          <span className="block">Sem atropelar seu ritmo e sem mexer no PDI ou nas outras etapas da mentoria.</span>
+          <span className="block"><LocalizedText text={"Sem atropelar seu ritmo e sem mexer no PDI ou nas outras etapas da mentoria."} /></span>
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-[#bdded1] bg-white px-3 py-1.5 text-xs font-semibold text-[#21594b]">Plano independente do PDI</span>
-          <span className="rounded-full border border-[#e0d6cc] bg-white px-3 py-1.5 text-xs font-semibold text-[#72574b]">Só salva com sua confirmação</span>
+          <span className="rounded-full border border-[#bdded1] bg-white px-3 py-1.5 text-xs font-semibold text-[#21594b]"><LocalizedText text={"Plano independente do PDI"} /></span>
+          <span className="rounded-full border border-[#e0d6cc] bg-white px-3 py-1.5 text-xs font-semibold text-[#72574b]"><LocalizedText text={"Só salva com sua confirmação"} /></span>
         </div>
       </header>
 
-      {carregando ? <p role="status" className="text-sm text-[#55675f]">Carregando seus planos...</p> : null}
+      {carregando ? <p role="status" className="text-sm text-[#55675f]"><LocalizedText text={"Carregando seus planos..."} /></p> : null}
       {erro ? <p role="alert" className="rounded-xl border border-[#e8c4b9] bg-[#fff4f0] px-4 py-3 text-sm text-[#934c38]">{erro}</p> : null}
       {mensagem ? <p role="status" className="rounded-xl border border-[#b6dccc] bg-[#eff9f3] px-4 py-3 text-sm text-[#25644f]">{mensagem}</p> : null}
 
@@ -177,11 +176,10 @@ export default function PlanoAcoesIrisClient() {
         <div className="grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
           <nav aria-label="Meus planos de ações da Íris" className="rounded-2xl border border-[#e2e7e2] bg-white p-3">
             <button type="button" onClick={novoPlano} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#0D8071] px-3 py-2 text-sm font-semibold text-white hover:bg-[#09685d]">
-              <Plus size={17} aria-hidden="true" /> Criar um plano
-            </button>
-            <p className="mb-2 mt-5 px-2 text-[11px] font-bold uppercase tracking-[0.15em] text-[#87968c]">Meus planos salvos</p>
+              <Plus size={17} aria-hidden="true" /><LocalizedText text={"Criar um plano"} /></button>
+            <p className="mb-2 mt-5 px-2 text-[11px] font-bold uppercase tracking-[0.15em] text-[#87968c]"><LocalizedText text={"Meus planos salvos"} /></p>
             {planos.length===0 ? (
-              <p className="px-2 py-3 text-xs leading-5 text-[#75837a]">Você ainda não salvou nenhum plano. Pode começar com um rascunho.</p>
+              <p className="px-2 py-3 text-xs leading-5 text-[#75837a]"><LocalizedText text={"Você ainda não salvou nenhum plano. Pode começar com um rascunho."} /></p>
             ) : planos.map(p => (
               <button type="button" key={p.id} onClick={() => {setPlanoId(p.id);setCriando(false);setRascunho(null);setErro(null);setMensagem('');}}
                 aria-current={!criando && p.id===planoId ? 'page' : undefined}
@@ -196,11 +194,9 @@ export default function PlanoAcoesIrisClient() {
             {criando ? (
               <div className="space-y-6 rounded-2xl border border-[#e0e7e0] bg-white p-5 sm:p-7">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.17em] text-[#0D8071]">Comece com o que é importante</p>
-                  <h2 className="mt-2 font-display text-2xl text-[#24392e]">O que vamos construir agora?</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#687a6f]">
-                    A Íris aproveita o que você já registrou na SOMA. Não precisa repetir toda a sua trajetória.
-                  </p>
+                  <p className="text-xs font-bold uppercase tracking-[0.17em] text-[#0D8071]"><LocalizedText text={"Comece com o que é importante"} /></p>
+                  <h2 className="mt-2 font-display text-2xl text-[#24392e]"><LocalizedText text={"O que vamos construir agora?"} /></h2>
+                  <p className="mt-2 text-sm leading-6 text-[#687a6f]"><LocalizedText text={"A Íris aproveita o que você já registrou na SOMA. Não precisa repetir toda a sua trajetória."} /></p>
                 </div>
 
                 <div role="group" aria-label="Tema do plano" className="grid gap-2 sm:grid-cols-2">
@@ -213,12 +209,12 @@ export default function PlanoAcoesIrisClient() {
                   ))}
                 </div>
                 <div>
-                  <label htmlFor="iris-objetivo" className="mb-2 block text-sm font-semibold text-[#334a3e]">Seu objetivo em uma frase</label>
+                  <label htmlFor="iris-objetivo" className="mb-2 block text-sm font-semibold text-[#334a3e]"><LocalizedText text={"Seu objetivo em uma frase"} /></label>
                   <textarea id="iris-objetivo" rows={3} maxLength={600} value={objetivo}
                     onChange={e => {setObjetivo(e.target.value);setRascunho(null);}}
                     placeholder="Ex.: quero migrar de operações para análise de dados sem começar do zero"
                     className="w-full resize-y rounded-xl border border-[#d7e4da] bg-white px-4 py-3 text-sm leading-6 text-[#27352d] focus:border-[#0D8071] focus:outline-none" />
-                  <p className="mt-2 text-xs leading-5 text-[#768779]">Pode ser uma hipótese. A Íris organiza um primeiro caminho e você decide o que faz sentido.</p>
+                  <p className="mt-2 text-xs leading-5 text-[#768779]"><LocalizedText text={"Pode ser uma hipótese. A Íris organiza um primeiro caminho e você decide o que faz sentido."} /></p>
                 </div>
                 <button type="button" disabled={gerando || objetivo.trim().length<5} onClick={() => void gerarPlano()}
                   className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#0D8071] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0a655b] disabled:opacity-50">
@@ -228,7 +224,7 @@ export default function PlanoAcoesIrisClient() {
                 {rascunho && (
                   <section aria-labelledby="rascunho-iris-title" className="space-y-5 border-t border-[#e2e8e0] pt-6">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0D8071]">Revisão antes de salvar</p>
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0D8071]"><LocalizedText text={"Revisão antes de salvar"} /></p>
                       <h3 id="rascunho-iris-title" className="mt-2 font-display text-2xl text-[#24392e]">{rascunho.titulo}</h3>
                       <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[#526358]">{rascunho.diagnostico}</p>
                       <p className="mt-3 text-sm font-semibold text-[#2d5443]">Foco: {rascunho.foco}</p>
@@ -252,19 +248,14 @@ export default function PlanoAcoesIrisClient() {
                         </div>
                       ))}
                     </div>
-                    <div className="rounded-xl border border-[#c4ddd1] bg-[#f3faf5] p-4 text-sm leading-6 text-[#426450]">
-                      Este rascunho ainda não foi salvo. Ao confirmar, ele ficará na sua conta para acompanhar o progresso.
-                      O PDI e as outras ferramentas da SOMA não são alterados.
-                    </div>
+                    <div className="rounded-xl border border-[#c4ddd1] bg-[#f3faf5] p-4 text-sm leading-6 text-[#426450]"><LocalizedText text={"Este rascunho ainda não foi salvo. Ao confirmar, ele ficará na sua conta para acompanhar o progresso. O PDI e as outras ferramentas da SOMA não são alterados."} /></div>
                     <div className="flex flex-wrap gap-3">
                       <button type="button" disabled={salvando} onClick={() => void salvarPlano()}
                         className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#0D8071] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
                         <Check size={17} aria-hidden="true" /> {salvando?'Salvando...':'Confirmar e salvar meu plano'}
                       </button>
                       <button type="button" disabled={salvando || gerando} onClick={()=>setRascunho(null)}
-                        className="min-h-11 rounded-xl border border-[#dce2db] px-4 py-3 text-sm text-[#526658]">
-                        Descartar rascunho
-                      </button>
+                        className="min-h-11 rounded-xl border border-[#dce2db] px-4 py-3 text-sm text-[#526658]"><LocalizedText text={"Descartar rascunho"} /></button>
                     </div>
                   </section>
                 )}
@@ -273,23 +264,22 @@ export default function PlanoAcoesIrisClient() {
               <div className="space-y-6 rounded-2xl border border-[#e1e8df] bg-white p-5 sm:p-7">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="max-w-2xl">
-                    <p className="text-xs font-bold uppercase tracking-[0.17em] text-[#0D8071]">Seu plano em movimento</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.17em] text-[#0D8071]"><LocalizedText text={"Seu plano em movimento"} /></p>
                     <h2 className="mt-2 font-display text-2xl leading-tight text-[#24392e] sm:text-3xl">{ativo.titulo}</h2>
                     <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[#5b6b60]">{ativo.diagnostico}</p>
                   </div>
                   <button type="button" onClick={() => void excluirPlano()} disabled={apagando}
                     className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#ebd9d2] px-3 text-xs font-medium text-[#a65d4e] hover:bg-[#fff4f0] disabled:opacity-50">
-                    <Trash2 size={15} aria-hidden="true" /> Excluir plano
-                  </button>
+                    <Trash2 size={15} aria-hidden="true" /><LocalizedText text={"Excluir plano"} /></button>
                 </div>
                 <div className="rounded-xl bg-[#f2f7f2] p-4">
-                  <p className="text-xs font-semibold text-[#567366]">Objetivo</p>
+                  <p className="text-xs font-semibold text-[#567366]"><LocalizedText text={"Objetivo"} /></p>
                   <p className="mt-1 text-sm font-medium leading-6 text-[#2c4638]">{ativo.objetivo}</p>
                   <p className="mt-2 text-xs text-[#678070]">Foco: {ativo.foco}</p>
                 </div>
                 <div>
                   <div className="flex items-end justify-between gap-3">
-                    <p className="text-sm font-semibold text-[#2c4437]">Seu avanço</p>
+                    <p className="text-sm font-semibold text-[#2c4437]"><LocalizedText text={"Seu avanço"} /></p>
                     <p className="text-sm font-bold text-[#0D8071]">{concluidas} de {ativo.etapas.length} etapas</p>
                   </div>
                   <div role="progressbar" aria-label="Progresso do Plano de Ações da Íris" aria-valuenow={percentual} aria-valuemin={0} aria-valuemax={100}
@@ -310,19 +300,18 @@ export default function PlanoAcoesIrisClient() {
                           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#7e9386]">Etapa {i+1} · {etapa.horizonte}</p>
                           <h3 className={'mt-1 text-base font-semibold '+(etapa.concluida?'text-[#608171]':'text-[#253d2f]')}>{etapa.titulo}</h3>
                           <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#5e6f63]">{etapa.descricao}</p>
-                          <p className="mt-3 rounded-lg bg-[#f1f6f1] p-3 text-xs leading-5 text-[#476555]"><strong>Como medir o avanço:</strong> {etapa.evidencia}</p>
+                          <p className="mt-3 rounded-lg bg-[#f1f6f1] p-3 text-xs leading-5 text-[#476555]"><strong><LocalizedText text={"Como medir o avanço:"} /></strong> {etapa.evidencia}</p>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs leading-5 text-[#7b8a7b]">Este acompanhamento é pessoal e independente do PDI. Você decide quando marcar cada passo como concluído.</p>
+                <p className="text-xs leading-5 text-[#7b8a7b]"><LocalizedText text={"Este acompanhamento é pessoal e independente do PDI. Você decide quando marcar cada passo como concluído."} /></p>
               </div>
             ) : (
               <div className="rounded-2xl border border-[#e1e8df] bg-white p-6 text-center">
-                <h2 className="font-display text-2xl text-[#253d30]">Seu próximo capítulo pode começar aqui</h2>
-                <button type="button" onClick={novoPlano} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#0D8071] px-5 text-sm font-semibold text-white">
-                  Criar meu primeiro plano <ArrowRight size={16} aria-hidden="true"/>
+                <h2 className="font-display text-2xl text-[#253d30]"><LocalizedText text={"Seu próximo capítulo pode começar aqui"} /></h2>
+                <button type="button" onClick={novoPlano} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#0D8071] px-5 text-sm font-semibold text-white"><LocalizedText text={"Criar meu primeiro plano"} /><ArrowRight size={16} aria-hidden="true"/>
                 </button>
               </div>
             )}
