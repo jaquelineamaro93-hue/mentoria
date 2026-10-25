@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Wallet, TrendingUp, Users, AlertTriangle, Gift, Target, Loader2, ArrowLeft } from 'lucide-react';
+import { Wallet, TrendingUp, Users, AlertTriangle, Gift, Target, Loader2 } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 import { createClient } from '@/lib/supabase/client';
 import { posthog, limparIdentidade } from '@/lib/posthog';
@@ -127,15 +127,9 @@ export default function FinanceiroClient({
   return (
     <>
       <div className="">
-        <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
+        
 
-        <button
-          onClick={() => router.push('/admin')}
-          className="flex items-center gap-1.5 text-sm text-gray-text hover:text-black transition mb-4"
-        >
-          <ArrowLeft size={16} />
-          Voltar
-        </button>
+        
         
 
         <div className="grid gap-3 sm:grid-cols-3 mb-6" aria-label="Filtros dos mentorados">

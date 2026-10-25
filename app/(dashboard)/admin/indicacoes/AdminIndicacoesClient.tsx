@@ -42,7 +42,7 @@ export default function AdminIndicacoesClient({ linhas }: { linhas: Linha[] }) {
 
   return (
     <>
-      <div className="mb-6"><a href="/admin" className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors">← Voltar ao painel</a></div>
+      
 
       <h1 className="font-display text-3xl text-black mb-1">Indicações</h1>
       <p className="text-sm text-gray-text mb-8">

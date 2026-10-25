@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import AdminFeedbackHubClient from '../AdminFeedbackHubClient';
@@ -49,12 +48,7 @@ export default async function AdminFeedbacksPage() {
   return (
     <main className="px-6 py-8 md:px-12 md:py-12 w-full">
       <div className="mb-6">
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 text-sm text-gray-text hover:text-black transition-colors"
-        >
-          ← Voltar ao painel
-        </Link>
+        
       </div>
 
       <header className="mb-8">
