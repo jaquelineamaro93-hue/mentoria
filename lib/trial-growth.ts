@@ -18,6 +18,12 @@ function safe(text: string) {
   })[c] || c);
 }
 type Stage = 'd3' | 'd1' | 'd0' | 'p2';
+export function trialGrowthStage(status: string, days: number): Stage | null {
+  if (status === 'expired') return days <= -2 && days >= -14 ? 'p2' : null;
+  if (status !== 'active') return null;
+  return days === 3 ? 'd3' : days === 1 ? 'd1' : days === 0 ? 'd0'
+    : days <= -2 && days >= -14 ? 'p2' : null;
+}
 function buildEmail(firstName: string, stage: Stage, end: string, onboarding: boolean, optOutUrl: string) {
   const first = safe(firstName);
   const date = new Intl.DateTimeFormat('pt-BR', {
@@ -27,21 +33,21 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
     d3: 'Sua jornada de carreira pode continuar na SOMA',
     d1: 'Seu teste na SOMA termina amanhã',
     d0: 'Hoje é o último dia do seu teste gratuito na SOMA',
-    p2: 'O que faltou para a SOMA fazer sentido para você?',
+    p2: 'Qual é o próximo passo da sua carreira?',
   };
   const intro = stage === 'p2'
-    ? 'Seu período gratuito terminou. Queremos saber o que faltou para a SOMA ajudar mais no seu momento profissional.'
+    ? 'Seu teste gratuito terminou, mas você pode continuar trabalhando no seu próximo passo profissional. O que faz mais sentido agora: buscar uma nova oportunidade ou crescer onde você está?'
     : 'Seu período gratuito na SOMA está chegando ao fim. Você pode continuar sua jornada de carreira com clareza, estratégia e autonomia.';
   const activation = onboarding
-    ? 'Se ainda não explorou a plataforma, comece pela entrevista inicial e conheça suas próximas possibilidades.'
+    ? 'Se não conseguiu explorar tudo durante o teste, responda a este e-mail contando seu objetivo. Posso ajudar você a entender por onde começar.'
     : 'Continue de onde parou e transforme seus objetivos em pequenas ações consistentes.';
   const checkout = 'https://somamentoria.com/checkout';
   const html = `<div style="font:16px/1.6 Arial,sans-serif;color:#24382d;max-width:580px;margin:auto;padding:24px">
-    <h2>Sua jornada merece continuidade</h2>
+    <h2>Seu próximo passo de carreira</h2>
     <p>Oi, ${first}!</p>
     <p>${intro}</p><p>${activation}</p>
     <p>Na SOMA, você pode desenvolver seu PDI, organizar seus objetivos e acompanhar sua evolução profissional.</p>
-    <p><a href="${checkout}" style="background:#276b52;color:white;padding:12px 18px;text-decoration:none;border-radius:8px">Conhecer os planos</a></p>
+    <p><a href="${checkout}" style="background:#276b52;color:white;padding:12px 18px;text-decoration:none;border-radius:8px">${stage === 'p2' ? 'Escolher meu plano' : 'Conhecer os planos'}</a></p>
     ${stage === 'p2' ? '' : `<p>Seu acesso gratuito termina em ${date}.</p>`}
     <p>Se precisar de ajuda para começar, responda a este e-mail.</p>
     <p>Um abraço,<br>Jaqueline Amaro<br>Fundadora da SOMA Mentoria</p>
@@ -49,7 +55,7 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
   </div>`;
   return { subject: subjects[stage], html };
 }
-export async function executarTrialGrowth() {
+export async function executarTrialGrowth({ expiredOnly = false }: { expiredOnly?: boolean } = {}) {
   const summary = { sent: 0, eligible: 0, skipped: 0, errors: [] as string[] };
   if (!process.env.SENDGRID_API_KEY || !process.env.SENDGRID_FROM_EMAIL) {
     summary.errors.push('SendGrid não configurado.');
@@ -62,7 +68,7 @@ export async function executarTrialGrowth() {
   const db = createAdminClient();
   const { data: profiles, error } = await db.from('profiles')
     .select('id,nome,email,is_admin,onboarding_concluido,trial_status,trial_ends_at,status_assinatura,status_pagamento,trial_converted_at,mp_subscription_id')
-    .eq('is_admin', false).eq('trial_status', 'active').not('trial_ends_at', 'is', null);
+    .eq('is_admin', false).in('trial_status', ['active', 'expired']).not('trial_ends_at', 'is', null);
   if (error) { summary.errors.push('Não foi possível consultar trials.'); return summary; }
   const now = new Date();
   for (const profile of profiles || []) {
@@ -74,8 +80,8 @@ export async function executarTrialGrowth() {
       summary.skipped++; continue;
     }
     const days = daysUntil(profile.trial_ends_at, now);
-    const stage: Stage | null = days === 3 ? 'd3' : days === 1 ? 'd1'
-      : days === 0 ? 'd0' : days === -2 ? 'p2' : null;
+    const stage = trialGrowthStage(profile.trial_status, days);
+    if (expiredOnly && stage !== 'p2') continue;
     if (!stage || (stage === 'd0' && now >= new Date(profile.trial_ends_at))) { summary.skipped++; continue; }
     // A campanha não deve incluir clientes com qualquer módulo SaaS pago.
     const { data: paidModules, error: moduleError } = await db.from('soma_module_subscriptions')
@@ -93,7 +99,7 @@ export async function executarTrialGrowth() {
     const { data: fresh, error: freshError } = await db.from('profiles')
       .select('trial_status,status_assinatura,status_pagamento,trial_converted_at,mp_subscription_id')
       .eq('id', profile.id).single();
-    if (freshError || !fresh || fresh.trial_status !== 'active'
+    if (freshError || !fresh || !['active', 'expired'].includes(fresh.trial_status)
       || fresh.status_assinatura === 'ativo' || fresh.status_pagamento === 'ativo'
       || fresh.trial_converted_at || fresh.mp_subscription_id) {
       summary.skipped++; continue;
