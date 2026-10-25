@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useEffect, useState } from 'react';
 import { Mascot } from '@/components/soma/CareerJourney';
@@ -241,23 +242,17 @@ export default function OnboardingClient({
         <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center">
           <div>
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-widest text-[#F9D1A7]">
-              <Sparkles size={14} aria-hidden="true" /> SUA JORNADA SOMA
-            </p>
-            <h1 className="max-w-2xl font-display text-4xl leading-tight text-white sm:text-5xl">Sua evolução começa aqui.</h1>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-white/85 sm:text-base">
-              Um caminho para se conhecer, planejar seus próximos movimentos e descobrir ferramentas que fazem sentido para você.
-            </p>
+              <Sparkles size={14} aria-hidden="true" /><LocalizedText text={"SUA JORNADA SOMA"} /></p>
+            <h1 className="max-w-2xl font-display text-4xl leading-tight text-white sm:text-5xl"><LocalizedText text={"Sua evolução começa aqui."} /></h1>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/85 sm:text-base"><LocalizedText text={"Um caminho para se conhecer, planejar seus próximos movimentos e descobrir ferramentas que fazem sentido para você."} /></p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <a href="#explorar-titulo" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#FFB366] px-5 py-3 text-sm font-semibold text-[#172C2B] transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                Explorar ferramentas <ArrowRight size={17} aria-hidden="true" />
+              <a href="#explorar-titulo" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#FFB366] px-5 py-3 text-sm font-semibold text-[#172C2B] transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><LocalizedText text={"Explorar ferramentas"} /><ArrowRight size={17} aria-hidden="true" />
               </a>
-              <a href="#essenciais-titulo" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                Minha jornada
-              </a>
+              <a href="#essenciais-titulo" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><LocalizedText text={"Minha jornada"} /></a>
             </div>
           </div>
           <section aria-labelledby="progresso-titulo" className="relative rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/75">Seu progresso</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/75"><LocalizedText text={"Seu progresso"} /></p>
             <h2 id="progresso-titulo" className="mt-3 text-4xl font-semibold tracking-tight text-white">{percentual}<span className="text-2xl text-[#FFB366]">%</span></h2>
             <p className="mt-1 text-sm text-white/85">{concluidas} de {etapas.length} etapas essenciais</p>
             <div role="progressbar" aria-label="Etapas essenciais concluídas" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentual} aria-valuetext={`${concluidas} de ${etapas.length} etapas concluídas`} className="mt-4 h-2 overflow-hidden rounded-full bg-white/20">
@@ -274,10 +269,10 @@ export default function OnboardingClient({
       <section aria-label="Seus companheiros da Expedição SOMA" className="mb-8 overflow-hidden rounded-[24px] border border-[#DDE6E0] bg-[#F7F7EE] p-4 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl">
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-[#386657]">A Expedição SOMA acompanha você</p>
-            <h2 className="mt-2 font-display text-2xl text-[#183F37] sm:text-3xl">Quatro companheiros para acompanhar sua história</h2>
-            <p className="mt-2 text-sm leading-6 text-[#52675B]">Conheça Lume, Norte, Brasa e Íris. Eles apresentam cada capítulo da jornada e acompanham suas descobertas. Suas conquistas e Impulsos continuam registrados no Meu Passaporte.</p>
-            <Link href="/passaporte" onClick={() => registrarClique('passaporte', 'expedicao')} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#183F37] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#183F37]">Ver minhas conquistas e ranking <ArrowRight size={16} aria-hidden="true" /></Link>
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-[#386657]"><LocalizedText text={"A Expedição SOMA acompanha você"} /></p>
+            <h2 className="mt-2 font-display text-2xl text-[#183F37] sm:text-3xl"><LocalizedText text={"Quatro companheiros para acompanhar sua história"} /></h2>
+            <p className="mt-2 text-sm leading-6 text-[#52675B]"><LocalizedText text={"Conheça Lume, Norte, Brasa e Íris. Eles apresentam cada capítulo da jornada e acompanham suas descobertas. Suas conquistas e Impulsos continuam registrados no Meu Passaporte."} /></p>
+            <Link href="/passaporte" onClick={() => registrarClique('passaporte', 'expedicao')} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#183F37] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#183F37]"><LocalizedText text={"Ver minhas conquistas e ranking"} /><ArrowRight size={16} aria-hidden="true" /></Link>
           </div>
           <div className="grid grid-cols-4 gap-2 sm:gap-3" role="group" aria-label="Escolha um companheiro para conhecer sua mensagem">
             {guias.map((guia, i) => (
@@ -323,7 +318,7 @@ export default function OnboardingClient({
                       </span>
                     </div>
                     <p className="mt-1 text-sm leading-6 text-gray-700">{etapa.descricao}</p>
-                    <p className="mt-1 text-sm leading-6 text-black"><strong>Por que importa:</strong> {etapa.beneficio}</p>
+                    <p className="mt-1 text-sm leading-6 text-black"><strong><LocalizedText text={"Por que importa:"} /></strong> {etapa.beneficio}</p>
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                       <span className="text-xs font-medium text-gray-700">{etapa.progresso}</span>
                       <Link href={etapa.href} onClick={() => registrarClique(etapa.key, 'essenciais')}
@@ -343,10 +338,8 @@ export default function OnboardingClient({
       <div data-soma-capitulo="3" aria-hidden="true" className="h-px" />
       <section aria-labelledby="explorar-titulo" className="mb-10">
         <div className="mb-4">
-          <h2 id="explorar-titulo" className="font-display text-2xl text-black">2. Explore conforme seu objetivo</h2>
-          <p className="mt-1 text-sm leading-6 text-gray-700">
-            Não é preciso fazer tudo de uma vez. Escolha o recurso que responde ao seu desafio de agora.
-          </p>
+          <h2 id="explorar-titulo" className="font-display text-2xl text-black"><LocalizedText text={"2. Explore conforme seu objetivo"} /></h2>
+          <p className="mt-1 text-sm leading-6 text-gray-700"><LocalizedText text={"Não é preciso fazer tudo de uma vez. Escolha o recurso que responde ao seu desafio de agora."} /></p>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           {exploracao.map((item) => {
@@ -361,7 +354,7 @@ export default function OnboardingClient({
                 </div>
                 <h3 className="mt-3 text-base font-semibold text-black">{item.titulo}</h3>
                 <p className="mt-1 text-sm leading-6 text-gray-700">{item.descricao}</p>
-                <p className="mt-2 text-sm leading-6 text-black"><strong>Você ganha:</strong> {item.beneficio}</p>
+                <p className="mt-2 text-sm leading-6 text-black"><strong><LocalizedText text={"Você ganha:"} /></strong> {item.beneficio}</p>
                 <Link href={item.href} onClick={() => registrarClique(item.key, 'exploracao')}
                   className="mt-auto inline-flex min-h-11 items-center gap-2 self-start pt-3 text-sm font-semibold text-brown underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown">
                   {item.cta} <ArrowRight size={15} aria-hidden="true" />
@@ -372,9 +365,7 @@ export default function OnboardingClient({
         </div>
 
         <details className="group mt-4 rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-sm font-semibold text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown [&::-webkit-details-marker]:hidden">
-            Conhecer todas as outras ferramentas
-            <ChevronDown size={19} className="shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-sm font-semibold text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown [&::-webkit-details-marker]:hidden"><LocalizedText text={"Conhecer todas as outras ferramentas"} /><ChevronDown size={19} className="shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
           <div className="mt-4 space-y-5 border-t border-gray-200 pt-4">
             {outrasFerramentas.map((grupo) => (
@@ -402,14 +393,12 @@ export default function OnboardingClient({
 
       {profile?.is_admin && (
         <section aria-label="Configurações administrativas de onboarding" className="rounded-xl border border-amber-300 bg-amber-50 p-5">
-          <h2 className="text-sm font-semibold text-amber-950">Configuração administrativa</h2>
-          <p className="mt-1 text-sm text-amber-950">Esta opção confirma a sessão inicial. Não altera o preenchimento das demais ferramentas.</p>
+          <h2 className="text-sm font-semibold text-amber-950"><LocalizedText text={"Configuração administrativa"} /></h2>
+          <p className="mt-1 text-sm text-amber-950"><LocalizedText text={"Esta opção confirma a sessão inicial. Não altera o preenchimento das demais ferramentas."} /></p>
           <label className="mt-3 flex min-h-11 items-center gap-3 text-sm font-medium text-amber-950">
             <input type="checkbox" checked={onboardingAdmin} disabled={salvandoAdmin}
               onChange={(event) => void atualizarOnboarding(event.target.checked)}
-              className="h-5 w-5 accent-amber-800" />
-            Marcar sessão inicial como concluída
-          </label>
+              className="h-5 w-5 accent-amber-800" /><LocalizedText text={"Marcar sessão inicial como concluída"} /></label>
         </section>
       )}
     </main>
