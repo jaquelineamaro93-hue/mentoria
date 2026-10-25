@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 
 const depoimentos = [
@@ -38,9 +39,9 @@ export default function DepoimentosPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3 sm:gap-6">
           <Link href="/" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</Link>
           <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
-            <Link href="/como-funciona" className="hover:text-white transition-colors">Como funciona</Link>
-            <Link href="/depoimentos" className="text-white">Depoimentos</Link>
-            <Link href="/#planos" className="hover:text-white transition-colors">Planos</Link>
+            <Link href="/como-funciona" className="hover:text-white transition-colors"><LocalizedText text={"Como funciona"} /></Link>
+            <Link href="/depoimentos" className="text-white"><LocalizedText text={"Depoimentos"} /></Link>
+            <Link href="/#planos" className="hover:text-white transition-colors"><LocalizedText text={"Planos"} /></Link>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/login" className="text-white/90 font-medium text-xs sm:text-sm">Entrar</Link>
@@ -52,21 +53,17 @@ export default function DepoimentosPage() {
       <main>
         <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-[#F8F7F4] border-b border-gray-faint">
           <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs uppercase tracking-[0.22em] mb-3 text-mint-deep">Histórias reais</p>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-black">Quem passou por aqui</h1>
-            <p className="mt-5 text-gray-text leading-relaxed max-w-2xl mx-auto">
-              Relatos de pessoas que usaram a SOMA para organizar decisões, reconhecer forças e transformar clareza em movimento.
-            </p>
+            <p className="text-xs uppercase tracking-[0.22em] mb-3 text-mint-deep"><LocalizedText text={"Histórias reais"} /></p>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-black"><LocalizedText text={"Quem passou por aqui"} /></h1>
+            <p className="mt-5 text-gray-text leading-relaxed max-w-2xl mx-auto"><LocalizedText text={"Relatos de pessoas que usaram a SOMA para organizar decisões, reconhecer forças e transformar clareza em movimento."} /></p>
           </div>
         </section>
 
         <section id="depoimentos-linkedin" className="scroll-mt-24 px-4 sm:px-6 py-10 sm:py-14 md:py-16">
           <div className="mx-auto max-w-5xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0D8071]">Relatos publicados no LinkedIn</p>
-            <h2 className="mt-2 font-display text-2xl text-black sm:text-3xl">Depoimentos com links para os posts originais</h2>
-            <p className="mt-2 text-sm leading-relaxed text-gray-text">
-              Leia as publicações de Maria Laura, Giulia e Rita diretamente no LinkedIn.
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0D8071]"><LocalizedText text={"Relatos publicados no LinkedIn"} /></p>
+            <h2 className="mt-2 font-display text-2xl text-black sm:text-3xl"><LocalizedText text={"Depoimentos com links para os posts originais"} /></h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-text"><LocalizedText text={"Leia as publicações de Maria Laura, Giulia e Rita diretamente no LinkedIn."} /></p>
           </div>
           <div className="max-w-5xl mx-auto mt-6 grid md:grid-cols-3 gap-6">
             {depoimentos.map((item) => (
@@ -90,7 +87,7 @@ export default function DepoimentosPage() {
                 <p className="text-sm mb-5 leading-relaxed text-gray-text">{item.texto}</p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
                   <div className="text-lg" aria-label="5 estrelas">⭐⭐⭐⭐⭐</div>
-                  <span className="text-xs font-semibold" style={{ color: item.cor }}>Ver no LinkedIn →</span>
+                  <span className="text-xs font-semibold" style={{ color: item.cor }}><LocalizedText text={"Ver no LinkedIn →"} /></span>
                 </div>
               </a>
             ))}
@@ -101,17 +98,15 @@ export default function DepoimentosPage() {
         <SomaSuccessStories completo />
 
         <section className="border-t border-gray-faint bg-[#f6faf8] px-4 py-8 text-center sm:px-6">
-          <p className="text-sm text-[#526760]">Quer conhecer outras trajetórias de mentorados e profissionais da comunidade?</p>
-          <Link href="/#historias-reais" className="mt-3 inline-flex min-h-11 items-center font-semibold text-[#0D8071] underline-offset-4 hover:underline">
-            Rever o resumo das histórias na página inicial
-          </Link>
+          <p className="text-sm text-[#526760]"><LocalizedText text={"Quer conhecer outras trajetórias de mentorados e profissionais da comunidade?"} /></p>
+          <Link href="/#historias-reais" className="mt-3 inline-flex min-h-11 items-center font-semibold text-[#0D8071] underline-offset-4 hover:underline"><LocalizedText text={"Rever o resumo das histórias na página inicial"} /></Link>
         </section>
 
         <section className="px-4 sm:px-6 py-12 text-center" style={{ backgroundColor: '#1A1A1A' }}>
-          <h2 className="font-display text-2xl sm:text-3xl text-white">Quer entender se a SOMA faz sentido para seu momento?</h2>
+          <h2 className="font-display text-2xl sm:text-3xl text-white"><LocalizedText text={"Quer entender se a SOMA faz sentido para seu momento?"} /></h2>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/#planos" className="px-7 py-3.5 rounded-lg text-white font-medium" style={{ backgroundColor: '#0D8071' }}>Ver planos</Link>
-            <Link href="/" className="px-7 py-3.5 rounded-lg border border-white/25 text-white font-medium">Voltar para a página inicial</Link>
+            <Link href="/#planos" className="px-7 py-3.5 rounded-lg text-white font-medium" style={{ backgroundColor: '#0D8071' }}><LocalizedText text={"Ver planos"} /></Link>
+            <Link href="/" className="px-7 py-3.5 rounded-lg border border-white/25 text-white font-medium"><LocalizedText text={"Voltar para a página inicial"} /></Link>
           </div>
         </section>
       </main>
