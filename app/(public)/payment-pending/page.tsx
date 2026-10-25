@@ -10,10 +10,10 @@ export default function PaymentPendingPage() {
         <div className="text-5xl mb-4">⏳</div>
         <h1 className="font-display text-2xl text-black mb-2"><LocalizedText text={"Pagamento Pendente"} /></h1>
         <p className="text-sm text-gray-text mb-6">
-          Seu pagamento está sendo processado. Você receberá um email em breve.
+          <LocalizedText text={"Seu pagamento está sendo processado. Você receberá um email em breve."} />
         </p>
         <Link href="/dashboard" className="inline-block bg-brown-deep text-white px-6 py-3 rounded-lg font-medium hover:bg-brown">
-          Voltar
+          <LocalizedText text={"Voltar"} />
         </Link>
       </div>
     </div>
