@@ -8,6 +8,7 @@ export const viewport: Viewport = {
 import './globals.css';
 import PostHogInit from '@/components/PostHogInit';
 import AcessoGate from '@/components/AcessoGate';
+import { LocaleProvider, LanguageSwitcher } from '@/components/LocaleProvider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://somamentoria.com'),
@@ -46,9 +47,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-white text-black">
-        <PostHogInit />
-        <AcessoGate />
-        {children}
+        <LocaleProvider>
+          <PostHogInit />
+          <AcessoGate />
+          {children}
+          <LanguageSwitcher />
+        </LocaleProvider>
       </body>
     </html>
   );
