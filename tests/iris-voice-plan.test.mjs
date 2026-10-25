@@ -37,8 +37,11 @@ test('Consultoria tem métodos claros de transição, recrutamento, renda e ment
   assert.match(voz,/plano persistente|planos persistentes/i);
 });
 
-test('Comunicação é em português brasileiro e renderiza markdown seguro',()=>{
-  assert.match(voz,/português brasileiro/);
+test('Comunicação respeita idioma selecionado e renderiza markdown seguro',()=>{
+  assert.match(voz,/copilotLanguageInstruction\(args\.locale\)/);
+  assert.match(src('lib/i18n/locales.mjs'),/português brasileiro/);
+  assert.match(src('lib/i18n/locales.mjs'),/espanhol latino-americano/);
+  assert.match(src('lib/i18n/locales.mjs'),/inglês claro e natural/);
   assert.match(voz,/Sem travessões/);
   assert.match(voz,/Separe ideias com linhas em branco/);
   assert.match(voz,/negrito/);
