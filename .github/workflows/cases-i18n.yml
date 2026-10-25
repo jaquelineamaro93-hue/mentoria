@@ -10,6 +10,9 @@ on:
       - 'app/(public)/cases/**'
       - 'app/(public)/page.tsx'
       - 'tests/i18n-cases.test.mjs'
+      - 'tests/onboarding-i18n.test.mjs'
+      - 'lib/i18n/onboarding-copy.ts'
+      - 'app/(dashboard)/onboarding/OnboardingClient.tsx'
       - '.github/workflows/cases-i18n.yml'
   push:
     branches: [main]
@@ -23,3 +26,4 @@ jobs:
         with:
           persist-credentials: false
       - run: node tests/i18n-cases.test.mjs
+      - run: node tests/onboarding-i18n.test.mjs
