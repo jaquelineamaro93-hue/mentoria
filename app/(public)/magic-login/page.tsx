@@ -1,11 +1,14 @@
 'use client';
 
+import { useLocale } from '@/components/LocaleProvider';
+import { translateCopy } from '@/components/LocalizedText';
 import { safeSaasNext } from '@/lib/auth/saas-return';
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
 
 function MagicLoginContent() {
+  const { locale } = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get('email')?.trim().toLowerCase() ?? '';
@@ -37,10 +40,10 @@ function MagicLoginContent() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      setSucesso('Código enviado! Verifique seu email.');
+      setSucesso("Código enviado! Verifique seu email.");
       setStage('code');
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao enviar código');
+      setErro(err instanceof Error ? err.message  : "Erro ao enviar código");
     } finally {
       setLoading(false);
     }
@@ -61,7 +64,7 @@ function MagicLoginContent() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      setSucesso('Código verificado! Redirecionando...');
+      setSucesso("Código verificado! Redirecionando...");
       setTimeout(() => {
         if (data.loginUrl) {
           window.location.href = data.loginUrl;
@@ -70,7 +73,7 @@ function MagicLoginContent() {
         }
       }, 1500);
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Código inválido');
+      setErro(err instanceof Error ? err.message  : "Código inválido");
     } finally {
       setLoading(false);
     }
@@ -85,30 +88,30 @@ function MagicLoginContent() {
           </p>
           <div className="h-px w-12 bg-brown mx-auto my-3" />
           <p className="text-xs uppercase tracking-[0.25em] text-gray-text">
-            Entrar com código
+            {translateCopy("Entrar com código",locale)}
           </p>
         </div>
 
         {sucesso && stage === 'code' && (
           <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-6 text-center mb-6">
             <CheckCircle2 size={40} className="text-green-600 mx-auto mb-3" />
-            <h2 className="font-display text-lg text-green-700 mb-1">Sucesso!</h2>
-            <p className="text-sm text-green-600">{sucesso}</p>
+            <h2 className="font-display text-lg text-green-700 mb-1">{translateCopy("Sucesso!",locale)}</h2>
+            <p className="text-sm text-green-600">{translateCopy(sucesso,locale)}</p>
           </div>
         )}
 
         <div className="bg-white border-2 border-gray-faint rounded-2xl p-8">
           {stage === 'email' ? (
             <>
-              <h2 className="font-display text-xl text-black mb-1">Entrar</h2>
+              <h2 className="font-display text-xl text-black mb-1">{translateCopy("Entrar",locale)}</h2>
               <p className="text-sm text-gray-text mb-6">
-                Digite seu email para receber um código
+                {translateCopy("Digite seu email para receber um código",locale)}
               </p>
 
               {erro && (
                 <div className="flex gap-3 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                   <AlertCircle size={16} className="text-red-700 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-red-700">{erro}</p>
+                  <p className="text-xs text-red-700">{translateCopy(erro,locale)}</p>
                 </div>
               )}
 
@@ -133,21 +136,21 @@ function MagicLoginContent() {
                   disabled={loading}
                   className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
                 >
-                  {loading ? 'Enviando...' : 'Enviar código'}
+                  {loading ? translateCopy("Enviando...",locale)  : translateCopy("Enviar código",locale)}
                 </button>
               </form>
 
               <p className="text-xs text-gray-text text-center mt-6">
                 <a href={nextPath ? '/login?next=' + encodeURIComponent(nextPath) : '/login'} className="text-black hover:underline font-medium">
-                  Voltar ao login
+                  {translateCopy("Voltar ao login",locale)}
                 </a>
               </p>
             </>
           ) : (
             <>
-              <h2 className="font-display text-xl text-black mb-1">Seu código</h2>
+              <h2 className="font-display text-xl text-black mb-1">{translateCopy("Seu código",locale)}</h2>
               <p className="text-sm text-gray-text mb-6">
-                Enviamos um código para<br /><strong>{email}</strong>
+                {translateCopy("Enviamos um código para",locale)}<br /><strong>{email}</strong>
               </p>
 
               {erro && (
@@ -160,7 +163,7 @@ function MagicLoginContent() {
               <form onSubmit={handleVerifyCode} className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-black mb-2">
-                    Código (6 dígitos)
+                    {translateCopy("Código (6 dígitos)",locale)}
                   </label>
                   <input
                     type="text"
@@ -179,7 +182,7 @@ function MagicLoginContent() {
                   disabled={loading || code.length !== 6}
                   className="w-full bg-brown-deep text-white py-3 rounded-lg font-medium hover:bg-brown transition-colors disabled:opacity-50 mt-6"
                 >
-                  {loading ? 'Verificando...' : 'Confirmar código'}
+                  {loading ? translateCopy("Verificando...",locale)  : translateCopy("Confirmar código",locale)}
                 </button>
               </form>
 
@@ -194,7 +197,7 @@ function MagicLoginContent() {
                   }}
                   className="flex-1 text-black hover:underline font-medium"
                 >
-                  Usar outro email
+                  {translateCopy("Usar outro email",locale)}
                 </button>
                 <button
                   type="button"
@@ -211,10 +214,10 @@ function MagicLoginContent() {
                         const data = await res.json();
                         throw new Error(data.error);
                       }
-                      setSucesso('Novo código enviado!');
+                      setSucesso("Novo código enviado!");
                       setCode('');
                     } catch (err) {
-                      setErro(err instanceof Error ? err.message : 'Erro ao reenviar código');
+                      setErro(err instanceof Error ? err.message  : "Erro ao reenviar código");
                     } finally {
                       setLoading(false);
                     }
@@ -222,7 +225,7 @@ function MagicLoginContent() {
                   disabled={loading}
                   className="flex-1 text-black hover:underline font-medium disabled:opacity-50"
                 >
-                  Reenviar código
+                  {translateCopy("Reenviar código",locale)}
                 </button>
               </div>
             </>
@@ -235,7 +238,7 @@ function MagicLoginContent() {
 
 export default function MagicLoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Carregando...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Loading…</p></div>}>
       <MagicLoginContent />
     </Suspense>
   );
