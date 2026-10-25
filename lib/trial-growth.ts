@@ -24,7 +24,7 @@ export function trialGrowthStage(status: string, days: number): Stage | null {
   return days === 3 ? 'd3' : days === 1 ? 'd1' : days === 0 ? 'd0'
     : days <= -2 && days >= -14 ? 'p2' : null;
 }
-function buildEmail(firstName: string, stage: Stage, end: string, onboarding: boolean, optOutUrl: string) {
+function buildEmail(firstName: string, stage: Stage, end: string, onboarding: boolean, hasInterview: boolean, optOutUrl: string) {
   const first = safe(firstName);
   const date = new Intl.DateTimeFormat('pt-BR', {
     timeZone: TZ, day: '2-digit', month: 'long',
@@ -43,18 +43,20 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
         ? 'Seu período gratuito termina hoje, no horário previsto para sua conta. Se quiser continuar, conheça os planos antes do encerramento do acesso.'
         : 'Seu teste gratuito terminou, mas você pode continuar trabalhando no seu próximo passo profissional. O que faz mais sentido agora: buscar uma nova oportunidade ou crescer onde está?';
   const activation = onboarding
-    ? 'Sua entrevista inicial ainda está pendente. Ela é o ponto de partida para dar direção à sua jornada na SOMA.'
+    ? hasInterview
+      ? 'Você já deu o primeiro passo com a sua entrevista inicial. Agora pode explorar as próximas atividades e organizar o que faz mais sentido para sua carreira.'
+      : 'Sua entrevista inicial ainda não está registrada. Esse é um bom primeiro passo para dar direção à sua jornada na SOMA.'
     : 'Você já iniciou sua jornada. Agora é a hora de transformar seus objetivos em ações consistentes.';
   const params = (action: string) => 'utm_source=sendgrid&utm_medium=email&utm_campaign=soma_trial_growth&utm_content=' + stage + '_' + action;
   const checkout = 'https://somamentoria.com/checkout?' + params('checkout');
   const start = 'https://somamentoria.com/onboarding?' + params('ativacao');
   const activationFirst = stage === 'd3' && onboarding;
   const primaryUrl = activationFirst ? start : checkout;
-  const primaryLabel = activationFirst ? 'Fazer minha entrevista inicial' : stage === 'p2' ? 'Conhecer os planos' : 'Escolher como continuar';
+  const primaryLabel = activationFirst ? (hasInterview ? 'Ver próximos passos da minha jornada' : 'Fazer minha entrevista inicial') : stage === 'p2' ? 'Conhecer os planos' : 'Escolher como continuar';
   const secondary = activationFirst
     ? '<p>Já sabe que quer continuar? <a href="' + checkout + '">Veja os planos da SOMA</a>.</p>'
     : onboarding && stage === 'd1'
-      ? '<p>Antes de escolher, você também pode <a href="' + start + '">fazer sua entrevista inicial</a>.</p>'
+      ? '<p>Antes de escolher, você também pode <a href="' + start + '">' + (hasInterview ? 'rever sua jornada' : 'começar sua entrevista inicial') + '</a>.</p>'
       : '';
   const html = `<div style="font:16px/1.6 Arial,sans-serif;color:#24382d;max-width:580px;margin:auto;padding:24px">
     <h2>Seu próximo passo de carreira</h2>
@@ -85,6 +87,14 @@ export async function executarTrialGrowth({ expiredOnly = false }: { expiredOnly
     .select('id,nome,email,is_admin,onboarding_concluido,trial_status,trial_ends_at,status_assinatura,status_pagamento,trial_converted_at,mp_subscription_id')
     .eq('is_admin', false).in('trial_status', ['active', 'expired']).not('trial_ends_at', 'is', null);
   if (error) { summary.errors.push('Não foi possível consultar trials.'); return summary; }
+  if (!profiles?.length) return summary;
+  const { data: interviews, error: interviewError } = await db.from('entrevistas_iniciais')
+    .select('user_id').in('user_id', profiles.map(p => p.id));
+  if (interviewError) {
+    summary.errors.push('Não foi possível verificar a jornada inicial.');
+    return summary;
+  }
+  const interviewed = new Set((interviews || []).map(i => i.user_id));
   const now = new Date();
   for (const profile of profiles || []) {
     const email = (profile.email || '').trim().toLowerCase();
@@ -127,7 +137,7 @@ export async function executarTrialGrowth({ expiredOnly = false }: { expiredOnly
     const signature = createHmac('sha256', process.env.CRON_SECRET).update(profile.id).digest('hex');
     const optOutUrl = 'https://somamentoria.com/api/trial-growth/unsubscribe?u=' +
       encodeURIComponent(profile.id) + '&sig=' + signature;
-    const msg = buildEmail(firstName, stage, profile.trial_ends_at, !profile.onboarding_concluido, optOutUrl);
+    const msg = buildEmail(firstName, stage, profile.trial_ends_at, !profile.onboarding_concluido, interviewed.has(profile.id), optOutUrl);
     const accepted = await enviarEmail({ to: email, subject: msg.subject, html: msg.html });
     if (!accepted) {
       await db.from('trial_growth_dispatches').delete().eq('user_id',profile.id).eq('stage',stage).eq('status','reserved');
