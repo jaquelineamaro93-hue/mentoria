@@ -442,6 +442,22 @@ const words:Record<string,[string,string]>={
 "Condições para novas contratações.":["Conditions for new purchases.","Condiciones para nuevas contrataciones."],
 "Documentos anteriores permanecem vinculados à contratação original.":["Previous documents remain linked to the original purchase.","Los documentos anteriores permanecen vinculados a la contratación original."],
 "Este documento contratual é apresentado em português, versão original válida para aceite. A tradução da interface não altera suas cláusulas.":["This contract is presented in Portuguese, the original version for acceptance. Interface translation does not change its terms.","Este contrato se presenta en portugués, la versión original válida para aceptar. La traducción de la interfaz no cambia sus cláusulas."],
+"Senhas não conferem":["Passwords do not match","Las contraseñas no coinciden"],
+"Mínimo 8 caracteres":["At least 8 characters","Mínimo 8 caracteres"],
+"As senhas não conferem":["Passwords do not match","Las contraseñas no coinciden"],
+"A senha deve ter no mínimo 8 caracteres":["Password must have at least 8 characters","La contraseña debe tener al menos 8 caracteres"],
+"Arquivo muito grande. Máximo permitido é 5MB":["File too large. Maximum size is 5 MB","Archivo demasiado grande. Tamaño máximo: 5 MB"],
+"Informe um WhatsApp válido com DDD.":["Enter a valid WhatsApp number with area code.","Ingresa un número de WhatsApp válido con código de área."],
+"Nenhuma seção configurada ainda.":["No sections configured yet.","Aún no se han configurado secciones."],
+"Não consegui salvar essa seção. Confira sua internet e tente de novo.":["Couldn't save this section. Check your connection and try again.","No se pudo guardar esta sección. Revisa tu conexión y vuelve a intentarlo."],
+"Uma conversa de cada vez, com direção":["One conversation at a time, with direction","Una conversación a la vez, con dirección"],
+"Plano de Ações da Íris":["Íris action plan","Plan de acción de Íris"],
+"Preparação pronta. Agora pratique.":["Preparation ready. Now practice.","Preparación lista. Ahora practica."],
+"Situação & Obstáculos:":["Situation & Obstacles:","Situación y obstáculos:"],
+"Nova conversa com a Íris":["New conversation with Íris","Nueva conversación con Íris"],
+"Expandir janela da Íris":["Expand Íris window","Ampliar la ventana de Íris"],
+"Reduzir janela da Íris":["Shrink Íris window","Reducir la ventana de Íris"],
+"Abrir Íris Copiloto":["Open Íris Copilot","Abrir Íris Copiloto"],
 };
 export function translateCopy(text:string,locale:'pt-BR'|'en'|'es-419'){
  return locale==='pt-BR'?text:(words[text]?.[locale==='en'?0:1]||text);
