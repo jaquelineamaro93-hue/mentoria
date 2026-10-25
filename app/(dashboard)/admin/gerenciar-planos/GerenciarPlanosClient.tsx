@@ -20,7 +20,9 @@ interface Edicao {
 export default function GerenciarPlanosClient({
   mentorados: mentoradosIniciais,
   planos: planosIniciais,
+  pessoaInicial,
 }: {
+  pessoaInicial?: string;
   mentorados: Profile[];
   planos: PlanoMentoria[];
 }) {
@@ -32,6 +34,7 @@ export default function GerenciarPlanosClient({
   const [mostrarFormPlano, setMostrarFormPlano] = useState(false);
   const [criandoPlano, setCriandoPlano] = useState(false);
   const [buscaMentorado, setBuscaMentorado] = useState('');
+  const [pessoaSelecionada, setPessoaSelecionada] = useState(pessoaInicial || '');
   const [filtroPlano, setFiltroPlano] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('');
   const [trialEdicao, setTrialEdicao] = useState<
@@ -50,8 +53,9 @@ export default function GerenciarPlanosClient({
   const planoMap = new Map(planos.map((p) => [p.id, p]));
   const termoMentorado = buscaMentorado.trim().toLocaleLowerCase('pt-BR');
   const trialAtivo = (m: Profile) => m.trial_status === 'active' && Boolean(m.trial_ends_at) && new Date(m.trial_ends_at!).getTime() > Date.now();
-  const statusVisivel = (m: Profile) => trialAtivo(m) ? 'trial' : m.trial_status === 'expired' && m.status_assinatura !== 'ativo' ? 'trial_encerrado' : m.status_assinatura;
+  const statusVisivel = (m: Profile) => trialAtivo(m) ? 'trial' : (m.trial_status === 'expired' || (m.trial_status === 'active' && Boolean(m.trial_ends_at) && new Date(m.trial_ends_at!).getTime() <= Date.now())) && m.status_assinatura !== 'ativo' ? 'trial_encerrado' : m.status_assinatura;
   const mentoradosFiltrados = mentorados.filter((m) => {
+    if (pessoaSelecionada && m.id !== pessoaSelecionada) return false;
     if (filtroPlano && m.plano_id !== filtroPlano) return false;
     if (filtroStatus && statusVisivel(m) !== filtroStatus) return false;
     if (!termoMentorado) return true;
@@ -401,6 +405,7 @@ export default function GerenciarPlanosClient({
         </div>
       </section>
 
+      <div id="pessoas-planos" className="scroll-mt-6">{pessoaSelecionada && <p className="mb-4 rounded-xl border border-gray-faint p-4 text-sm">Exibindo a pessoa selecionada no Analytics. <button type="button" onClick={() => setPessoaSelecionada('')} className="min-h-11 text-mint-deep underline">Ver todas as pessoas</button></p>}</div>
       <div className="mb-3">
         <label className="relative block max-w-xl">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-text" />

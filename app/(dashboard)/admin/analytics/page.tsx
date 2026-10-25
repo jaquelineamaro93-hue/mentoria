@@ -169,7 +169,7 @@ export default async function AdminAnalyticsPage({
       admin
         .from('profiles')
         .select(
-          'id,created_at,last_activity_at,status_assinatura,trial_status,trial_started_at,trial_ends_at,trial_converted_at,trial_prompt_variant,is_admin'
+          'id,nome,email,created_at,last_activity_at,status_assinatura,trial_status,trial_started_at,trial_ends_at,trial_converted_at,trial_prompt_variant,is_admin'
         )
         .eq('is_admin', false)
         .range(from, to)
@@ -548,18 +548,22 @@ export default async function AdminAnalyticsPage({
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="space-y-3">
             {[
-              ['Iniciados', trialsStarted.length],
-              ['Dentro do prazo', trialsActive.length],
-              ['Convertidos', trialsConverted.length],
-              ['Expirados', trialsExpired.length],
-            ].map(([label, value]) => (
-              <div key={String(label)} className="rounded-xl border border-gray-faint p-3">
-                <p className="font-display text-xl text-black">{value}</p>
-                <p className="text-[11px] text-gray-text">{label}</p>
+              { label: 'Iniciados', people: trialsStarted },
+              { label: 'Dentro do prazo', people: trialsActive },
+              { label: 'Convertidos', people: trialsConverted },
+              { label: 'Expirados', people: trialsExpired },
+            ].map(({ label, people }) => <details key={label} className="rounded-xl border border-gray-faint bg-white">
+              <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-3 p-4 focus-visible:outline-2 focus-visible:outline-mint-deep"><span className="text-sm font-medium">{label} <strong className="ml-2 text-lg">{people.length}</strong></span><span className="text-xs text-mint-deep">Ver pessoas</span></summary>
+              <div className="border-t border-gray-faint px-4">
+                {people.length === 0 ? <p className="py-4 text-sm text-gray-text">Nenhuma pessoa nesta etapa.</p> : <ul className="divide-y divide-gray-faint">{people.map(person => <li key={person.id} className="py-4">
+                  <p className="text-sm font-semibold">{person.nome || 'Sem nome'}</p><p className="mt-1 break-all text-sm text-gray-text">{person.email || 'E-mail não informado'}</p>
+                  <p className="mt-2 text-xs text-gray-text">{person.trial_ends_at ? `Término do teste: ${new Date(person.trial_ends_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}` : 'Término do teste não informado'}</p>
+                  <Link href={'/admin/gerenciar-planos?pessoa=' + encodeURIComponent(person.id) + '#pessoas-planos'} className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-mint-deep underline">Gerenciar plano desta pessoa</Link>
+                </li>)}</ul>}
               </div>
-            ))}
+            </details>)}
           </div>
 
           <p className="mt-4 text-sm text-gray-text">{trialsActive.length} testes com prazo vigente. {trialsExpired.length} encerrados pelo prazo ou status registrado.{trialsWithoutEnd.length > 0 && ` Há ${trialsWithoutEnd.length} cadastro(s) sem data de término para conferir em Planos e contratos.`}</p>

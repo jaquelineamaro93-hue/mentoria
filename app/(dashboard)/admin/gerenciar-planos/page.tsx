@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import GerenciarPlanosClient from './GerenciarPlanosClient';
 
-export default async function GerenciarPlanosPage() {
+export default async function GerenciarPlanosPage({ searchParams }: { searchParams: Promise<{ pessoa?: string }> }) {
+  const { pessoa } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -47,6 +48,6 @@ export default async function GerenciarPlanosPage() {
   ];
   return <>
     {signed.error||orders.error||purchases.error||versions.error?<p className="mb-5 rounded-xl border p-4 text-black">Não foi possível consultar os aceites. Atualize a página para tentar novamente.</p>:<AdminContractRegister entries={entries}/>}
-    <GerenciarPlanosClient mentorados={mentorados||[]} planos={planos||[]}/>
+    <GerenciarPlanosClient pessoaInicial={pessoa} mentorados={mentorados||[]} planos={planos||[]}/>
   </>;
 }
