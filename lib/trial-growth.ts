@@ -30,24 +30,39 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
     timeZone: TZ, day: '2-digit', month: 'long',
   }).format(new Date(end));
   const subjects: Record<Stage, string> = {
-    d3: 'Sua jornada de carreira pode continuar na SOMA',
-    d1: 'Seu teste na SOMA termina amanhã',
-    d0: 'Hoje é o último dia do seu teste gratuito na SOMA',
+    d3: 'Você ainda pode aproveitar seu teste gratuito na SOMA',
+    d1: 'Seu teste SOMA termina amanhã: escolha seu próximo passo',
+    d0: 'Seu teste gratuito da SOMA termina hoje',
     p2: 'Qual é o próximo passo da sua carreira?',
   };
-  const intro = stage === 'p2'
-    ? 'Seu teste gratuito terminou, mas você pode continuar trabalhando no seu próximo passo profissional. O que faz mais sentido agora: buscar uma nova oportunidade ou crescer onde você está?'
-    : 'Seu período gratuito na SOMA está chegando ao fim. Você pode continuar sua jornada de carreira com clareza, estratégia e autonomia.';
+  const intro = stage === 'd3'
+    ? 'Seu teste gratuito está chegando ao fim. Antes de decidir como continuar, reserve alguns minutos para descobrir o que a SOMA pode ajudar você a desenvolver na carreira.'
+    : stage === 'd1'
+      ? 'Seu teste termina amanhã. Vale escolher agora como você quer continuar seu desenvolvimento profissional, com clareza sobre seus objetivos e as ferramentas que vão ajudar nessa jornada.'
+      : stage === 'd0'
+        ? 'Seu período gratuito termina hoje, no horário previsto para sua conta. Se quiser continuar, conheça os planos antes do encerramento do acesso.'
+        : 'Seu teste gratuito terminou, mas você pode continuar trabalhando no seu próximo passo profissional. O que faz mais sentido agora: buscar uma nova oportunidade ou crescer onde está?';
   const activation = onboarding
-    ? 'Se não conseguiu explorar tudo durante o teste, responda a este e-mail contando seu objetivo. Posso ajudar você a entender por onde começar.'
-    : 'Continue de onde parou e transforme seus objetivos em pequenas ações consistentes.';
-  const checkout = 'https://somamentoria.com/checkout';
+    ? 'Sua entrevista inicial ainda está pendente. Ela é o ponto de partida para dar direção à sua jornada na SOMA.'
+    : 'Você já iniciou sua jornada. Agora é a hora de transformar seus objetivos em ações consistentes.';
+  const params = (action: string) => 'utm_source=sendgrid&utm_medium=email&utm_campaign=soma_trial_growth&utm_content=' + stage + '_' + action;
+  const checkout = 'https://somamentoria.com/checkout?' + params('checkout');
+  const start = 'https://somamentoria.com/onboarding?' + params('ativacao');
+  const activationFirst = stage === 'd3' && onboarding;
+  const primaryUrl = activationFirst ? start : checkout;
+  const primaryLabel = activationFirst ? 'Fazer minha entrevista inicial' : stage === 'p2' ? 'Conhecer os planos' : 'Escolher como continuar';
+  const secondary = activationFirst
+    ? '<p>Já sabe que quer continuar? <a href="' + checkout + '">Veja os planos da SOMA</a>.</p>'
+    : onboarding && stage === 'd1'
+      ? '<p>Antes de escolher, você também pode <a href="' + start + '">fazer sua entrevista inicial</a>.</p>'
+      : '';
   const html = `<div style="font:16px/1.6 Arial,sans-serif;color:#24382d;max-width:580px;margin:auto;padding:24px">
     <h2>Seu próximo passo de carreira</h2>
     <p>Oi, ${first}!</p>
     <p>${intro}</p><p>${activation}</p>
     <p>Na SOMA, você pode desenvolver seu PDI, organizar seus objetivos e acompanhar sua evolução profissional.</p>
-    <p><a href="${checkout}" style="background:#276b52;color:white;padding:12px 18px;text-decoration:none;border-radius:8px">${stage === 'p2' ? 'Escolher meu plano' : 'Conhecer os planos'}</a></p>
+    <p><a href="${primaryUrl}" style="background:#276b52;color:white;padding:12px 18px;text-decoration:none;border-radius:8px">${primaryLabel}</a></p>
+    ${secondary}
     ${stage === 'p2' ? '' : `<p>Seu acesso gratuito termina em ${date}.</p>`}
     <p>Se precisar de ajuda para começar, responda a este e-mail.</p>
     <p>Um abraço,<br>Jaqueline Amaro<br>Fundadora da SOMA Mentoria</p>
