@@ -1,4 +1,6 @@
 'use client';
+import { useLocale } from '@/components/LocaleProvider';
+import { translateCopy } from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export default function PdiClient({ profile, userId, secoes, respostasIniciais }: Props) {
+  const { locale } = useLocale();
   const router = useRouter();
   const supabase = createClient();
 
@@ -67,7 +70,7 @@ export default function PdiClient({ profile, userId, secoes, respostasIniciais }
     setSalvando(false);
 
     if (error) {
-      setErro('Não consegui salvar essa seção. Confira sua internet e tente de novo.');
+      setErro(translateCopy("Não consegui salvar essa seção. Confira sua internet e tente de novo.",locale));
       return false;
     }
 
