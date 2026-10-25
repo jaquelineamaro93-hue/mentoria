@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useLocale } from '@/components/LocaleProvider';
+import CaseVideoShowcase from '@/components/public/CaseVideoShowcase';
 import { ArrowRight, ArrowLeft, Quote, BookOpen, Users, BriefcaseBusiness } from 'lucide-react';
 
 const copy={
@@ -67,6 +68,7 @@ export default function CasesPage(){
    </div>
    <p className="mt-8 max-w-4xl text-xs leading-6 text-[#566960]">{t.note}</p>
   </section>
+  <CaseVideoShowcase />
   <section className="bg-[#EAF4EF] px-5 py-12"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6">
     <div className="flex gap-3 text-[#0D8071]"><Users size={24}/><BriefcaseBusiness size={24}/></div>
     <Link href="/planos" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white">{t.cta}<ArrowRight size={17}/></Link>

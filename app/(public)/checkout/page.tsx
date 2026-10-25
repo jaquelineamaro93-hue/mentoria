@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import CheckoutClient from './CheckoutClient';
@@ -49,15 +50,13 @@ export default async function CheckoutPage() {
       <div className="max-w-6xl mx-auto">
         <Link href="/planos" className="inline-flex items-center gap-2 text-black hover:text-gray-text mb-6 sm:mb-8">
           <ArrowLeft size={20} />
-          <span>Voltar</span>
+          <span><LocalizedText text={"Voltar"} /></span>
         </Link>
 
         <h1 className="text-3xl sm:text-4xl font-display text-black mb-8 sm:mb-12 text-center">Checkout</h1>
 
         {planoAtualCodigo && (
-          <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black">
-            Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado.
-          </div>
+          <div className="bg-mint-light border border-mint rounded-xl p-4 mb-8 text-center text-sm text-black"><LocalizedText text={"Você já possui um plano ativo. Ao escolher um novo plano, ele substituirá o anterior ao ser confirmado."} /></div>
         )}
 
         <CheckoutClient

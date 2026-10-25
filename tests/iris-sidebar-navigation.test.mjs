@@ -29,7 +29,7 @@ test('O Plano de Ação Íris abre a página existente, com histórico próprio 
   assert.match(page, /title: 'Plano de Ação Íris \| SOMA Mentoria'/);
   assert.match(page, /return <PlanoAcoesIrisClient \/>/);
   assert.match(page, /redirect\('\/login'\)/);
-  assert.match(client, />Plano de Ação Íris<\/h1>/);
+  assert.match(client, /<LocalizedText text=\{"Plano de Ação Íris"\} \/>/);
   assert.match(client, /Meus planos salvos/);
   assert.match(client, /Confirmar e salvar meu plano/);
   assert.match(client, /aria-valuenow=\{percentual\}/);

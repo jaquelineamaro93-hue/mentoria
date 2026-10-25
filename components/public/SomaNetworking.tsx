@@ -1,3 +1,4 @@
+import LocalizedText from '@/components/LocalizedText';
 /**
  * Logos de empresas citadas em trajetórias profissionais da SOMA e da mentora.
  * Não indicam vínculo empregatício atual, parceria ou disponibilidade para contato.
@@ -40,28 +41,18 @@ export default function SomaNetworking() {
   return (
     <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="scroll-mt-24 border-y border-[#e5ede9] bg-[#f6faf8] py-14 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#0D8071]">Pessoas e conexões</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#0D8071]"><LocalizedText text={"Pessoas e conexões"} /></p>
         <h2 id="soma-networking-titulo" className="mx-auto mt-3 max-w-3xl font-display text-3xl leading-tight text-[#172823] sm:text-4xl">
           {EMPRESAS_REDE.length > 0
             ? 'Conecte-se com profissionais de empresas como'
             : 'Conecte-se com profissionais que também investem em si.'}
         </h2>
-        <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-[#526760] sm:text-base">
-          Carreira e networking não precisam ser pesados. Podem ser genuínos.
-          Aprenda com quem também está investindo em si.
-        </p>
+        <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-[#526760] sm:text-base"><LocalizedText text={"Carreira e networking não precisam ser pesados. Podem ser genuínos. Aprenda com quem também está investindo em si."} /></p>
 
         <div className="mt-11 border-t border-[#d9e8e2] pt-9 sm:mt-14 sm:pt-11">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0D8071]">
-            Mentorado também é conexão
-          </p>
-          <h3 className="mx-auto mt-3 max-w-3xl font-display text-2xl leading-tight text-[#172823] sm:text-3xl">
-            Empresas onde nossos mentorados atuam
-          </h3>
-          <p className="mx-auto mt-3 max-w-3xl text-sm leading-6 text-[#526760] sm:text-base">
-            A SOMA reúne profissionais com diferentes histórias e desafios de carreira.
-            Estas são algumas das empresas presentes na trajetória dos mentorados.
-          </p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0D8071]"><LocalizedText text={"Mentorado também é conexão"} /></p>
+          <h3 className="mx-auto mt-3 max-w-3xl font-display text-2xl leading-tight text-[#172823] sm:text-3xl"><LocalizedText text={"Empresas onde nossos mentorados atuam"} /></h3>
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-6 text-[#526760] sm:text-base"><LocalizedText text={"A SOMA reúne profissionais com diferentes histórias e desafios de carreira. Estas são algumas das empresas presentes na trajetória dos mentorados."} /></p>
           <div
             role="list"
             aria-label={`${EMPRESAS_MENTORADOS.length} empresas onde atuam mentorados da SOMA`}
@@ -104,18 +95,11 @@ export default function SomaNetworking() {
               </a>
             ))}
           </div>
-          <p className="mt-1 text-xs text-[#74877e] sm:hidden">
-            Deslize para o lado para conhecer todas as empresas.
-          </p>
-          <p className="mx-auto mt-5 max-w-4xl text-xs leading-5 text-[#74877e]">
-            As marcas representam apenas a atuação profissional de mentorados. Não há indicação de parceria,
-            patrocínio ou endosso dessas empresas à SOMA, nem promessa de contato com seus colaboradores.
-          </p>
+          <p className="mt-1 text-xs text-[#74877e] sm:hidden"><LocalizedText text={"Deslize para o lado para conhecer todas as empresas."} /></p>
+          <p className="mx-auto mt-5 max-w-4xl text-xs leading-5 text-[#74877e]"><LocalizedText text={"As marcas representam apenas a atuação profissional de mentorados. Não há indicação de parceria, patrocínio ou endosso dessas empresas à SOMA, nem promessa de contato com seus colaboradores."} /></p>
         </div>
 
-        <p className="mt-10 text-xs font-semibold uppercase tracking-[0.16em] text-[#74877e]">
-          Outras trajetórias profissionais que inspiram a SOMA
-        </p>
+        <p className="mt-10 text-xs font-semibold uppercase tracking-[0.16em] text-[#74877e]"><LocalizedText text={"Outras trajetórias profissionais que inspiram a SOMA"} /></p>
         {EMPRESAS_REDE.length > 0 ? (
           <>
             <div aria-label="Empresas presentes em trajetórias profissionais relacionadas à SOMA" className="mt-9 grid grid-cols-2 items-center gap-3 sm:grid-cols-4 sm:gap-5">
@@ -127,8 +111,7 @@ export default function SomaNetworking() {
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-xs text-[#74877e]">Marcas presentes em trajetórias profissionais que inspiram a SOMA, sem vínculo de parceria ou patrocínio. A menção não indica vínculo atual nem garante contato com colaboradores.
-              <span className="mt-1 block">Logotipo Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons.</span></p>
+            <p className="mt-5 text-xs text-[#74877e]"><LocalizedText text={"Marcas presentes em trajetórias profissionais que inspiram a SOMA, sem vínculo de parceria ou patrocínio. A menção não indica vínculo atual nem garante contato com colaboradores."} /><span className="mt-1 block">Logotipo Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons.</span></p>
           </>
         ) : (
           <div aria-label="Áreas de atuação presentes na proposta de networking" className="mx-auto mt-9 flex max-w-4xl flex-wrap justify-center gap-2.5">

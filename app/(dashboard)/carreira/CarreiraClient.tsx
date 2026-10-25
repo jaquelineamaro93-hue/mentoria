@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useSaasAccess } from '@/lib/contexts/SaasAccessContext';
 import { useEffect, useState } from 'react';
@@ -88,12 +89,9 @@ export default function CarreiraClient({
   return (
     <div className="w-full">
       <header className="mb-7">
-        <p className="text-xs uppercase tracking-[0.16em] text-gray-text mb-2">Mercado de trabalho</p>
-        <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Prepare-se para novas oportunidades</h1>
-        <p className="text-sm md:text-base text-gray-text max-w-3xl leading-relaxed">
-          Use esta área quando estiver buscando uma nova vaga. Analise seu currículo, compare oportunidades,
-          acompanhe candidaturas e pratique entrevistas com todo o contexto conectado.
-        </p>
+        <p className="text-xs uppercase tracking-[0.16em] text-gray-text mb-2"><LocalizedText text={"Mercado de trabalho"} /></p>
+        <h1 className="font-display text-3xl md:text-4xl text-black mb-2"><LocalizedText text={"Prepare-se para novas oportunidades"} /></h1>
+        <p className="text-sm md:text-base text-gray-text max-w-3xl leading-relaxed"><LocalizedText text={"Use esta área quando estiver buscando uma nova vaga. Analise seu currículo, compare oportunidades, acompanhe candidaturas e pratique entrevistas com todo o contexto conectado."} /></p>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-3 mb-8" role="tablist" aria-label="Etapas da busca por novas oportunidades">

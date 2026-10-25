@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -96,12 +97,9 @@ export default function MinhaTrilhaClient({
   return (
     <>
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2">Sua experiência na SOMA</p>
-        <h1 className="font-display text-3xl text-black mb-2">Como está sendo a mentoria para você?</h1>
-        <p className="text-sm text-gray-text max-w-2xl leading-relaxed">
-          Uma vez por mês, conte como está sendo sua experiência, o que está funcionando e o que podemos melhorar.
-          Esse check-in é sobre a mentoria — não é uma avaliação do seu desempenho profissional.
-        </p>
+        <p className="text-xs uppercase tracking-[0.16em] text-mint-deep mb-2"><LocalizedText text={"Sua experiência na SOMA"} /></p>
+        <h1 className="font-display text-3xl text-black mb-2"><LocalizedText text={"Como está sendo a mentoria para você?"} /></h1>
+        <p className="text-sm text-gray-text max-w-2xl leading-relaxed"><LocalizedText text={"Uma vez por mês, conte como está sendo sua experiência, o que está funcionando e o que podemos melhorar. Esse check-in é sobre a mentoria — não é uma avaliação do seu desempenho profissional."} /></p>
       </header>
 
       <div className="relative pl-8 space-y-8">
@@ -159,7 +157,7 @@ export default function MinhaTrilhaClient({
                 ) : ehMesAtual && !jaEnviouEsseMes ? (
                   <div className="bg-white border border-brown-deep/30 rounded-xl p-4 space-y-3">
                     <div>
-                      <div className="flex items-center gap-1 mb-2"><p className="text-xs text-gray-text">Como está sendo esse mês para você?</p><Tooltip texto="De 0 a 5: como foi a mentoria este mês" /></div>
+                      <div className="flex items-center gap-1 mb-2"><p className="text-xs text-gray-text"><LocalizedText text={"Como está sendo esse mês para você?"} /></p><Tooltip texto="De 0 a 5: como foi a mentoria este mês" /></div>
                       <div className="flex gap-1.5">
                         {[0, 1, 2, 3, 4, 5].map((n) => (
                           <button
@@ -200,7 +198,7 @@ export default function MinhaTrilhaClient({
                 ) : ehFuturo ? (
                   <p className="text-sm text-gray-text">Disponível em {nomeDoMes(referencia)}</p>
                 ) : (
-                  <p className="text-sm text-gray-text">Sem check-in registrado nesse mês</p>
+                  <p className="text-sm text-gray-text"><LocalizedText text={"Sem check-in registrado nesse mês"} /></p>
                 )}
               </div>
             );

@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -74,13 +75,9 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
             href="/dashboard"
             className="inline-flex items-center gap-2 text-xs font-medium text-gray-text hover:text-black mb-4 transition-colors"
           >
-            <ArrowLeft size={14} />
-            Voltar ao Início
-          </Link>
-          <h1 className="font-display text-3xl md:text-4xl text-black mb-2">Primeiros 90 Dias</h1>
-          <p className="text-gray-text text-base leading-relaxed">
-            Guia de aceleração de carreira e transição executiva
-          </p>
+            <ArrowLeft size={14} /><LocalizedText text={"Voltar ao Início"} /></Link>
+          <h1 className="font-display text-3xl md:text-4xl text-black mb-2"><LocalizedText text={"Primeiros 90 Dias"} /></h1>
+          <p className="text-gray-text text-base leading-relaxed"><LocalizedText text={"Guia de aceleração de carreira e transição executiva"} /></p>
         </div>
       </div>
 
@@ -88,7 +85,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
       <div>
         {/* STARS Diagnosis */}
         <div className="mb-12">
-          <h2 className="text-xl text-black font-medium mb-6">Contexto de Atuação</h2>
+          <h2 className="text-xl text-black font-medium mb-6"><LocalizedText text={"Contexto de Atuação"} /></h2>
           <StarsSelector selected={situacaoStars} onSelect={handleStarsSelect} />
         </div>
 
@@ -147,7 +144,7 @@ export default function Primeiros90DiasClient({ initialData, userId }: Primeiros
               >
                 {isSaving ? 'Salvando...' : 'Salvar Progresso'}
               </button>
-              {saved && <p className="text-mint font-medium">Salvo com sucesso</p>}
+              {saved && <p className="text-mint font-medium"><LocalizedText text={"Salvo com sucesso"} /></p>}
             </div>
           </div>
         )}

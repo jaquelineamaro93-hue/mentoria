@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -77,26 +78,20 @@ export default function FeedbackParesClient({
 
         <section className="mb-10">
           <Eyebrow>
-            <MessageCircle size={13} /> Novo feedback
-          </Eyebrow>
+            <MessageCircle size={13} /><LocalizedText text={"Novo feedback"} /></Eyebrow>
           <Panel className="p-6">
             {colegas.length === 0 ? (
-              <p className="text-sm text-gray-text">
-                Ainda não tem outras pessoas cadastradas na mentoria para você dar
-                feedback. Assim que mais gente entrar, aparece aqui.
-              </p>
+              <p className="text-sm text-gray-text"><LocalizedText text={"Ainda não tem outras pessoas cadastradas na mentoria para você dar feedback. Assim que mais gente entrar, aparece aqui."} /></p>
             ) : (
               <>
                 <label className="flex flex-col gap-1.5 mb-4 ">
-                  <span className="text-xs uppercase tracking-wide text-gray-text">
-                    Para quem
-                  </span>
+                  <span className="text-xs uppercase tracking-wide text-gray-text"><LocalizedText text={"Para quem"} /></span>
                   <select
                     value={paraUserId}
                     onChange={(e) => setParaUserId(e.target.value)}
                     className="bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                   >
-                    <option value="">Selecione uma colega...</option>
+                    <option value=""><LocalizedText text={"Selecione uma colega..."} /></option>
                     {colegas.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.nome}
@@ -106,9 +101,7 @@ export default function FeedbackParesClient({
                 </label>
 
                 <label className="flex flex-col gap-1.5 mb-4">
-                  <span className="text-xs uppercase tracking-wide text-gray-text">
-                    Sua mensagem
-                  </span>
+                  <span className="text-xs uppercase tracking-wide text-gray-text"><LocalizedText text={"Sua mensagem"} /></span>
                   <textarea
                     value={mensagem}
                     onChange={(e) => setMensagem(e.target.value)}
@@ -167,9 +160,7 @@ export default function FeedbackParesClient({
 
           {aba === 'recebidos' ? (
             recebidos.length === 0 ? (
-              <Panel className="p-6 text-sm text-gray-text text-center">
-                Você ainda não recebeu nenhum feedback. Que tal ser a primeira a mandar um?
-              </Panel>
+              <Panel className="p-6 text-sm text-gray-text text-center"><LocalizedText text={"Você ainda não recebeu nenhum feedback. Que tal ser a primeira a mandar um?"} /></Panel>
             ) : (
               <div className="flex flex-col gap-3">
                 {recebidos.map((f) => (
@@ -186,9 +177,7 @@ export default function FeedbackParesClient({
               </div>
             )
           ) : enviados.length === 0 ? (
-            <Panel className="p-6 text-sm text-gray-text text-center">
-              Você ainda não enviou nenhum feedback.
-            </Panel>
+            <Panel className="p-6 text-sm text-gray-text text-center"><LocalizedText text={"Você ainda não enviou nenhum feedback."} /></Panel>
           ) : (
             <div className="flex flex-col gap-3">
               {enviados.map((f) => (

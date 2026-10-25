@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useEffect, useState } from 'react';
 import { Check, Lock, Loader2, Award, ShoppingBag, Zap, Flame, ScanSearch,
@@ -103,10 +104,8 @@ export default function PassaporteClient({
 
         <main className="flex-1 overflow-auto">
         <div className="px-6 py-10 md:px-12 w-full">
-          <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20">
-            Carreira em movimento
-          </p>
-          <h1 className="font-display text-3xl text-black mb-8">Meu mapa de carreira</h1>
+          <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20"><LocalizedText text={"Carreira em movimento"} /></p>
+          <h1 className="font-display text-3xl text-black mb-8"><LocalizedText text={"Meu mapa de carreira"} /></h1>
 
           <div role="tablist" aria-label="Áreas do Passaporte" className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-[#DDE6E0] bg-white p-2 grid-cols-2 sm:grid-cols-4">
             {([
@@ -141,7 +140,7 @@ export default function PassaporteClient({
           {tab === 'conquistas' && (
             <div className="space-y-10">
               <section>
-                <Eyebrow>Missões que movem sua história</Eyebrow>
+                <Eyebrow><LocalizedText text={"Missões que movem sua história"} /></Eyebrow>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {conquistas.map((c) => {
                     const desbloqueada = idsDesbloqueadas.has(c.id);
@@ -158,8 +157,8 @@ export default function PassaporteClient({
               </section>
 
               <section aria-labelledby="soma-pillars-title">
-                <h2 id="soma-pillars-title" className="text-xl font-semibold text-[#183F37]">Quatro forças para sua carreira</h2>
-                <p className="mt-2 mb-5 text-sm leading-6 text-[#52675B]">Entenda o que cada ação desenvolve. As descrições ficam visíveis também no celular.</p>
+                <h2 id="soma-pillars-title" className="text-xl font-semibold text-[#183F37]"><LocalizedText text={"Quatro forças para sua carreira"} /></h2>
+                <p className="mt-2 mb-5 text-sm leading-6 text-[#52675B]"><LocalizedText text={"Entenda o que cada ação desenvolve. As descrições ficam visíveis também no celular."} /></p>
                 <div className="grid gap-5 lg:grid-cols-2">
                 {(['sabedoria', 'objetividade', 'maestria', 'alquimia'] as const).map((pilar, index) => {
                   const guides = ['Lume · Reconheça suas forças', 'Norte · Transforme intenção em direção', 'Brasa · Construa constância', 'Íris · Abra novas oportunidades'];
@@ -174,7 +173,7 @@ export default function PassaporteClient({
                       const linked = conquistas.find(c => c.codigo === item.id);
                       const earned = !!linked && idsDesbloqueadas.has(linked.id);
                       const Icone = ICONES_CONQUISTA[item.icone] ?? Award;
-                      return <li key={item.id} className="flex gap-3 py-4"><span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F5EF] text-[#386657]"><Icone size={20} strokeWidth={1.8} aria-hidden="true"/></span><div><h4 className="text-sm font-semibold text-[#273F34]">{item.nome}</h4><p className="mt-1 text-sm leading-5 text-[#52675B]">{item.descricao}</p>{earned && <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#24533C]"><Check size={12} aria-hidden="true"/>Conquista registrada</span>}</div></li>;
+                      return <li key={item.id} className="flex gap-3 py-4"><span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F5EF] text-[#386657]"><Icone size={20} strokeWidth={1.8} aria-hidden="true"/></span><div><h4 className="text-sm font-semibold text-[#273F34]">{item.nome}</h4><p className="mt-1 text-sm leading-5 text-[#52675B]">{item.descricao}</p>{earned && <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#24533C]"><Check size={12} aria-hidden="true"/><LocalizedText text={"Conquista registrada"} /></span>}</div></li>;
                     })}
                     </ul>
                   </article>;
@@ -209,8 +208,7 @@ export default function PassaporteClient({
                       </div>
                       {jaResgatado ? (
                         <span className="text-xs text-mint flex items-center gap-1">
-                          <Check size={13} /> Resgatado
-                        </span>
+                          <Check size={13} /><LocalizedText text={"Resgatado"} /></span>
                       ) : disponivel ? (
                         <button
                           onClick={() => resgatar(r)}

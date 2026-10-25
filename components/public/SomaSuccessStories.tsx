@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
+import { useLocale } from '@/components/LocaleProvider';
+import { translateCopy } from '@/components/LocalizedText';
 import { ArrowRight, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
 /**
@@ -151,6 +153,8 @@ const DEPOIMENTOS_LINKEDIN = [
 ] as const;
 
 export default function SomaSuccessStories({ completo = false }: { completo?: boolean } = {}) {
+  const { locale } = useLocale();
+  const t = (value:string) => translateCopy(value,locale);
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -193,14 +197,13 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
           <div className="max-w-3xl">
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#4ac1ae]/30 bg-[#0D8071]/20 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#8fe1d3]">
               <Quote size={15} aria-hidden="true" />
-              Histórias recebidas, resultados reais
+              {t('Histórias recebidas, resultados reais')}
             </p>
             <h2 id="historias-soma-titulo" className="font-display text-3xl leading-tight sm:text-4xl">
-              O próximo capítulo pode começar com um <span className="text-[#65cbb8]">sim.</span>
+              {t('O próximo capítulo pode começar com um')} <span className="text-[#65cbb8]">sim.</span>
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#bbcbc6]">
-              Depoimentos compartilhados por pessoas que passaram pela mentoria ou receberam
-              orientações em comunidades. Recolocação, evolução profissional e novas possibilidades.
+              {t('Depoimentos compartilhados por pessoas que passaram pela mentoria ou receberam orientações em comunidades. Recolocação, evolução profissional e novas possibilidades.')}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
@@ -244,7 +247,7 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <span className="rounded-full bg-[#0D8071]/25 px-3 py-1.5 text-[11px] font-semibold text-[#8fe1d3]">
-                    {historia.categoria}
+                    {t(historia.categoria)}
                   </span>
                   <Quote size={20} className="shrink-0 text-[#65cbb8]/75" aria-hidden="true" />
                 </div>
@@ -258,7 +261,7 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-white">{historia.nome}</p>
-                  <p className="mt-0.5 line-clamp-1 text-[11px] text-[#a7bdb5]">{historia.detalhe} · {historia.origem}</p>
+                  <p className="mt-0.5 line-clamp-1 text-[11px] text-[#a7bdb5]">{t(historia.detalhe)} · {t(historia.origem)}</p>
                 </div>
               </div>
             </article>
@@ -268,10 +271,10 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
         {!completo && (
           <>
             <p className="mt-3 text-xs leading-5 text-[#a7bdb5]">
-              Os cartões mostram um resumo. Na página de Depoimentos estão os relatos integrais e os posts originais do LinkedIn.
+              {t('Os cartões mostram um resumo. Na página de Depoimentos estão os relatos integrais e os posts originais do LinkedIn.')}
             </p>
         <nav aria-label="Depoimentos anteriores publicados no LinkedIn" className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium text-[#a7bdb5]">Relatos publicados no LinkedIn:</span>
+          <span className="mr-1 text-xs font-medium text-[#a7bdb5]">{t('Relatos publicados no LinkedIn:')}</span>
           {DEPOIMENTOS_LINKEDIN.map(depoimento => (
             <a
               key={depoimento.autor}
@@ -288,15 +291,14 @@ export default function SomaSuccessStories({ completo = false }: { completo?: bo
         )}
         <div className="mt-1 flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-3xl text-xs leading-5 text-[#a7bdb5]">
-            Depoimentos reais compartilhados com autorização. Trechos editados apenas para concisão e legibilidade.
-            Resultados individuais não representam promessa de aprovação ou contratação.
+            {t('Depoimentos reais compartilhados com autorização. Trechos editados apenas para concisão e legibilidade. Resultados individuais não representam promessa de aprovação ou contratação.')}
           </p>
           {!completo && (
             <Link
               href="/depoimentos"
               className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#8fe1d3] transition hover:text-white"
             >
-              Ver depoimentos publicados no LinkedIn <ArrowRight size={17} aria-hidden="true" />
+              {t('Ver depoimentos publicados no LinkedIn')} <ArrowRight size={17} aria-hidden="true" />
             </Link>
           )}
         </div>

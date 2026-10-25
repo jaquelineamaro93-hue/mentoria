@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -204,22 +205,16 @@ export default function EntrevistaClient({
         {!embedded && (
           <>
             <Eyebrow>
-              <Sparkles size={14} />
-              Preparação para entrevistas
-            </Eyebrow>
-            <h1 className="font-display text-3xl text-black mb-1">SOAR Builder</h1>
-            <p className="text-sm text-gray-text mb-8">
-              Mapeie suas experiências com o framework SOAR e prepare respostas para entrevistas.
-            </p>
+              <Sparkles size={14} /><LocalizedText text={"Preparação para entrevistas"} /></Eyebrow>
+            <h1 className="font-display text-3xl text-black mb-1"><LocalizedText text={"SOAR Builder"} /></h1>
+            <p className="text-sm text-gray-text mb-8"><LocalizedText text={"Mapeie suas experiências com o framework SOAR e prepare respostas para entrevistas."} /></p>
           </>
         )}
 
         {embedded && (initialCurriculo || initialDescricaoVaga) && (
           <Panel className="p-4 mb-6 border-mint bg-mint-light/40">
-            <p className="text-sm font-medium text-black">A SOMA trouxe o contexto da etapa anterior</p>
-            <p className="text-sm text-gray-text mt-1">
-              Seu currículo e a vaga da análise mais recente já estão preenchidos abaixo. Revise se quiser e gere sua preparação SOAR.
-            </p>
+            <p className="text-sm font-medium text-black"><LocalizedText text={"A SOMA trouxe o contexto da etapa anterior"} /></p>
+            <p className="text-sm text-gray-text mt-1"><LocalizedText text={"Seu currículo e a vaga da análise mais recente já estão preenchidos abaixo. Revise se quiser e gere sua preparação SOAR."} /></p>
           </Panel>
         )}
 
@@ -232,9 +227,7 @@ export default function EntrevistaClient({
                 : 'text-gray-text hover:text-black'
             }`}
           >
-            <Sparkles size={18} className="inline mr-2" />
-            Preparar SOAR
-          </button>
+            <Sparkles size={18} className="inline mr-2" /><LocalizedText text={"Preparar SOAR"} /></button>
           <button
             onClick={() => setAba('simular')}
             className={`pb-3 px-3 sm:px-4 font-medium transition ${
@@ -243,9 +236,7 @@ export default function EntrevistaClient({
                 : 'text-gray-text hover:text-black'
             }`}
           >
-            <PlayCircle size={18} className="inline mr-2" />
-            Simular entrevista
-          </button>
+            <PlayCircle size={18} className="inline mr-2" /><LocalizedText text={"Simular entrevista"} /></button>
           <button
             onClick={() => setAba('minhas')}
             className={`pb-3 px-3 sm:px-4 font-medium transition ${
@@ -254,9 +245,7 @@ export default function EntrevistaClient({
                 : 'text-gray-text hover:text-black'
             }`}
           >
-            <BookOpen size={18} className="inline mr-2" />
-            Minhas análises
-          </button>
+            <BookOpen size={18} className="inline mr-2" /><LocalizedText text={"Minhas análises"} /></button>
         </div>
 
         {aba === 'novo' && (
@@ -268,9 +257,7 @@ export default function EntrevistaClient({
                   <p className="text-sm text-mint font-medium mb-1">
                     <strong>SOAR</strong> = Situation, Obstacle, Action, Result
                   </p>
-                  <p className="text-sm text-mint">
-                    Vamos mapear suas experiências alinhadas com a vaga que você está disputando.
-                  </p>
+                  <p className="text-sm text-mint"><LocalizedText text={"Vamos mapear suas experiências alinhadas com a vaga que você está disputando."} /></p>
                 </div>
               </div>
             </Panel>
@@ -278,22 +265,20 @@ export default function EntrevistaClient({
             {applications.length > 0 && (
               <Panel className="p-5">
                 <label className="block">
-                  <span className="block text-sm font-medium text-black mb-2">Preparar para uma candidatura salva</span>
+                  <span className="block text-sm font-medium text-black mb-2"><LocalizedText text={"Preparar para uma candidatura salva"} /></span>
                   <select
                     value={candidaturaId}
                     onChange={(event) => handleSelecionarCandidatura(event.target.value)}
                     className="w-full bg-white border border-gray-faint rounded-lg px-4 py-2.5 text-sm text-black focus:border-mint-deep"
                   >
-                    <option value="">Usar apenas a vaga preenchida abaixo</option>
+                    <option value=""><LocalizedText text={"Usar apenas a vaga preenchida abaixo"} /></option>
                     {applications.map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.cargo} · {item.empresa}
                       </option>
                     ))}
                   </select>
-                  <span className="block text-xs text-gray-text mt-2">
-                    Ao escolher uma candidatura, a descrição da vaga é reaproveitada e o SOAR fica ligado a esse processo.
-                  </span>
+                  <span className="block text-xs text-gray-text mt-2"><LocalizedText text={"Ao escolher uma candidatura, a descrição da vaga é reaproveitada e o SOAR fica ligado a esse processo."} /></span>
                 </label>
               </Panel>
             )}
@@ -301,9 +286,7 @@ export default function EntrevistaClient({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Panel className="p-6">
                 <h3 className="font-medium text-black mb-3 flex items-center gap-2">
-                  <Briefcase size={18} />
-                  Seu Currículo / Experiências
-                </h3>
+                  <Briefcase size={18} /><LocalizedText text={"Seu Currículo / Experiências"} /></h3>
                 <textarea
                   value={curriculo}
                   onChange={(e) => setCurriculo(e.target.value)}
@@ -314,9 +297,7 @@ export default function EntrevistaClient({
 
               <Panel className="p-6">
                 <h3 className="font-medium text-black mb-3 flex items-center gap-2">
-                  <Briefcase size={18} />
-                  Descrição da Vaga
-                </h3>
+                  <Briefcase size={18} /><LocalizedText text={"Descrição da Vaga"} /></h3>
                 <textarea
                   value={descricaoVaga}
                   onChange={(e) => setDescricaoVaga(e.target.value)}
@@ -334,14 +315,10 @@ export default function EntrevistaClient({
               >
                 {gerando ? (
                   <>
-                    <Loader2 size={20} className="animate-spin" />
-                    Analisando...
-                  </>
+                    <Loader2 size={20} className="animate-spin" /><LocalizedText text={"Analisando..."} /></>
                 ) : (
                   <>
-                    <Sparkles size={20} />
-                    Gerar Análise SOAR
-                  </>
+                    <Sparkles size={20} /><LocalizedText text={"Gerar Análise SOAR"} /></>
                 )}
               </button>
             </div>
@@ -361,9 +338,7 @@ export default function EntrevistaClient({
           <div className="space-y-6">
             {analises.length > 0 && (
               <Panel className="p-4">
-                <h3 className="text-xs uppercase tracking-wider text-gray-text mb-3">
-                  Análises salvas
-                </h3>
+                <h3 className="text-xs uppercase tracking-wider text-gray-text mb-3"><LocalizedText text={"Análises salvas"} /></h3>
                 <div className="flex flex-wrap gap-2">
                   {analises.map((item) => (
                     <div
@@ -399,25 +374,23 @@ export default function EntrevistaClient({
             {!analise ? (
               <Panel className="text-center py-12 p-6">
                 <BookOpen size={48} className="text-black mb-4" />
-                <p className="text-gray-text mb-4">Nenhuma análise SOAR gerada ainda</p>
+                <p className="text-gray-text mb-4"><LocalizedText text={"Nenhuma análise SOAR gerada ainda"} /></p>
                 <button
                   onClick={() => setAba('novo')}
                   className="text-black hover:text-mint-deep transition underline font-medium"
-                >
-                  Gerar sua primeira análise
-                </button>
+                ><LocalizedText text={"Gerar sua primeira análise"} /></button>
               </Panel>
             ) : (
               <>
                 <Panel className="bg-mint-light border border-mint p-6">
-                  <h3 className="font-display text-lg text-mint mb-3 flex items-center gap-2"><Target size={18} />Sua Abertura (3 frases)</h3>
+                  <h3 className="font-display text-lg text-mint mb-3 flex items-center gap-2"><Target size={18} /><LocalizedText text={"Sua Abertura (3 frases)"} /></h3>
                   <div className="bg-white p-4 rounded-lg border border-mint">
                     <Texto className="text-sm text-black leading-relaxed">{analise.abertura}</Texto>
                   </div>
                 </Panel>
 
                 <Panel className="p-6">
-                  <h3 className="font-display text-lg text-black mb-4 flex items-center gap-2"><BookOpen size={18} />3 Histórias Âncora Prontas</h3>
+                  <h3 className="font-display text-lg text-black mb-4 flex items-center gap-2"><BookOpen size={18} /><LocalizedText text={"3 Histórias Âncora Prontas"} /></h3>
                   <div className="space-y-4">
                     {analise.historiasAncora.map((historia, idx) => (
                       <div key={idx} className="bg-white p-4 rounded-lg border border-gray-faint">
@@ -433,14 +406,10 @@ export default function EntrevistaClient({
                         >
                           {copiado === historia ? (
                             <>
-                              <CheckCircle2 size={14} />
-                              Copiado!
-                            </>
+                              <CheckCircle2 size={14} /><LocalizedText text={"Copiado!"} /></>
                           ) : (
                             <>
-                              <Copy size={14} />
-                              Copiar história
-                            </>
+                              <Copy size={14} /><LocalizedText text={"Copiar história"} /></>
                           )}
                         </button>
                       </div>
@@ -449,10 +418,10 @@ export default function EntrevistaClient({
                 </Panel>
 
                 <Panel className="p-6">
-                  <h3 className="font-display text-lg text-black mb-4 flex items-center gap-2"><MessageSquare size={18} />Respostas Prontas</h3>
+                  <h3 className="font-display text-lg text-black mb-4 flex items-center gap-2"><MessageSquare size={18} /><LocalizedText text={"Respostas Prontas"} /></h3>
                   <div className="space-y-4">
                     <div className="bg-white p-4 rounded-lg border border-gray-faint">
-                      <h4 className="font-medium text-black mb-2">Por que quer sair da empresa atual?</h4>
+                      <h4 className="font-medium text-black mb-2"><LocalizedText text={"Por que quer sair da empresa atual?"} /></h4>
                       <Texto className="text-sm text-black mb-3">{analise.resposta_por_que_sair}</Texto>
                       <button
                         onClick={() => handleCopiar(analise.resposta_por_que_sair)}
@@ -464,20 +433,16 @@ export default function EntrevistaClient({
                       >
                         {copiado === analise.resposta_por_que_sair ? (
                           <>
-                            <CheckCircle2 size={14} />
-                            Copiado!
-                          </>
+                            <CheckCircle2 size={14} /><LocalizedText text={"Copiado!"} /></>
                         ) : (
                           <>
-                            <Copy size={14} />
-                            Copiar resposta
-                          </>
+                            <Copy size={14} /><LocalizedText text={"Copiar resposta"} /></>
                         )}
                       </button>
                     </div>
 
                     <div className="bg-white p-4 rounded-lg border border-gray-faint">
-                      <h4 className="font-medium text-black mb-2">Por que quer essa vaga?</h4>
+                      <h4 className="font-medium text-black mb-2"><LocalizedText text={"Por que quer essa vaga?"} /></h4>
                       <Texto className="text-sm text-black mb-3">{analise.resposta_por_que_vaga}</Texto>
                       <button
                         onClick={() => handleCopiar(analise.resposta_por_que_vaga)}
@@ -489,20 +454,16 @@ export default function EntrevistaClient({
                       >
                         {copiado === analise.resposta_por_que_vaga ? (
                           <>
-                            <CheckCircle2 size={14} />
-                            Copiado!
-                          </>
+                            <CheckCircle2 size={14} /><LocalizedText text={"Copiado!"} /></>
                         ) : (
                           <>
-                            <Copy size={14} />
-                            Copiar resposta
-                          </>
+                            <Copy size={14} /><LocalizedText text={"Copiar resposta"} /></>
                         )}
                       </button>
                     </div>
 
                     <div className="bg-white p-4 rounded-lg border border-gray-faint">
-                      <h4 className="font-medium text-black mb-2">Como você trata seus gaps?</h4>
+                      <h4 className="font-medium text-black mb-2"><LocalizedText text={"Como você trata seus gaps?"} /></h4>
                       <Texto className="text-sm text-black mb-3">{analise.tratamento_gaps}</Texto>
                       <button
                         onClick={() => handleCopiar(analise.tratamento_gaps)}
@@ -514,14 +475,10 @@ export default function EntrevistaClient({
                       >
                         {copiado === analise.tratamento_gaps ? (
                           <>
-                            <CheckCircle2 size={14} />
-                            Copiado!
-                          </>
+                            <CheckCircle2 size={14} /><LocalizedText text={"Copiado!"} /></>
                         ) : (
                           <>
-                            <Copy size={14} />
-                            Copiar resposta
-                          </>
+                            <Copy size={14} /><LocalizedText text={"Copiar resposta"} /></>
                         )}
                       </button>
                     </div>
@@ -529,7 +486,7 @@ export default function EntrevistaClient({
                 </Panel>
 
                 <Panel className="p-6">
-                  <h3 className="font-display text-lg text-black mb-4 flex items-center gap-2"><Briefcase size={18} />Experiências Mapeadas</h3>
+                  <h3 className="font-display text-lg text-black mb-4 flex items-center gap-2"><Briefcase size={18} /><LocalizedText text={"Experiências Mapeadas"} /></h3>
                   <div className="space-y-4">
                     {analise.experiencias.map((exp, idx) => (
                       <div key={idx} className="border border-gray-faint p-4 rounded-lg">
@@ -566,15 +523,15 @@ export default function EntrevistaClient({
                               <Texto className="mt-1 text-sm">{exp.situacao}</Texto>
                             </div>
                             <div>
-                              <strong className="text-black text-sm">Ações:</strong>
+                              <strong className="text-black text-sm"><LocalizedText text={"Ações:"} /></strong>
                               <Texto className="mt-1 text-sm">{exp.acoes}</Texto>
                             </div>
                             <div>
-                              <strong className="text-black text-sm">Resultados:</strong>
+                              <strong className="text-black text-sm"><LocalizedText text={"Resultados:"} /></strong>
                               <Texto className="mt-1 text-sm">{exp.resultados}</Texto>
                             </div>
                             <div className="bg-mint-light p-3 rounded-lg border border-mint">
-                              <strong className="text-black text-xs">Sumário para contar:</strong>
+                              <strong className="text-black text-xs"><LocalizedText text={"Sumário para contar:"} /></strong>
                               <Texto className="text-black text-xs italic mt-2">{exp.sumario}</Texto>
                             </div>
                           </div>

@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -27,9 +28,7 @@ export default function MeuPlanoClient({
   if (!plano) {
     return (
       <>
-        <p className="text-sm text-gray-text">
-          Seu plano será ativado em breve. Você receberá um aviso por email.
-        </p>
+        <p className="text-sm text-gray-text"><LocalizedText text={"Seu plano será ativado em breve. Você receberá um aviso por email."} /></p>
       </>
     );
   }
@@ -46,26 +45,26 @@ export default function MeuPlanoClient({
       <div className="bg-white border border-gray-faint rounded-2xl p-6 mb-8">
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <p className="text-xs text-gray-text mb-1">Duração total</p>
+            <p className="text-xs text-gray-text mb-1"><LocalizedText text={"Duração total"} /></p>
             <p className="text-2xl font-display text-black">{mesesRestantes} meses</p>
           </div>
           <div>
-            <p className="text-xs text-gray-text mb-1">Status</p>
+            <p className="text-xs text-gray-text mb-1"><LocalizedText text={"Status"} /></p>
             <p className="text-sm font-medium text-green-600">Ativo</p>
           </div>
         </div>
 
         <div className="bg-white rounded-lg p-4 mb-4">
-          <p className="text-xs text-gray-text mb-3">Opções de investimento:</p>
+          <p className="text-xs text-gray-text mb-3"><LocalizedText text={"Opções de investimento:"} /></p>
           <div className="space-y-1 text-sm">
             <p className="text-black">
-              <span className="font-medium">À vista:</span> R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              <span className="font-medium"><LocalizedText text={"À vista:"} /></span> R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
             <p className="text-black">
-              <span className="font-medium">Cartão:</span> R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              <span className="font-medium"><LocalizedText text={"Cartão:"} /></span> R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
             <p className="text-black">
-              <span className="font-medium">Recorrente:</span> {plano.parcelas_recorrente}x de R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              <span className="font-medium"><LocalizedText text={"Recorrente:"} /></span> {plano.parcelas_recorrente}x de R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -89,39 +88,37 @@ export default function MeuPlanoClient({
         </div>
       </div>
 
-      <h2 className="font-display text-xl text-black mb-4">O que você tem incluído</h2>
+      <h2 className="font-display text-xl text-black mb-4"><LocalizedText text={"O que você tem incluído"} /></h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-white border border-gray-faint rounded-xl p-4">
           <Video size={18} className="text-mint mb-2" />
-          <p className="text-sm font-medium text-black mb-1">Encontros online</p>
+          <p className="text-sm font-medium text-black mb-1"><LocalizedText text={"Encontros online"} /></p>
           <p className="text-2xl font-display text-black mb-2">{encontrosOnlineIndividuais + encontrosOnlineColetivos}</p>
           <p className="text-xs text-gray-text">{encontrosOnlineIndividuais} individual + {encontrosOnlineColetivos} coletivos</p>
         </div>
 
         <div className="bg-white border border-gray-faint rounded-xl p-4">
           <Users size={18} className="text-mint mb-2" />
-          <p className="text-sm font-medium text-black mb-1">Encontros presenciais</p>
+          <p className="text-sm font-medium text-black mb-1"><LocalizedText text={"Encontros presenciais"} /></p>
           <p className="text-2xl font-display text-black mb-2">{encontrosPresenciais}</p>
-          <p className="text-xs text-gray-text">Troca de experiências em grupo</p>
+          <p className="text-xs text-gray-text"><LocalizedText text={"Troca de experiências em grupo"} /></p>
         </div>
 
         <div className="bg-white border border-gray-faint rounded-xl p-4">
           <FileText size={18} className="text-mint mb-2" />
-          <p className="text-sm font-medium text-black mb-1">Ferramentas incluídas</p>
-          <p className="text-xs text-gray-text">PDI, Diagnóstico, Mapa Quem Sou Eu, Simulador de CV e mais</p>
+          <p className="text-sm font-medium text-black mb-1"><LocalizedText text={"Ferramentas incluídas"} /></p>
+          <p className="text-xs text-gray-text"><LocalizedText text={"PDI, Diagnóstico, Mapa Quem Sou Eu, Simulador de CV e mais"} /></p>
         </div>
 
         <div className="bg-white border border-gray-faint rounded-xl p-4">
           <Clock size={18} className="text-mint mb-2" />
-          <p className="text-sm font-medium text-black mb-1">Seu ritmo</p>
-          <p className="text-xs text-gray-text">Acesso ao portal 24/7 para trabalhar quando quiser</p>
+          <p className="text-sm font-medium text-black mb-1"><LocalizedText text={"Seu ritmo"} /></p>
+          <p className="text-xs text-gray-text"><LocalizedText text={"Acesso ao portal 24/7 para trabalhar quando quiser"} /></p>
         </div>
       </div>
 
       <div className="mt-8 bg-mint-deep/10 border border-mint-deep/30 rounded-2xl p-5">
-        <p className="text-sm text-black">
-          Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho pra você.
-        </p>
+        <p className="text-sm text-black"><LocalizedText text={"Tem dúvidas sobre seu plano? Me chama que a gente conversa sobre o melhor caminho pra você."} /></p>
       </div>
     </>
   );

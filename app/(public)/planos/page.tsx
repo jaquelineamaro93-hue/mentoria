@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import ScrollToSectionButton from '@/components/public/ScrollToSectionButton';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
@@ -34,17 +35,17 @@ export default async function PlanosPage() {
       <div className="max-w-[1800px] w-full mx-auto">
         <Link href="/" className="inline-flex items-center gap-2 text-black hover:text-[#000000] mb-6 sm:mb-8">
           <ArrowLeft size={20} />
-          <span>Voltar</span>
+          <span><LocalizedText text={"Voltar"} /></span>
         </Link>
 
         <section className="relative mb-10 overflow-hidden rounded-[28px] bg-[#102A2B] px-5 py-9 text-white sm:px-10 sm:py-12 lg:px-14" aria-labelledby="planos-titulo">
           <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-28 h-[420px] w-[420px] rounded-full border-[65px] border-white/[0.04]" />
           <div className="relative grid items-center gap-7 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="max-w-xl">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#FFCB9C]">SOMA | Carreira e Plataforma</p>
-              <h1 id="planos-titulo" className="font-display text-4xl leading-tight sm:text-5xl">Sua carreira merece novas possibilidades</h1>
-              <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base">Escolha acompanhamento humano na SOMA Carreira ou monte sua assinatura de ferramentas na SOMA Plataforma.</p>
-              <ScrollToSectionButton targetId="opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#B8E2CE] px-6 py-3 text-sm font-semibold text-[#000000] transition-colors hover:bg-[#9AD2B8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Conhecer opções de acesso</ScrollToSectionButton>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#FFCB9C]"><LocalizedText text={"SOMA | Carreira e Plataforma"} /></p>
+              <h1 id="planos-titulo" className="font-display text-4xl leading-tight sm:text-5xl"><LocalizedText text={"Sua carreira merece novas possibilidades"} /></h1>
+              <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base"><LocalizedText text={"Escolha acompanhamento humano na SOMA Carreira ou monte sua assinatura de ferramentas na SOMA Plataforma."} /></p>
+              <ScrollToSectionButton targetId="opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#B8E2CE] px-6 py-3 text-sm font-semibold text-[#000000] transition-colors hover:bg-[#9AD2B8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><LocalizedText text={"Conhecer opções de acesso"} /></ScrollToSectionButton>
             </div>
             <div className="relative grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4" aria-label="Lume, Norte, Brasa e Íris, mascotes oficiais da SOMA">
               {[
@@ -63,13 +64,13 @@ export default async function PlanosPage() {
           </div>
         </section>
         <div id="opcoes-de-acesso" className="mb-6 text-center sm:mb-9">
-          <h2 className="font-display text-3xl text-[#000000] sm:text-4xl">Escolha como começar</h2>
-          <p className="mt-2 text-sm text-[#000000]">Encontre o plano que faz sentido para o seu momento</p>
+          <h2 className="font-display text-3xl text-[#000000] sm:text-4xl"><LocalizedText text={"Escolha como começar"} /></h2>
+          <p className="mt-2 text-sm text-[#000000]"><LocalizedText text={"Encontre o plano que faz sentido para o seu momento"} /></p>
         </div>
 
         <div className="grid items-start gap-5 lg:grid-cols-2 lg:gap-6">
         <section id="soma-carreira" aria-labelledby="soma-carreira-heading" className="min-w-0 rounded-3xl border border-[#C8DED4] bg-[#F4FAF7] p-4 sm:p-5">
-          <header className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#000000]">Mentoria · acompanhamento humano</p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#000000]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#000000]">Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês.</p></header>
+          <header className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#000000]"><LocalizedText text={"Mentoria · acompanhamento humano"} /></p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#000000]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#000000]"><LocalizedText text={"Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês."} /></p></header>
         <div className="grid gap-4 xl:grid-cols-2">
           {(planos || []).map((plano: PlanoMentoria) => (
             <div key={plano.id} className="bg-white border-2 border-[#C8DED4] hover:border-[#74BBA0] transition-colors rounded-2xl p-4 sm:p-5 flex flex-col">
@@ -78,7 +79,7 @@ export default async function PlanosPage() {
                 <h2 className="text-xl font-display text-[#000000] mb-1">{plano.nome}</h2>
                 <p className="text-sm mb-4">
                   {plano.codigo.includes('online') ? (
-                    <span className="text-[#000000] font-medium">100% Online</span>
+                    <span className="text-[#000000] font-medium"><LocalizedText text={"100% Online"} /></span>
                   ) : (
                     <span className="text-[#000000]">{plano.foco}</span>
                   )}
@@ -86,7 +87,7 @@ export default async function PlanosPage() {
                 <p className="text-xs text-[#000000] mb-6">{plano.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
               </div>
 
-              <details className="mb-5 rounded-xl bg-[#F4FAF7] p-4"><summary className="cursor-pointer text-sm font-semibold text-[#000000]">Ver o que está incluído</summary><div className="mt-3 space-y-2">
+              <details className="mb-5 rounded-xl bg-[#F4FAF7] p-4"><summary className="cursor-pointer text-sm font-semibold text-[#000000]"><LocalizedText text={"Ver o que está incluído"} /></summary><div className="mt-3 space-y-2">
                 {(plano.itens_inclusos || []).map((item: string, i: number) => (
                   <div key={i} className="flex gap-2 text-sm text-black">
                     <span>✓</span>
@@ -102,11 +103,11 @@ export default async function PlanosPage() {
                     <span className="font-bold text-black">R$ {Number(plano.preco_avista).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex flex-col gap-1 2xl:flex-row 2xl:justify-between text-sm">
-                    <span className="text-[#000000]">Cartão (1x)</span>
+                    <span className="text-[#000000]"><LocalizedText text={"Cartão (1x)"} /></span>
                     <span className="font-bold text-black">R$ {Number(plano.preco_cartao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="flex flex-col gap-1 2xl:flex-row 2xl:justify-between text-sm">
-                    <span className="text-[#000000]">Recorrente</span>
+                    <span className="text-[#000000]"><LocalizedText text={"Recorrente"} /></span>
                     <span className="font-bold text-black">{plano.parcelas_recorrente}x R$ {(Number(plano.preco_recorrente_total) / plano.parcelas_recorrente).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>

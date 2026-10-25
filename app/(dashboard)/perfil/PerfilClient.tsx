@@ -1,4 +1,5 @@
 'use client';
+import LocalizedText from '@/components/LocalizedText';
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -153,15 +154,13 @@ export default function PerfilClient({
   return (
     <>
       <div className="flex items-start justify-between gap-4 mb-8">
-          <h1 className="font-display text-3xl text-black">Meu Perfil</h1>
+          <h1 className="font-display text-3xl text-black"><LocalizedText text={"Meu Perfil"} /></h1>
           {perfil && (
             <button
               onClick={() => setVerTour(true)}
               className="flex items-center gap-1.5 text-sm font-medium text-black bg-mint-light border border-mint rounded-lg px-3 py-2 hover:bg-mint-light/70 transition shrink-0"
             >
-              <Compass size={15} />
-              Rever tour do portal
-            </button>
+              <Compass size={15} /><LocalizedText text={"Rever tour do portal"} /></button>
           )}
         </div>
 
@@ -182,7 +181,7 @@ export default function PerfilClient({
 
         {/* Foto de Perfil */}
         <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-xl text-black mb-4">Foto de Perfil</h2>
+          <h2 className="font-display text-xl text-black mb-4"><LocalizedText text={"Foto de Perfil"} /></h2>
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-mint-deep flex items-center justify-center text-white text-3xl font-display">
               {perfil?.nome?.[0]?.toUpperCase() || 'U'}
@@ -192,9 +191,7 @@ export default function PerfilClient({
               disabled={salvando}
               className="flex items-center gap-2 bg-brown-deep text-white px-4 py-2 rounded-lg hover:bg-brown transition-colors disabled:opacity-50"
             >
-              <Upload size={16} />
-              Enviar Foto
-            </button>
+              <Upload size={16} /><LocalizedText text={"Enviar Foto"} /></button>
             <input
               ref={fileInputRef}
               type="file"
@@ -207,7 +204,7 @@ export default function PerfilClient({
 
         {/* Informações Pessoais */}
         <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-xl text-black mb-6">Informações Pessoais</h2>
+          <h2 className="font-display text-xl text-black mb-6"><LocalizedText text={"Informações Pessoais"} /></h2>
 
           <div className="mb-6">
             <label className="block text-xs font-medium text-black mb-2">Nome</label>
@@ -230,26 +227,26 @@ export default function PerfilClient({
           </div>
 
           <div className="mb-6 grid gap-5 sm:grid-cols-2">
-            <div><label className="block text-xs font-medium text-black mb-2">Como prefere ser identificado(a)?</label>
-              <select value={genero} onChange={e => setGenero(e.target.value as typeof genero)} className="w-full px-4 py-3 border border-gray-faint rounded-lg"><option value="">Prefiro não informar</option><option value="feminino">Feminino</option><option value="masculino">Masculino</option><option value="nao_binario">Não binário</option><option value="outro">Outra identidade</option><option value="prefiro_nao_informar">Prefiro não informar</option></select>
+            <div><label className="block text-xs font-medium text-black mb-2"><LocalizedText text={"Como prefere ser identificado(a)?"} /></label>
+              <select value={genero} onChange={e => setGenero(e.target.value as typeof genero)} className="w-full px-4 py-3 border border-gray-faint rounded-lg"><option value=""><LocalizedText text={"Prefiro não informar"} /></option><option value="feminino"><LocalizedText text={"Feminino"} /></option><option value="masculino"><LocalizedText text={"Masculino"} /></option><option value="nao_binario"><LocalizedText text={"Não binário"} /></option><option value="outro"><LocalizedText text={"Outra identidade"} /></option><option value="prefiro_nao_informar"><LocalizedText text={"Prefiro não informar"} /></option></select>
             </div>
-            <div><label className="block text-xs font-medium text-black mb-2">WhatsApp com DDD</label>
+            <div><label className="block text-xs font-medium text-black mb-2"><LocalizedText text={"WhatsApp com DDD"} /></label>
               <input type="tel" inputMode="tel" autoComplete="tel" placeholder="(11) 99999-9999" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="w-full px-4 py-3 border border-gray-faint rounded-lg" />
-              <p className="mt-1 text-xs text-gray-text">Informe seu número para receber acompanhamento da mentoria.</p>
+              <p className="mt-1 text-xs text-gray-text"><LocalizedText text={"Informe seu número para receber acompanhamento da mentoria."} /></p>
             </div>
           </div>
           <label className="mb-3 flex items-start gap-2 text-sm text-gray-text"><input type="checkbox" checked={aceitaWhatsapp} onChange={e => {setAceitaWhatsapp(e.target.checked);if(!e.target.checked)setAceitaIrisIA(false);}} className="mt-1" /><span>Autorizo a SOMA Mentoria a enviar orientações e acompanhamentos personalizados pelo WhatsApp. Posso retirar essa autorização a qualquer momento nesta página.</span></label>
           <label className="mb-6 flex items-start gap-2 rounded-lg border border-gray-faint p-3 text-sm text-black">
             <input type="checkbox" checked={aceitaIrisIA} disabled={!aceitaWhatsapp} onChange={e => setAceitaIrisIA(e.target.checked)} className="mt-1" />
-            <span><strong>Acompanhamento com a Íris (IA)</strong>. Autorizo que minhas respostas de WhatsApp e informações mínimas sobre objetivos e próximos passos sejam processadas pelo serviço externo de IA Manus/Cue para gerar orientações e acompanhar minha evolução. Posso desativar aqui ou escrever PARAR no WhatsApp. A ativação do canal oficial depende da disponibilidade da integração.</span>
+            <span><strong><LocalizedText text={"Acompanhamento com a Íris (IA)"} /></strong>. Autorizo que minhas respostas de WhatsApp e informações mínimas sobre objetivos e próximos passos sejam processadas pelo serviço externo de IA Manus/Cue para gerar orientações e acompanhar minha evolução. Posso desativar aqui ou escrever PARAR no WhatsApp. A ativação do canal oficial depende da disponibilidade da integração.</span>
           </label>
           {perfil?.whatsapp_numero && <p className="mb-5 text-xs text-gray-text">{aceitaWhatsapp ? 'Contato autorizado para mensagens da SOMA.' : 'WhatsApp cadastrado. A autorização de mensagens está desativada.'}</p>}
           {/* Senha */}
           <div className="border-t border-gray-faint pt-6">
-            <h3 className="font-medium text-black mb-4">Redefinir Senha</h3>
+            <h3 className="font-medium text-black mb-4"><LocalizedText text={"Redefinir Senha"} /></h3>
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-black mb-2">Nova Senha</label>
+              <label className="block text-xs font-medium text-black mb-2"><LocalizedText text={"Nova Senha"} /></label>
               <div className="relative">
                 <input
                   type={mostraSenha ? 'text' : 'password'}
@@ -269,7 +266,7 @@ export default function PerfilClient({
             </div>
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-black mb-2">Confirmar Senha</label>
+              <label className="block text-xs font-medium text-black mb-2"><LocalizedText text={"Confirmar Senha"} /></label>
               <input
                 type={mostraSenha ? 'text' : 'password'}
                 value={confirmaSenha}
@@ -284,7 +281,7 @@ export default function PerfilClient({
         {/* Meu Plano */}
         {plano && (
           <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
-            <h2 className="font-display text-xl text-black mb-4">Meu Plano</h2>
+            <h2 className="font-display text-xl text-black mb-4"><LocalizedText text={"Meu Plano"} /></h2>
             <div className="space-y-2 text-sm">
               <p>
                 <span className="font-medium text-black">{plano.nome}</span>
@@ -292,8 +289,7 @@ export default function PerfilClient({
               <p className="text-gray-text">
                 Duração: {plano.duracao_meses} meses
               </p>
-              <p className="text-gray-text">
-                Status: <span className="text-green-600 font-medium">Ativo</span>
+              <p className="text-gray-text"><LocalizedText text={"Status:"} /><span className="text-green-600 font-medium">Ativo</span>
               </p>
             </div>
           </div>
@@ -301,13 +297,11 @@ export default function PerfilClient({
 
         {/* Termos */}
         <div className="bg-white border border-gray-faint rounded-2xl p-8 mb-8">
-          <h2 className="font-display text-xl text-black mb-4">Documentos</h2>
+          <h2 className="font-display text-xl text-black mb-4"><LocalizedText text={"Documentos"} /></h2>
           <a
             href="#"
             className="text-black hover:underline font-medium text-sm"
-          >
-            📄 Ler Termos de Mentoria
-          </a>
+          ><LocalizedText text={"📄 Ler Termos de Mentoria"} /></a>
         </div>
 
         {/* Botões */}
