@@ -65,6 +65,7 @@ export default async function HomePage() {
             <a href="#portal" className="hover:text-white transition-colors">Portal</a>
             <a href="#rede-soma" className="hover:text-white transition-colors">Rede SOMA</a>
             <Link href="/depoimentos" className="hover:text-white transition-colors">Depoimentos</Link>
+            <Link href="/cases" className="hover:text-white transition-colors">Cases</Link>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -78,6 +79,7 @@ export default async function HomePage() {
                 <a href="#portal" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Portal</a>
                 <a href="#rede-soma" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Rede SOMA</a>
                 <Link href="/depoimentos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Depoimentos no LinkedIn</Link>
+                <Link href="/cases" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Cases</Link>
                 <a href="#planos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10">Planos</a>
               </nav>
             </details>
@@ -326,6 +328,17 @@ export default async function HomePage() {
               Falar comigo no WhatsApp
             </a>
           </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="cases-teaser-title" className="bg-[#f4f8f5] px-5 py-12 sm:py-16">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 rounded-2xl border border-[#cee5d9] bg-white p-7 sm:p-10">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#0D8071]">Histórias de carreira</p>
+            <h2 id="cases-teaser-title" className="mt-3 font-display text-3xl text-[#13211D]">Resultados contados por quem viveu a jornada</h2>
+            <p className="mt-3 text-sm leading-7 text-[#53675f]">Recolocação, LinkedIn e entrevistas em relatos reais, com contexto e depoimentos originais.</p>
+          </div>
+          <Link href="/cases" className="inline-flex min-h-11 items-center rounded-lg bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white">Ver os cases</Link>
         </div>
       </section>
 
