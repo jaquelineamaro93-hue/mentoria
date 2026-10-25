@@ -337,8 +337,10 @@ export default async function AdminAnalyticsPage({
 
   const trialsStarted = profiles.filter((profile) => Boolean(profile.trial_started_at));
   const trialsConverted = profiles.filter((profile) => profile.trial_status === 'converted');
-  const trialsActive = profiles.filter((profile) => profile.trial_status === 'active');
-  const trialsExpired = profiles.filter((profile) => profile.trial_status === 'expired');
+  const now = new Date().getTime();
+  const trialsActive = profiles.filter((profile) => profile.trial_status === 'active' && Boolean(profile.trial_ends_at) && new Date(profile.trial_ends_at!).getTime() > now);
+  const trialsExpired = profiles.filter((profile) => profile.trial_status === 'expired' || (profile.trial_status === 'active' && Boolean(profile.trial_ends_at) && new Date(profile.trial_ends_at!).getTime() <= now));
+  const trialsWithoutEnd = profiles.filter((profile) => profile.trial_status === 'active' && !profile.trial_ends_at);
 
   const conversionDays = trialsConverted
     .filter((profile) => profile.trial_started_at && profile.trial_converted_at)
@@ -498,10 +500,12 @@ export default async function AdminAnalyticsPage({
               ))}
             </div>
           </div>
-          <details className="mt-5 text-sm">
-            <summary className="cursor-pointer py-3 font-medium text-mint-deep focus-visible:outline-2">Ver dados em tabela</summary>
-            <table className="w-full text-left"><caption className="sr-only">Pessoas com eventos por dia, {periodLabel}</caption><thead><tr><th scope="col" className="py-2">Data</th><th scope="col">Pessoas</th></tr></thead><tbody>{dayBuckets.map((bucket) => <tr key={bucket.key} className="border-t border-gray-faint"><th scope="row" className="py-2 font-normal">{bucket.label}</th><td>{bucket.users.size}</td></tr>)}</tbody></table>
-          </details>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3" aria-label="Insights de atividade">
+            <div className="rounded-xl bg-gray-50 p-4"><h3 className="text-sm font-medium">Maior movimento</h3><p className="mt-2 text-sm text-gray-text">{dayBuckets.some(bucket => bucket.users.size > 0) ? `${dayBuckets.filter(bucket => bucket.users.size === maxDaily).map(bucket => bucket.label).join(', ')}: ${maxDaily} pessoas no dia.` : 'Ainda não há atividade registrada no período.'}</p></div>
+            <div className="rounded-xl bg-gray-50 p-4"><h3 className="text-sm font-medium">Frequência de atividade</h3><p className="mt-2 text-sm text-gray-text">{dayBuckets.filter(bucket => bucket.users.size > 0).length} de {dayBuckets.length} dias com eventos registrados.</p></div>
+            <div className="rounded-xl bg-gray-50 p-4"><h3 className="text-sm font-medium">Próximo olhar</h3><p className="mt-2 text-sm text-gray-text">Compare os dias de maior atividade com encontros e comunicações para investigar o que ajuda as pessoas a voltar.</p></div>
+          </div>
+          <ul className="sr-only" aria-label="Pessoas com eventos por dia">{dayBuckets.map(bucket => <li key={bucket.key}>{bucket.label}: {bucket.users.size} pessoas</li>)}</ul>
         </Panel>
       </section>
 
@@ -515,43 +519,14 @@ export default async function AdminAnalyticsPage({
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-gray-faint bg-white">
-          <table className="w-full min-w-[860px] text-sm">
-            <thead>
-              <tr className="border-b border-gray-faint bg-gray-50/70">
-                <th className="px-4 py-3 text-left font-medium text-black">Ferramenta</th>
-                <th className="px-4 py-3 text-right font-medium text-black">Adoção histórica</th>
-                <th className="px-4 py-3 text-right font-medium text-black">Usuários {periodDays}d</th>
-                <th className="px-4 py-3 text-right font-medium text-black">Ações {periodDays}d</th>
-                <th className="px-4 py-3 text-right font-medium text-black">Visitas {periodDays}d</th>
-                <th className="px-4 py-3 text-left font-medium text-black">Sinal</th>
-              </tr>
-            </thead>
-            <tbody>
-              {features.map((feature) => {
-                const signal = featureSignal(feature, base);
-                return (
-                  <tr key={feature.key} className="border-b border-gray-faint last:border-0">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-black">{feature.label}</p>
-                      <p className="text-[10px] text-gray-text mt-0.5">{feature.group}</p>
-                    </td>
-                    <td className="px-4 py-3 text-right text-black">
-                      {feature.allUsers}/{base} <span className="text-gray-text">({pct(feature.allUsers, base)}%)</span>
-                    </td>
-                    <td className="px-4 py-3 text-right text-black">{feature.recentUsers}</td>
-                    <td className="px-4 py-3 text-right text-black">{feature.recentActions}</td>
-                    <td className="px-4 py-3 text-right text-black">{feature.views}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] ${featureTone(signal)}`}>
-                        {signal}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {features.map(feature => { const signal = featureSignal(feature, base); return <Panel key={feature.key} className="p-5">
+            <p className="text-xs text-gray-text">{feature.group}</p><h3 className="mt-1 text-base font-semibold">{feature.label}</h3>
+            <p className="mt-3 text-sm"><strong>{feature.recentUsers}</strong> pessoas salvaram registros no período; <strong>{feature.views}</strong> visitaram a ferramenta.</p>
+            <p className="mt-2 text-xs text-gray-text">Histórico: {feature.allUsers} de {base} pessoas com registros ({pct(feature.allUsers, base)}%). {feature.recentActions} ações no período.</p>
+            <span className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-xs ${featureTone(signal)}`}>{signal}</span>
+            <p className="mt-3 text-sm text-gray-text">{feature.isNew ? 'Recurso recente: observe a adoção por mais tempo antes de decidir mudanças.' : feature.views > 0 && feature.recentUsers === 0 ? 'Há visitas sem novos registros. Vale conferir se a orientação para concluir a tarefa está clara.' : feature.recentUsers > 0 ? 'Há uso com registros salvos. Investigue como essa ferramenta contribui para o próximo passo da jornada.' : 'Sem novos registros neste período. Verifique a etapa da jornada e quem tem acesso antes de avaliar a procura.'}</p>
+          </Panel>; })}
         </div>
       </section>
 
@@ -576,7 +551,7 @@ export default async function AdminAnalyticsPage({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               ['Iniciados', trialsStarted.length],
-              ['Ativos', trialsActive.length],
+              ['Dentro do prazo', trialsActive.length],
               ['Convertidos', trialsConverted.length],
               ['Expirados', trialsExpired.length],
             ].map(([label, value]) => (
@@ -587,6 +562,7 @@ export default async function AdminAnalyticsPage({
             ))}
           </div>
 
+          <p className="mt-4 text-sm text-gray-text">{trialsActive.length} testes com prazo vigente. {trialsExpired.length} encerrados pelo prazo ou status registrado.{trialsWithoutEnd.length > 0 && ` Há ${trialsWithoutEnd.length} cadastro(s) sem data de término para conferir em Planos e contratos.`}</p>
           <div className="mt-5 grid sm:grid-cols-2 gap-3">
             <div className="rounded-xl bg-gray-50 p-4">
               <p className="text-[11px] uppercase tracking-wide text-gray-text">Conversão</p>
