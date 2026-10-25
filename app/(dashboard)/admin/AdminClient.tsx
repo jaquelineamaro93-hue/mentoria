@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import AdminAreaDirectory from '@/components/AdminAreaDirectory';
 import { Loader2, Send, Search } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
@@ -249,10 +248,6 @@ export default function AdminClient({
       <div><h1 className="text-2xl font-semibold">Acompanhamento dos mentorados</h1><p className="mt-2 text-sm text-[#53685e]">Localize uma pessoa, confira sua atividade e abra os detalhes para acompanhar.</p></div>
       <Link href="/admin/usuarios" className={acaoClass}>Pessoas e acessos</Link>
     </header>
-    <details className="mb-6 rounded-xl border border-[#d7e3dc] bg-white">
-      <summary className="cursor-pointer px-4 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2">Outras áreas da administração</summary>
-      <div className="space-y-4 border-t border-[#edf2ef] p-4"><AdminAreaDirectory /></div>
-    </details>
     <section aria-label="Sinais para acompanhamento" className="mb-6">
       <h2 className="mb-3 text-base font-semibold">Onde olhar agora</h2>
       <div className="flex flex-wrap gap-2">{filtros.map(item => <button key={item.value} type="button" aria-pressed={filtroAtividade === item.value} onClick={() => { setFiltroAtividade(item.value); setBuscaMentorado(''); }} className={'min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 ' + (filtroAtividade === item.value ? 'border-[#24594b] bg-[#edf5f0] font-semibold' : 'border-[#d7e3dc] bg-white hover:bg-[#f5f8f6]')}><span className="mr-2 font-semibold">{item.count}</span>{item.title}</button>)}</div>
