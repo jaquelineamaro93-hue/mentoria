@@ -1,4 +1,5 @@
 'use client';
+import { useLocale } from '@/components/LocaleProvider';
 
 import { useEffect, useRef, useState } from 'react';
 import { BookOpen, MessageCircle, ArrowUpRight, ClipboardList, ChevronDown, ExternalLink, History, Maximize2, Minimize2, Plus, Trash2, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react';
@@ -53,6 +54,7 @@ function saudacaoIris(nome = ''): Mensagem {
 }
 
 export default function IrisCopiloto() {
+  const { locale } = useLocale();
   const [aberto, setAberto] = useState(false);
   const [expandido, setExpandido] = useState(false);
   const [nomeMentorado, setNomeMentorado] = useState('');
@@ -321,7 +323,7 @@ export default function IrisCopiloto() {
         credentials: 'same-origin',
         cache: 'no-store',
         body: JSON.stringify({
-          mensagem: pedido, conversation_id: conversationId, persistir_historico: permitirHistorico,
+          mensagem: pedido, locale, conversation_id: conversationId, persistir_historico: permitirHistorico,
           ...(helpId ? { acao: 'ajuda_artigo', artigo_id: helpId } : {}),
           ...(!helpId && perguntaAtiva ? { acao: 'pdi_preparar', secao: perguntaAtiva.secao,
             modo: perguntaAtiva.modo } : {}),
