@@ -7,6 +7,7 @@ import SomaProductShowcase from '@/components/public/SomaProductShowcase';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 import SomaNetworking from '@/components/public/SomaNetworking';
 import LocalizedText from '@/components/LocalizedText';
+import { LanguageSwitcher } from '@/components/LocaleProvider';
 
 export const metadata: Metadata = {
   title: 'SOMA Mentoria - Transforme sua Carreira',
@@ -59,9 +60,9 @@ export default async function HomePage() {
     <div className="min-h-screen overflow-x-clip bg-white">
       {/* Header */}
       <header className="sticky top-0 z-50" style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10 py-3 sm:py-4 flex items-center justify-between gap-3 lg:gap-6">
           <a href="#topo" className="font-display text-lg sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
-          <nav aria-label="Navegação principal da SOMA" className="hidden lg:flex items-center gap-5 text-sm text-white/75">
+          <nav aria-label="Navegação principal da SOMA" className="hidden lg:flex flex-1 items-center justify-center gap-4 xl:gap-6 text-sm text-white/75">
             <Link href="/como-funciona" className="hover:text-white transition-colors"><LocalizedText text={"Como funciona"} /></Link>
             <a href="#portal" className="hover:text-white transition-colors"><LocalizedText text={"Portal"} /></a>
             <a href="#rede-soma" className="hover:text-white transition-colors"><LocalizedText text={"Rede SOMA"} /></a>
@@ -69,7 +70,7 @@ export default async function HomePage() {
             <Link href="/cases" className="hover:text-white transition-colors"><LocalizedText text={"Cases"} /></Link>
             <a href="#planos" className="hover:text-white transition-colors"><LocalizedText text={"Planos"} /></a>
           </nav>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <details className="group relative lg:hidden">
               <summary aria-label="Abrir menu da SOMA" className="flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-white/25 px-2.5 text-xs font-medium text-white marker:hidden [&::-webkit-details-marker]:hidden">
                 <Menu size={18} aria-hidden="true" />
@@ -94,6 +95,7 @@ export default async function HomePage() {
             >
               Começar
             </Link>
+            <LanguageSwitcher placement="inline" />
           </div>
         </div>
       </header>
@@ -117,7 +119,7 @@ export default async function HomePage() {
           aria-hidden="true"
           className="absolute inset-0 z-10 bg-black/60"
         />
-        <div className="relative z-20 max-w-5xl mx-auto">
+        <div className="relative z-20 mx-auto w-full max-w-[1120px]">
           <p className="text-xs uppercase tracking-[0.25em] mb-4" style={{ color: '#55C9B9' }}>
             <LocalizedText text={"Mentoria de carreira + portal de acompanhamento"} />
           </p>
@@ -159,7 +161,7 @@ export default async function HomePage() {
 
       {/* Para qual momento */}
       <section className="bg-white py-12 sm:py-16 border-b border-gray-faint">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10">
           <div className="max-w-3xl mx-auto text-center mb-10">
             <p className="text-xs uppercase tracking-[0.2em] mb-3 text-mint-deep"><LocalizedText text={"Seu momento importa"} /></p>
             <h3 className="font-display text-3xl md:text-4xl text-black">
