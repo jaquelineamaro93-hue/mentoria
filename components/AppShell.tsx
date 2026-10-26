@@ -45,56 +45,35 @@ function SectionNavigationCards({
   if (group.id === 'mercado' && pathname === '/carreira') return null;
 
   return (
-    <section className="mb-7" aria-label={translatedNav(group.label,locale)}>
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.16em] text-gray-text">
-            {translatedNav(group.label,locale)}
-          </p>
-          <p className="text-sm text-black mt-0.5">{locale==='en'?'Explore more topics in this section':locale==='es-419'?'Explora otros temas de esta sección':'Acesse os outros temas desta área'}</p>
-        </div>
+    <nav className="mb-5 min-w-0" aria-label={translatedNav(group.label, locale)}>
+      <div className="mb-2 flex items-center gap-2">
+        <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-gray-text">
+          {translatedNav(group.label, locale)}
+        </span>
       </div>
-
-      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="flex max-w-full items-center gap-1.5 overflow-x-auto rounded-2xl border border-gray-faint bg-white p-1.5" style={{ scrollbarWidth: 'thin' }}>
         {group.items.filter(item => !access || saasCanVisit(access, item.href.split('?')[0], item.href.split('?')[1])).map((item) => {
           const Icon = item.icon;
           const active = isPortalRouteActive(pathname, item.href, currentSearch);
-
           return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={active ? 'page' : undefined}
               className={[
-                'group flex items-center gap-3 rounded-xl border px-4 py-3.5 transition-all',
+                'inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep',
                 active
-                  ? 'border-mint-deep bg-mint-light/55 shadow-sm'
-                  : 'border-gray-faint bg-white hover:border-mint hover:bg-[#fbfcfd]',
+                  ? 'bg-mint-light text-black shadow-sm'
+                  : 'text-gray-text hover:bg-[#f2f7f5] hover:text-black',
               ].join(' ')}
             >
-              <span
-                className={[
-                  'w-9 h-9 rounded-lg grid place-items-center shrink-0 transition-colors',
-                  active
-                    ? 'bg-mint-deep text-white'
-                    : 'bg-[#eef2f6] text-black group-hover:bg-mint-light',
-                ].join(' ')}
-              >
-                <Icon size={17} strokeWidth={1.7} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-medium text-black leading-tight">
-                  {translatedNav(item.label,locale)}
-                </span>
-                <span className="block text-[11px] text-gray-text mt-1">
-                  {active ? 'Você está aqui' : 'Abrir'}
-                </span>
-              </span>
+              <Icon size={16} strokeWidth={1.8} aria-hidden="true" className="shrink-0" />
+              <span className="whitespace-nowrap">{translatedNav(item.label, locale)}</span>
             </Link>
           );
         })}
       </div>
-    </section>
+    </nav>
   );
 }
 
