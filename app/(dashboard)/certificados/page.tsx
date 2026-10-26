@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ArrowUpRight, LockKeyhole, Printer } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { requireProductAccess } from '@/lib/security/require-product-access';
+import { sintetizarJornada } from '@/lib/certificado-sintese';
 
 export const metadata: Metadata = {
   title: 'Meus certificados | SOMA',
@@ -22,10 +23,11 @@ export default async function CertificadosPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const [{ data: profile }, { data: feedbacks, error: feedbackError }, { data: atividades, error: atividadeError }] = await Promise.all([
+  const [{ data: profile }, { data: feedbacks, error: feedbackError }, { data: atividades, error: atividadeError }, { data: evidencias, error: evidenciasError }] = await Promise.all([
     supabase.from('profiles').select('nome,status_assinatura,data_fim_acesso,trial_status,trial_ends_at,is_admin').eq('id', user.id).single(),
     supabase.from('checkins_mensais').select('id,mes_referencia,created_at').eq('user_id', user.id).order('mes_referencia', { ascending: false }),
     supabase.from('carreira_checkins').select('dia,tipo').eq('user_id', user.id).order('dia', { ascending: false }),
+    supabase.from('carreira_atividades_reconhecidas').select('dia,fonte,tipo').eq('user_id',user.id).order('dia',{ascending:false}),
   ]);
 
   const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
@@ -47,7 +49,7 @@ export default async function CertificadosPage() {
     return ativo && !!atividadesMes && atividadesMes.quantidade > 0;
   });
   const nome = (profile?.nome || 'Profissional SOMA').trim();
-  const erro = !!feedbackError || !!atividadeError;
+  const erro = !!feedbackError || !!atividadeError || !!evidenciasError;
 
   return (
     <main className="w-full px-3 py-7 sm:px-5 lg:px-6">
@@ -80,7 +82,8 @@ export default async function CertificadosPage() {
         <div className="space-y-5">
           <p className="text-sm text-[#52675B]">{certificados.length} {certificados.length === 1 ? 'certificado disponível' : 'certificados disponíveis'}</p>
           {certificados.map((item, index) => {
-            const dados = porMes.get(item.mes_referencia.slice(0, 7))!;
+            const chave = item.mes_referencia.slice(0,7);
+            const resumo = sintetizarJornada((atividades??[]).filter(a=>a.dia.slice(0,7)===chave),(evidencias??[]).filter(a=>a.dia.slice(0,7)===chave));
             const titulo = mesLongo(item.mes_referencia);
             return <article key={item.id} className="overflow-hidden rounded-2xl border border-[#D9E4DA] bg-[#F9F8F4] shadow-sm">
               <div className="grid lg:grid-cols-[1fr_0.68fr]">
@@ -98,10 +101,10 @@ export default async function CertificadosPage() {
                 <div className="flex flex-col justify-between gap-6 p-7 sm:p-9">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#386657]">Na sua jornada</p>
-                    <h3 className="mt-3 font-serif text-2xl text-[#18382F]">Movimento que se registra.</h3>
-                    <p className="mt-3 text-sm leading-6 text-[#53675B]">Sua avaliação mensal e suas ações realizadas no período confirmam a participação ativa na jornada.</p>
-                    <div className="mt-5 border-t border-[#D8E3DA] pt-4 text-sm text-[#274638]"><strong>{dados.quantidade}</strong> {dados.quantidade === 1 ? 'atividade registrada' : 'atividades registradas'} neste mês</div>
-                    <p className="mt-2 text-xs text-[#65766C]">Frente: reconhecimento da participação. Verso: síntese de ações documentadas, sem publicar o conteúdo privado da avaliação.</p>
+                    <h3 className="mt-3 font-serif text-2xl text-[#18382F]">Sua evolução em perspectiva.</h3>
+                    <p className="mt-3 text-sm leading-6 text-[#53675B]">{resumo.resumo}</p>
+                    <div className="mt-5 border-t border-[#D8E3DA] pt-4 text-sm text-[#274638]"><strong>{resumo.registros}</strong> movimentos documentados em {resumo.dias} dias</div>
+                    <p className="mt-2 text-xs text-[#65766C]">Próximo foco: {resumo.proximoFoco}</p>
                   </div>
                   <Link href={`/certificados/${item.mes_referencia}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#183F37] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#286554]"><Printer size={16}/> Visualizar e imprimir</Link>
                 </div>
