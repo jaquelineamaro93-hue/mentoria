@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireProductAccess } from '@/lib/security/require-product-access';
 import PrintCertificateButton from './PrintCertificateButton';
+import { sintetizarJornada } from '@/lib/certificado-sintese';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,17 +15,18 @@ export default async function CertificadoMensal({ params }: { params: Promise<{ 
   const db = await createClient();
   const {data:{user}} = await db.auth.getUser();
   if (!user) redirect('/login');
-  const [{data:profile,error:profileError},{data:feedback,error:feedbackError},{data:acoes,error:acoesError}] = await Promise.all([
+  const [{data:profile,error:profileError},{data:feedback,error:feedbackError},{data:acoes,error:acoesError},{data:evidencias,error:evidenciasError}] = await Promise.all([
     db.from('profiles').select('nome,status_assinatura,data_fim_acesso,trial_status,trial_ends_at,is_admin').eq('id',user.id).single(),
     db.from('checkins_mensais').select('id,mes_referencia').eq('user_id',user.id).eq('mes_referencia',mes).maybeSingle(),
     db.from('carreira_checkins').select('dia,tipo').eq('user_id',user.id).gte('dia',mes).lt('dia',new Date(Date.UTC(Number(mes.slice(0,4)),Number(mes.slice(5,7)),1)).toISOString().slice(0,10)),
+    db.from('carreira_atividades_reconhecidas').select('dia,fonte,tipo').eq('user_id',user.id).gte('dia',mes).lt('dia',new Date(Date.UTC(Number(mes.slice(0,4)),Number(mes.slice(5,7)),1)).toISOString().slice(0,10)),
   ]);
   const today = new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
   const active=!!profile&&(
     (profile.status_assinatura==='ativo'&&(!profile.data_fim_acesso||profile.data_fim_acesso>=today))||
     (profile.trial_status==='active'&&!!profile.trial_ends_at&&new Date(profile.trial_ends_at).getTime()>Date.now())
   );
-  if(profileError||feedbackError||acoesError||!active||!feedback||!acoes?.length) notFound();
+  if(profileError||feedbackError||acoesError||evidenciasError||!active||!feedback||!(acoes?.length||evidencias?.length)) notFound();
   const titulo=new Date(mes+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   const nome=profile.nome?.trim()||'Profissional SOMA';
   const labels: Record<string, string> = {
@@ -33,6 +35,7 @@ export default async function CertificadoMensal({ params }: { params: Promise<{ 
     pdi:'Plano de desenvolvimento',aprendizado:'Aprendizado contínuo',reflexao:'Reflexão de carreira',
   };
   const tipos=[...new Set(acoes.map(a=>String(a.tipo)))].map(t=>labels[t] || 'Atividade de carreira');
+  const sintese = sintetizarJornada(acoes??[], evidencias??[]);
   return <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-8">
     <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3"><Link href="/certificados" className="text-sm font-semibold text-[#245846]">Voltar aos certificados</Link><PrintCertificateButton/></div>
     <div className="certificate-pages space-y-6">
@@ -43,7 +46,7 @@ export default async function CertificadoMensal({ params }: { params: Promise<{ 
         <div className="relative flex flex-wrap justify-between gap-4 border-t border-white/25 pt-5 text-xs uppercase tracking-[0.12em]"><span className="capitalize">{titulo}</span><span>SOMA Mentoria</span></div>
       </section>
       <section className="certificate-page flex min-h-[680px] flex-col justify-between bg-[#F7F5EE] p-8 text-[#17382F] sm:p-14">
-        <div><div className="flex items-center justify-between border-b border-[#BDCFC0] pb-5 text-xs font-semibold uppercase tracking-[0.2em]"><span>SOMA • Sua evolução</span><span>02 / 02</span></div><p className="mt-12 text-xs uppercase tracking-[0.25em] text-[#386657]">Registro de desenvolvimento</p><h2 className="mt-3 font-serif text-4xl sm:text-5xl">Seu mês.<br/>Suas conquistas.</h2><div className="mt-12 grid gap-8 sm:grid-cols-2"><div className="border-t border-[#9EBBA9] pt-4"><p className="text-5xl font-serif">{acoes.length}</p><p className="mt-3 text-sm">Atividades de carreira registradas</p></div><div className="border-t border-[#9EBBA9] pt-4"><p className="text-5xl font-serif">01</p><p className="mt-3 text-sm">Avaliação mensal concluída</p></div></div><h3 className="mt-12 text-xs font-semibold uppercase tracking-[0.2em]">Áreas trabalhadas no período</h3><ul className="mt-4 grid gap-3 sm:grid-cols-2">{tipos.map(tipo=><li key={tipo} className="border-b border-[#D2DED4] py-2 text-sm">{tipo}</li>)}</ul></div>
+        <div><div className="flex items-center justify-between border-b border-[#BDCFC0] pb-5 text-xs font-semibold uppercase tracking-[0.2em]"><span>SOMA • Sua evolução</span><span>02 / 02</span></div><p className="mt-12 text-xs uppercase tracking-[0.25em] text-[#386657]">Registro de desenvolvimento</p><h2 className="mt-3 font-serif text-4xl sm:text-5xl">Síntese de carreira.<br/>Seu próximo passo.</h2><p className="mt-4 text-sm leading-6 text-[#52675B]">{sintese.resumo}</p><div className="mt-12 grid gap-8 sm:grid-cols-2"><div className="border-t border-[#9EBBA9] pt-4"><p className="text-5xl font-serif">{sintese.registros}</p><p className="mt-3 text-sm">Movimentos registrados</p></div><div className="border-t border-[#9EBBA9] pt-4"><p className="text-5xl font-serif">01</p><p className="mt-3 text-sm">Avaliação mensal concluída</p></div></div><p className="mt-4 text-sm text-[#52675B]">{sintese.dias} dias com ações, incluindo {sintese.automaticas} atividades reconhecidas automaticamente pela plataforma.</p><h3 className="mt-8 text-xs font-semibold uppercase tracking-[0.2em]">Áreas trabalhadas no período</h3><ul className="mt-4 grid gap-3 sm:grid-cols-2">{sintese.frentes.map(tipo=><li key={tipo} className="border-b border-[#D2DED4] py-2 text-sm">{tipo}</li>)}</ul><h3 className="mt-7 text-xs font-semibold uppercase tracking-[0.2em]">Próximo foco sugerido</h3><p className="mt-3 text-sm leading-6">{sintese.proximoFoco}</p></div>
         <div className="border-t border-[#BDCFC0] pt-5 text-xs leading-5 text-[#52675B]">Este documento reconhece registros de participação e desenvolvimento na SOMA. Não comprova competências formalmente avaliadas, carga horária ou endosso de terceiros. A avaliação privada não é reproduzida.</div>
       </section>
     </div>
