@@ -6,7 +6,7 @@ import LocalizedText from '@/components/LocalizedText';
  */
 const EMPRESAS_REDE: ReadonlyArray<{ nome: string; logoUrl: string }> = [
   { nome: 'Banco do Brasil', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Banco_do_Brasil_Logo.svg' },
-  { nome: 'Volvo', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/54/Volvo_logo.svg' },
+  { nome: 'Volvo', logoUrl: '/images/volvo-wordmark.svg' },
   { nome: 'Webmotors', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/LogoWebmotors_250px.png' },
   { nome: 'Ansell', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Ansell_Logo.svg' },
 ];
