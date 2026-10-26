@@ -103,11 +103,11 @@ export default function PassaporteClient({
       <div className="flex flex-col md:flex-row w-full">
 
         <main className="flex-1 overflow-auto">
-        <div className="px-6 py-10 md:px-12 w-full">
+        <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 w-full">
           <p className="text-xs uppercase tracking-[0.2em] text-mint mb-2 bg-mint/10 px-3 py-1.5 rounded-md inline-flex items-center gap-2 border border-mint/20"><LocalizedText text={"Carreira em movimento"} /></p>
-          <h1 className="font-display text-3xl text-black mb-8"><LocalizedText text={"Meu mapa de carreira"} /></h1>
+          <h1 className="font-display text-3xl text-black mb-5"><LocalizedText text={"Meu mapa de carreira"} /></h1>
 
-          <div role="tablist" aria-label="Áreas do Passaporte" className="mb-6 grid grid-cols-1 gap-2 rounded-2xl border border-[#DDE6E0] bg-white p-2 grid-cols-2 sm:grid-cols-4">
+          <div role="tablist" aria-label="Áreas do Passaporte" className="mb-5 flex gap-1.5 overflow-x-auto rounded-2xl border border-[#DDE6E0] bg-white p-1.5">
             {([
               { id: 'conquistas', label: 'Conquistas', description: 'Sua jornada e próximas missões', Icon: Award },
               { id: 'loja', label: 'Loja de recompensas', description: 'Troque seus Impulsos', Icon: ShoppingBag },
@@ -127,8 +127,8 @@ export default function PassaporteClient({
                   selecionarAba(tabs[next].id);
                   document.getElementById(`passaporte-tab-${tabs[next].id}`)?.focus();
                 }}
-                className={`flex min-h-[72px] items-center gap-3 rounded-xl px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#183F37] focus-visible:ring-offset-2 ${tab === id ? 'bg-[#183F37] text-white shadow-sm' : 'text-[#334B41] hover:bg-[#EEF5EF]'}`}>
-                <Icon size={21} aria-hidden="true" className="shrink-0"/><span><span className="block text-sm font-semibold">{label}</span><span className={`mt-1 block text-xs ${tab === id ? 'text-[#D0E3D9]' : 'text-[#52675B]'}`}>{description}</span></span>
+                className={`flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#183F37] focus-visible:ring-offset-2 ${tab === id ? 'bg-[#183F37] text-white shadow-sm' : 'text-[#334B41] hover:bg-[#EEF5EF]'}`}>
+                <Icon size={17} aria-hidden="true" className="shrink-0"/><span><span className="block text-sm font-semibold">{label}</span><span className={`mt-1 hidden text-xs lg:block ${tab === id ? 'text-[#D0E3D9]' : 'text-[#52675B]'}`}>{description}</span></span>
               </button>
             ))}
           </div>
