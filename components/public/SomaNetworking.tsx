@@ -23,6 +23,7 @@ const EMPRESAS_MENTORADOS: ReadonlyArray<{ nome: string; site: string; dominio: 
   { nome: 'O Boticário', site: 'https://www.boticario.com.br/', dominio: 'boticario.com.br' },
   { nome: 'Monks', site: 'https://www.monks.com/pt', dominio: 'monks.com' },
   { nome: 'Cielo', site: 'https://www.cielo.com.br/', dominio: 'cielo.com.br' },
+  { nome: 'Renner', site: 'https://www.lojasrenner.com.br/', dominio: 'lojasrenner.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Logotipo_das_Lojas_Renner.svg' },
   { nome: 'Samsung', site: 'https://www.samsung.com/br/', dominio: 'samsung.com', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Samsung_wordmark.svg' },
   { nome: 'LWSA', site: 'https://lwsa.tech/', dominio: 'lwsa.tech' },
   { nome: 'Embraer', site: 'https://www.embraer.com/pt/', dominio: 'embraer.com' },
