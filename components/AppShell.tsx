@@ -205,7 +205,7 @@ function AppShellContent({ children, initialProfile, copilotoLiberado }: { child
             </span>
           </nav>
 
-          <div className="ml-auto flex items-center gap-3"><span className={styles.portalCaption}>Seu espaço de desenvolvimento</span>{initialProfile && <NewsBell />}</div>
+          <div className="ml-auto mr-[132px] flex shrink-0 items-center gap-2 sm:mr-[140px]"><span className={styles.portalCaption}>Seu espaço de desenvolvimento</span>{initialProfile && <NewsBell />}</div>
         </header>
 
         <main ref={main} id="portal-content" tabIndex={-1} className={styles.main}>
