@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ vagas });
+    return NextResponse.json({ vagas }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('🔴 [VAGAS-GET] Exception:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
@@ -52,7 +52,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('📝 [VAGAS-POST] Inserindo:', { mentorado_id: user.id, ...body });
+    if (body.fit_score != null && (!Number.isInteger(body.fit_score) || body.fit_score < 0 || body.fit_score > 100)) {
+      return NextResponse.json({ error: 'Pontuação de compatibilidade inválida.' }, { status: 400 });
+    }
 
     const { data: vaga, error } = await supabase
       .from('vagas_candidatura')
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
     }
 
-    console.log('✅ [VAGAS-POST] Criada:', vaga);
+    // Não registrar dados de currículo e análises privadas nos logs.
     return NextResponse.json({ vaga }, { status: 201 });
   } catch (error) {
     console.error('🔴 [VAGAS-POST] Exception:', error);
