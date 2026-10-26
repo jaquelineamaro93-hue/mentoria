@@ -20,7 +20,7 @@ export default async function CertificadoMensal({ params }: { params: Promise<{ 
     db.from('carreira_checkins').select('dia,tipo').eq('user_id',user.id).gte('dia',mes).lt('dia',new Date(Date.UTC(Number(mes.slice(0,4)),Number(mes.slice(5,7)),1)).toISOString().slice(0,10)),
   ]);
   const today = new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
-  const active=!!profile&&!profile.is_admin&&(
+  const active=!!profile&&(
     (profile.status_assinatura==='ativo'&&(!profile.data_fim_acesso||profile.data_fim_acesso>=today))||
     (profile.trial_status==='active'&&!!profile.trial_ends_at&&new Date(profile.trial_ends_at).getTime()>Date.now())
   );
@@ -33,7 +33,7 @@ export default async function CertificadoMensal({ params }: { params: Promise<{ 
     pdi:'Plano de desenvolvimento',aprendizado:'Aprendizado contínuo',reflexao:'Reflexão de carreira',
   };
   const tipos=[...new Set(acoes.map(a=>String(a.tipo)))].map(t=>labels[t] || 'Atividade de carreira');
-  return <main className="mx-auto max-w-5xl px-4 py-6 sm:px-8">
+  return <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-8">
     <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3"><Link href="/certificados" className="text-sm font-semibold text-[#245846]">Voltar aos certificados</Link><PrintCertificateButton/></div>
     <div className="certificate-pages space-y-6">
       <section className="certificate-page relative flex min-h-[680px] flex-col justify-between overflow-hidden bg-[#112820] p-8 text-[#F9F6EE] sm:p-14">
