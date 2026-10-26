@@ -64,51 +64,57 @@ export default function VagasClient({
 
   return (
     <>
-      <div className={embedded ? '' : 'p-8 md:p-12'}>
+      <div className={embedded ? '' : 'px-4 py-6 sm:px-6 lg:px-8 lg:py-8'}>
           {!embedded && (
-            <div className="mb-8">
+            <div className="mb-5">
               <Eyebrow>
                 <Briefcase size={14} /><LocalizedText text={"Gestão de candidaturas"} /></Eyebrow>
-              <h1 className="font-display text-4xl text-black mb-2"><LocalizedText text={"Controle de vagas"} /></h1>
+              <h1 className="font-display text-3xl md:text-4xl text-black mb-2"><LocalizedText text={"Controle de vagas"} /></h1>
               <p className="text-gray-text text-sm"><LocalizedText text={"Acompanhe suas candidaturas durante sua jornada de carreira."} /></p>
             </div>
           )}
 
           {/* Tabs */}
-          <div className="flex gap-1 mb-6 border-b border-gray-faint">
+          <div role="tablist" aria-label="Etapas da gestão de candidaturas" className="flex gap-1 mb-5 overflow-x-auto rounded-2xl border border-gray-faint bg-white p-1.5">
             <button
               onClick={() => setTab('analise')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
+              role="tab"
+              aria-selected={tab === 'analise'} 
+              className={`shrink-0 rounded-xl px-3.5 py-2.5 font-medium text-sm transition flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep ${
                 tab === 'analise'
-                  ? 'border-mint-deep text-black'
-                  : 'border-transparent text-gray-text hover:text-black'
+                  ? 'bg-mint-light text-black shadow-sm'
+                  : 'text-gray-text hover:bg-gray-50 hover:text-black'
               }`}
             >
               <Zap className="w-4 h-4" /><LocalizedText text={"Análise de Fit"} /></button>
 
             <button
               onClick={() => setTab('kanban')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
+              role="tab"
+              aria-selected={tab === 'kanban'} 
+              className={`shrink-0 rounded-xl px-3.5 py-2.5 font-medium text-sm transition flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep ${
                 tab === 'kanban'
-                  ? 'border-mint-deep text-black'
-                  : 'border-transparent text-gray-text hover:text-black'
+                  ? 'bg-mint-light text-black shadow-sm'
+                  : 'text-gray-text hover:bg-gray-50 hover:text-black'
               }`}
             >
               <BarChart3 className="w-4 h-4" /><LocalizedText text={"Kanban"} /></button>
 
             <button
               onClick={() => setTab('ranking')}
-              className={`py-3 px-4 font-medium text-sm transition border-b-2 flex items-center gap-2 ${
+              role="tab"
+              aria-selected={tab === 'ranking'} 
+              className={`shrink-0 rounded-xl px-3.5 py-2.5 font-medium text-sm transition flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep ${
                 tab === 'ranking'
-                  ? 'border-mint-deep text-black'
-                  : 'border-transparent text-gray-text hover:text-black'
+                  ? 'bg-mint-light text-black shadow-sm'
+                  : 'text-gray-text hover:bg-gray-50 hover:text-black'
               }`}
             >
               <TrendingUp className="w-4 h-4" /><LocalizedText text={"Ranking"} /></button>
           </div>
 
           {/* Content */}
-          <Panel className="p-6">
+          <Panel className="p-4 sm:p-6">
             {loading ? (
               <div className="text-center py-12">
                 <div className="text-gray-text"><LocalizedText text={"Carregando vagas..."} /></div>
@@ -121,7 +127,7 @@ export default function VagasClient({
                 {tab === 'kanban' && (
                   <KanbanTab vagas={vagas} onVagaAtualizada={triggerRefetch} />
                 )}
-                {tab === 'ranking' && <RankingTab vagas={vagas} />}
+                {tab === 'ranking' && <RankingTab vagas={vagas} onAnalisar={() => setTab('analise')} />}
               </>
             )}
           </Panel>
