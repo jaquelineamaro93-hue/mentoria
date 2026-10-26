@@ -55,10 +55,10 @@ export function translatedNav(value:string,locale:SiteLocale){
 }
 export function LanguageSwitcher(){
   const {locale,setLocale}=useLocale();
-  return <div className="fixed right-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-[55] rounded-full border border-slate-300/75 bg-white/95 p-1.5 shadow-lg backdrop-blur-sm md:bottom-3 md:left-3 md:right-auto md:top-auto" data-testid="soma-language-switcher">
+  return <div className="fixed right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[55] rounded-xl border border-slate-300/75 bg-white/95 p-1 shadow-sm backdrop-blur-sm sm:right-5 sm:top-[calc(env(safe-area-inset-top)+0.9rem)]" data-testid="soma-language-switcher">
     <label htmlFor="soma-language" className="sr-only">Idioma / Language / Idioma</label>
     <select id="soma-language" aria-label="Idioma / Language" value={locale} onChange={e=>setLocale(e.target.value as SiteLocale)}
-      className="max-w-[138px] rounded-full border-0 bg-transparent px-2 py-1 text-xs font-semibold text-slate-900 outline-offset-2 focus-visible:outline-2 focus-visible:outline-teal-700">
+      className="max-w-[128px] rounded-lg border-0 bg-transparent px-1.5 py-1 text-xs font-semibold text-slate-900 outline-offset-2 focus-visible:outline-2 focus-visible:outline-teal-700">
       <option value="pt-BR">🇧🇷 Português</option><option value="es-419">🌎 Español</option><option value="en">🇺🇸 English</option>
     </select>
   </div>;
