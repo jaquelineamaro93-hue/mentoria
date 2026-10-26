@@ -25,5 +25,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node scripts/test-help-center.cjs
+      - run: node --test tests/rankings-contracts.test.mjs
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run build
