@@ -50,16 +50,16 @@ test('Feedback exige usuário autenticado, evita dados de outros mentorados e n�
 });
 
 
-test('17 empresas de mentorados aparecem com marca, site oficial e sem confundir patrocínio', () => {
+test('18 empresas de mentorados aparecem com marca, site oficial e sem confundir patrocínio', () => {
   const home = read('app/(public)/page.tsx');
   const networking = read('components/public/SomaNetworking.tsx');
   const empresas = [
     'Porte', 'Credsystem', 'Lojas Torra', 'Whirlpool', 'O Boticário',
-    'Monks', 'Cielo', 'Samsung', 'LWSA', 'Embraer',
+    'Monks', 'Cielo', 'Renner', 'Samsung', 'LWSA', 'Embraer',
     'Gupy', 'PicPay', 'Loft', 'Capgemini', 'Mercado Livre', 'RD Saúde', 'Itaú',
   ];
   const bloco = networking.split('const EMPRESAS_MENTORADOS:')[1]?.split('const AREAS_REDE')[0] ?? '';
-  assert.equal((bloco.match(/nome: '/g) ?? []).length, 17, 'Devem existir 17 logos de mentorados');
+  assert.equal((bloco.match(/nome: '/g) ?? []).length, 18, 'Devem existir 18 logos de mentorados');
   for (const nome of empresas) {
     assert.ok(bloco.includes(`nome: '${nome}'`), 'Marca ausente: ' + nome);
   }
