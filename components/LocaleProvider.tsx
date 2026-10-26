@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export type SiteLocale = 'pt-BR' | 'es-419' | 'en';
 const Context = createContext<{locale:SiteLocale;setLocale:(value:SiteLocale)=>void}>({locale:'pt-BR',setLocale:()=>{}});
@@ -53,9 +54,13 @@ export const navTranslations: Record<string, [string,string]> = {
 export function translatedNav(value:string,locale:SiteLocale){
   return locale==='pt-BR'?value:(navTranslations[value]?.[locale==='en'?0:1]||value);
 }
-export function LanguageSwitcher(){
+export function LanguageSwitcher({ placement = 'floating' }: { placement?: 'floating' | 'inline' }){
   const {locale,setLocale}=useLocale();
-  return <div className="fixed right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[55] rounded-xl border border-slate-300/75 bg-white/95 p-1 shadow-sm backdrop-blur-sm sm:right-5 sm:top-[calc(env(safe-area-inset-top)+0.9rem)]" data-testid="soma-language-switcher">
+  const pathname=usePathname();
+  if (placement==='floating' && pathname==='/') return null;
+  return <div className={placement==='inline'
+    ? 'relative shrink-0 rounded-lg border border-white/20 bg-white p-1 shadow-sm'
+    : 'fixed right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[55] rounded-xl border border-slate-300/75 bg-white/95 p-1 shadow-sm backdrop-blur-sm sm:right-5 sm:top-[calc(env(safe-area-inset-top)+0.9rem)]'} data-testid="soma-language-switcher">
     <label htmlFor="soma-language" className="sr-only">Idioma / Language / Idioma</label>
     <select id="soma-language" aria-label="Idioma / Language" value={locale} onChange={e=>setLocale(e.target.value as SiteLocale)}
       className="max-w-[128px] rounded-lg border-0 bg-transparent px-1.5 py-1 text-xs font-semibold text-slate-900 outline-offset-2 focus-visible:outline-2 focus-visible:outline-teal-700">
