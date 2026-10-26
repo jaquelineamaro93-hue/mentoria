@@ -52,31 +52,33 @@ export async function PATCH(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const updateData = await request.json();
-
-    // Verificar se a vaga pertence ao usuário
-    const { data: vaga } = await supabase
-      .from('vagas_candidatura')
-      .select('mentorado_id')
-      .eq('id', id)
-      .single();
-
-    if (!vaga || vaga.mentorado_id !== user.id) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+    const body = await request.json();
+    // Apenas dados de acompanhamento podem ser atualizados por esta rota.
+    // O resultado da análise de fit só pode ser criado pelo fluxo de análise.
+    const allowed = ['empresa', 'cargo', 'descricao_vaga', 'link_vaga', 'contato', 'proximo_passo', 'observacoes', 'etapa'] as const;
+    const updateData: Record<string, unknown> = {};
+    for (const field of allowed) {
+      if (Object.prototype.hasOwnProperty.call(body, field)) {
+        updateData[field] = body[field];
+      }
+    }
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'Nenhum campo permitido para atualização.' }, { status: 400 });
     }
 
     const { data: vagaAtualizada, error } = await supabase
       .from('vagas_candidatura')
-      .update({
-        ...updateData,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ ...updateData, updated_at: new Date().toISOString() })
       .eq('id', id)
+      .eq('mentorado_id', user.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return NextResponse.json({ error: 'Erro ao atualizar vaga' }, { status: 500 });
+    }
+    if (!vagaAtualizada) {
+      return NextResponse.json({ error: 'Vaga não encontrada' }, { status: 404 });
     }
 
     return NextResponse.json({ vaga: vagaAtualizada });
