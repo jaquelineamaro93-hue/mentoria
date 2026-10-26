@@ -27,11 +27,12 @@ export default async function CertificadoMensal({ params }: { params: Promise<{ 
   if(profileError||feedbackError||acoesError||!active||!feedback||!acoes?.length) notFound();
   const titulo=new Date(mes+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   const nome=profile.nome?.trim()||'Profissional SOMA';
-  const tipos=[...new Set(acoes.map(a=>a.tipo))].map(t=>({
+  const labels: Record<string, string> = {
     ingles:'Prática de inglês',curriculo:'Desenvolvimento de currículo',linkedin:'Posicionamento profissional',
     networking:'Construção de conexões',candidatura:'Busca de oportunidades',entrevista:'Preparação para entrevistas',
     pdi:'Plano de desenvolvimento',aprendizado:'Aprendizado contínuo',reflexao:'Reflexão de carreira',
-  }[t]||'Atividade de carreira'));
+  };
+  const tipos=[...new Set(acoes.map(a=>String(a.tipo)))].map(t=>labels[t] || 'Atividade de carreira');
   return <main className="mx-auto max-w-5xl px-4 py-6 sm:px-8">
     <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3"><Link href="/certificados" className="text-sm font-semibold text-[#245846]">Voltar aos certificados</Link><PrintCertificateButton/></div>
     <div className="certificate-pages space-y-6">
