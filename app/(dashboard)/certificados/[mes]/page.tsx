@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CertificadoMensal({ params }: { params: Promise<{ mes: string }> }) {
   const { mes } = await params;
-  if (!/^\\d{4}-(0[1-9]|1[0-2])-01$/.test(mes)) notFound();
+  if (!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(mes)) notFound();
   const access = await requireProductAccess('mentorship');
   if (!access.ok) redirect('/plataforma');
   const db = await createClient();
