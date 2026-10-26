@@ -68,6 +68,7 @@ export const portalNavGroups: PortalNavGroup[] = [
     label: 'Sua experiência na SOMA',
     items: [
       { href: '/minha-trilha', label: 'Avaliar a mentoria', icon: Star },
+      { href: '/certificados', label: 'Meus certificados', icon: Award },
     ],
   },
   {
