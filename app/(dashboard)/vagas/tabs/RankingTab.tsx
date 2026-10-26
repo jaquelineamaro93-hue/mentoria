@@ -1,6 +1,6 @@
 'use client';
 
-import { Trophy, Star, TrendingUp } from 'lucide-react';
+import { Trophy, Star, TrendingUp, ArrowRight } from 'lucide-react';
 import { Panel, Eyebrow } from '@/components/Panel';
 
 interface Vaga {
@@ -13,6 +13,7 @@ interface Vaga {
 
 interface Props {
   vagas: Vaga[];
+  onAnalisar?: () => void;
 }
 
 const getCorEtapa = (etapa: string): string => {
@@ -43,11 +44,11 @@ const getEtapaLabel = (etapa: string): string => {
   return labels[etapa] || etapa;
 };
 
-export default function RankingTab({ vagas }: Props) {
+export default function RankingTab({ vagas, onAnalisar }: Props) {
   // Filtrar vagas com fit_score e ordenar
   const vagasComFit = vagas
-    .filter((v) => v.fit_score !== null)
-    .sort((a, b) => (b.fit_score || 0) - (a.fit_score || 0));
+    .filter((v) => typeof v.fit_score === 'number' && Number.isFinite(v.fit_score) && v.fit_score >= 0 && v.fit_score <= 100)
+    .sort((a, b) => (b.fit_score ?? 0) - (a.fit_score ?? 0));
 
   const top3 = vagasComFit.slice(0, 3);
   const resto = vagasComFit.slice(3);
@@ -58,12 +59,13 @@ export default function RankingTab({ vagas }: Props) {
         <TrendingUp size={14} />
         Análise de Oportunidades
       </Eyebrow>
-      <h2 className="font-display text-3xl text-black mb-8">Ranking de Compatibilidade</h2>
+      <h2 className="font-display text-2xl md:text-3xl text-black mb-5">Ranking de Compatibilidade</h2>
 
       {vagasComFit.length === 0 ? (
         <Panel className="text-center py-12 p-6 border border-gray-faint">
           <p className="text-black">Nenhuma vaga analisada ainda</p>
-          <p className="text-sm text-gray-text mt-2">Use a aba "Análise de Fit" para analisar vagas</p>
+          <p className="text-sm text-gray-text mt-2">Analise uma oportunidade e salve o resultado para que ela apareça no ranking.</p>
+          {onAnalisar && <button type="button" onClick={onAnalisar} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-mint-deep px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-deep">Analisar uma vaga <ArrowRight size={16} /></button>}
         </Panel>
       ) : (
         <div className="space-y-6">
