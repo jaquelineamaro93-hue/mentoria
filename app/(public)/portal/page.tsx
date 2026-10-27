@@ -24,7 +24,7 @@ const journeys=[
 ];
 
 export default function PortalPublicPage() {
- return <div className="min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
+ return <div className="soma-marketing min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
    <SomaSiteHeader active="/portal" />
    <main>
      <section className="mx-auto max-w-7xl px-5 pb-14 pt-16 sm:px-8 sm:pb-20 sm:pt-24">
