@@ -1,4 +1,4 @@
-import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
+import { SomaSiteHeader, SomaSiteFooter, SomaSiteCallToAction } from '@/components/public/SomaMarketingChrome';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
