@@ -77,18 +77,20 @@ test('Carrossel compacto mantém histórias e revela os três depoimentos antigo
   }
 });
 
-test('Navegação da home leva a seções e página de depoimentos no desktop e celular', () => {
-  const landing = source('app/(public)/page.tsx');
+test('Navegação pública compartilhada cobre Home, Portal, Rede SOMA, Planos, Depoimentos e Cases', () => {
+  const home = source('app/(public)/page.tsx');
+  const nav = source('components/public/SomaMarketingChrome.tsx');
   const rede = source('components/public/SomaNetworking.tsx');
-  const portal = source('components/public/SomaProductShowcase.tsx');
-  assert.match(landing, /aria-label="Navegação principal da SOMA"/);
-  assert.match(landing, /aria-label="Navegação móvel da SOMA"/);
-  assert.match(landing, /<details className="group relative lg:hidden"/);
-  assert.match(landing, /className="sticky top-0 z-50"/);
-  for (const href of ['#portal','#rede-soma','#planos','/como-funciona','/depoimentos']) {
-    assert.ok(landing.includes('href="' + href + '"'), 'Link de menu ausente: ' + href);
+  assert.match(home, /<SomaSiteHeader active="\/"\s*\/>/);
+  assert.match(nav, /aria-label="Navegação principal"/);
+  assert.match(nav, /aria-label="Navegação móvel"/);
+  assert.match(nav, /sticky top-0/);
+  assert.match(nav, /group relative lg:hidden/);
+  for (const href of ['/portal','/rede-soma','/planos','/como-funciona','/depoimentos','/cases']) {
+    assert.ok(nav.includes("href: '"+href+"'"), 'Rota ausente do menu: ' + href);
   }
   assert.match(rede, /id="rede-soma"/);
-  assert.match(portal, /id="portal"/);
-  assert.match(landing, /id="planos"/);
+  assert.match(home, /id="portal"/);
+  assert.match(home, /id="planos"/);
+  assert.match(home, /href="\/cases"/);
 });
