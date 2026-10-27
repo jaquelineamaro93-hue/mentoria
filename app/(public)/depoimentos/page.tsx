@@ -33,7 +33,7 @@ const depoimentos = [
 ];
 
 export default function DepoimentosPage() {
- return <div className="min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
+ return <div className="soma-marketing min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
    <SomaSiteHeader active="/depoimentos"/>
    <main>
      <section className="border-b border-[#294138] px-5 pb-12 pt-16 sm:pb-20 sm:pt-24">
