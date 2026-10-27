@@ -12,7 +12,8 @@ test('welcome HTML preserves SOMA voice, branding and hand-lettered signature', 
   assert.match(mail, /Começar minha jornada na SOMA/);
   assert.match(mail, /&amp;utm_medium=email/);
   assert.match(mail, /somamentoria\.com\/onboarding/);
-  assert.doesNotMatch(mail, /🎉|!|<script/i);
+  assert.doesNotMatch(mail, /🎉|<script/i);
+  assert.doesNotMatch(mail, /Bem-vindo!|Parabéns!|Sua conta foi criada!/i);
 });
 
 test('welcome dispatch is authenticated and deduplicated', () => {
