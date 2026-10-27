@@ -76,3 +76,21 @@ test('LP Home utiliza retrato mais recente de Jaqueline com corte circular do Ca
  assert.match(home,/rounded-full object-cover object-\[center_20%\]/);
  assert.doesNotMatch(home,/src="\/images\/jaqueline-amaro-2026\.webp"/);
 });
+
+test('Portal SOMA tem um único scroll vertical minimalista, sem afetar LP e sidebar',()=>{
+ const globals=read('app/globals.css');
+ const shell=read('components/PortalShell.module.css');
+ const app=read('components/AppShell.tsx');
+ const analytics=read('app/(dashboard)/admin/analytics/page.tsx');
+ assert.match(globals,/html:has\(#portal-content\)/);
+ assert.match(globals,/body:has\(#portal-content\)/);
+ assert.match(globals,/overflow: hidden/);
+ assert.match(shell,/\.main\s*\{[^}]*overflow-y: auto;/);
+ assert.match(shell,/\.main\s*\{[^}]*scrollbar-gutter: auto;/);
+ assert.match(shell,/\.main::-webkit-scrollbar\s*\{\s*width: 6px;/);
+ assert.match(shell,/\.main::-webkit-scrollbar-track\s*\{\s*background: transparent;/);
+ assert.match(app,/id="portal-content"/);
+ assert.match(shell,/\.navigation\s*\{[^}]*overflow-y: auto;/);
+ assert.match(analytics,/overflow-x-auto/);
+ assert.doesNotMatch(shell,/\.main\s*\{[^}]*scrollbar-gutter: stable/);
+});
