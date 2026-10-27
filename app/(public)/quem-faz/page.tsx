@@ -1,3 +1,4 @@
+import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -37,7 +38,8 @@ const trajetoria = [
 
 export default function QuemFazPage() {
   return (
-    <main className="min-h-screen bg-[#f8faf8] text-[#183128]">
+    <SomaSiteHeader active="/quem-faz"/>
+      <main className="min-h-screen bg-[#f8faf8] text-[#183128]">
       <header className="border-b border-[#dfe8e1] bg-white">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6">
           <Link href="/" className="font-display text-2xl font-semibold text-[#183128]">SOMA Mentoria</Link>
@@ -128,5 +130,6 @@ export default function QuemFazPage() {
         </div>
       </section>
     </main>
+    <SomaSiteFooter />
   );
 }
