@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import LocalizedText from '@/components/LocalizedText';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
+import { SomaSiteHeader, SomaSiteFooter, SomaSiteCallToAction } from '@/components/public/SomaMarketingChrome';
 
 const depoimentos = [
   {
@@ -33,83 +33,38 @@ const depoimentos = [
 ];
 
 export default function DepoimentosPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      <header style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3 sm:gap-6">
-          <Link href="/" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</Link>
-          <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
-            <Link href="/como-funciona" className="hover:text-white transition-colors"><LocalizedText text={"Como funciona"} /></Link>
-            <Link href="/depoimentos" className="text-white"><LocalizedText text={"Depoimentos"} /></Link>
-            <Link href="/#planos" className="hover:text-white transition-colors"><LocalizedText text={"Planos"} /></Link>
-          </nav>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="text-white/90 font-medium text-xs sm:text-sm">Entrar</Link>
-            <Link href="/planos" className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm text-white whitespace-nowrap" style={{ backgroundColor: '#0D8071' }}>Começar</Link>
-          </div>
-        </div>
-      </header>
-
-      <main>
-        <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-[#F8F7F4] border-b border-gray-faint">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs uppercase tracking-[0.22em] mb-3 text-mint-deep"><LocalizedText text={"Histórias reais"} /></p>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-black"><LocalizedText text={"Quem passou por aqui"} /></h1>
-            <p className="mt-5 text-gray-text leading-relaxed max-w-2xl mx-auto"><LocalizedText text={"Relatos de pessoas que usaram a SOMA para organizar decisões, reconhecer forças e transformar clareza em movimento."} /></p>
-          </div>
-        </section>
-
-        <section id="depoimentos-linkedin" className="scroll-mt-24 px-4 sm:px-6 py-10 sm:py-14 md:py-16">
-          <div className="mx-auto max-w-5xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0D8071]"><LocalizedText text={"Relatos publicados no LinkedIn"} /></p>
-            <h2 className="mt-2 font-display text-2xl text-black sm:text-3xl"><LocalizedText text={"Depoimentos com links para os posts originais"} /></h2>
-            <p className="mt-2 text-sm leading-relaxed text-gray-text"><LocalizedText text={"Leia as publicações de Maria Laura, Giulia e Rita diretamente no LinkedIn."} /></p>
-          </div>
-          <div className="max-w-5xl mx-auto mt-6 grid md:grid-cols-3 gap-6">
-            {depoimentos.map((item) => (
-              <a
-                key={item.nome}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-2xl p-5 sm:p-6 border transition-all hover:-translate-y-1 hover:shadow-lg"
-                style={{ backgroundColor: item.bg, borderColor: item.cor }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: item.cor }}>
-                    {item.iniciais}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-black">{item.nome}</p>
-                    <p className="text-xs font-medium" style={{ color: item.cor }}>{item.cargo}</p>
-                  </div>
-                </div>
-                <p className="text-sm mb-5 leading-relaxed text-gray-text">{item.texto}</p>
-                <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
-                  <div className="text-lg" aria-label="5 estrelas">⭐⭐⭐⭐⭐</div>
-                  <span className="text-xs font-semibold" style={{ color: item.cor }}><LocalizedText text={"Ver no LinkedIn →"} /></span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        {/* Todos os relatos atuais ficam completos aqui. A home apresenta cartões compactos. */}
-        <SomaSuccessStories completo />
-
-        <section className="border-t border-gray-faint bg-[#f6faf8] px-4 py-8 text-center sm:px-6">
-          <p className="text-sm text-[#526760]"><LocalizedText text={"Quer conhecer outras trajetórias de mentorados e profissionais da comunidade?"} /></p>
-          <Link href="/#historias-reais" className="mt-3 inline-flex min-h-11 items-center font-semibold text-[#0D8071] underline-offset-4 hover:underline"><LocalizedText text={"Rever o resumo das histórias na página inicial"} /></Link>
-        </section>
-
-        <section className="px-4 sm:px-6 py-12 text-center" style={{ backgroundColor: '#1A1A1A' }}>
-          <h2 className="font-display text-2xl sm:text-3xl text-white"><LocalizedText text={"Quer entender se a SOMA faz sentido para seu momento?"} /></h2>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/#planos" className="px-7 py-3.5 rounded-lg text-white font-medium" style={{ backgroundColor: '#0D8071' }}><LocalizedText text={"Ver planos"} /></Link>
-            <Link href="/" className="px-7 py-3.5 rounded-lg border border-white/25 text-white font-medium"><LocalizedText text={"Voltar para a página inicial"} /></Link>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+ return <div className="min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
+   <SomaSiteHeader active="/depoimentos"/>
+   <main>
+     <section className="border-b border-[#294138] px-5 pb-12 pt-16 sm:pb-20 sm:pt-24">
+       <div className="mx-auto max-w-7xl sm:px-3">
+         <p className="text-sm font-semibold text-[#8FD3BE]">Depoimentos · histórias recebidas, resultados reais</p>
+         <h1 className="mt-5 max-w-5xl font-display text-5xl font-semibold leading-[1.02] tracking-[-.04em] sm:text-7xl">O próximo capítulo pode começar <span className="font-serif font-normal italic text-[#8FD3BE]">com um sim.</span></h1>
+         <p className="mt-6 max-w-3xl text-lg leading-8 text-[#C3D0CC]">Relatos de pessoas que passaram pela mentoria ou compartilharam experiências com a comunidade. Cada trajetória é única e tem seu próprio ritmo.</p>
+         <Link href="/planos" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-[#8FD3BE] px-7 font-semibold text-[#10221c] hover:bg-[#C6F0E2]">Conhecer os planos</Link>
+       </div>
+     </section>
+     <section id="depoimentos-linkedin" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
+       <div className="flex flex-wrap items-end justify-between gap-6">
+         <div><p className="text-sm font-semibold text-[#8FD3BE]">Histórias compartilhadas</p><h2 className="mt-3 max-w-3xl font-display text-3xl sm:text-5xl">Relatos publicados <span className="font-serif font-normal italic text-[#8FD3BE]">no LinkedIn.</span></h2></div>
+         <p className="max-w-sm text-sm leading-7 text-[#A9BAB5]">Posts originais, com acesso direto à publicação. Nenhum resultado é garantia de contratação ou promoção.</p>
+       </div>
+       <div className="mt-9 grid items-stretch gap-5 md:grid-cols-3">
+         {depoimentos.map(item=><a key={item.nome} href={item.href} target="_blank" rel="noopener noreferrer"
+           className="flex flex-col rounded-3xl border border-[#395649] bg-[#1B312B] p-6 transition-transform hover:-translate-y-1 hover:border-[#8FD3BE]">
+           <span className="text-4xl font-serif italic text-[#8FD3BE]" aria-hidden="true">“</span>
+           <p className="mt-3 flex-1 text-base leading-7 text-[#EEF3F1]">{item.texto}</p>
+           <div className="mt-7 flex items-center gap-3 border-t border-white/10 pt-6">
+             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#305845] font-bold text-[#C6F0E2]">{item.iniciais}</span>
+             <span><strong className="block text-sm text-white">{item.nome}</strong><span className="mt-1 block text-xs text-[#A9BAB5]">{item.cargo}</span></span>
+           </div>
+           <span className="mt-4 text-xs font-semibold text-[#8FD3BE]">Ver publicação no LinkedIn ↗</span>
+         </a>)}
+       </div>
+     </section>
+     <div className="soma-redesign-stories"><SomaSuccessStories completo /></div>
+     <SomaSiteCallToAction title="A próxima história pode ser a sua."/>
+   </main>
+   <SomaSiteFooter/>
+ </div>;
 }
