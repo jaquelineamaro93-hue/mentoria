@@ -7,7 +7,9 @@ const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8'
 test('Rede SOMA tem uma única grade com exatamente 22 empresas e a colagem original', () => {
  const home=read('app/(public)/page.tsx');
  const source=read('components/public/SomaNetworking.tsx');
- assert.match(home, /<SomaNetworking \/>/);
+ assert.match(home, /<SomaBrandTicker \/>/);
+ assert.match(read('components/public/SomaBrandTicker.tsx'), /SOMA_COMPANIES/);
+ assert.doesNotMatch(home, /<SomaNetworking \/>/);
  assert.match(source,/const EMPRESAS: ReadonlyArray<Empresa>/);
  const arr=source.split('const EMPRESAS: ReadonlyArray<Empresa> = [')[1]?.split('];')[0] ?? '';
  assert.equal((arr.match(/nome: '/g)||[]).length,22);
