@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import { createClient } from '@/lib/supabase/server';
 import SomaNetworking from '@/components/public/SomaNetworking';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
@@ -30,7 +31,7 @@ export default async function HomePage() {
         <div aria-hidden="true" className="pointer-events-none absolute bottom-[-380px] left-[15%] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(181,83,44,.18),transparent_67%)]"/>
         <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.1fr_.9fr] lg:py-24">
           <div>
-            <p className="text-sm font-semibold text-[#8FD3BE]">Mentoria de carreira + portal de acompanhamento</p>
+            <p className="text-sm font-semibold text-[#8FD3BE]"><LocalizedText text={"Mentoria de carreira + portal de acompanhamento"}/></p>
             <h1 className="mt-6 max-w-4xl font-display text-[clamp(3.8rem,9vw,8rem)] font-bold leading-[.94] tracking-[-.055em]">Clareza vira <em className="font-serif font-normal italic text-[#8FD3BE]">movimento.</em></h1>
             <p className="mt-8 max-w-2xl text-lg leading-8 text-[#C3D0CC]">Entenda seu momento, escolha uma direção e siga com um portal que guarda o que você descobriu, decidiu e precisa fazer para crescer na empresa ou mudar de rota.</p>
             <div className="mt-9 flex flex-wrap gap-3">
@@ -122,6 +123,7 @@ export default async function HomePage() {
               <h2 className="mt-3 max-w-3xl font-display text-4xl font-semibold leading-tight sm:text-5xl">O próximo capítulo pode começar <em className="font-serif font-normal text-[#8FD3BE]">com um sim.</em></h2>
             </div>
             <Link href="/depoimentos" className="text-sm font-semibold text-[#8FD3BE] hover:text-white">Conhecer os depoimentos ↗</Link>
+            <Link href="/cases" className="text-sm font-semibold text-[#8FD3BE] hover:text-white">Ver cases ↗</Link>
           </div>
         </div>
         <SomaSuccessStories />
