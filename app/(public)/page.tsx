@@ -64,6 +64,7 @@ export default async function HomePage() {
           <a href="#topo" className="font-display text-lg sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</a>
           <nav aria-label="Navegação principal da SOMA" className="hidden lg:flex flex-1 items-center justify-center gap-4 xl:gap-6 text-sm text-white/75">
             <Link href="/como-funciona" className="hover:text-white transition-colors"><LocalizedText text={"Como funciona"} /></Link>
+            <Link href="/quem-faz" className="hover:text-white transition-colors"><LocalizedText text={"Quem faz"} /></Link>
             <a href="#portal" className="hover:text-white transition-colors"><LocalizedText text={"Portal"} /></a>
             <a href="#rede-soma" className="hover:text-white transition-colors"><LocalizedText text={"Rede SOMA"} /></a>
             <Link href="/depoimentos" className="hover:text-white transition-colors"><LocalizedText text={"Depoimentos"} /></Link>
@@ -78,6 +79,7 @@ export default async function HomePage() {
               </summary>
               <nav aria-label="Navegação móvel da SOMA" className="absolute right-0 top-full z-50 mt-2 flex w-56 flex-col gap-1 rounded-xl border border-white/15 bg-[#1A1A1A] p-2 shadow-2xl">
                 <Link href="/como-funciona" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Como funciona"} /></Link>
+                <Link href="/quem-faz" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Quem faz"} /></Link>
                 <a href="#portal" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Portal"} /></a>
                 <a href="#rede-soma" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Rede SOMA"} /></a>
                 <Link href="/depoimentos" className="rounded-lg px-3 py-3 text-sm text-white hover:bg-white/10"><LocalizedText text={"Depoimentos no LinkedIn"} /></Link>
@@ -202,31 +204,56 @@ export default async function HomePage() {
       <SomaNetworking />
       <SomaSuccessStories />
 
-      {/* Sobre a mentora — compacto e horizontal */}
-      <section className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}><LocalizedText text={"Sobre a mentora"} /></p>
-              <h3 className="font-display text-3xl mb-4" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
-              <div className="leading-relaxed space-y-3 max-w-3xl" style={{ color: '#808080' }}>
-                <p>Administradora e Head de CRM, com trajetória na intersecção entre dados, tecnologia e negócios e passagens por empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
-                <p><LocalizedText text={"Na SOMA, transforma essa vivência em orientação prática para quem precisa ganhar clareza, se posicionar melhor e transformar estratégia em movimento de carreira."} /></p>
+      {/* Sobre quem faz — foto verdadeira, biografia fundamentada no currículo.
+          Colagem do topo e seção Pessoas e conexões permanecem inalteradas. */}
+      <section aria-labelledby="quem-faz-home" className="border-y border-[#E3EBE7] bg-[#F7FAF8] py-16 sm:py-24">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <div className="overflow-hidden rounded-[28px] bg-[#E6ECE8] shadow-[0_24px_60px_rgba(14,45,35,0.09)]">
+            <img
+              src="/images/jaqueline-amaro-retrato.svg"
+              alt="Foto real de Jaqueline Amaro, criadora da SOMA Mentoria"
+              width={1024}
+              height={1536}
+              loading="lazy"
+              className="aspect-[4/5] w-full object-cover object-[center_32%]"
+            />
+          </div>
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#0D8071]">
+              <LocalizedText text={"Quem faz a SOMA"} />
+            </p>
+            <h2 id="quem-faz-home" className="font-display text-3xl leading-tight text-[#172823] sm:text-4xl lg:text-5xl">
+              <LocalizedText text={"Por trás de cada plano de carreira, existem pessoas, histórias e conexões."} />
+            </h2>
+            <p className="mt-6 text-base leading-8 text-[#43574F]">
+              Sou Jaqueline Amaro, fundadora da SOMA. Tenho 15 anos de experiência em relacionamento com clientes, CRM e Customer Experience, com atuação em tecnologia, varejo e setor automotivo, incluindo projetos com a Volvo Cars e a Nuvia.
+            </p>
+            <p className="mt-4 text-base leading-8 text-[#43574F]">
+              Minha trajetória une estratégia, dados, liderança de pessoas e desenvolvimento profissional. A SOMA nasceu para transformar esse repertório em uma jornada prática: entender o momento, criar um plano e manter o movimento com acompanhamento humano.
+            </p>
+            <div className="mt-7 grid grid-cols-2 gap-4 border-y border-[#D8E6DE] py-5">
+              <div>
+                <p className="font-display text-3xl text-[#1B493C]">15 anos</p>
+                <p className="mt-1 text-sm text-[#52675E]">de experiência profissional</p>
+              </div>
+              <div>
+                <p className="font-display text-3xl text-[#1B493C]">CRM + CX + IA</p>
+                <p className="mt-1 text-sm text-[#52675E]">experiência aplicada a negócios e pessoas</p>
               </div>
             </div>
-            <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-6">
-              <div className="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/a/ACg8ocK5UM1XQO5ZsfxXR9UFYwL0AMIwJbtOw8azK85UTGZE2ljwqCzksQ=s192-c" alt="Jaqueline Amaro" referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-full object-cover" />
-                <div>
-                  <p className="font-semibold text-black"><LocalizedText text={"Jaqueline, a mentora"} /></p>
-                  <p className="mt-1 text-sm text-gray-text"><LocalizedText text={"Estratégia de carreira com repertório real de mercado."} /></p>
-                </div>
-              </div>
-              <div className="mt-5 grid gap-2 text-sm text-gray-text sm:grid-cols-3 lg:grid-cols-1">
-                <span><LocalizedText text={"Dados + negócios"} /></span>
-                <span>Posicionamento + execução</span>
-                <span><LocalizedText text={"Mentoria + acompanhamento"} /></span>
-              </div>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/quem-faz"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#096A5D]"
+              >
+                <LocalizedText text={"Conhecer minha história"} />
+              </Link>
+              <Link
+                href="/como-funciona"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[#BDD2C7] px-6 py-3 text-sm font-semibold text-[#174F42] hover:bg-white"
+              >
+                <LocalizedText text={"Entender o método SOMA"} />
+              </Link>
             </div>
           </div>
         </div>
