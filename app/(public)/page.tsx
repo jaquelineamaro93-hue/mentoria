@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
 import SomaBrandTicker from '@/components/public/SomaBrandTicker';
 
@@ -43,7 +44,7 @@ export default function HomePage() {
       <div aria-hidden="true" className="soma-home-blob-one pointer-events-none absolute -right-40 -top-64 h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,rgba(47,125,109,.55),transparent_65%)]"/>
       <div aria-hidden="true" className="soma-home-blob-two pointer-events-none absolute -bottom-[340px] left-[18%] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(181,83,44,.32),transparent_65%)]"/>
       <div className="relative mx-auto flex max-w-7xl flex-col gap-7 px-5 pb-14 pt-16 sm:px-8 sm:pb-20 sm:pt-[88px]">
-        <p className="text-sm font-semibold text-[#8FD3BE]">Mentoria de carreira + portal de acompanhamento</p>
+        <p className="text-sm font-semibold text-[#8FD3BE]"><LocalizedText text={"Mentoria de carreira + portal de acompanhamento"} /></p>
         <h1 className="max-w-6xl font-display text-[clamp(3.9rem,10.4vw,8rem)] font-bold leading-[.9] tracking-[-.045em]">
           Clareza vira<br/>
           <span className="font-serif font-normal italic tracking-[-.02em] text-[#8FD3BE]">movimento.</span>
@@ -52,7 +53,7 @@ export default function HomePage() {
           <p className="max-w-[27em] text-lg leading-[1.65] text-[#C3D0CC] sm:text-xl">Entenda seu momento, escolha uma direção e siga com um portal que guarda o que você descobriu, decidiu e precisa fazer, para crescer na empresa ou mudar de rota.</p>
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap gap-2.5">
-              <Link href="/planos" className="inline-flex min-h-[58px] items-center justify-center rounded-full bg-[#8FD3BE] px-7 text-base font-semibold text-[#0F1A18] transition-colors hover:bg-[#C6F0E2]">Ver planos</Link>
+              <Link href="/planos" className="inline-flex min-h-[58px] items-center justify-center rounded-full bg-[#8FD3BE] px-7 text-base font-semibold text-[#0F1A18] transition-colors hover:bg-[#C6F0E2]"><LocalizedText text={"Ver planos"} /></Link>
               <a href={whatsappHref} target={whatsapp?'_blank':undefined} rel={whatsapp?'noopener noreferrer':undefined} className="inline-flex min-h-[58px] items-center justify-center rounded-full border border-[#3C5550] px-6 text-base text-[#EEF3F1] transition-colors hover:border-[#8FD3BE]">{whatsapp?'WhatsApp':'Fale com a SOMA'}</a>
             </div>
             <span className="text-sm text-[#93A6A1]">Veja os valores atualizados de cada modalidade nos planos</span>
@@ -86,8 +87,8 @@ export default function HomePage() {
           </div>
         </div>
         <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-[#8FD3BE]">
-          <Link href="/como-funciona" className="hover:text-white">Conheça o método →</Link>
-          <Link href="/portal" className="hover:text-white">Veja o portal por dentro →</Link>
+          <Link href="/como-funciona" className="hover:text-white"><LocalizedText text={"Conheça o método"} /> →</Link>
+          <Link href="/portal" className="hover:text-white"><LocalizedText text={"Veja o portal por dentro"} /> →</Link>
           <Link href="/quem-faz" className="hover:text-white">Conheça minha trajetória →</Link>
         </div>
       </div>
