@@ -14,3 +14,26 @@
 @media (prefers-reduced-motion:reduce) {
   .soma-marketing *, .soma-marketing *::before, .soma-marketing *::after {animation-duration:0.01ms!important;transition-duration:0.01ms!important}
 }
+
+/* Movimento discreto do hero e ticker do Home HTML aprovado */
+@keyframes soma-home-flutua-one {
+  0%,100% { transform: translate(0,0) scale(1) }
+  50% { transform: translate(6%,-4%) scale(1.12) }
+}
+@keyframes soma-home-flutua-two {
+  0%,100% { transform: translate(0,0) scale(1.05) }
+  50% { transform: translate(-8%,6%) scale(.95) }
+}
+@keyframes soma-home-ticker {
+  from { transform: translateX(0) }
+  to { transform: translateX(-50%) }
+}
+.soma-home-blob-one { animation: soma-home-flutua-one 18s ease-in-out infinite }
+.soma-home-blob-two { animation: soma-home-flutua-two 22s ease-in-out infinite }
+.soma-ticker-track { animation: soma-home-ticker 40s linear infinite }
+.soma-brand-band:focus-within .soma-ticker-track,
+.soma-brand-band:hover .soma-ticker-track { animation-play-state: paused }
+@media (prefers-reduced-motion: reduce) {
+  .soma-home-blob-one,.soma-home-blob-two,.soma-ticker-track { animation: none !important }
+  .soma-brand-band { overflow-x:auto }
+}
