@@ -93,7 +93,7 @@ export default function SomaNetworking({ showCollage = false }: { showCollage?: 
         {showCollage && (
           <div className="relative mt-8 overflow-hidden rounded-2xl sm:mt-10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/soma-network-collage.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="block h-auto w-full object-contain" />
+            <img src="/soma-home-colagem-2026.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="block h-auto w-full object-contain" />
           </div>
         )}
         <div className="mt-9 flex flex-wrap items-end justify-between gap-4">
