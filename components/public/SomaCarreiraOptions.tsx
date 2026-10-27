@@ -29,12 +29,12 @@ export default function SomaCarreiraOptions() {
     <section id="soma-carreira-extras" aria-label="Adicionais da SOMA Carreira"
       className="rounded-2xl border border-[#375348] bg-[#13261f] p-5 sm:p-6">
       <h3 className="text-lg font-semibold text-[#EEF3F1]"><LocalizedText text={"Sua SOMA Carreira já é completa"} /></h3>
-      <p className="mt-2 text-sm leading-6 text-[#EEF3F1]"><LocalizedText text={"Portal, ferramentas, encontros coletivos, Íris Copiloto e acompanhamento no WhatsApp já fazem parte do plano."} /></p>
+      <p className="mt-2 text-sm leading-6 text-[#D1E3D8]"><LocalizedText text={"Portal, ferramentas, encontros coletivos, Íris Copiloto e acompanhamento no WhatsApp já fazem parte do plano."} /></p>
       <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-[#EEF3F1]"><CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden="true" /><LocalizedText text={"1 encontro individual 1:1 por mês incluído."} /></p>
 
       <fieldset className="mt-6 space-y-4 border-t border-[#375348] pt-5">
         <legend className="text-base font-semibold text-[#EEF3F1]"><LocalizedText text={"Quer mais encontros individuais?"} /></legend>
-        <p className="text-sm leading-6 text-[#EEF3F1]"><LocalizedText text={"Escolha o total de encontros por mês. O adicional varia conforme a quantidade e a duração do plano."} /></p>
+        <p className="text-sm leading-6 text-[#D1E3D8]"><LocalizedText text={"Escolha o total de encontros por mês. O adicional varia conforme a quantidade e a duração do plano."} /></p>
         <label className="block text-sm font-medium text-[#EEF3F1]"><LocalizedText text={"Duração do plano"} /><select value={duracao} onChange={e => setDuracao(Number(e.target.value) as 6 | 12)} className="mt-2 min-h-11 w-full rounded-xl border border-[#375348] bg-[#1B312B] px-3 py-2">
             <option value={6}>6 meses</option><option value={12}><LocalizedText text={"12 meses"} /></option>
           </select>
@@ -55,7 +55,7 @@ export default function SomaCarreiraOptions() {
           <input type="checkbox" checked={kitOnboarding} onChange={e => setKitOnboarding(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#0D8071]" />
           <span className="flex-1 text-sm leading-6 text-[#EEF3F1]">
             <strong className="flex items-center gap-2 text-[#EEF3F1]"><PackageCheck size={18} aria-hidden="true" /><LocalizedText text={"Kit Onboarding"} /></strong><LocalizedText text={"Kit de boas-vindas da sua mentoria SOMA Carreira."} /><span className="mt-1 block font-semibold text-[#EEF3F1]">+ {formatarReais(KIT_ONBOARDING_CENTAVOS)}, pagamento único</span>
-            <span className="mt-1 block text-xs text-[#EEF3F1]"><LocalizedText text={"Se seu plano já inclui o kit, você não precisa adicioná-lo."} /></span>
+            <span className="mt-1 block text-xs text-[#D1E3D8]"><LocalizedText text={"Se seu plano já inclui o kit, você não precisa adicioná-lo."} /></span>
           </span>
         </label>
       </fieldset>

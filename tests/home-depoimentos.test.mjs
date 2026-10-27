@@ -54,3 +54,16 @@ test('A fotografia de colagem original está no repositório e mantém gradiente
  assert.match(home,/bg-gradient-to-t/);
  assert.match(home,/object-contain/);
 });
+
+test('Novo hero e colagem íntegra coexistem com o gradiente legível', () => {
+ const home=read('app/(public)/page.tsx');
+ const network=read('components/public/SomaNetworking.tsx');
+ const assets=readFileSync(new URL('../public/soma-network-collage.webp',import.meta.url));
+ const original=readFileSync(new URL('../public/soma-home-colagem-2026.webp',import.meta.url));
+ const cards=read('components/public/SomaHeroJourney.tsx');
+ assert.deepEqual(assets,original);
+ assert.match(home, /<SomaHeroJourney\s*\/>/);
+ assert.match(home, /bg-gradient-to-t/);
+ assert.ok(network.indexOf('EMPRESAS.map(empresa') < network.indexOf('{showCollage &&'), '22 logos devem vir antes da colagem');
+ for (const x of ['Mapa Quem Sou Eu','SEU PDI','PRÓXIMO ENCONTRO']) assert.ok(cards.includes(x));
+});
