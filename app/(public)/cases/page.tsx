@@ -1,5 +1,5 @@
-import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
 'use client';
+import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
 import Link from 'next/link';
 import { useLocale } from '@/components/LocaleProvider';
 import CaseVideoShowcase from '@/components/public/CaseVideoShowcase';
