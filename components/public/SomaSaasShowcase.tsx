@@ -57,11 +57,11 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
                   <Icone size={21} aria-hidden="true" />
                 </span>
                 <span className="font-semibold text-[#EEF3F1]">{oferta.nome}</span>
-                {marcado && <span className="ml-auto rounded-full bg-[#245343] px-2 py-1 text-[11px] font-semibold text-[#EEF3F1]">Selecionado</span>}
+                {marcado && <span className="ml-auto rounded-full bg-[#245343] px-2 py-1 text-[11px] font-semibold text-[#D1F2E4]">Selecionado</span>}
               </span>
-              <span className="text-sm leading-6 text-[#EEF3F1]">{oferta.descricao}</span>
+              <span className="text-sm leading-6 text-[#D8E9E0]">{oferta.descricao}</span>
               <strong className="mt-3 text-2xl tracking-tight text-[#EEF3F1]">{formatarReais(BASE_SAAS_CENTAVOS[codigo])}</strong>
-              <span className="mt-1 text-xs text-[#EEF3F1]">por mês, sem agentes de IA</span>
+              <span className="mt-1 text-xs text-[#D1E3D8]">por mês, sem agentes de IA</span>
               <span className="mt-3 flex-1 space-y-1">
                 {oferta.itens.map(item => (
                   <span key={item} className="flex items-start gap-2 py-1 text-sm text-[#EEF3F1]">
@@ -79,7 +79,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
       <div id="soma-saas-configurador" className="mt-6 grid scroll-mt-24 gap-5 rounded-2xl border border-[#375348] bg-[#13261f] p-5 sm:p-7">
         <div>
           <h3 className="text-lg font-semibold text-[#EEF3F1]">Monte seu plano</h3>
-          <p className="mt-1 text-sm leading-6 text-[#EEF3F1]">
+          <p className="mt-1 text-sm leading-6 text-[#D1E3D8]">
             Marque somente os recursos que pretende usar. O total mensal aparece ao lado.
           </p>
           {plano === 'avulso' && (
@@ -112,7 +112,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
                 <span className="mt-1 block font-semibold text-[#EEF3F1]">+ {formatarReais(ADICIONAL_IA_CENTAVOS)}/mês, se contratado sozinho</span>
               </span>
             </label>
-            <p className="text-xs leading-5 text-[#EEF3F1]">
+            <p className="text-xs leading-5 text-[#D1E3D8]">
               Se escolher os dois agentes, o adicional combinado é de {formatarReais(DOIS_AGENTES_CENTAVOS)}/mês, em vez de R$ 300,00.
 
             </p>
@@ -140,7 +140,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
             className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#8FD3BE] px-4 py-3 text-center text-sm font-semibold text-[#10221c] hover:bg-[#9AD2B8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071]">
             Começar meus 7 dias grátis <ArrowUpRight size={15} aria-hidden="true" />
           </a>
-          <p className="mt-3 text-xs leading-5 text-[#EEF3F1]">
+          <p className="mt-3 text-xs leading-5 text-[#D1E3D8]">
             Teste as ferramentas escolhidas por 7 dias, sem cartão. Depois, assine pelo Mercado Pago.
           </p>
         </aside>
@@ -153,7 +153,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {modulos.map(m => (
               <div key={m.slug} className="rounded-lg border border-[#375348] bg-[#1B312B] px-4 py-3">
-                <p className="text-sm font-medium text-[#1d4538]">{m.title}</p>
+                <p className="text-sm font-medium text-[#EEF3F1]">{m.title}</p>
                 {m.description && <p className="mt-1 text-xs leading-5 text-[#EEF3F1]">{m.description}</p>}
               </div>
             ))}
