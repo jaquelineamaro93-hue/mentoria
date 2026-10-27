@@ -6,6 +6,8 @@ on:
       - 'app/(public)/page.tsx'
       - 'components/public/SomaSuccessStories.tsx'
       - 'tests/home-depoimentos.test.mjs'
+      - 'app/globals.css'
+      - 'components/PortalShell.module.css'
       - '.github/workflows/home-depoimentos.yml'
   workflow_dispatch:
 
