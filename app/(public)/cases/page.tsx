@@ -1,4 +1,5 @@
 'use client';
+import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
 import Link from 'next/link';
 import { useLocale } from '@/components/LocaleProvider';
 import CaseVideoShowcase from '@/components/public/CaseVideoShowcase';
@@ -41,12 +42,9 @@ const copy={
 } as const;
 export default function CasesPage(){
  const {locale}=useLocale(); const t=copy[locale];
- return <main className="min-h-screen bg-[#F8FAF8] text-[#13211D]">
-  <header className="border-b border-[#DCE5E0] bg-white"><nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5" aria-label="SOMA">
-   <Link href="/" className="font-display text-xl font-semibold">SOMA<span className="text-[#0D8071]">.</span></Link>
-   <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0D8071]"><ArrowLeft size={17}/>{t.back}</Link>
-  </nav></header>
-  <section className="border-b border-[#DFE7E2] bg-[#10261F] px-5 py-16 text-white md:py-24">
+ return <div className="soma-marketing min-h-screen bg-[#0F1A18] text-[#EEF3F1]"><SomaSiteHeader active="/cases"/><main className="min-h-screen bg-[#0F1A18] text-[#EEF3F1]">
+  
+  <section className="border-b border-[#365246] bg-[#10261F] px-5 py-16 text-white md:py-24">
    <div className="mx-auto max-w-5xl"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9CE2D0]">{t.kicker}</p>
     <h1 className="mt-5 max-w-4xl font-display text-4xl leading-tight md:text-6xl">{t.title}</h1>
     <p className="mt-6 max-w-2xl text-base leading-8 text-[#D2E4DD]">{t.subtitle}</p>
@@ -54,24 +52,24 @@ export default function CasesPage(){
    </div>
   </section>
   <section id="historias" className="mx-auto max-w-6xl scroll-mt-8 px-5 py-12 md:py-20">
-   <div className="mb-8 flex items-center gap-3"><BookOpen className="text-[#0D8071]"/><h2 className="font-display text-2xl md:text-3xl">{t.section}</h2></div>
+   <div className="mb-8 flex items-center gap-3"><BookOpen className="text-[#8FD3BE]"/><h2 className="font-display text-2xl md:text-3xl">{t.section}</h2></div>
    <div className="grid gap-6 lg:grid-cols-3">
-    {t.stories.map((s,i)=><article key={s.name} className="flex flex-col rounded-2xl border border-[#D7E2DC] bg-white p-6 shadow-sm">
+    {t.stories.map((s,i)=><article key={s.name} className="flex flex-col rounded-2xl border border-[#365246] bg-[#1B312B] p-6 shadow-sm">
       <p className="text-xs font-bold uppercase tracking-widest text-[#0D8071]">{s.kind}</p><h3 className="mt-4 min-h-[4.5rem] font-display text-2xl leading-tight">{s.title}</h3>
       <div className="mt-6 space-y-5 text-sm leading-6">
        <div><p className="mb-1 font-semibold text-[#0D8071]">01 · {t.steps[0]}</p><p>{s.challenge}</p></div>
        <div><p className="mb-1 font-semibold text-[#0D8071]">02 · {t.steps[1]}</p><p>{s.path}</p></div>
        <div><p className="mb-2 flex items-center gap-2 font-semibold text-[#0D8071]"><Quote size={15}/>03 · {t.steps[2]}</p>
-       <blockquote lang="pt-BR" className="rounded-xl bg-[#F0F6F2] p-4 italic text-[#263B33]">“{s.quote}”</blockquote><p className="mt-2 font-semibold">{s.name}</p></div>
+       <blockquote lang="pt-BR" className="rounded-xl bg-[#264437] p-4 italic text-[#EEF3F1]">“{s.quote}”</blockquote><p className="mt-2 font-semibold">{s.name}</p></div>
       </div>
      </article>)}
    </div>
-   <p className="mt-8 max-w-4xl text-xs leading-6 text-[#566960]">{t.note}</p>
+   <p className="mt-8 max-w-4xl text-xs leading-6 text-[#A9BAB5]">{t.note}</p>
   </section>
   <CaseVideoShowcase />
-  <section className="bg-[#EAF4EF] px-5 py-12"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6">
+  <section className="bg-[#1B312B] px-5 py-12"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6">
     <div className="flex gap-3 text-[#0D8071]"><Users size={24}/><BriefcaseBusiness size={24}/></div>
-    <Link href="/planos" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white">{t.cta}<ArrowRight size={17}/></Link>
+    <Link href="/planos" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#8FD3BE] px-6 py-3 text-sm font-semibold text-[#10221c]">{t.cta}<ArrowRight size={17}/></Link>
   </div></section>
- </main>;
+ </main><SomaSiteFooter/></div>;
 }

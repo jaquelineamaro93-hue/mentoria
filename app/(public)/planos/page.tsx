@@ -1,3 +1,4 @@
+import { SomaSiteHeader, SomaSiteFooter } from '@/components/public/SomaMarketingChrome';
 import Link from 'next/link';
 import LocalizedText from '@/components/LocalizedText';
 import ScrollToSectionButton from '@/components/public/ScrollToSectionButton';
@@ -31,7 +32,9 @@ export default async function PlanosPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0F1A18] px-4 py-6 text-[#EEF3F1] sm:px-6 lg:px-8">
+    <div className="soma-marketing min-h-screen bg-[#0F1A18] text-[#EEF3F1]">
+      <SomaSiteHeader active="/planos"/>
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-[1800px] w-full mx-auto">
         <Link href="/" className="inline-flex items-center gap-2 text-[#C3D0CC] hover:text-white mb-6 sm:mb-8">
           <ArrowLeft size={20} />
@@ -137,6 +140,8 @@ export default async function PlanosPage() {
         <div className="min-w-0 rounded-3xl border border-[#325248] bg-[#142722] p-4 sm:p-5"><SomaSaasShowcase modulos={modulosRaw ?? []} /></div>
         </div>
       </div>
+      </div>
+      <SomaSiteFooter />
     </div>
   );
 }

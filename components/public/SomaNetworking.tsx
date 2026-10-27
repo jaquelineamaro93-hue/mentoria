@@ -71,7 +71,7 @@ function EmpresaCard({ empresa }: { empresa: Empresa }) {
   );
 }
 
-export default function SomaNetworking() {
+export default function SomaNetworking({ showCollage = false }: { showCollage?: boolean }) {
   return (
     <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="scroll-mt-24 bg-[#0F1A18] py-14 text-[#EEF3F1] sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -88,12 +88,12 @@ export default function SomaNetworking() {
             <div><strong className="block text-3xl sm:text-4xl">2022</strong><span className="text-xs text-[#A9BAB5]">início da SOMA</span></div>
           </div>
         </div>
-        {/* A colagem original das conexões permanece como conteúdo central da seção */}
-        <div className="relative mt-8 overflow-hidden rounded-2xl sm:mt-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/soma-network-collage.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="h-auto max-h-[360px] w-full object-cover object-center sm:max-h-[480px]" />
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0F1A18] to-transparent" />
-        </div>
+        {showCollage && (
+          <div className="relative mt-8 overflow-hidden rounded-2xl sm:mt-10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/soma-network-collage.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="block h-auto w-full object-contain" />
+          </div>
+        )}
         <div className="mt-9 flex flex-wrap items-end justify-between gap-4">
           <h3 className="max-w-2xl font-display text-2xl leading-tight sm:text-3xl"><LocalizedText text={"Onde mentorados e alunos constroem carreira"} /></h3>
           <p className="max-w-sm text-sm leading-6 text-[#A9BAB5]"><LocalizedText text={"Estas são algumas das empresas presentes nas trajetórias profissionais de mentorados e alunos da SOMA."} /></p>

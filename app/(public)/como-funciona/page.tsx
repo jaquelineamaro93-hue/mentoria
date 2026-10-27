@@ -1,65 +1,42 @@
 import Link from 'next/link';
 import LocalizedText from '@/components/LocalizedText';
+import { SomaSiteHeader, SomaSiteFooter, SomaSiteCallToAction } from '@/components/public/SomaMarketingChrome';
+import { SomaInteractiveMethod, SomaInteractiveMoment } from '@/components/public/SomaInteractiveMethod';
+
+const steps = [
+  { name:'Entendemos o contexto', detail:'Sua história, valores, forças e o momento em que você está.' },
+  { name:'Organizamos a estratégia', detail:'Prioridades, metas claras e as ferramentas certas para o seu caminho.' },
+  { name:'Acompanhamos no portal', detail:'Entre um encontro e outro, a jornada fica registrada e evolui com você.' },
+];
 
 export default function ComoFuncionaPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      <header style={{ backgroundColor: '#1A1A1A', borderBottom: '1px solid #2D2D2D' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3 sm:gap-6">
-          <Link href="/" className="font-display text-xl sm:text-2xl text-white whitespace-nowrap">SOMA Mentoria</Link>
-          <nav className="hidden lg:flex items-center gap-6 text-sm text-white/70">
-            <Link href="/como-funciona" className="text-white"><LocalizedText text={"Como funciona"} /></Link>
-            <Link href="/depoimentos" className="hover:text-white transition-colors"><LocalizedText text={"Depoimentos"} /></Link>
-            <Link href="/#planos" className="hover:text-white transition-colors"><LocalizedText text={"Planos"} /></Link>
-          </nav>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="text-white/90 font-medium text-xs sm:text-sm">Entrar</Link>
-            <Link href="/planos" className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg font-medium text-xs sm:text-sm text-white whitespace-nowrap" style={{ backgroundColor: '#0D8071' }}>Começar</Link>
-          </div>
+  return <div className="soma-marketing min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
+    <SomaSiteHeader active="/como-funciona" />
+    <main>
+      <SomaInteractiveMethod />
+      <SomaInteractiveMoment />
+      <section className="border-t border-[#22332F] py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <h2 className="max-w-4xl font-display text-4xl font-semibold tracking-tight sm:text-6xl">
+            Do primeiro encontro <span className="font-serif font-normal italic text-[#8FD3BE]">em diante.</span>
+          </h2>
+          <ol className="mt-10 border-t border-[#2B403C]">
+            {steps.map((s,i)=><li key={s.name} className="grid items-center gap-3 border-b border-[#2B403C] py-6 sm:py-8 md:grid-cols-[160px_1fr_1fr] md:gap-9">
+              <span aria-hidden="true" className="font-display text-7xl font-bold leading-none text-[#2F7D6D] sm:text-8xl">{i+1}</span>
+              <h3 className="font-display text-2xl font-semibold sm:text-3xl">{s.name}</h3>
+              <p className="text-base leading-7 text-[#A9BAB5] sm:text-lg">{s.detail} {i===2&&<Link href="/portal" className="font-semibold text-[#8FD3BE] hover:underline">Ver o portal</Link>}</p>
+            </li>)}
+          </ol>
         </div>
-      </header>
-
-      <main>
-        <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-[#F8F7F4] border-b border-gray-faint">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs uppercase tracking-[0.22em] mb-3 text-mint-deep"><LocalizedText text={"Como funciona"} /></p>
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-black"><LocalizedText text={"Humano no contexto, portal na continuidade."} /></h1>
-            <p className="mt-5 text-gray-text leading-relaxed max-w-2xl mx-auto"><LocalizedText text={"O encontro ajuda a ler o momento. O portal registra decisões, ações e evolução para você não recomeçar do zero."} /></p>
-          </div>
-        </section>
-
-        <section className="px-4 sm:px-6 py-10 sm:py-14 md:py-16">
-          <div className="max-w-5xl mx-auto grid gap-5 md:grid-cols-2">
-            <div className="border rounded-2xl p-5 sm:p-7 bg-white" style={{ borderColor: '#E8E8E8' }}>
-              <div className="h-10 w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(13,128,113,.28)', color: '#0D8071', backgroundColor: 'rgba(13,128,113,.06)' }}>01</div>
-              <p className="text-xs uppercase tracking-wide mt-5" style={{ color: '#0D8071' }}>Online</p>
-              <h2 className="font-display text-2xl mt-1 text-black"><LocalizedText text={"Alinhamento e mapa individual"} /></h2>
-              <p className="mt-3 text-sm leading-relaxed text-gray-text"><LocalizedText text={"Metas, bloqueios, forças, contexto e direção traduzidos em um plano prático. O objetivo é entender seu cenário antes de escolher ferramentas ou ações."} /></p>
-            </div>
-
-            <div className="border rounded-2xl p-5 sm:p-7 bg-white" style={{ borderColor: '#E8E8E8' }}>
-              <div className="h-10 w-10 rounded-full border flex items-center justify-center text-xs font-semibold tracking-[0.12em]" style={{ borderColor: 'rgba(142,63,74,.25)', color: '#8E3F4A', backgroundColor: 'rgba(142,63,74,.06)' }}>02</div>
-              <p className="text-xs uppercase tracking-wide mt-5" style={{ color: '#8E3F4A' }}><LocalizedText text={"Presencial ou online"} /></p>
-              <h2 className="font-display text-2xl mt-1 text-black"><LocalizedText text={"Presença, posicionamento e troca"} /></h2>
-              <p className="mt-3 text-sm leading-relaxed text-gray-text"><LocalizedText text={"Situações reais, posicionamento profissional, repertório coletivo e próximos movimentos. A mentoria conecta reflexão com execução."} /></p>
-            </div>
-          </div>
-
-          <div className="max-w-5xl mx-auto mt-6 rounded-2xl bg-[#F8F7F4] border border-gray-faint p-5 sm:p-7 md:p-8">
-            <p className="text-xs uppercase tracking-[0.18em] text-mint-deep"><LocalizedText text={"Entre um encontro e outro"} /></p>
-            <h2 className="font-display text-2xl md:text-3xl text-black mt-2"><LocalizedText text={"O portal mantém a jornada organizada."} /></h2>
-            <p className="mt-3 text-sm md:text-base leading-relaxed text-gray-text max-w-3xl"><LocalizedText text={"Autoconhecimento, plano de desenvolvimento, primeiros 90 dias, currículo, vagas, LinkedIn e preparação para entrevistas ficam conectados ao seu contexto, para que o trabalho continue sem fragmentar a jornada."} /></p>
-          </div>
-        </section>
-
-        <section className="px-4 sm:px-6 py-12 text-center" style={{ backgroundColor: '#1A1A1A' }}>
-          <h2 className="font-display text-2xl sm:text-3xl text-white"><LocalizedText text={"Veja o formato que combina com seu momento."} /></h2>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/#planos" className="px-7 py-3.5 rounded-lg text-white font-medium" style={{ backgroundColor: '#0D8071' }}><LocalizedText text={"Ver planos"} /></Link>
-            <Link href="/" className="px-7 py-3.5 rounded-lg border border-white/25 text-white font-medium"><LocalizedText text={"Voltar para a página inicial"} /></Link>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+      </section>
+      <section className="border-t border-[#22332F] px-5 py-16 text-center sm:py-20">
+        <blockquote className="mx-auto max-w-4xl font-serif text-3xl italic leading-snug text-[#EEF3F1] sm:text-5xl">
+          Humano no que precisa de contexto, <span className="text-[#8FD3BE]">tecnologia no que precisa de continuidade.</span>
+        </blockquote>
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[#A9BAB5]">A IA apoia análises e preparação. A mentoria conecta essas informações ao seu momento real, às decisões de carreira e ao que você consegue sustentar na prática.</p>
+      </section>
+      <SomaSiteCallToAction />
+    </main>
+    <SomaSiteFooter />
+  </div>;
 }
