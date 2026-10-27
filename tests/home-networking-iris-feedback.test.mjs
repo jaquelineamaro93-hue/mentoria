@@ -16,7 +16,7 @@ test('Rede SOMA tem uma única grade com exatamente 22 empresas e a colagem orig
  assert.match(source,/Onde mentorados e alunos constroem carreira/);
  assert.match(source,/soma-network-collage\.webp/);
  assert.match(source,/lg:grid-cols-5 xl:grid-cols-6/);
- assert.match(source,/sem parceria, patrocínio ou endosso/);
+ assert.match(source,/Não há parceria, patrocínio ou endosso/);
  assert.doesNotMatch(source,/Outras trajetórias profissionais que inspiram/);
  assert.match(source,/não indica vínculo atual|atual ou anterior/);
  assert.match(source,/id="rede-soma"/);
