@@ -202,31 +202,56 @@ export default async function HomePage() {
       <SomaNetworking />
       <SomaSuccessStories />
 
-      {/* Sobre a mentora — compacto e horizontal */}
-      <section className="bg-white py-14" style={{ borderTop: '1px solid #E8E8E8', borderBottom: '1px solid #E8E8E8' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#0D8071' }}><LocalizedText text={"Sobre a mentora"} /></p>
-              <h3 className="font-display text-3xl mb-4" style={{ color: '#1A1A1A' }}>Jaqueline Amaro</h3>
-              <div className="leading-relaxed space-y-3 max-w-3xl" style={{ color: '#808080' }}>
-                <p>Administradora e Head de CRM, com trajetória na intersecção entre dados, tecnologia e negócios e passagens por empresas como Banco do Brasil, Loft, Ansell e Guanabara Rodoviário.</p>
-                <p><LocalizedText text={"Na SOMA, transforma essa vivência em orientação prática para quem precisa ganhar clareza, se posicionar melhor e transformar estratégia em movimento de carreira."} /></p>
+
+      {/* Quem faz: retrato real do ensaio e dados do currículo. Preservar ambas as colagens acima. */}
+      <section aria-labelledby="quem-faz-home" className="border-y border-[#e5e9e6] bg-[#f8faf9] py-16 sm:py-20">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-8 px-4 sm:px-6 lg:grid-cols-[0.78fr_1.22fr] lg:gap-14">
+          <div className="mx-auto w-full max-w-[390px] lg:mx-0">
+            <div className="overflow-hidden rounded-[24px] border border-[#dce8e1] bg-[#e9e5e0] shadow-[0_24px_55px_-34px_rgba(20,55,40,0.30)]">
+              <img
+                src="https://drive.google.com/thumbnail?id=1PBOUq65_MSc8HpcRT0oNsqar0W6WPTqP&sz=w1200"
+                alt="Retrato profissional real de Jaqueline Amaro, fundadora da SOMA"
+                referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
+                className="aspect-[3/4] w-full object-cover object-top"
+              />
+            </div>
+            <p className="mt-3 text-xs text-[#708078]">Jaqueline Amaro, fundadora da SOMA</p>
+          </div>
+          <div className="min-w-0">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.19em] text-[#0D8071]"><LocalizedText text={"Quem faz a SOMA"} /></p>
+            <h2 id="quem-faz-home" className="font-display text-3xl leading-tight text-[#183128] sm:text-4xl lg:text-[43px]">
+              <LocalizedText text={"Experiência de mercado, escuta e estratégia para a sua carreira."} />
+            </h2>
+            <p className="mt-5 max-w-2xl leading-7 text-[#53655c]">
+              Sou Jaqueline Amaro, especialista em CRM, Customer Experience e inteligência artificial, com 15 anos de experiência em relacionamento com clientes, tecnologia e liderança de projetos. Atuei em iniciativas de transformação e crescimento com empresas como Volvo Cars, Nuvia AI e operações de varejo.
+            </p>
+            <p className="mt-3 max-w-2xl leading-7 text-[#53655c]">
+              Criei a SOMA para conectar o que aprendi na prática com um acompanhamento de carreira que respeita a trajetória e o momento de cada pessoa. Sem fórmulas prontas: com repertório, método e ações possíveis.
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="Experiência da mentora">
+              <div className="rounded-xl border border-[#dce8e1] bg-white p-4">
+                <strong className="block font-display text-2xl text-[#185e4e]">15 anos</strong>
+                <span className="mt-1 block text-xs leading-5 text-[#61736a]">de atuação em CRM, CX e negócios</span>
+              </div>
+              <div className="rounded-xl border border-[#dce8e1] bg-white p-4">
+                <strong className="block font-display text-2xl text-[#185e4e]">+35%</strong>
+                <span className="mt-1 block text-xs leading-5 text-[#61736a]">em conversão de jornadas digitais em projeto profissional*</span>
+              </div>
+              <div className="col-span-2 rounded-xl border border-[#dce8e1] bg-white p-4 sm:col-span-1">
+                <strong className="block font-display text-2xl text-[#185e4e]">MBA em CX</strong>
+                <span className="mt-1 block text-xs leading-5 text-[#61736a]">formação voltada à experiência do cliente</span>
               </div>
             </div>
-            <div className="rounded-2xl border border-gray-faint bg-[#f7f9fb] p-6">
-              <div className="flex items-center gap-4">
-                <img src="https://lh3.googleusercontent.com/a/ACg8ocK5UM1XQO5ZsfxXR9UFYwL0AMIwJbtOw8azK85UTGZE2ljwqCzksQ=s192-c" alt="Jaqueline Amaro" referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-full object-cover" />
-                <div>
-                  <p className="font-semibold text-black"><LocalizedText text={"Jaqueline, a mentora"} /></p>
-                  <p className="mt-1 text-sm text-gray-text"><LocalizedText text={"Estratégia de carreira com repertório real de mercado."} /></p>
-                </div>
-              </div>
-              <div className="mt-5 grid gap-2 text-sm text-gray-text sm:grid-cols-3 lg:grid-cols-1">
-                <span><LocalizedText text={"Dados + negócios"} /></span>
-                <span>Posicionamento + execução</span>
-                <span><LocalizedText text={"Mentoria + acompanhamento"} /></span>
-              </div>
+            <p className="mt-3 text-xs leading-5 text-[#7b8980]">*Resultado profissional informado no currículo, referente à atuação em CRM, não a resultados garantidos pela mentoria.</p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link href="/quem-faz" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#0D8071] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0a6459]">
+                <LocalizedText text={"Conheça minha trajetória"} />
+              </Link>
+              <Link href="/como-funciona" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[#b9cec3] px-6 py-3 text-sm font-semibold text-[#1c4c3c] transition-colors hover:bg-white">
+                <LocalizedText text={"Entenda o método SOMA"} />
+              </Link>
             </div>
           </div>
         </div>
