@@ -67,3 +67,12 @@ test('Novo hero e colagem íntegra coexistem com o gradiente legível', () => {
  assert.ok(network.indexOf('EMPRESAS.map(empresa') < network.indexOf('{showCollage &&'), '22 logos devem vir antes da colagem');
  for (const x of ['Mapa Quem Sou Eu','SEU PDI','PRÓXIMO ENCONTRO']) assert.ok(cards.includes(x));
 });
+
+test('LP Home utiliza retrato mais recente de Jaqueline com corte circular do Canva',()=>{
+ const home=read('app/(public)/page.tsx');
+ const portrait=statSync(new URL('../public/images/jaqueline-amaro-home-20261027.webp',import.meta.url));
+ assert.ok(portrait.size>300000,'Imagem original em boa resolução');
+ assert.match(home,/src="\/images\/jaqueline-amaro-home-20261027\.webp"/);
+ assert.match(home,/rounded-full object-cover object-\[center_20%\]/);
+ assert.doesNotMatch(home,/src="\/images\/jaqueline-amaro-2026\.webp"/);
+});
