@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DashboardClient from './DashboardClient';
+import WelcomeEmailTrigger from '@/components/WelcomeEmailTrigger';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import type {
   Profile, Diagnostic, BussolaPosicionamento,
@@ -76,7 +77,9 @@ export default async function DashboardPage() {
   );
 
   return (
-    <DashboardClient
+    <>
+      <WelcomeEmailTrigger />
+      <DashboardClient
       profile={profile}
       entrevista={entrevistaResult.data ?? null}
       diagnostic={diagnosticResult.data ?? null}
@@ -90,6 +93,7 @@ export default async function DashboardPage() {
       votacaoAtiva={votacaoAtiva}
       feedbacks={feedbacksResult.data ?? []}
       careerJourney={careerJourney}
-    />
+      />
+    </>
   );
 }
