@@ -90,12 +90,6 @@ export default function SomaNetworking({ showCollage = false }: { showCollage?: 
             <div><strong className="block text-3xl sm:text-4xl">2022</strong><span className="text-xs text-[#A9BAB5]">início da SOMA</span></div>
           </div>
         </div>
-        {showCollage && (
-          <div className="relative mt-8 overflow-hidden rounded-2xl sm:mt-10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/soma-home-colagem-2026.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="block h-auto w-full object-contain" />
-          </div>
-        )}
         <div className="mt-9 flex flex-wrap items-end justify-between gap-4">
           <h3 className="max-w-2xl font-display text-2xl leading-tight sm:text-3xl"><LocalizedText text={"Onde mentorados e alunos constroem carreira"} /></h3>
           <p className="max-w-sm text-sm leading-6 text-[#A9BAB5]"><LocalizedText text={"Estas são algumas das empresas presentes nas trajetórias profissionais de mentorados e alunos da SOMA."} /></p>
@@ -104,6 +98,12 @@ export default function SomaNetworking({ showCollage = false }: { showCollage?: 
           {EMPRESAS.map(empresa => <EmpresaCard key={empresa.nome} empresa={empresa} />)}
         </div>
         <p className="mt-6 max-w-5xl text-xs leading-6 text-[#A9BAB5]"><LocalizedText text={"As marcas representam a atuação profissional de mentorados e alunos, atual ou anterior. Não há parceria, patrocínio ou endosso dessas empresas à SOMA, nem promessa de contato com seus colaboradores."} /> <span>Logotipo Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons.</span></p>
+        {showCollage && (
+          <div className="relative mt-10 overflow-hidden rounded-2xl sm:mt-10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/soma-home-colagem-2026.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="block h-auto w-full object-contain" />
+          </div>
+        )}
         <div className="mt-8 flex flex-wrap gap-3 border-t border-white/15 pt-8">
           <Link href="/planos" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#8FD3BE] px-6 text-sm font-semibold text-[#0F1A18] hover:bg-[#b9e7d7]">Ver planos</Link>
           <Link href="/depoimentos" className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#43665a] px-6 text-sm font-semibold text-white hover:border-[#8FD3BE]">Ler depoimentos</Link>
