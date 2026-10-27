@@ -1,4 +1,5 @@
 import sgMail from '@sendgrid/mail';
+import { buildWelcomeEmail } from './welcome-email';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
@@ -42,12 +43,7 @@ export async function sendEmail({
 
 export const enviarEmail = sendEmail;
 
-export const templateBoasVindas = (nome: string) => `
-  <h2>Bem-vindo ao SOMA Mentoria! 🎉</h2>
-  <p>Olá ${nome},</p>
-  <p>Seu pagamento foi aprovado e sua conta foi criada com sucesso!</p>
-  <p><a href="https://somamentoria.com/dashboard">Acessar Dashboard</a></p>
-`;
+export const templateBoasVindas = (nome: string) => buildWelcomeEmail(nome).html;
 
 export const templateInatividade = (nome: string) => {
   const primeiro=nome.trim().split(/\s+/)[0].replace(/[&<>"']/g,(ch)=>({
