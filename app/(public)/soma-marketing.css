@@ -37,3 +37,25 @@
   .soma-home-blob-one,.soma-home-blob-two,.soma-ticker-track { animation: none !important }
   .soma-brand-band { overflow-x:auto }
 }
+
+
+/* Rolagem sutil apenas nas páginas públicas SOMA.
+   Preserva indicador de posição e não altera scrollbars de áreas logadas. */
+html:has(.soma-marketing) {
+  scrollbar-width: thin;
+  scrollbar-color: #526b60 #0f1a18;
+}
+html:has(.soma-marketing)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+html:has(.soma-marketing)::-webkit-scrollbar-track {
+  background: #0f1a18;
+}
+html:has(.soma-marketing)::-webkit-scrollbar-thumb {
+  background: #526b60;
+  border-radius: 999px;
+}
+html:has(.soma-marketing)::-webkit-scrollbar-thumb:hover {
+  background: #83af9c;
+}

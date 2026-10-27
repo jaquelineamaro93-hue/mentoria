@@ -16,7 +16,7 @@ test('Rede SOMA tem uma única grade com exatamente 22 empresas e a colagem orig
  const brands=['Porte','Credsystem','Lojas Torra','Whirlpool','O Boticário','Monks','Cielo','Renner','Samsung','LWSA','Embraer','Gupy','PicPay','Loft','Capgemini','Mercado Livre','RD Saúde','Itaú','Banco do Brasil','Volvo','Webmotors','Ansell'];
  for(const brand of brands) assert.ok(arr.includes("nome: '"+brand+"'"),brand);
  assert.match(source,/Onde mentorados e alunos constroem carreira/);
- assert.match(source,/soma-network-collage\.webp/);
+ assert.match(source,/soma-home-colagem-2026\.webp/);
  assert.match(source,/lg:grid-cols-5 xl:grid-cols-6/);
  assert.match(source,/Não há parceria, patrocínio ou endosso/);
  assert.doesNotMatch(source,/Outras trajetórias profissionais que inspiram/);
