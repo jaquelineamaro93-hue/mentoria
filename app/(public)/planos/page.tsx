@@ -75,15 +75,15 @@ export default async function PlanosPage() {
           {(planos || []).map((plano: PlanoMentoria) => (
             <div key={plano.id} className="bg-[#1B312B] border border-[#375348] hover:border-[#8FD3BE] transition-colors rounded-2xl p-4 sm:p-5 flex flex-col">
               <div className="mb-4">
-                <p className="text-xs font-medium text-[#EEF3F1] mb-2">{plano.duracao_meses} MESES</p>
-                <h2 className="text-xl font-display text-[#EEF3F1] mb-1">{plano.nome}</h2>
-                <p className="text-sm mb-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-display text-2xl font-semibold text-[#8FD3BE]">{plano.duracao_meses} <span className="font-sans text-xs font-normal text-[#B9CDC3]">meses</span></p>
                   {plano.codigo.includes('online') ? (
-                    <span className="text-[#EEF3F1] font-medium"><LocalizedText text={"100% Online"} /></span>
+                    <span className="rounded-full border border-[#5FAD91] bg-[#21483a] px-3 py-1 text-xs font-semibold text-[#B8E2CE]"><LocalizedText text={"100% online"} /></span>
                   ) : (
-                    <span className="text-[#EEF3F1]">{plano.foco}</span>
+                    <span className="rounded-full border border-[#BB7959] bg-[#54372B] px-3 py-1 text-xs font-semibold text-[#FFE0CA]"><LocalizedText text={"Híbrido"} /></span>
                   )}
-                </p>
+                </div>
+                <h2 className="mb-3 font-display text-xl text-[#EEF3F1]">{plano.nome}</h2>
                 <p className="text-xs text-[#EEF3F1] mb-6">{plano.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
               </div>
 
