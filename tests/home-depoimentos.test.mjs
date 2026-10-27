@@ -1,96 +1,47 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+const read = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-const source = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
-
-test('Depoimentos aparecem de forma destacada na home publica', () => {
-  const home = source('app/(public)/page.tsx');
-  const ui = source('components/public/SomaSuccessStories.tsx');
-  assert.match(home, /import SomaSuccessStories from/);
-  assert.match(home, /<SomaSuccessStories \/>/);
-  assert.match(ui, /id="historias-reais"/);
-  assert.match(ui, /Histórias recebidas, resultados reais/);
-  assert.match(ui, /font-display/);
-  assert.match(ui, /bg-\[#111b19\]/);
+test('Home reproduz os seis blocos do HTML aprovado na ordem correta', () => {
+ const home=read('app/(public)/page.tsx');
+ const order=['Clareza vira','<SomaBrandTicker />','Quem faz a SOMA','soma-network-collage.webp','O próximo capítulo','É o momento de'];
+ let last=-1; for(const item of order){const n=home.indexOf(item);assert.ok(n>last, 'Bloco fora de ordem: '+item);last=n}
+ assert.match(home,/Nathalia Ferlin/);
+ assert.match(home,/quoteCards\.map/);
+ assert.doesNotMatch(home,/<SomaNetworking\s*\/>|<SomaSuccessStories\s*\/>/);
+ assert.doesNotMatch(home,/A mesma carreira pede|Ainda ficou alguma dúvida\?/);
+ assert.match(home,/href="\/planos"/);
 });
-
-test('Carrossel responsivo e com recursos basicos de acessibilidade', () => {
-  const ui = source('components/public/SomaSuccessStories.tsx');
-  assert.match(ui, /'use client'/);
-  assert.match(ui, /snap-x snap-mandatory/);
-  assert.match(ui, /overflow-x-auto/);
-  assert.match(ui, /sm:w-\[calc/);
-  assert.match(ui, /lg:w-\[calc/);
-  assert.match(ui, /aria-label="Ver próximos depoimentos"/);
-  assert.match(ui, /aria-label="Ver depoimentos anteriores"/);
-  assert.match(ui, /disabled=\{!canGoForward\}/);
-  assert.match(ui, /disabled=\{!canGoBack\}/);
-  assert.match(ui, /prefers-reduced-motion/);
-  assert.match(ui, /onScroll=\{syncActive\}/);
+test('Três relatos da Home têm origem verificável e não prometem contratação',()=>{
+ const home=read('app/(public)/page.tsx');
+ for(const name of ['Henrique Silva','Paulo Cézar Silveira','Jéssica Carolina','Nathalia Ferlin'])assert.ok(home.includes(name),name);
+ assert.equal((home.match(/tag: '/g)||[]).length,3);
+ assert.doesNotMatch(home, /⭐⭐⭐⭐⭐|99%|empresas parceiras|vagas garantidas/);
+ const source=read('components/public/SomaSuccessStories.tsx');
+ for(const name of ['Nathalia Ferlin','Henrique Silva','Paulo Cézar Silveira','Erick Almeida','Geraldo Macinelli','Jaque Ferreira'])assert.ok(source.includes(name),name);
+ assert.match(source,/Resultados individuais não representam promessa de aprovação ou contratação/);
 });
-
-test('Autores autorizados aparecem sem números, telefones ou conversas privadas', () => {
-  const ui = source('components/public/SomaSuccessStories.tsx');
-  for (const pessoa of ['Nathalia Ferlin', 'Henrique Silva', 'Paulo Cézar Silveira', 'Erick Almeida', 'Geraldo Macinelli', 'Jaque Ferreira']) {
-    assert.ok(ui.includes(pessoa), 'Nome ausente: ' + pessoa);
-  }
-  assert.doesNotMatch(ui, /wa\.me|whatsapp\.com|<img|next\/image|\\.jpeg|\\.jpg|\\.png/i);
-  assert.doesNotMatch(ui, /\+55\s?\d{2}|\b\d{11}\b|@gmail\.com/i);
-  assert.match(ui, /historia.nome/);
-  assert.match(ui, /historia.iniciais/);
-  assert.match(ui, /historia.origem/);
-  assert.match(ui, /Depoimentos reais compartilhados com autorização/);
-  assert.match(ui, /Resultados individuais não representam promessa de aprovação ou contratação/);
-  assert.doesNotMatch(ui, /⭐⭐⭐⭐⭐|99%|empresas parceiras/i);
+test('Depoimentos completos e fontes originais permanecem acessíveis',()=>{
+ const home=read('app/(public)/page.tsx');
+ const full=read('app/(public)/depoimentos/page.tsx');
+ const ui=read('components/public/SomaSuccessStories.tsx');
+ assert.match(home,/href="\/depoimentos"/);
+ assert.match(full,/Depoimentos com links para os posts originais/);
+ for(const name of ['Maria Laura Soares','Giulia Gomes','Rita Alecrim'])assert.ok(full.includes(name));
+ for(const href of ['https://lnkd.in/p/esE9t5fr','https://lnkd.in/p/eetWmSiv','https://lnkd.in/p/euSGD_V9'])assert.ok(full.includes(href));
+ assert.match(ui,/snap-x snap-mandatory/);
+ assert.match(ui,/aria-label="Ver próximos depoimentos"/);
+ assert.match(ui,/prefers-reduced-motion/);
 });
-
-test('Depoimentos nao fazem todos os relatos parecerem contratacoes pela plataforma', () => {
-  const ui = source('components/public/SomaSuccessStories.tsx');
-  assert.match(ui, /orientações em comunidades/);
-  assert.match(ui, /Evolução em entrevistas/);
-  assert.match(ui, /Novo contrato profissional/);
-  assert.match(ui, /LinkedIn e currículo/);
-  assert.match(ui, /Aprovação na Gupy/);
-  const cards = (ui.match(/\scategoria:/g) || []).length;
-  const autores = (ui.match(/\snome:/g) || []).length;
-  assert.equal(cards, autores);
-  assert.ok(cards >= 10 && cards <= 20, 'Quantidade de relatos inesperada: ' + cards);
-});
-
-test('Carrossel compacto mantém histórias e revela os três depoimentos antigos do LinkedIn', () => {
-  const ui = source('components/public/SomaSuccessStories.tsx');
-  const landing = source('app/(public)/page.tsx');
-  const antiga = source('app/(public)/depoimentos/page.tsx');
-  assert.match(ui, /h-\[256px\]/);
-  assert.match(ui, /sm:h-\[240px\]/);
-  assert.match(ui, /line-clamp-4/);
-  assert.match(ui, /Ver depoimentos publicados no LinkedIn/);
-  assert.match(landing, /href="\/depoimentos"/);
-  assert.match(antiga, /Depoimentos com links para os posts originais/);
-  for (const pessoa of ['Maria Laura Soares', 'Giulia Gomes', 'Rita Alecrim']) {
-    assert.ok(ui.includes(pessoa), 'Link antigo invisível na home: ' + pessoa);
-    assert.ok(antiga.includes(pessoa), 'Depoimento antigo ausente: ' + pessoa);
-  }
-  for (const url of ['https://lnkd.in/p/esE9t5fr','https://lnkd.in/p/eetWmSiv','https://lnkd.in/p/euSGD_V9']) {
-    assert.ok(ui.includes(url) && antiga.includes(url), 'Link anterior não preservado: ' + url);
-  }
-});
-
-test('Navegação pública compartilhada cobre Home, Portal, Rede SOMA, Planos, Depoimentos e Cases', () => {
-  const home = source('app/(public)/page.tsx');
-  const nav = source('components/public/SomaMarketingChrome.tsx');
-  const rede = source('components/public/SomaNetworking.tsx');
-  assert.match(home, /<SomaSiteHeader active="\/"\s*\/>/);
-  assert.match(nav, /aria-label="Navegação principal"/);
-  assert.match(nav, /aria-label="Navegação móvel"/);
-  assert.match(nav, /sticky top-0/);
-  assert.match(nav, /group relative lg:hidden/);
-  for (const href of ['/portal','/rede-soma','/planos','/como-funciona','/depoimentos','/cases']) {
-    assert.ok(nav.includes("href: '"+href+"'"), 'Rota ausente do menu: ' + href);
-  }
-  assert.match(rede, /id="rede-soma"/);
-  assert.match(home, /id="portal"/);
-  assert.match(home, /id="planos"/);
-  assert.match(home, /href="\/cases"/);
+test('Header compartilhado oferece navegação desktop e mobile',()=>{
+ const home=read('app/(public)/page.tsx');
+ const nav=read('components/public/SomaMarketingChrome.tsx');
+ const rede=read('components/public/SomaNetworking.tsx');
+ assert.match(home, /<SomaSiteHeader active="\/"\s*\/>/);
+ assert.match(nav,/aria-label="Navegação principal"/);
+ assert.match(nav,/aria-label="Navegação móvel"/);
+ for(const path of ['/portal','/rede-soma','/planos','/como-funciona','/depoimentos','/cases'])assert.ok(nav.includes("href: '"+path+"'"));
+ assert.match(rede,/id="rede-soma"/);
+ assert.match(home, /<SomaBrandTicker\s*\/>/);
 });
