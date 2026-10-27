@@ -361,59 +361,34 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-14 bg-white" style={{ borderTop: '1px solid #E8E8E8' }}>
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="font-display text-4xl text-center text-black mb-2"><LocalizedText text={"Perguntas Frequentes"} /></h2>
-          <p className="text-center text-gray-text mb-8 text-base"><LocalizedText text={"Tire suas dúvidas sobre como a mentoria SOMA funciona"} /></p>
-
-          <div className="space-y-4">
-            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span><LocalizedText text={"Como a mentoria SOMA funciona?"} /></span>
-                <span className="text-gray-text">+</span>
+      {/* FAQ compacto: evita repetir como funciona, portal, planos e depoimentos já apresentados acima */}
+      <section aria-labelledby="faq-soma-titulo" className="border-t border-[#e7ece9] bg-white py-10 sm:py-12">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto mb-7 max-w-2xl text-center">
+            <h2 id="faq-soma-titulo" className="font-display text-3xl text-[#1A1A1A] sm:text-4xl"><LocalizedText text={"Ainda ficou alguma dúvida?"} /></h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-text sm:text-base"><LocalizedText text={"Três respostas rápidas antes de começar"} /></p>
+          </div>
+          <div className="grid items-start gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+            <details className="group rounded-2xl border border-[#dce7e1] bg-[#fafcfb] px-5 py-4 transition-colors open:border-[#8ab6a7] open:bg-white">
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 font-display text-lg leading-snug text-[#183128] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0D8071] [&::-webkit-details-marker]:hidden">
+                <span><LocalizedText text={"Quanto tempo preciso dedicar?"} /></span>
+                <span aria-hidden="true" className="shrink-0 text-xl font-sans font-light text-[#0D8071] transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"A mentoria SOMA funciona em dois momentos. Primeiro você tem encontros online onde a gente mapeia quem você é, identifica seus diferenciais e desenha um plano prático de 90 dias. Depois você participa de encontros presenciais em grupo onde a gente trabalha networking, posicionamento profissional e aprende juntos com pessoas que buscam o mesmo nível de excelência que você."} /></p>
+              <p className="mt-3 border-t border-[#e1e9e3] pt-3 text-sm leading-6 text-[#52675f]"><LocalizedText text={"O ritmo depende dos seus objetivos. Entre os encontros, você pode avançar nas atividades do portal e priorizar os passos que fazem sentido para sua rotina."} /></p>
             </details>
-
-            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span><LocalizedText text={"O que eu encontro dentro do portal?"} /></span>
-                <span className="text-gray-text">+</span>
+            <details className="group rounded-2xl border border-[#dce7e1] bg-[#fafcfb] px-5 py-4 transition-colors open:border-[#8ab6a7] open:bg-white">
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 font-display text-lg leading-snug text-[#183128] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0D8071] [&::-webkit-details-marker]:hidden">
+                <span><LocalizedText text={"Preciso participar presencialmente?"} /></span>
+                <span aria-hidden="true" className="shrink-0 text-xl font-sans font-light text-[#0D8071] transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"O portal organiza sua jornada em três frentes: autoconhecimento, crescimento na empresa e mercado de trabalho. Você encontra diagnóstico, Mapa Quem Sou Eu, diário, PDI, primeiros 90 dias, leitura de cenário, currículo, Gupy & ATS, LinkedIn, acompanhamento de vagas e preparação para entrevistas. As ferramentas são apoio para a mentoria — não substituem o contexto humano dos encontros."} /></p>
+              <p className="mt-3 border-t border-[#e1e9e3] pt-3 text-sm leading-6 text-[#52675f]"><LocalizedText text={"Não. A SOMA oferece formatos online e híbridos. Confira o que está incluído no plano escolhido antes de contratar."} /></p>
             </details>
-
-            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span><LocalizedText text={"Quanto tempo preciso dedicar à mentoria?"} /></span>
-                <span className="text-gray-text">+</span>
+            <details className="group rounded-2xl border border-[#dce7e1] bg-[#fafcfb] px-5 py-4 transition-colors open:border-[#8ab6a7] open:bg-white md:col-span-2 lg:col-span-1">
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 font-display text-lg leading-snug text-[#183128] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0D8071] [&::-webkit-details-marker]:hidden">
+                <span><LocalizedText text={"Posso pausar minha mentoria?"} /></span>
+                <span aria-hidden="true" className="shrink-0 text-xl font-sans font-light text-[#0D8071] transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"Oferecemos planos de 6 meses ou 12 meses conforme sua necessidade. A mentoria se adapta ao seu contexto, seja você começando algo novo, enfrentando uma crise ou buscando fazer as coisas com mais excelência. O tempo depende do quanto você quer evoluir e do quanto está disposto a se dedicar."} /></p>
-            </details>
-
-            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span><LocalizedText text={"Qual é o investimento?"} /></span>
-                <span className="text-gray-text">+</span>
-              </summary>
-              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"A gente oferece flexibilidade total. Você pode pagar à vista com PIX, em uma parcela no cartão ou parcelar ao longo dos meses. Depois que você confirma o pagamento, já ganha acesso ao portal com todos os materiais, agendamento dos encontros e começa a jornada. Tudo fica guardado lá pra você acompanhar seu progresso."} /></p>
-            </details>
-
-            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span><LocalizedText text={"Preciso vir presencialmente?"} /></span>
-                <span className="text-gray-text">+</span>
-              </summary>
-              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"Temos planos 100% online e planos presenciais. Se você não consegue vir pessoalmente, sem problema. Os encontros em grupo podem ser virtuais. O importante é que você realmente quer mudar de patamar na carreira e está aberto pra aprender com quem já passou pelo mesmo que você."} /></p>
-            </details>
-
-            <details className="border border-gray-faint rounded-lg p-5 cursor-pointer hover:border-gray-text transition-colors">
-              <summary className="font-display text-lg text-black flex justify-between items-center cursor-pointer">
-                <span><LocalizedText text={"Posso ver quem já fez a mentoria?"} /></span>
-                <span className="text-gray-text">+</span>
-              </summary>
-              <p className="text-gray-text mt-4 leading-relaxed"><LocalizedText text={"Com certeza. A página de Depoimentos reúne histórias reais de quem já passou pela SOMA, com links para os relatos completos no LinkedIn. Você acessa essa página pelo menu no topo do site."} /></p>
+              <p className="mt-3 border-t border-[#e1e9e3] pt-3 text-sm leading-6 text-[#52675f]"><LocalizedText text={"Há opção de pausa programada de até 60 dias, conforme as condições do seu plano. Ela não suspende automaticamente cobranças ou parcelas."} /></p>
             </details>
           </div>
         </div>
