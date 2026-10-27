@@ -9,7 +9,7 @@ const steps = [
 ];
 
 export default function ComoFuncionaPage() {
-  return <div className="min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
+  return <div className="soma-marketing min-h-screen overflow-x-clip bg-[#0F1A18] text-[#EEF3F1]">
     <SomaSiteHeader active="/como-funciona" />
     <main>
       <SomaInteractiveMethod />
