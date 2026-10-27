@@ -23,7 +23,7 @@ export default function SomaHeroJourney() {
 
       <div className="soma-home-boia-three absolute bottom-[55px] right-[2%] flex w-[70%] items-center gap-2.5 rounded-[20px] bg-[#8FD3BE] px-3 py-3 text-[#0F1A18] shadow-[0_20px_40px_rgba(0,0,0,.35)] sm:bottom-10 sm:right-0 sm:w-[60%] sm:gap-3 sm:px-[18px] sm:py-4" style={{ rotate: '3deg' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="https://drive.google.com/thumbnail?id=1PBOUq65_MSc8HpcRT0oNsqar0W6WPTqP&sz=w400" alt="" width={44} height={44} decoding="async" loading="lazy" className="h-10 w-10 shrink-0 rounded-full border-2 border-[#0F1A18] object-cover object-[center_20%] sm:h-11 sm:w-11" referrerPolicy="no-referrer"/>
+        <img src="/images/jaqueline-amaro-2026.webp" alt="" width={44} height={44} decoding="async" loading="lazy" className="h-10 w-10 shrink-0 rounded-full border-2 border-[#0F1A18] object-cover object-[center_20%] sm:h-11 sm:w-11"/>
         <span className="min-w-0"><strong className="block text-[10px] font-bold tracking-wide sm:text-xs">PRÓXIMO ENCONTRO</strong><span className="mt-0.5 block text-[12px] font-semibold leading-tight sm:text-[14px]">Individual com a Jaqueline</span><span className="mt-1 block text-[11px] sm:text-[13px]">Agendamento no portal</span></span>
       </div>
 
