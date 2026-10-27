@@ -105,7 +105,7 @@ export default function HomePage() {
     {/* Colagem com UMA imagem e depoimento na mesma seção, sem um segundo mosaico */}
     <section aria-label="Encontros e conexões da SOMA" className="relative isolate overflow-hidden bg-[#0F1A18]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/soma-network-collage.webp" alt="Encontros, palestras e rodas de conversa da comunidade SOMA" className="block h-auto w-full object-contain"/>
+      <img src="/soma-home-colagem-2026.webp" alt="Encontros, palestras e rodas de conversa da comunidade SOMA" className="block h-auto w-full object-contain"/>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0F1A18]/95 via-[#0F1A18]/55 to-transparent"/>
       <figure className="absolute inset-x-0 bottom-0 mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-4 px-5 pb-4 sm:gap-6 sm:px-8 sm:pb-12">
         <blockquote className="max-w-[23em] font-display text-[clamp(1.4rem,3.4vw,2.75rem)] font-semibold leading-[1.06] tracking-[-.02em]">“Passei no processo seletivo depois de 2 meses buscando emprego. <span className="font-serif font-normal italic text-[#8FD3BE]">Venci a Gupy.”</span></blockquote>
