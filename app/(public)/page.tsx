@@ -56,7 +56,7 @@ export default function HomePage() {
             <Link href="/planos" className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#8FD3BE] px-7 text-base font-semibold text-[#0F1A18] transition-colors hover:bg-[#C6F0E2]"><LocalizedText text={"Ver planos"} /></Link>
             <a href={whatsappHref} target={whatsapp?'_blank':undefined} rel={whatsapp?'noopener noreferrer':undefined} className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[#3C5550] px-6 text-base text-[#EEF3F1] transition-colors hover:border-[#8FD3BE]">{whatsapp?'WhatsApp':'Fale com a SOMA'}</a>
           </div>
-          <span className="mt-3 block text-sm text-[#B5C9C0]">a partir de R$ 24,90/mês na Plataforma · mentoria online e híbrida</span>
+          <span className="mt-3 block text-sm text-[#B5C9C0]">a partir de <strong className="font-bold text-white">R$ 24,90/mês</strong> na Plataforma · mentoria online e híbrida</span>
         </div>
         <SomaHeroJourney />
       </div>
