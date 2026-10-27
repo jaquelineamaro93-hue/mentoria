@@ -14,7 +14,7 @@ for(const tag of ['pt-BR','en','es-419']) {
 }
 assert.ok(cases.includes('Nathalia Ferlin')&&cases.includes('Paulo Cézar Silveira'));
 assert.match(cases,/lang="pt-BR"/);
-assert.ok(home.includes('href="/cases"'),'Landing missing case route');
+assert.ok(read('components/public/SomaMarketingChrome.tsx').includes("href: '/cases'"),'Public navigation missing case route');
 assert.ok(home.includes('LocalizedText'),'Landing missing localized copy');
 assert.match(copy,/Preguntas frecuentes/);
 assert.match(app,/translatedNav\(location\.label,locale\)/);

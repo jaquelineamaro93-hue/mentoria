@@ -38,6 +38,8 @@ const EMPRESAS: ReadonlyArray<Empresa> = [
   { nome: 'Ansell', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Ansell_Logo.svg' },
 ];
 
+export { EMPRESAS as SOMA_COMPANIES };
+
 function EmpresaCard({ empresa }: { empresa: Empresa }) {
   const imagem = empresa.logoUrl ?? `https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`;
   const logo = (
