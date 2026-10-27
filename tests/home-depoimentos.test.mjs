@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 const read = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
 test('Home reproduz os seis blocos do HTML aprovado na ordem correta', () => {
  const home=read('app/(public)/page.tsx');
- const order=['Clareza vira','<SomaBrandTicker />','Quem faz a SOMA','soma-network-collage.webp','O próximo capítulo','É o momento de'];
+ const order=['Clareza vira','<SomaBrandTicker />','Quem faz a SOMA','soma-home-colagem-2026.webp','O próximo capítulo','É o momento de'];
  let last=-1; for(const item of order){const n=home.indexOf(item);assert.ok(n>last, 'Bloco fora de ordem: '+item);last=n}
  assert.match(home,/Nathalia Ferlin/);
  assert.match(home,/quoteCards\.map/);
@@ -44,4 +44,13 @@ test('Header compartilhado oferece navegação desktop e mobile',()=>{
  for(const path of ['/portal','/rede-soma','/planos','/como-funciona','/depoimentos','/cases'])assert.ok(nav.includes("href: '"+path+"'"));
  assert.match(rede,/id="rede-soma"/);
  assert.match(home, /<SomaBrandTicker\s*\/>/);
+});
+
+test('A fotografia de colagem original está no repositório e mantém gradiente e enquadramento',()=>{
+ const home=read('app/(public)/page.tsx');
+ const image=statSync(new URL('../public/soma-home-colagem-2026.webp',import.meta.url));
+ assert.ok(image.size>=500000);
+ assert.match(home,/src="\/soma-home-colagem-2026\.webp"/);
+ assert.match(home,/bg-gradient-to-t/);
+ assert.match(home,/object-contain/);
 });
