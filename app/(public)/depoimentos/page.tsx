@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import SomaSuccessStories from '@/components/public/SomaSuccessStories';
 import { SomaSiteHeader, SomaSiteFooter, SomaSiteCallToAction } from '@/components/public/SomaMarketingChrome';
 
@@ -46,8 +47,8 @@ export default function DepoimentosPage() {
      </section>
      <section id="depoimentos-linkedin" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
        <div className="flex flex-wrap items-end justify-between gap-6">
-         <div><p className="text-sm font-semibold text-[#8FD3BE]">Histórias compartilhadas</p><h2 className="mt-3 max-w-3xl font-display text-3xl sm:text-5xl">Relatos publicados <span className="font-serif font-normal italic text-[#8FD3BE]">no LinkedIn.</span></h2></div>
-         <p className="max-w-sm text-sm leading-7 text-[#A9BAB5]">Posts originais, com acesso direto à publicação. Nenhum resultado é garantia de contratação ou promoção.</p>
+         <div><p className="text-sm font-semibold text-[#8FD3BE]"><LocalizedText text={"Depoimentos"}/> · histórias compartilhadas</p><h2 className="mt-3 max-w-3xl font-display text-3xl sm:text-5xl">Relatos publicados <span className="font-serif font-normal italic text-[#8FD3BE]">no LinkedIn.</span></h2></div>
+         <p className="max-w-sm text-sm leading-7 text-[#A9BAB5]">Depoimentos com links para os posts originais. Nenhum resultado é garantia de contratação ou promoção.</p>
        </div>
        <div className="mt-9 grid items-stretch gap-5 md:grid-cols-3">
          {depoimentos.map(item=><a key={item.nome} href={item.href} target="_blank" rel="noopener noreferrer"
