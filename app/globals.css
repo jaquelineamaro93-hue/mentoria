@@ -125,3 +125,16 @@ select:focus-visible {
   50% { transform: translateX(100%); }
   100% { transform: translateX(300%); }
 }
+
+/* O portal usa o painel principal como único eixo vertical de rolagem.
+   Evita que o documento e o painel mantenham duas barras lado a lado.
+   Não interfere na LP ou nas páginas públicas. */
+html:has(#portal-content) {
+  height: 100%;
+  overflow: hidden;
+}
+body:has(#portal-content) {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
