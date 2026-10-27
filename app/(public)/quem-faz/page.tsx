@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Conheça Jaqueline Amaro, fundadora da SOMA Mentoria. Trajetória em CRM, experiência do cliente, inteligência artificial, liderança e o método de desenvolvimento de carreira da SOMA.',
 };
 
-const foto = 'https://drive.google.com/thumbnail?id=1PBOUq65_MSc8HpcRT0oNsqar0W6WPTqP&sz=w1200';
+const foto = '/images/jaqueline-amaro-2026.webp';
 
 const trajetoria = [
   {
@@ -54,7 +54,7 @@ export default function QuemFazPage() {
       </div>
       <div className="overflow-hidden rounded-3xl border border-[#315443] bg-[#18342C] p-3">
        {/* eslint-disable-next-line @next/next/no-img-element */}
-       <img src={foto} alt="Jaqueline Amaro, fundadora da SOMA" referrerPolicy="no-referrer" className="aspect-[4/5] w-full rounded-2xl object-cover object-top"/>
+       <img src={foto} alt="Jaqueline Amaro, fundadora da SOMA" className="aspect-[4/5] w-full rounded-2xl object-cover object-top"/>
       </div>
     </div>
    </section>
