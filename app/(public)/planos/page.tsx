@@ -36,7 +36,7 @@ export default async function PlanosPage() {
       <SomaSiteHeader active="/planos"/>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-[1800px] w-full mx-auto">
-        <Link href="/" className="inline-flex items-center gap-2 text-[#C3D0CC] hover:text-white mb-6 sm:mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-[#D6E7DE] hover:text-white mb-6 sm:mb-8">
           <ArrowLeft size={20} />
           <span><LocalizedText text={"Voltar"} /></span>
         </Link>
@@ -48,7 +48,7 @@ export default async function PlanosPage() {
               <p className="mb-4 text-xs font-semibold uppercase tracking-[.22em] text-[#8FD3BE]"><LocalizedText text={"SOMA | Carreira e Plataforma"} /></p>
               <h1 id="planos-titulo" className="font-display text-4xl leading-tight sm:text-5xl"><LocalizedText text={"Sua carreira merece novas possibilidades"} /></h1>
               <p className="mt-5 max-w-lg text-sm leading-7 text-[#D6E7DE] sm:text-base"><LocalizedText text={"Escolha acompanhamento humano na SOMA Carreira ou monte sua assinatura de ferramentas na SOMA Plataforma."} /></p>
-              <ScrollToSectionButton targetId="opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#B8E2CE] px-6 py-3 text-sm font-semibold text-[#EEF3F1] transition-colors hover:bg-[#9AD2B8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><LocalizedText text={"Conhecer opções de acesso"} /></ScrollToSectionButton>
+              <ScrollToSectionButton targetId="opcoes-de-acesso" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#B8E2CE] px-6 py-3 text-sm font-semibold text-[#10221c] transition-colors hover:bg-[#9AD2B8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><LocalizedText text={"Conhecer opções de acesso"} /></ScrollToSectionButton>
             </div>
             <div className="relative grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4" aria-label="Lume, Norte, Brasa e Íris, mascotes oficiais da SOMA">
               {[
@@ -73,7 +73,7 @@ export default async function PlanosPage() {
 
         <div className="grid items-start gap-5 lg:grid-cols-2 lg:gap-6">
         <section id="soma-carreira" aria-labelledby="soma-carreira-heading" className="min-w-0 rounded-3xl border border-[#325248] bg-[#142722] p-4 sm:p-5">
-          <header className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EEF3F1]"><LocalizedText text={"Mentoria · acompanhamento humano"} /></p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#EEF3F1]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#EEF3F1]"><LocalizedText text={"Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês."} /></p></header>
+          <header className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EEF3F1]"><LocalizedText text={"Mentoria · acompanhamento humano"} /></p><h2 id="soma-carreira-heading" className="mt-2 font-display text-3xl text-[#EEF3F1]">SOMA Carreira</h2><p className="mt-3 text-sm leading-7 text-[#D7E8DE]"><LocalizedText text={"Portal completo, encontros, Íris Copiloto e WhatsApp incluídos. Seu plano já tem 1 encontro individual por mês."} /></p></header>
         <div className="grid gap-4 xl:grid-cols-2">
           {(planos || []).map((plano: PlanoMentoria) => (
             <div key={plano.id} className="bg-[#1B312B] border border-[#375348] hover:border-[#8FD3BE] transition-colors rounded-2xl p-4 sm:p-5 flex flex-col">
@@ -87,7 +87,7 @@ export default async function PlanosPage() {
                   )}
                 </div>
                 <h2 className="mb-3 font-display text-xl text-[#EEF3F1]">{plano.nome}</h2>
-                <p className="text-xs text-[#EEF3F1] mb-6">{plano.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
+                <p className="mb-6 text-sm leading-6 text-[#D1E3D8]">{plano.descricao_encontros?.replace(/\s*\+\s*Kit onboarding/gi, '')}</p>
               </div>
 
               <details className="mb-5 rounded-xl bg-[#12241f] border border-[#375348] p-4"><summary className="cursor-pointer text-sm font-semibold text-[#EEF3F1]"><LocalizedText text={"Ver o que está incluído"} /></summary><div className="mt-3 space-y-2">
@@ -120,7 +120,7 @@ export default async function PlanosPage() {
                 {plano.trial_enabled && (
                   <Link
                     href={`/login?mode=cadastrar&trial_plan=${plano.id}`}
-                    className="w-full inline-flex items-center justify-center border border-[#8FD3BE] bg-transparent text-[#8FD3BE] py-3 rounded-xl font-semibold hover:bg-[#e5f5ee] text-center transition"
+                    className="w-full inline-flex items-center justify-center border border-[#8FD3BE] bg-transparent text-[#8FD3BE] py-3 rounded-xl font-semibold hover:bg-[#24463A] text-center transition"
                   >
                     {plano.trial_label || 'Teste grátis'} por até {plano.trial_days} dias
                   </Link>
