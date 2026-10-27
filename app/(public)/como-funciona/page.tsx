@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LocalizedText from '@/components/LocalizedText';
 import { SomaSiteHeader, SomaSiteFooter, SomaSiteCallToAction } from '@/components/public/SomaMarketingChrome';
 import { SomaInteractiveMethod, SomaInteractiveMoment } from '@/components/public/SomaInteractiveMethod';
 
