@@ -96,7 +96,7 @@ export default function HomePage() {
         <div className="relative aspect-square w-full max-w-[440px] rounded-full border border-[#2F5A50] p-3 sm:p-[22px]">
           {/* Foto real já aprovada para a seção institucional */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/jaqueline-amaro-2026.webp" alt="Jaqueline Amaro, fundadora da SOMA" loading="lazy" decoding="async" className="aspect-square h-full w-full rounded-full object-cover object-[center_20%]"/>
+          <img src="/images/jaqueline-amaro-2026.webp" alt="Jaqueline Amaro, fundadora da SOMA" loading="lazy" decoding="async" className="aspect-square h-full w-full rounded-full bg-[#A7A8A6] object-contain object-center"/>
           <span className="absolute bottom-5 right-0 max-w-[80%] rounded-full bg-[#8FD3BE] px-4 py-2 text-center text-xs font-semibold text-[#0F1A18] sm:bottom-9 sm:text-sm">Jaqueline Amaro · fundadora</span>
         </div>
       </div>
