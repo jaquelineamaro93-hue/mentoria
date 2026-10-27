@@ -1,28 +1,26 @@
+import Link from 'next/link';
 import LocalizedText from '@/components/LocalizedText';
-/**
- * Logos de empresas citadas em trajetórias profissionais da SOMA e da mentora.
- * Não indicam vínculo empregatício atual, parceria ou disponibilidade para contato.
- * Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons (atribuição).
- */
-const EMPRESAS_REDE: ReadonlyArray<{ nome: string; logoUrl: string }> = [
-  { nome: 'Banco do Brasil', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Banco_do_Brasil_Logo.svg' },
-  { nome: 'Volvo', logoUrl: '/images/volvo-wordmark.svg' },
-  { nome: 'Webmotors', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/LogoWebmotors_250px.png' },
-  { nome: 'Ansell', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Ansell_Logo.svg' },
-];
 
-/** Empresas informadas pela criadora como locais de atuação de mentorados atuais.
- * A presença da marca não representa parceria, patrocínio ou endosso corporativo.
- * O domínio serve apenas para buscar o ícone de marca; nada vem da conta do mentorado.
+/**
+ * Empresas presentes em trajetórias da rede SOMA.
+ * A marca não indica parceria, patrocínio, vínculo atual ou acesso a colaboradores.
+ * As URLs de logos mantêm os recursos já usados na aplicação.
  */
-const EMPRESAS_MENTORADOS: ReadonlyArray<{ nome: string; site: string; dominio: string; logoUrl?: string }> = [
+type Empresa = {
+  nome: string;
+  site?: string;
+  dominio?: string;
+  logoUrl?: string;
+};
+
+const EMPRESAS: ReadonlyArray<Empresa> = [
   { nome: 'Porte', site: 'https://porte.com.br/', dominio: 'porte.com.br' },
   { nome: 'Credsystem', site: 'https://www.credsystem.com.br/', dominio: 'credsystem.com.br' },
   { nome: 'Lojas Torra', site: 'https://www.lojastorra.com.br/', dominio: 'lojastorra.com.br' },
   { nome: 'Whirlpool', site: 'https://www.whirlpool.com.br/', dominio: 'whirlpool.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Whirlpool_Corporation_Logo.png' },
   { nome: 'O Boticário', site: 'https://www.boticario.com.br/', dominio: 'boticario.com.br' },
   { nome: 'Monks', site: 'https://www.monks.com/pt', dominio: 'monks.com' },
-  { nome: 'Cielo', site: 'https://www.cielo.com.br/', dominio: 'cielo.com.br' },
+  { nome: 'Cielo', site: 'https://www.cielo.com.br/', dominio: 'cielo.com.br', logoUrl: '/images/cielo-mentorado.svg' },
   { nome: 'Renner', site: 'https://www.lojasrenner.com.br/', dominio: 'lojasrenner.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Logotipo_das_Lojas_Renner.svg' },
   { nome: 'Samsung', site: 'https://www.samsung.com/br/', dominio: 'samsung.com', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Samsung_wordmark.svg' },
   { nome: 'LWSA', site: 'https://lwsa.tech/', dominio: 'lwsa.tech' },
@@ -34,93 +32,80 @@ const EMPRESAS_MENTORADOS: ReadonlyArray<{ nome: string; site: string; dominio: 
   { nome: 'Mercado Livre', site: 'https://www.mercadolivre.com.br/', dominio: 'mercadolivre.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/16/Mercado_Livre_wordmark_%28Portuguese_version%29.svg' },
   { nome: 'RD Saúde', site: 'https://rdsaude.com.br/', dominio: 'rdsaude.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Logo_RD_Saude.png' },
   { nome: 'Itaú', site: 'https://www.itau.com.br/', dominio: 'itau.com.br', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/82/ITAU_LOGO.svg' },
+  { nome: 'Banco do Brasil', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Banco_do_Brasil_Logo.svg' },
+  { nome: 'Volvo', logoUrl: '/images/volvo-wordmark.svg' },
+  { nome: 'Webmotors', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/LogoWebmotors_250px.png' },
+  { nome: 'Ansell', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Ansell_Logo.svg' },
 ];
 
-const AREAS_REDE = ['CRM', 'Customer Experience', 'Customer Success', 'Dados', 'Produto', 'Inteligência Artificial'];
+function EmpresaCard({ empresa }: { empresa: Empresa }) {
+  const imagem = empresa.logoUrl ?? `https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`;
+  const logo = (
+    <>
+      <span className={empresa.nome === 'Cielo'
+        ? 'flex h-12 w-full items-center justify-center rounded-lg bg-[#214880] px-2'
+        : 'flex h-12 w-full items-center justify-center'}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imagem}
+          alt=""
+          aria-hidden="true"
+          width={empresa.logoUrl ? 144 : 48}
+          height={48}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className={empresa.logoUrl ? 'max-h-11 max-w-[90%] object-contain' : 'h-10 w-10 object-contain'}
+        />
+      </span>
+      <span className="mt-2 text-center text-sm font-semibold leading-tight text-[#21372d]">{empresa.nome}</span>
+    </>
+  );
+  const className = 'flex min-h-28 flex-col items-center justify-center rounded-2xl border border-[#dbe7df] bg-white px-3 py-4 shadow-sm transition-colors hover:border-[#8FD3BE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8FD3BE]';
+  return empresa.site ? (
+    <a href={empresa.site} target="_blank" rel="noopener noreferrer" title={`Visitar o site de ${empresa.nome}`} className={className}>
+      {logo}
+    </a>
+  ) : (
+    <div className={className}>{logo}</div>
+  );
+}
 
 export default function SomaNetworking() {
   return (
-    <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="scroll-mt-24 border-y border-[#e5ede9] bg-[#f6faf8] py-14 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#0D8071]"><LocalizedText text={"Pessoas e conexões"} /></p>
-        <h2 id="soma-networking-titulo" className="mx-auto mt-3 max-w-3xl font-display text-3xl leading-tight text-[#172823] sm:text-4xl">
-          {EMPRESAS_REDE.length > 0
-            ? 'Conecte-se com profissionais de empresas como'
-            : 'Conecte-se com profissionais que também investem em si.'}
-        </h2>
-        <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-[#526760] sm:text-base"><LocalizedText text={"Carreira e networking não precisam ser pesados. Podem ser genuínos. Aprenda com quem também está investindo em si."} /></p>
-
-        <div className="mt-11 border-t border-[#d9e8e2] pt-9 sm:mt-14 sm:pt-11">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0D8071]"><LocalizedText text={"Mentorado também é conexão"} /></p>
-          <h3 className="mx-auto mt-3 max-w-3xl font-display text-2xl leading-tight text-[#172823] sm:text-3xl"><LocalizedText text={"Empresas onde nossos mentorados atuam"} /></h3>
-          <p className="mx-auto mt-3 max-w-3xl text-sm leading-6 text-[#526760] sm:text-base"><LocalizedText text={"A SOMA reúne profissionais com diferentes histórias e desafios de carreira. Estas são algumas das empresas presentes na trajetória dos mentorados."} /></p>
-          <div
-            role="list"
-            aria-label={`${EMPRESAS_MENTORADOS.length} empresas onde atuam mentorados da SOMA`}
-            className="mt-7 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-4 lg:grid-cols-5"
-          >
-            {EMPRESAS_MENTORADOS.map(empresa => (
-              <a
-                role="listitem"
-                key={empresa.nome}
-                href={empresa.site}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={`Visitar o site da ${empresa.nome}`}
-                className="group flex min-h-32 w-40 shrink-0 snap-start flex-col items-center justify-center gap-3 rounded-2xl border border-[#d9e8e2] bg-white px-3 py-5 shadow-sm transition-colors hover:border-[#82b7a6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D8071] sm:w-auto"
-              >
-                <span className={empresa.nome === 'Cielo'
-                  ? 'flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg bg-[#214880]'
-                  : empresa.logoUrl
-                    ? 'flex h-14 w-full max-w-36 items-center justify-center rounded-xl bg-white px-1'
-                    : 'flex h-14 w-14 items-center justify-center rounded-xl bg-[#f6faf8]'}>
-                  {/* Logos completas de origem verificada; favicon apenas como fallback para outras marcas. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={empresa.nome === 'Cielo'
-                      ? '/images/cielo-mentorado.svg'
-                      : empresa.logoUrl ?? `https://www.google.com/s2/favicons?domain=${empresa.dominio}&sz=128`}
-                    alt=""
-                    aria-hidden="true"
-                    width={empresa.nome === 'Cielo' || empresa.logoUrl ? 144 : 48}
-                    height={empresa.nome === 'Cielo' || empresa.logoUrl ? 56 : 48}
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                    className={empresa.nome === 'Cielo' ? 'h-11 w-28 object-contain' : empresa.logoUrl ? 'h-12 max-w-full object-contain' : 'h-12 w-12 object-contain'}
-                  />
-                </span>
-                <span className="text-center text-sm font-semibold leading-tight text-[#293b35] group-hover:text-[#0D8071]">
-                  {empresa.nome}
-                </span>
-              </a>
-            ))}
+    <section id="rede-soma" aria-labelledby="soma-networking-titulo" className="scroll-mt-24 bg-[#0F1A18] py-14 text-[#EEF3F1] sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid items-end gap-8 md:grid-cols-[1fr_auto]">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8FD3BE]"><LocalizedText text={"Rede SOMA · pessoas e conexões"} /></p>
+            <h2 id="soma-networking-titulo" className="mt-3 font-display text-4xl leading-tight sm:text-5xl">
+              <LocalizedText text={"Mentorado também é conexão"} />
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-[#C3D0CC]"><LocalizedText text={"Carreira e networking não precisam ser pesados. Podem ser genuínos. Aprenda com quem também está investindo em si."} /></p>
           </div>
-          <p className="mt-1 text-xs text-[#74877e] sm:hidden"><LocalizedText text={"Deslize para o lado para conhecer todas as empresas."} /></p>
-          <p className="mx-auto mt-5 max-w-4xl text-xs leading-5 text-[#74877e]"><LocalizedText text={"As marcas representam apenas a atuação profissional de mentorados. Não há indicação de parceria, patrocínio ou endosso dessas empresas à SOMA, nem promessa de contato com seus colaboradores."} /></p>
+          <div className="flex gap-8 sm:gap-12" aria-label="Informações da rede">
+            <div><strong className="block text-3xl sm:text-4xl">{EMPRESAS.length}</strong><span className="text-xs text-[#A9BAB5]">empresas na trajetória da rede</span></div>
+            <div><strong className="block text-3xl sm:text-4xl">2022</strong><span className="text-xs text-[#A9BAB5]">início da SOMA</span></div>
+          </div>
         </div>
-
-        <p className="mt-10 text-xs font-semibold uppercase tracking-[0.16em] text-[#74877e]"><LocalizedText text={"Outras trajetórias profissionais que inspiram a SOMA"} /></p>
-        {EMPRESAS_REDE.length > 0 ? (
-          <>
-            <div aria-label="Empresas presentes em trajetórias profissionais relacionadas à SOMA" className="mt-9 grid grid-cols-2 items-center gap-3 sm:grid-cols-4 sm:gap-5">
-              {EMPRESAS_REDE.map(empresa => (
-                <div key={empresa.nome} className="flex min-h-24 items-center justify-center rounded-xl border border-[#d9e8e2] bg-white px-4 py-5 shadow-sm transition-colors hover:border-[#a4cec0] sm:min-h-28">
-                  {/* Imagens verificadas com origem conhecida, sem scripts ou pixels de rastreamento */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img alt={empresa.nome} src={empresa.logoUrl} loading="lazy" className="max-h-12 max-w-full object-contain" decoding="async" referrerPolicy="no-referrer" />
-                </div>
-              ))}
-            </div>
-            <p className="mt-5 text-xs text-[#74877e]"><LocalizedText text={"Marcas presentes em trajetórias profissionais que inspiram a SOMA, sem vínculo de parceria ou patrocínio. A menção não indica vínculo atual nem garante contato com colaboradores."} /><span className="mt-1 block">Logotipo Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons.</span></p>
-          </>
-        ) : (
-          <div aria-label="Áreas de atuação presentes na proposta de networking" className="mx-auto mt-9 flex max-w-4xl flex-wrap justify-center gap-2.5">
-            {AREAS_REDE.map(area => (
-              <span key={area} className="rounded-full border border-[#bdd8cf] bg-white px-4 py-2 text-sm font-medium text-[#1e5d51]">{area}</span>
-            ))}
-          </div>
-        )}
+        {/* A colagem original das conexões permanece como conteúdo central da seção */}
+        <div className="relative mt-8 overflow-hidden rounded-2xl sm:mt-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/soma-network-collage.webp" alt="Encontros, conversas e conexões da comunidade SOMA" loading="lazy" className="h-auto max-h-[360px] w-full object-cover object-center sm:max-h-[480px]" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0F1A18] to-transparent" />
+        </div>
+        <div className="mt-9 flex flex-wrap items-end justify-between gap-4">
+          <h3 className="max-w-2xl font-display text-2xl leading-tight sm:text-3xl"><LocalizedText text={"Onde mentorados e alunos constroem carreira"} /></h3>
+          <p className="max-w-sm text-sm leading-6 text-[#A9BAB5]"><LocalizedText text={"Estas são algumas das empresas presentes nas trajetórias profissionais de mentorados e alunos da SOMA."} /></p>
+        </div>
+        <div aria-label={`${EMPRESAS.length} empresas da rede SOMA`} className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+          {EMPRESAS.map(empresa => <EmpresaCard key={empresa.nome} empresa={empresa} />)}
+        </div>
+        <p className="mt-6 max-w-5xl text-xs leading-6 text-[#A9BAB5]"><LocalizedText text={"As marcas representam a atuação profissional de mentorados e alunos, atual ou anterior. Não há parceria, patrocínio ou endosso dessas empresas à SOMA, nem promessa de contato com seus colaboradores."} /> <span>Logotipo Webmotors: © Lucas Manfre Barreiro, via Wikimedia Commons.</span></p>
+        <div className="mt-8 flex flex-wrap gap-3 border-t border-white/15 pt-8">
+          <Link href="/planos" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#8FD3BE] px-6 text-sm font-semibold text-[#0F1A18] hover:bg-[#b9e7d7]">Ver planos</Link>
+          <Link href="/depoimentos" className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#43665a] px-6 text-sm font-semibold text-white hover:border-[#8FD3BE]">Ler depoimentos</Link>
+        </div>
       </div>
     </section>
   );

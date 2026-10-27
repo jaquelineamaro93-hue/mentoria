@@ -4,26 +4,23 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('Networking fica na home e fala de conexões genuínas, sem confundir marcas com patrocinadores', () => {
-  const home = read('app/(public)/page.tsx');
-  const networking = read('components/public/SomaNetworking.tsx');
-  assert.match(home, /<SomaNetworking \/>/);
-  assert.match(networking, /Conecte-se com profissionais de empresas como/);
-  assert.match(networking, /Carreira e networking não precisam ser pesados/);
-  assert.match(networking, /Podem ser genuínos/);
-  assert.match(networking, /Aprenda com quem também está investindo em si/);
-  assert.match(networking, /EMPRESAS_REDE\.length > 0/);
-  assert.match(networking, /sem vínculo de parceria ou patrocínio/);
-  assert.match(networking, /CRM/);
-  assert.match(networking, /sm:grid-cols-4/);
-  for (const marca of ['Banco do Brasil', 'Volvo', 'Webmotors', 'Ansell']) {
-    assert.ok(networking.includes(marca), 'Logo ausente: ' + marca);
-  }
-  assert.match(networking, /upload\.wikimedia\.org\/wikipedia\/commons/);
-  assert.match(networking, /não indica vínculo atual nem garante contato com colaboradores/);
-  assert.match(networking, /Logotipo Webmotors: © Lucas Manfre Barreiro/);
+test('Rede SOMA tem uma única grade com exatamente 22 empresas e a colagem original', () => {
+ const home=read('app/(public)/page.tsx');
+ const source=read('components/public/SomaNetworking.tsx');
+ assert.match(home, /<SomaNetworking \/>/);
+ assert.match(source,/const EMPRESAS: ReadonlyArray<Empresa>/);
+ const arr=source.split('const EMPRESAS: ReadonlyArray<Empresa> = [')[1]?.split('];')[0] ?? '';
+ assert.equal((arr.match(/nome: '/g)||[]).length,22);
+ const brands=['Porte','Credsystem','Lojas Torra','Whirlpool','O Boticário','Monks','Cielo','Renner','Samsung','LWSA','Embraer','Gupy','PicPay','Loft','Capgemini','Mercado Livre','RD Saúde','Itaú','Banco do Brasil','Volvo','Webmotors','Ansell'];
+ for(const brand of brands) assert.ok(arr.includes("nome: '"+brand+"'"),brand);
+ assert.match(source,/Onde mentorados e alunos constroem carreira/);
+ assert.match(source,/soma-network-collage\.webp/);
+ assert.match(source,/lg:grid-cols-5 xl:grid-cols-6/);
+ assert.match(source,/Não há parceria, patrocínio ou endosso/);
+ assert.doesNotMatch(source,/Outras trajetórias profissionais que inspiram/);
+ assert.match(source,/não indica vínculo atual|atual ou anterior/);
+ assert.match(source,/id="rede-soma"/);
 });
-
 test('Íris tem avaliação por resposta com joinha e comentário opcional, sem aparecer na LP', () => {
   const iris = read('components/IrisCopiloto.tsx');
   const home = read('app/(public)/page.tsx');
@@ -50,62 +47,22 @@ test('Feedback exige usuário autenticado, evita dados de outros mentorados e n�
 });
 
 
-test('18 empresas de mentorados aparecem com marca, site oficial e sem confundir patrocínio', () => {
-  const home = read('app/(public)/page.tsx');
-  const networking = read('components/public/SomaNetworking.tsx');
-  const empresas = [
-    'Porte', 'Credsystem', 'Lojas Torra', 'Whirlpool', 'O Boticário',
-    'Monks', 'Cielo', 'Renner', 'Samsung', 'LWSA', 'Embraer',
-    'Gupy', 'PicPay', 'Loft', 'Capgemini', 'Mercado Livre', 'RD Saúde', 'Itaú',
-  ];
-  const bloco = networking.split('const EMPRESAS_MENTORADOS:')[1]?.split('const AREAS_REDE')[0] ?? '';
-  assert.equal((bloco.match(/nome: '/g) ?? []).length, 18, 'Devem existir 18 logos de mentorados');
-  for (const nome of empresas) {
-    assert.ok(bloco.includes(`nome: '${nome}'`), 'Marca ausente: ' + nome);
-  }
-  assert.match(networking, /Empresas onde nossos mentorados atuam/);
-  assert.match(networking, /As marcas representam apenas a atuação profissional de mentorados/);
-  assert.match(networking, /Não há indicação de parceria/);
-  assert.match(networking, /rel="noopener noreferrer"/);
-  assert.match(networking, /grid-cols-5/);
-  assert.match(networking, /overflow-x-auto/);
-  assert.ok(networking.includes('google.com/s2/favicons'));
-  assert.doesNotMatch(networking, /srsltid=|gclid=|gad_source=/);
-  assert.ok(home.includes('<SomaNetworking />'));
-  assert.ok(home.includes('<SomaSuccessStories />'));
-  for (const antiga of ['Banco do Brasil', 'Volvo', 'Webmotors', 'Ansell']) {
-    assert.ok(networking.includes(antiga), 'Marca anterior removida: ' + antiga);
-  }
+
+test('Logos oficiais já cadastrados continuam no grid, inclusive Volvo e Cielo locais',()=>{
+ const source=read('components/public/SomaNetworking.tsx');
+ const volvo=read('public/images/volvo-wordmark.svg');
+ const cielo=read('public/images/cielo-mentorado.svg');
+ assert.match(source,/\/images\/volvo-wordmark\.svg/);
+ assert.match(source,/\/images\/cielo-mentorado\.svg/);
+ assert.match(volvo,/<svg/);
+ assert.match(cielo,/data:image\/webp;base64,/);
+ assert.match(source,/empresa\.logoUrl \?\?/);
+ assert.match(source,/google\.com\/s2\/favicons/);
+ assert.match(source,/Logotipo Webmotors: © Lucas Manfre Barreiro/);
+ assert.match(source,/rel="noopener noreferrer"/);
 });
-
-test('Cielo usa imagem local baseada no logo fornecido, sem depender do favicon externo', () => {
-  const source = read('components/public/SomaNetworking.tsx');
-  const localLogo = read('public/images/cielo-mentorado.svg');
-  assert.match(source, /empresa\.nome === 'Cielo'/);
-  assert.match(source, /\/images\/cielo-mentorado\.svg/);
-  assert.match(localLogo, /<svg/);
-  assert.match(localLogo, /data:image\/webp;base64,/);
-  assert.ok(localLogo.length > 1000, 'Imagem da Cielo incompleta');
-  assert.match(source, /id="rede-soma"/);
-});
-
-
-test('Whirlpool, Samsung e marcas adicionadas usam logotipos completos em vez de favicons', () => {
-  const source = read('components/public/SomaNetworking.tsx');
-  const entries = [
-    ['Whirlpool', 'Whirlpool_Corporation_Logo.png'],
-    ['Samsung', 'Samsung_wordmark.svg'],
-    ['Capgemini', 'Capgemini_201x_logo.svg'],
-    ['Mercado Livre', 'Mercado_Livre_wordmark_'],
-    ['RD Saúde', 'Logo_RD_Saude.png'],
-    ['Itaú', 'ITAU_LOGO.svg'],
-  ];
-  for (const [brand, image] of entries) {
-    const line = source.split('\n').find(item => item.includes(`nome: '${brand}'`));
-    assert.ok(line?.includes('logoUrl:'), `${brand} precisa de logo completa`);
-    assert.ok(line?.includes(image), `${brand} precisa da imagem correta`);
-  }
-  assert.match(source, /empresa\.logoUrl \?\?/);
-  assert.match(source, /EMPRESAS_MENTORADOS\.length} empresas onde atuam mentorados/);
-  assert.match(source, /object-contain/);
+test('Logos completos das empresas permanecem inalterados',()=>{
+ const source=read('components/public/SomaNetworking.tsx');
+ const expected=[['Whirlpool','Whirlpool_Corporation_Logo.png'],['Samsung','Samsung_wordmark.svg'],['Capgemini','Capgemini_201x_logo.svg'],['Mercado Livre','Mercado_Livre_wordmark_'],['RD Saúde','Logo_RD_Saude.png'],['Itaú','ITAU_LOGO.svg']];
+ for(const [brand,path] of expected){const line=source.split('\n').find(line=>line.includes("nome: '"+brand+"'"));assert.ok(line?.includes(path),brand)}
 });
