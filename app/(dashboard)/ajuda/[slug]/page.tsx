@@ -7,6 +7,7 @@ import { helpHeadings, helpReadingMinutes, relatedHelpArticles } from '@/lib/hel
 import { ArrowLeft, ArrowRight, ChevronRight, Clock3 } from 'lucide-react';
 import HelpMarkdown from '@/components/help/HelpMarkdown';
 import HelpWatermark from '@/components/help/HelpWatermark';
+import HelpContentPrivacy from '@/components/help/HelpContentPrivacy';
 import AskIris from '@/components/help/AskIris';
 import ReleaseRead from '@/components/help/ReleaseRead';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -47,6 +48,7 @@ export default async function ArticlePage({ params, searchParams }: { params: Pr
       <div className="min-w-0">
         <article className="relative isolate overflow-hidden rounded-2xl border border-[#d7e3dc] bg-white p-5 sm:p-8">
           <HelpWatermark label={watermark} />
+          <HelpContentPrivacy />
           {article.status !== 'published' && <p className="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">Prévia administrativa · {article.status === 'draft' ? 'Rascunho' : 'Arquivado'}</p>}
           <p className="text-xs uppercase tracking-widest text-[#53685e]">{article.category}</p>
           <h1 className="mt-2 font-display text-3xl text-[#183f37]">{article.title}</h1>
