@@ -144,6 +144,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
           <p className="mt-3 text-xs leading-5 text-[#D1E3D8]">
             Teste as ferramentas escolhidas por 7 dias, sem cartão. Depois, assine pelo Mercado Pago.
           </p>
+          <div className="mt-3 flex justify-center"><GuestCheckoutRecovery product="plataforma" planCode={plano} moduleSlug={selecionado?.slug} iris={iris} whatsapp={whatsapp} label="Guardar minha escolha por e-mail" /></div>
         </aside>
       </div>
 
