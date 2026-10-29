@@ -131,7 +131,7 @@ export async function POST(request: Request) {
 
   const now = new Date();
   const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  let record = previous;
+  let record: { id: string; email_hash: string; offer_expires_at: string } | null = previous;
   if (!record) {
     const inserted = await db.from('soma_guest_checkout_leads').insert({
       email, email_hash: hash, product, plan_code: planCode, module_slug: moduleSlug || null,
