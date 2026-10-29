@@ -31,7 +31,7 @@ export const portalNavGroups: PortalNavGroup[] = [
       { href: '/percepcao-360', label: 'Percepção 360', icon: Users },
       { href: '/diario', label: 'Diário de Bordo', icon: NotebookPen },
       { href: '/feedbacks', label: 'Feedbacks recebidos', icon: MessageCircle },
-      { href: '/gravacoes', label: 'Gravações', icon: PlayCircle },
+      { href: '/gravacoes', label: 'Biblioteca de aprendizagem', icon: PlayCircle },
     ],
   },
   {
