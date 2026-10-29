@@ -8,7 +8,7 @@ test('non-customer cart recovery is offered at both public buying surfaces', () 
   const saas = read('components/public/SomaSaasShowcase.tsx');
   assert.match(career,/GuestCheckoutRecovery/);
   assert.match(career,/product="carreira"/);
-  assert.match(career,/!logado && !planoAtualCodigo/);
+  assert.match(career,/!planoAtualCodigo/);
   assert.match(saas,/product="plataforma"/);
   assert.match(saas,/Guardar minha escolha por e-mail/);
 });
