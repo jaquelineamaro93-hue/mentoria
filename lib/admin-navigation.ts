@@ -9,6 +9,7 @@ export const ADMIN_AREAS = [
     { href: '/admin/financeiro', title: 'Financeiro', description: 'Receitas e movimentações' },
   ] },
   { group: 'Conteúdos e resultados', items: [
+    { href: '/admin/biblioteca', title: 'Biblioteca e microaulas', description: 'Trilhas, vídeos, exercícios e checagens de aprendizagem' },
     { href: '/admin/ajuda', title: 'Conteúdos e novidades', description: 'Tutoriais e avisos no sino' },
     { href: '/admin/analytics', title: 'Uso da plataforma', description: 'Acessos, funcionalidades e testes A/B' },
     { href: '/admin/crescimento', title: 'Crescimento', description: 'Aquisição e retenção' },
