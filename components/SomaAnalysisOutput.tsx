@@ -34,12 +34,12 @@ export default function SomaAnalysisOutput({
 
   return (
     <div className="grid xl:grid-cols-[minmax(0,1fr)_280px] gap-5 mt-8">
-      <section className="rounded-2xl border border-gray-faint bg-white overflow-hidden">
+      <section className="rounded-2xl border border-gray-faint bg-white min-w-0">
         <div className="flex items-center justify-between gap-3 border-b border-gray-faint px-5 py-4">
           <div className="flex items-center gap-2 min-w-0">
             <Sparkles size={17} className="text-mint-deep shrink-0" />
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-black truncate">
+              <p className="text-sm font-semibold text-black break-words">
                 {atual?.titulo || 'Resultado da análise'}
               </p>
               {atual?.created_at && (
@@ -61,9 +61,9 @@ export default function SomaAnalysisOutput({
           </button>
         </div>
 
-        <div className="p-5 md:p-7">
+        <div className="min-w-0 p-5 md:p-7">
           {atual ? (
-            <div className="max-w-none text-sm leading-relaxed text-black
+            <div className="min-w-0 max-w-none [overflow-wrap:anywhere] text-sm leading-relaxed text-black
               [&_h1]:font-display [&_h1]:text-2xl [&_h1]:mt-6 [&_h1]:mb-3
               [&_h2]:font-display [&_h2]:text-xl [&_h2]:mt-7 [&_h2]:mb-3
               [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-5 [&_h3]:mb-2
@@ -75,7 +75,11 @@ export default function SomaAnalysisOutput({
               [&_table]:w-full [&_table]:text-xs [&_table]:border-collapse
               [&_th]:border [&_th]:border-gray-faint [&_th]:p-2 [&_th]:text-left
               [&_td]:border [&_td]:border-gray-faint [&_td]:p-2 [&_td]:align-top">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+                table: ({ children }) => <div className="my-4 max-w-full overflow-x-auto rounded-lg border border-gray-faint" role="region" aria-label="Tabela da análise" tabIndex={0}><table>{children}</table></div>,
+                pre: ({ children }) => <pre className="my-4 whitespace-pre-wrap [overflow-wrap:anywhere] rounded-lg bg-mint-light p-4">{children}</pre>,
+                code: ({ children }) => <code className="whitespace-pre-wrap [overflow-wrap:anywhere]">{children}</code>,
+              }}>
                 {atual.resultado_markdown}
               </ReactMarkdown>
             </div>

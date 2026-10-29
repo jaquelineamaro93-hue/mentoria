@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const resultado = await chamarClaude(prompt, 8000);
+    const resultado = await chamarClaude(prompt, 8000, { exigirCompleta: true });
 
     const { data, error } = await supabase
       .from('soma_analises')

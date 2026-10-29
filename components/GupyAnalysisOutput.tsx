@@ -62,7 +62,7 @@ function TabelaLegivel({ children }: TextoProps) {
                     {colunas[j]}
                   </p>
                 )}
-                <div className="min-w-0 break-words text-sm leading-6 text-black">
+                <div className="min-w-0 [overflow-wrap:anywhere] text-sm leading-6 text-black">
                   {celula.props.children}
                 </div>
               </div>
@@ -99,7 +99,7 @@ function CorpoDeSecao({ secao }: { secao: GupySecao }) {
 
 function MarkdownLegivel({ markdown }: { markdown: string }) {
   return (
-    <div className="min-w-0 max-w-none break-words text-[15px] leading-7 text-[#29372f] sm:text-base">
+    <div className="min-w-0 max-w-none [overflow-wrap:anywhere] text-[15px] leading-7 text-[#29372f] sm:text-base">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
         h1: ({ children }) => <h2 className="mb-4 mt-2 font-display text-2xl leading-snug text-black sm:text-3xl">{children}</h2>,
         h2: ({ children }) => <h3 className="mb-4 mt-7 font-display text-2xl leading-snug text-black">{children}</h3>,
@@ -113,8 +113,8 @@ function MarkdownLegivel({ markdown }: { markdown: string }) {
         blockquote: ({ children }) => <blockquote className="my-5 rounded-xl border-l-4 border-mint-deep bg-mint-light px-4 py-3 text-[#244b3e]">{children}</blockquote>,
         hr: () => <hr className="my-6 border-gray-faint" />,
         table: ({ children }) => <TabelaLegivel>{children}</TabelaLegivel>,
-        pre: ({ children }) => <div className="my-5 min-w-0 overflow-x-auto whitespace-pre-wrap break-words rounded-xl border border-[#c8ded5] bg-[#f6faf8] px-4 py-4 font-[family-name:var(--font-body)] text-sm leading-7 text-black">{children}</div>,
-        code: ({ children, className }) => <code className={(className || '') + ' whitespace-pre-wrap break-words font-[family-name:var(--font-body)] text-[.92em]'}>{children}</code>,
+        pre: ({ children }) => <div className="my-5 min-w-0 overflow-x-auto whitespace-pre-wrap [overflow-wrap:anywhere] rounded-xl border border-[#c8ded5] bg-[#f6faf8] px-4 py-4 font-[family-name:var(--font-body)] text-sm leading-7 text-black">{children}</div>,
+        code: ({ children, className }) => <code className={(className || '') + ' whitespace-pre-wrap [overflow-wrap:anywhere] font-[family-name:var(--font-body)] text-[.92em]'}>{children}</code>,
         a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-mint-deep underline underline-offset-2">{children}</a>,
       }}>
         {markdown}
