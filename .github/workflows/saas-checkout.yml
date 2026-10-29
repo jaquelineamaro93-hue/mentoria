@@ -3,10 +3,16 @@ on:
   pull_request:
     paths:
       - 'app/api/saas/**'
+      - 'app/api/checkout-recovery/**'
+      - 'components/public/GuestCheckoutRecovery.tsx'
+      - 'components/public/SomaSaasShowcase.tsx'
+      - 'app/(public)/checkout/CheckoutClient.tsx'
+      - 'supabase/migrations/20261029142548_soma_guest_checkout_abandonment_consent_20261028.sql'
       - 'app/api/mercadopago/**'
       - 'lib/saas-*.ts'
       - 'lib/mercadopago.ts'
       - 'tests/saas-*'
+      - 'tests/guest-checkout-recovery.test.mjs'
       - '.github/workflows/saas-checkout.yml'
   push:
     branches: [main]
@@ -32,4 +38,4 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: node --experimental-strip-types --test tests/saas-access.test.mjs tests/saas-webhook.test.cjs tests/saas-recovery.test.cjs tests/saas-auth-flow.test.cjs tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs
+      - run: node --experimental-strip-types --test tests/saas-access.test.mjs tests/saas-webhook.test.cjs tests/saas-recovery.test.cjs tests/saas-auth-flow.test.cjs tests/mercadopago-security.test.cjs tests/soma-saas-pricing.test.mjs tests/guest-checkout-recovery.test.mjs
