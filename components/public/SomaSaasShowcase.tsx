@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ArrowUpRight, CheckCircle2, Layers3, Sparkles, Workflow } from 'lucide-react';
+import GuestCheckoutRecovery from '@/components/public/GuestCheckoutRecovery';
 import {
   BASE_SAAS_CENTAVOS, CATALOGO_SAAS,
   formatarReais, ADICIONAL_IA_CENTAVOS, DOIS_AGENTES_CENTAVOS,
