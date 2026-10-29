@@ -1,4 +1,5 @@
  'use client';
+import { acquisitionEvent } from '@/lib/acquisition';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PRODUCT_CONTRACTS, RECOVERY_CONTRACT_VERSION } from '@/lib/product-contracts';
@@ -39,7 +40,8 @@ export default function PlataformaClient({modules,initialAccess}:{modules:Module
   try {
    const response=await fetch('/api/saas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contractVersion:action==='recovery_checkout'?RECOVERY_CONTRACT_VERSION:PRODUCT_CONTRACTS.plataforma.version,action,plan,module,iris,whatsapp,accepted:action==='recovery_checkout'?true:accepted,orderId})});
    const result=await response.json();if(!response.ok) throw new Error(result.error);
-   if(result.checkoutUrl){try{sessionStorage.setItem('soma_checkout_return','1');}catch{}window.location.assign(result.checkoutUrl);return;}
+   if(result.checkoutUrl){acquisitionEvent('begin_checkout', {plan, module});try{sessionStorage.setItem('soma_checkout_return','1');}catch{}window.location.assign(result.checkoutUrl);return;}
+   if(action==='trial') acquisitionEvent('trial_started', {plan, module});
    await refresh();router.refresh();
   }catch(e){setError(e instanceof Error?e.message:'Não foi possível concluir.');}finally{setBusy(false);}
  }

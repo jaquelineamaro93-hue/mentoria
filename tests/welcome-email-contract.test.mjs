@@ -4,14 +4,14 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('welcome HTML preserves SOMA voice, branding and hand-lettered signature', () => {
+test('welcome email uses a plain presentation and a valid first-access destination', () => {
   const mail = read('lib/welcome-email.ts');
   assert.match(mail, /buildWelcomeEmail/);
-  assert.match(mail, /Segoe Script/);
+  assert.doesNotMatch(mail, /Segoe Script|border-radius/);
   assert.match(mail, /Jaqueline Amaro/);
-  assert.match(mail, /Começar minha jornada na SOMA/);
+  assert.match(mail, /Acessar minha conta/);
   assert.match(mail, /&amp;utm_medium=email/);
-  assert.match(mail, /somamentoria\.com\/onboarding/);
+  assert.match(mail, /somamentoria\.com\/login\?utm_source/);
   assert.doesNotMatch(mail, /🎉|<script/i);
   assert.doesNotMatch(mail, /Bem-vindo!|Parabéns!|Sua conta foi criada!/i);
 });

@@ -38,17 +38,17 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
   const intro = stage === 'd3'
     ? 'Seu teste gratuito está chegando ao fim. Antes de decidir como continuar, reserve alguns minutos para descobrir o que a SOMA pode ajudar você a desenvolver na carreira.'
     : stage === 'd1'
-      ? 'Seu teste termina amanhã. Vale escolher agora como você quer continuar seu desenvolvimento profissional, com clareza sobre seus objetivos e as ferramentas que vão ajudar nessa jornada.'
+      ? 'Seu teste termina amanhã. Se ainda não conseguiu experimentar, responda contando onde travou. Se já usou e quer continuar, veja as opções de acesso abaixo.'
       : stage === 'd0'
         ? 'Seu período gratuito termina hoje, no horário previsto para sua conta. Se quiser continuar, conheça os planos antes do encerramento do acesso.'
-        : 'Seu teste gratuito terminou, mas você pode continuar trabalhando no seu próximo passo profissional. O que faz mais sentido agora: buscar uma nova oportunidade ou crescer onde está?';
+        : 'Seu teste terminou. Você conseguiu usar o que procurava? Pode responder a este e-mail contando o que faltou. Se quiser retomar, os planos estão no link abaixo.';
   const activation = onboarding
     ? hasInterview
       ? 'Você já deu o primeiro passo com a sua entrevista inicial. Agora pode explorar as próximas atividades e organizar o que faz mais sentido para sua carreira.'
       : 'Sua entrevista inicial ainda não está registrada. Esse é um bom primeiro passo para dar direção à sua jornada na SOMA.'
     : 'Você já iniciou sua jornada. Agora é a hora de transformar seus objetivos em ações consistentes.';
   const params = (action: string) => 'utm_source=sendgrid&utm_medium=email&utm_campaign=soma_trial_growth&utm_content=' + stage + '_' + action;
-  const checkout = 'https://somamentoria.com/checkout?' + params('checkout');
+  const checkout = 'https://somamentoria.com/planos?' + params('checkout');
   const start = 'https://somamentoria.com/onboarding?' + params('ativacao');
   const activationFirst = stage === 'd3' && onboarding;
   const primaryUrl = activationFirst ? start : checkout;
@@ -58,12 +58,12 @@ function buildEmail(firstName: string, stage: Stage, end: string, onboarding: bo
     : onboarding && stage === 'd1'
       ? '<p>Antes de escolher, você também pode <a href="' + start + '">' + (hasInterview ? 'rever sua jornada' : 'começar sua entrevista inicial') + '</a>.</p>'
       : '';
-  const html = `<div style="font:16px/1.6 Arial,sans-serif;color:#24382d;max-width:580px;margin:auto;padding:24px">
-    <h2>Seu próximo passo de carreira</h2>
-    <p>Oi, ${first}!</p>
+  const html = `<div style="font:16px/1.6 Arial,sans-serif;color:#101827;max-width:580px;margin:auto;padding:24px">
+
+    <p>Oi, ${first}.</p>
     <p>${intro}</p><p>${activation}</p>
-    <p>Na SOMA, você pode desenvolver seu PDI, organizar seus objetivos e acompanhar sua evolução profissional.</p>
-    <p><a href="${primaryUrl}" style="background:#276b52;color:white;padding:12px 18px;text-decoration:none;border-radius:8px">${primaryLabel}</a></p>
+
+    <p><a href="${primaryUrl}" style="color:#101827;text-decoration:underline">${primaryLabel}</a></p>
     ${secondary}
     ${stage === 'p2' ? '' : `<p>Seu acesso gratuito termina em ${date}.</p>`}
     <p>Se precisar de ajuda para começar, responda a este e-mail.</p>

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Check, Circle } from 'lucide-react';
 import { requisitosSenha, senhaAtendeRequisitos, traduzirErroCadastro } from '@/lib/auth/senha-cadastro';
 import { createClient } from '@/lib/supabase/client';
+import { acquisitionEvent } from '@/lib/acquisition';
 import { posthog, identificarMentorado } from '@/lib/posthog';
 import OAuthButtons from '@/components/OAuthButtons';
 import type { TipoPacote } from '@/lib/types';
@@ -185,6 +186,7 @@ function LoginPageContent() {
       // que o usuário percebesse.
       identificarMentorado(data.user.id, { email, nome, tipo_pacote: tipoPacote });
       posthog.capture('cadastro_realizado', { tipo_pacote: tipoPacote });
+      acquisitionEvent('sign_up', { method: 'email', tipo_pacote: tipoPacote });
 
       // Segurança: não confirmamos mais contas apenas pelo userId.
       // O código enviado ao e-mail comprova que a pessoa controla o endereço.
