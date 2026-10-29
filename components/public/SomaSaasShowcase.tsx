@@ -15,7 +15,7 @@ const TIPOS: PlanoSaas[] = ['avulso', 'essencial', 'pro'];
 
 const ICONES = { avulso: Layers3, essencial: Workflow, pro: Sparkles };
 
-export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
+export default function SomaSaasShowcase({ modulos, showRecovery = true }: { modulos: Modulo[]; showRecovery?: boolean }) {
   const [plano, setPlano] = useState<PlanoSaas>('essencial');
   const [modulo, setModulo] = useState('');
   const [iris, setIris] = useState(false);
