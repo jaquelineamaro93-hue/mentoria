@@ -1,6 +1,7 @@
 'use client';
 import LocalizedText from '@/components/LocalizedText';
 import PurchaseContractConsent from '@/components/PurchaseContractConsent';
+import GuestCheckoutRecovery from '@/components/public/GuestCheckoutRecovery';
 import { PRODUCT_CONTRACTS } from '@/lib/product-contracts';
 
 import { useState, useEffect } from 'react';
