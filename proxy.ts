@@ -86,6 +86,7 @@ export async function proxy(request: NextRequest) {
   if (!user && path === '/plataforma') {
     const login = new URL('/login', request.url);
     login.searchParams.set('next', '/plataforma' + request.nextUrl.search);
+    login.searchParams.set('mode', 'cadastrar');
     const response = NextResponse.redirect(login);
     response.cookies.set('soma_saas_intent', encodeURIComponent('/plataforma' + request.nextUrl.search), { path: '/', maxAge: 3600, sameSite: 'lax', secure: true, httpOnly: true });
     return response;
