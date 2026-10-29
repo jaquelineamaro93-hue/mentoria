@@ -129,7 +129,7 @@ export async function proxy(request: NextRequest) {
       if(pausa){
         if(path.startsWith('/api')) {
           const liberada=path.startsWith('/api/mentoria/pausa') ||
-            path.startsWith('/api/auth/') || path.startsWith('/api/product-events') ||
+            path.startsWith('/api/auth/') || path === '/api/newsletter/unsubscribe' || path.startsWith('/api/product-events') ||
             path.startsWith('/api/trial/') || path.startsWith('/api/termos/') || path === '/api/ajuda/lidas';
           if(!liberada && !['GET','HEAD','OPTIONS'].includes(request.method))
             return NextResponse.json({error:'Sua mentoria está pausada. Retome no Meu Plano para continuar.'},

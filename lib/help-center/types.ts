@@ -21,7 +21,7 @@ export const releaseLabels: Record<HelpRelease['kind'], string> = {
 export function safeHelpPath(value: unknown): string | null {
   if (typeof value !== 'string' || value.length > 250 || !value.startsWith('/') ||
       value.startsWith('//') || /[\\\s#]/.test(value)) return null;
-  const allowed = ['/dashboard', '/onboarding', '/quem-sou-eu', '/exercicios', '/meu-pdi',
+  const allowed = ['/gravacoes','/dashboard', '/onboarding', '/quem-sou-eu', '/exercicios', '/meu-pdi',
     '/pdi', '/diario', '/carreira', '/gupy', '/linkedin', '/conteudo-linkedin', '/network',
     '/percepcao-360', '/primeiros-90-dias', '/leitura-cenario', '/plano-acoes-iris',
     '/meu-plano', '/plataforma', '/perfil', '/passaporte', '/contratos'];
