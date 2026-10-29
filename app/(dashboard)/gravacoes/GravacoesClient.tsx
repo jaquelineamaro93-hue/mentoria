@@ -34,7 +34,11 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
     <>
       
 
-        <div className="flex gap-2 mb-6">
+        <div className="mb-5 rounded-xl border border-gray-faint bg-white p-4 text-sm leading-relaxed text-gray-text">
+          As gravações abrem no Google Drive. Se aparecer “Solicitar acesso”, entre com a conta Google autorizada ou solicite a liberação na própria pasta.
+          Essa mensagem é uma permissão do Drive e não confirma uma restrição do seu plano SOMA.
+        </div>
+        <div className="flex flex-wrap gap-2 mb-6">
           {(['todas', 'individual', 'grupo'] as Filtro[]).map((f) => (
             <button
               key={f}
@@ -60,12 +64,12 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
                 href={g.drive_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 rounded-xl border border-gray-faint bg-white px-5 py-4 hover:border-mint transition-colors"
+                className="flex flex-wrap items-center gap-4 rounded-xl border border-gray-faint bg-white px-5 py-4 hover:border-mint transition-colors"
               >
                 <div className="w-12 h-12 rounded-lg bg-mint-light flex items-center justify-center text-mint shrink-0">
                   <PlayCircle size={22} />
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1 basis-40 [overflow-wrap:anywhere]">
                   <p className="text-sm text-black mb-1">{g.titulo}</p>
                   <div className="flex items-center gap-2">
                     <span
@@ -85,7 +89,7 @@ export default function GravacoesClient({ profile, gravacoes }: Props) {
                     )}
                   </div>
                 </div>
-                <span className="text-xs text-brown-deep shrink-0"><LocalizedText text={"Abrir no Drive"} /></span>
+                <span className="text-xs text-brown-deep shrink-0"><LocalizedText text={"Abrir gravações no Drive"} /></span>
               </a>
             ))}
           </div>

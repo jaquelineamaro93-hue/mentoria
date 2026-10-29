@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DashboardClient from './DashboardClient';
+import ProximosEncontros from '@/components/ProximosEncontros';
 import WelcomeEmailTrigger from '@/components/WelcomeEmailTrigger';
 import { BLOCOS_QUEM_SOU_EU } from '@/lib/prompts';
 import type {
@@ -79,6 +80,7 @@ export default async function DashboardPage() {
   return (
     <>
       <WelcomeEmailTrigger />
+      <ProximosEncontros />
       <DashboardClient
       profile={profile}
       entrevista={entrevistaResult.data ?? null}

@@ -173,11 +173,16 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
 
   if (encontros && encontros.length > 0) {
     for (const encontro of encontros) {
-      const { data: jaEnviados } = await supabase
+      const { data: jaEnviados, error: erroConsultaEnvios } = await supabase
         .from('emails_enviados')
         .select('user_id')
         .eq('tipo', 'lembrete_encontro')
         .eq('referencia_id', encontro.id);
+
+      if (erroConsultaEnvios) {
+        resultado.erros.push('Não foi possível verificar os lembretes deste encontro.');
+        continue;
+      }
 
       const idsJaEnviados = new Set((jaEnviados ?? []).map((e) => e.user_id));
 
@@ -185,20 +190,22 @@ export async function executarLembretes(): Promise<ResultadoLembretes> {
         if (idsJaEnviados.has(perfil.id)) continue;
 
         try {
-          await enviarEmail({
+          const enviado = await enviarEmail({
             para: perfil.email,
             assunto: `Lembrete: ${encontro.titulo}`,
             html: templateLembreteEncontro(
               perfil.nome,
               encontro.titulo,
-              new Date(encontro.data_evento).toLocaleString('pt-BR')
+              new Date(encontro.data_evento).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' (horário de Brasília)'
             ),
           });
-          await supabase.from('emails_enviados').insert({
+          if (!enviado) throw new Error('Envio rejeitado pelo provedor');
+          const { error: erroRegistro } = await supabase.from('emails_enviados').insert({
             user_id: perfil.id,
             tipo: 'lembrete_encontro',
             referencia_id: encontro.id,
           });
+          if (erroRegistro) throw new Error('Falha ao registrar o lembrete enviado');
           resultado.encontros++;
         } catch (e) {
           resultado.erros.push(`encontro ${perfil.email}: ${e}`);

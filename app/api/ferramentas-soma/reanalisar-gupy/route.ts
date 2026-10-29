@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
   ].join('\n');
 
   try {
-    const resultado = await chamarClaude(prompt, 7000);
+    const resultado = await chamarClaude(prompt, 7000, { exigirCompleta: true });
     if (typeof resultado !== 'string' || resultado.trim().length < 300) {
       return json({ error: 'A análise não pôde ser atualizada agora.' }, 503);
     }

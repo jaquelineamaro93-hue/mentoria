@@ -216,7 +216,7 @@ function LoginPageContent() {
       <div
         aria-hidden="true"
         className="absolute inset-0 z-0 bg-cover bg-[position:58%_center] md:bg-center"
-        style={{ backgroundImage: "url('/api/hero-collage?v=20261002-2')" }}
+        style={{ backgroundImage: "url('/soma-home-colagem-2026.webp')" }}
       />
       <div aria-hidden="true" className="absolute inset-0 z-10 bg-black/70" />
 
