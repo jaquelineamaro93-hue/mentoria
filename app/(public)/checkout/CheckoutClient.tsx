@@ -236,7 +236,7 @@ export default function CheckoutClient({
               </button>
             </div>
             <PurchaseContractConsent product="carreira" accepted={contractAccepted} onChange={setContractAccepted}/>
-            {!logado && !planoAtualCodigo && (
+            {!planoAtualCodigo && (
               <div className="mt-4 rounded-xl border border-[#b9d8ca] bg-[#eff8f3] p-4 text-[#183b2e]">
                 <p className="mb-3 text-sm">Vai deixar a contratação para depois? Guarde seu plano e retome quando quiser.</p>
                 <GuestCheckoutRecovery key={plano.id} product="carreira" planCode={plano.id} autoPrompt label="Guardar meu plano por e-mail" />
