@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ArrowUpRight, CheckCircle2, Layers3, Sparkles, Workflow } from 'lucide-react';
+import GuestCheckoutRecovery from '@/components/public/GuestCheckoutRecovery';
 import {
   BASE_SAAS_CENTAVOS, CATALOGO_SAAS,
   formatarReais, ADICIONAL_IA_CENTAVOS, DOIS_AGENTES_CENTAVOS,
@@ -14,7 +15,7 @@ const TIPOS: PlanoSaas[] = ['avulso', 'essencial', 'pro'];
 
 const ICONES = { avulso: Layers3, essencial: Workflow, pro: Sparkles };
 
-export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
+export default function SomaSaasShowcase({ modulos, showRecovery = true }: { modulos: Modulo[]; showRecovery?: boolean }) {
   const [plano, setPlano] = useState<PlanoSaas>('essencial');
   const [modulo, setModulo] = useState('');
   const [iris, setIris] = useState(false);
@@ -143,6 +144,7 @@ export default function SomaSaasShowcase({ modulos }: { modulos: Modulo[] }) {
           <p className="mt-3 text-xs leading-5 text-[#D1E3D8]">
             Teste as ferramentas escolhidas por 7 dias, sem cartão. Depois, assine pelo Mercado Pago.
           </p>
+          {showRecovery && <div className="mt-3 flex justify-center"><GuestCheckoutRecovery product="plataforma" planCode={plano} moduleSlug={selecionado?.slug} iris={iris} whatsapp={whatsapp} label="Guardar minha escolha por e-mail" /></div>}
         </aside>
       </div>
 

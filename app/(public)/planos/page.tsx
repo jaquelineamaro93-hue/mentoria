@@ -31,6 +31,21 @@ export default async function PlanosPage() {
     return !hasTestInCodigo && !hasTestInName && !hasTestInDesc;
   });
 
+  // No guest-cart promotion for accounts that already have a paid SOMA product.
+  const { data: { user } } = await supabase.auth.getUser();
+  let showGuestRecovery = true;
+  if (user) {
+    const [profileResult, subscriptionResult] = await Promise.all([
+      supabase.from('profiles').select('status_assinatura,status_pagamento,trial_converted_at').eq('id', user.id).maybeSingle(),
+      supabase.from('soma_module_subscriptions').select('id').eq('user_id', user.id).in('status', ['active','ativo','paid','authorized']).limit(1),
+    ]);
+    showGuestRecovery = !profileResult.error && !subscriptionResult.error &&
+      profileResult.data?.status_assinatura !== 'ativo' &&
+      profileResult.data?.status_pagamento !== 'ativo' &&
+      !profileResult.data?.trial_converted_at &&
+      !subscriptionResult.data?.length;
+  }
+
   return (
     <div className="soma-marketing min-h-screen bg-[#0F1A18] text-[#EEF3F1]">
       <SomaSiteHeader active="/planos"/>
@@ -137,7 +152,7 @@ export default async function PlanosPage() {
         </div>
         <div className="mt-5"><SomaCarreiraOptions /></div>
         </section>
-        <div className="min-w-0 rounded-3xl border border-[#325248] bg-[#142722] p-4 sm:p-5"><SomaSaasShowcase modulos={modulosRaw ?? []} /></div>
+        <div className="min-w-0 rounded-3xl border border-[#325248] bg-[#142722] p-4 sm:p-5"><SomaSaasShowcase modulos={modulosRaw ?? []} showRecovery={showGuestRecovery} /></div>
         </div>
       </div>
       </div>
