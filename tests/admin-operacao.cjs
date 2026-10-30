@@ -21,6 +21,16 @@ nodes(tree).find(n => n.type === 'button' && text(n).includes('E-mail não confi
 tree = render(); assert.equal(nodes(tree).filter(n => n.type === 'details' && ['a','b'].includes(n.key)).length,1);
 nodes(tree).find(n => n.type === 'input').props.onChange({ target: { value:'agata' } }); tree=render(); assert(text(tree).includes('Ágata Teste'));
 console.log('PASS one row per person, actions retained, email filter and accent-insensitive search');
+slots = [];
+const statusRow = (id, status, trial, end) => ({ ...row(id, id, true, true), profile: { ...row(id, id, true, true).profile, status_assinatura: status, trial_status: trial, trial_ends_at: end } });
+props.linhas = [statusRow('trial','trial','active','2999-01-01'), statusRow('expired','trial','active','2000-01-01'), statusRow('closed','encerrado'), statusRow('debt','inadimplente'), statusRow('paid','ativo','expired','2000-01-01')];
+tree = render();
+for (const [label, count, ids] of [['Em teste (trial)',1,['trial']],['Encerrados',2,['expired','closed']],['Inadimplentes',1,['debt']]]) {
+  const button = nodes(tree).find(n => n.type === 'button' && text(n) === String(count)+label);
+  assert(button, label + ' count'); button.props.onClick(); tree=render();
+  assert.deepEqual(nodes(tree).filter(n=>n.type==='details' && n.key).map(n=>n.key),ids);
+}
+console.log('PASS trial, expired, closed and overdue filters use account status, not activity; converted paid accounts stay out of expired');
 (async () => {
   slots=[]; const Users=compile(base+'/app/(dashboard)/admin/usuarios/UsuariosClient.tsx').UsuariosClient;
   const renderUsers=()=>{ index=0; return Users(); };
