@@ -66,6 +66,8 @@ export async function POST(request: NextRequest) {
     'com esses documentos. Não invente score, requisitos, resultados ou fatos não demonstrados.',
     'Se a nota estiver citada no relatório, mencione somente como estimativa anterior SOMA,',
     'jamais como score interno da Gupy. Utilize português brasileiro claro e natural.',
+    'Revise habilidades técnicas: ferramentas, linguagens, métodos e conhecimentos, sempre com evidências do relatório salvo. Separe habilidade demonstrada, menção sem contexto e requisito não demonstrado. Não deduza desconhecimento pela ausência no texto.',
+    'Sugira termos da vaga somente quando corresponderem à experiência real. Não afirme que sinônimos são ignorados, que grafia diferente elimina automaticamente ou que preencher uma quantidade fixa garante pontos. Não invente limite de habilidades nem nível de domínio; peça confirmação quando necessário.',
     'Reforce a METODOLOGIA AUTORAL do Guia GUPY SOMA, criada após três anos de testes:',
     '1) candidaturas repetidas a vagas da mesma empresa puderam reduzir oportunidades nos testes;',
     '2) likes/dislikes no histórico do candidato apresentaram impactos observados;',
