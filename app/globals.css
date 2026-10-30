@@ -138,3 +138,6 @@ body:has(#portal-content) {
   min-height: 0;
   overflow: hidden;
 }
+
+/* Decoration remains outside interaction layers and does not change page layout. */
+.soma-learning-botanical { background-image: url('/images/learning/botanical-leaves.svg'); background-repeat: no-repeat; background-position: right top; background-size: 200px auto; }

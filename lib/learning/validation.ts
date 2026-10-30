@@ -1,3 +1,4 @@
+import {parseGames} from './games.ts';
 export const MODULES = ['autoconhecimento','diagnostico','percepcao-360','curriculo-ats','linkedin','entrevistas','desenvolvimento','networking','vagas'];
 export const isId = (v:unknown):v is string => typeof v==='string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 export function safeLink(value:unknown, local=false) {
@@ -35,5 +36,5 @@ export function parseLesson(b:Record<string,unknown>) {
  const options=Array.isArray(b.quiz_options)?b.quiz_options.map(x=>txt(x,1,300)):[];
  if(options.length<2||options.length>5)throw new Error('Cadastre de 2 a 5 alternativas.');
  const answer=num(b.quiz_answer,0,options.length-1);mediaFor(b.media_url);
- return {course_id:b.course_id,title:txt(b.title,3,150),module_title:txt(b.module_title,3,120),summary:txt(b.summary,10,600),body:txt(b.body,30,30000),exercise:txt(b.exercise,10,2000),quiz_question:txt(b.quiz_question,10,1000),quiz_options:options,quiz_answer:answer,media_url:safeLink(b.media_url),material_url:safeLink(b.material_url),duration_minutes:num(b.duration_minutes,1,240),position:num(b.position??0,0,10000),published:b.published===true};
+ return {minigames:parseGames(b.minigames),course_id:b.course_id,title:txt(b.title,3,150),module_title:txt(b.module_title,3,120),summary:txt(b.summary,10,600),body:txt(b.body,30,30000),exercise:txt(b.exercise,10,2000),quiz_question:txt(b.quiz_question,10,1000),quiz_options:options,quiz_answer:answer,media_url:safeLink(b.media_url),material_url:safeLink(b.material_url),duration_minutes:num(b.duration_minutes,1,240),position:num(b.position??0,0,10000),published:b.published===true};
 }
