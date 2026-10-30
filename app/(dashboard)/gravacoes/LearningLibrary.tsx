@@ -1,16 +1,15 @@
 'use client';
 import { useState,useRef } from 'react';
-import { Play,BookOpen,CheckCircle2,ArrowLeft,ArrowRight,Trophy,Search,Settings,ExternalLink,LayoutGrid,List,MessageSquarePlus } from 'lucide-react';
+import { Play,BookOpen,CheckCircle2,ArrowLeft,ArrowRight,Trophy,Search,Settings,ExternalLink,LayoutGrid,List } from 'lucide-react';
 import Link from 'next/link';
 import type { LearningCourse,LearningLesson,LearningProgress,LessonDetail } from '@/lib/learning/types';
 import type { Profile } from '@/lib/types';
-import LibrarySuggestions from './LibrarySuggestions';
 type Props={courses:LearningCourse[];lessons:LearningLesson[];progress:LearningProgress[];profile:Profile|null};
 const button='inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#246554] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#183f37] disabled:opacity-50';
 function pct(done:number,total:number){return total?Math.round(done/total*100):0;}
 export default function LearningLibrary({courses,lessons,progress:initial,profile}:Props){
  const [progress,setProgress]=useState(initial),[query,setQuery]=useState(''),[category,setCategory]=useState('Todas'),[courseId,setCourseId]=useState<string|null>(null),[detail,setDetail]=useState<LessonDetail|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
- const [view,setView]=useState<'cards'|'list'>('cards'),[filter,setFilter]=useState('todas'),[area,setArea]=useState<'trilhas'|'sugestoes'>('trilhas');
+ const [view,setView]=useState<'cards'|'list'>('cards'),[filter,setFilter]=useState('todas');
  const requestId=useRef(0);
  const available=lessons.filter(l=>courses.some(c=>c.id===l.course_id));
  const completed=new Set(progress.filter(p=>p.completed_at&&available.some(l=>l.id===p.lesson_id)).map(p=>p.lesson_id));
@@ -32,8 +31,7 @@ export default function LearningLibrary({courses,lessons,progress:initial,profil
  const doneCourses=courses.filter(isDone).length;
  return <div className="min-w-0 space-y-6 text-[#193f34]">
   <header className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.14em] text-[#438a72]">Aprender e aplicar</p><h1 className="mt-2 text-2xl font-semibold sm:text-3xl">Biblioteca de aprendizagem</h1><p className="mt-2 text-sm leading-6 text-[#5c7167]">Escolha uma trilha, acompanhe as aulas e coloque o aprendizado em prática.</p></div>{profile?.is_admin&&<Link href="/admin/biblioteca" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#c9dad2] bg-white px-4 py-2 text-sm"><Settings size={16}/>Gerenciar biblioteca</Link>}</header>
-  <nav aria-label="Áreas da biblioteca" className="flex flex-wrap gap-2 border-b border-[#d5e4dc] pb-3"><button type="button" onClick={()=>setArea('trilhas')} aria-pressed={area==='trilhas'} className={'inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold '+(area==='trilhas'?'bg-[#193f34] text-white':'bg-white text-[#246554]')}><BookOpen size={17}/>Minhas trilhas</button><button type="button" onClick={()=>setArea('sugestoes')} aria-pressed={area==='sugestoes'} className={'inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold '+(area==='sugestoes'?'bg-[#193f34] text-white':'bg-white text-[#246554]')}><MessageSquarePlus size={17}/>Sugerir uma melhoria</button></nav>
-  {area==='sugestoes'?<LibrarySuggestions/>:course?<>
+  {course?<>
    <button type="button" onClick={leave} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#246554]"><ArrowLeft size={17}/>Voltar às trilhas</button>
    <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[17rem_minmax(0,1fr)]">
     <aside aria-label="Aulas da trilha" className="min-w-0 rounded-2xl border border-[#d5e4dc] bg-white p-4"><p className="text-xs font-semibold uppercase tracking-[.1em] text-[#438a72]">{course.category}</p><h2 className="mt-2 text-lg font-semibold">{course.title}</h2><p className="mt-2 text-xs text-[#5c7167]">{courseLessons.filter(l=>completed.has(l.id)).length} de {courseLessons.length} atividades concluídas</p><div className="my-4 h-1.5 rounded-full bg-[#e7f0ea]" role="progressbar" aria-label="Progresso da trilha" aria-valuenow={pct(courseLessons.filter(l=>completed.has(l.id)).length,courseLessons.length)} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-[#438a72]" style={{width:pct(courseLessons.filter(l=>completed.has(l.id)).length,courseLessons.length)+'%'}}/></div>

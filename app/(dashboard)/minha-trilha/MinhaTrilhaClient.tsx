@@ -1,5 +1,6 @@
 'use client';
 import LocalizedText from '@/components/LocalizedText';
+import LibrarySuggestions from '../gravacoes/LibrarySuggestions';
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,6 +32,7 @@ export default function MinhaTrilhaClient({
 }) {
   const router = useRouter();
   const supabase = createClient();
+  const [area, setArea] = useState<'avaliacao' | 'sugestoes'>('avaliacao');
   const [checkins, setCheckins] = useState(checkinsIniciais);
   const [nota, setNota] = useState<number | null>(null);
   const [feedbackTexto, setFeedbackTexto] = useState('');
@@ -102,7 +104,17 @@ export default function MinhaTrilhaClient({
         <p className="text-sm text-gray-text max-w-2xl leading-relaxed"><LocalizedText text={"Uma vez por mês, conte como está sendo sua experiência, o que está funcionando e o que podemos melhorar. Esse check-in é sobre a mentoria — não é uma avaliação do seu desempenho profissional."} /></p>
       </header>
 
-      <div className="relative pl-8 space-y-8">
+      <nav aria-label="Sua experiência na SOMA" className="mb-6 flex flex-wrap gap-2 border-b border-gray-faint pb-3">
+        {([{ id: 'avaliacao', label: 'Avaliar a mentoria' }, { id: 'sugestoes', label: 'Sugerir uma melhoria' }] as const).map((item) => (
+          <button key={item.id} type="button" onClick={() => setArea(item.id)} aria-pressed={area === item.id}
+            className={'min-h-11 rounded-xl px-4 py-2 text-sm font-semibold ' + (area === item.id ? 'bg-mint-deep text-white' : 'border border-gray-faint bg-white text-mint-deep')}>
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      <div hidden={area !== 'sugestoes'}><LibrarySuggestions /></div>
+      <div hidden={area !== 'avaliacao'} className="relative pl-8 space-y-8">
           <div className="absolute left-[11px] top-2 bottom-2 w-px bg-line" />
 
           {meses.map(({ referencia, indice }) => {
