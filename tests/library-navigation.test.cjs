@@ -1,0 +1,18 @@
+const fs=require('node:fs'),ts=require('typescript'),assert=require('node:assert/strict');
+let slots=[],idx=0;
+const React={useState(init){const i=idx++;if(!(i in slots))slots[i]=typeof init==='function'?init():init;return [slots[i],v=>slots[i]=typeof v==='function'?v(slots[i]):v];},useRef(init){const i=idx++;return slots[i]??=( {current:init} );}};
+const moduleMock={exports:{}};
+const code=ts.transpileModule(fs.readFileSync('app/(dashboard)/gravacoes/LearningLibrary.tsx','utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+new Function('require','module','exports',code)(n=>n==='react'?React:n==='react/jsx-runtime'?require(n):n==='lucide-react'?new Proxy({},{get:(_,p)=>p}):()=>null,moduleMock,moduleMock.exports);
+const Library=moduleMock.exports.default;
+const nodes=n=>!n||typeof n!=='object'?[]:[n,...[n.props?.children].flat(Infinity).flatMap(nodes)];
+const text=n=>Array.isArray(n)?n.map(text).join(''):n&&typeof n==='object'?text(n.props?.children):String(n??'');
+const courses=[{id:'a',title:'Mapa quem sou',category:'Autoconhecimento',description:'Uma trilha real.',position:1},{id:'b',title:'Carreira e PDI',category:'Desenvolvimento',description:'Outra trilha real.',position:2}];
+const lessons=[{id:'one',course_id:'a',title:'Primeira aula',module_title:'Aprender',duration_minutes:5},{id:'two',course_id:'a',title:'Segunda aula',module_title:'Aplicar',duration_minutes:5}];
+const props={courses,lessons,progress:[{lesson_id:'one',completed_at:'2026-01-01'},{lesson_id:'hidden',completed_at:'2026-01-01'}],profile:null};
+const render=()=>{idx=0;return Library(props)};
+let tree=render();assert(text(tree).includes('1 de 2 atividades concluídas'));assert(!text(tree).includes('Lives e gravações anteriores'));
+const search=nodes(tree).find(n=>n.type==='input'&&n.props.type==='search');search.props.onChange({target:{value:'PDI'}});tree=render();assert(!nodes(tree).some(n=>n.type==='article'&&text(n).includes('Mapa quem sou')));assert(text(tree).includes('Carreira e PDI'));
+search.props.onChange({target:{value:''}});tree=render();
+let requested;global.fetch=async url=>{requested=url;return {ok:true,json:async()=>({lesson:{...lessons[1],body:'Conteúdo',media:null}})}};
+(async()=>{const article=nodes(tree).find(n=>n.type==='article'&&text(n).includes('Mapa quem sou'));nodes(article).find(n=>n.type==='button').props.onClick();await new Promise(setImmediate);tree=render();assert.equal(requested,'/api/aprender/aula?id=two');assert(nodes(tree).some(n=>n.type==='aside'&&n.props['aria-label']==='Aulas da trilha'));assert(text(tree).includes('Voltar às trilhas'));nodes(tree).find(n=>n.type==='button'&&text(n)==='Voltar às trilhas').props.onClick();tree=render();assert(text(tree).includes('Suas trilhas'));console.log('PASS library search, valid progress, next unfinished activity, lesson navigation and return');})().catch(e=>{console.error(e);process.exitCode=1});
