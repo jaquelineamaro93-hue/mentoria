@@ -1,14 +1,16 @@
 'use client';
 import {useState} from 'react';
+import GameEditor from '@/components/learning/GameEditor';
+import type {LearningGame} from '@/lib/learning/games';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
 import {Plus,BookOpen,Play,Save,ArrowLeft} from 'lucide-react';
 import type {LearningCourse,LearningLesson} from '@/lib/learning/types';
 import {MODULES} from '@/lib/learning/validation';
 type CourseForm={id?:string;title:string;description:string;category:string;cover_url:string;required_module:string;published:boolean;position:number};
-type LessonForm={id?:string;course_id:string;module_title:string;title:string;summary:string;body:string;exercise:string;quiz_question:string;quiz_options:string[];quiz_answer:number;media_url:string;material_url:string;duration_minutes:number;position:number;published:boolean};
+type LessonForm={minigames:LearningGame[];id?:string;course_id:string;module_title:string;title:string;summary:string;body:string;exercise:string;quiz_question:string;quiz_options:string[];quiz_answer:number;media_url:string;material_url:string;duration_minutes:number;position:number;published:boolean};
 const emptyCourse:CourseForm={title:'',description:'',category:'Carreira',cover_url:'',required_module:'',published:false,position:0};
-function emptyLesson(course_id:string):LessonForm{return {course_id,module_title:'',title:'',summary:'',body:'',exercise:'',quiz_question:'',quiz_options:['',''],quiz_answer:0,media_url:'',material_url:'',duration_minutes:5,position:0,published:false};}
+function emptyLesson(course_id:string):LessonForm{return {minigames:[],course_id,module_title:'',title:'',summary:'',body:'',exercise:'',quiz_question:'',quiz_options:['',''],quiz_answer:0,media_url:'',material_url:'',duration_minutes:5,position:0,published:false};}
 const input='mt-1 block w-full rounded-lg border border-[#c5d9cd] bg-white px-3 py-2.5 text-sm text-[#213d34]';
 export default function LibraryAdmin({courses,lessons}:{courses:LearningCourse[];lessons:(LearningLesson&LessonForm)[]}){
  const router=useRouter(),[mode,setMode]=useState<'course'|'lesson'>('course'),[course,setCourse]=useState<CourseForm>(emptyCourse),[lesson,setLesson]=useState<LessonForm>(emptyLesson(courses[0]?.id||'')),[busy,setBusy]=useState(false),[error,setError]=useState(''),[success,setSuccess]=useState('');
@@ -36,6 +38,7 @@ export default function LibraryAdmin({courses,lessons}:{courses:LearningCourse[]
  {field('Link do vídeo (YouTube não listado ou outro provedor, opcional)',lesson.media_url,media_url=>setLesson(l=>({...l,media_url})),false,false)}
  <p className="text-xs leading-6 text-[#5c7167]">Para economizar armazenamento, publique no YouTube como não listado e cole o link aqui. O vídeo será reproduzido dentro da SOMA sem copiar o arquivo. Vimeo, vídeo individual do Drive e MP4/WebM HTTPS também são aceitos. Pastas não funcionam como player. Quem tiver o link não listado poderá compartilhá-lo.</p>
  {field('Material de apoio (HTTPS, opcional)',lesson.material_url,material_url=>setLesson(l=>({...l,material_url})),false,false)}
+ <GameEditor games={lesson.minigames||[]} onChange={minigames=>setLesson(l=>({...l,minigames}))}/>
  {field('Atividade de aplicação prática',lesson.exercise,exercise=>setLesson(l=>({...l,exercise})),true)}
  {field('Pergunta de checagem',lesson.quiz_question,quiz_question=>setLesson(l=>({...l,quiz_question})))}
  <fieldset className="space-y-3"><legend className="text-sm font-medium">Alternativas e resposta correta</legend>{lesson.quiz_options.map((o,i)=><div key={i} className="flex items-center gap-3"><input type="radio" name="correct-answer" aria-label={'Alternativa correta '+(i+1)} checked={lesson.quiz_answer===i} onChange={()=>setLesson(l=>({...l,quiz_answer:i}))}/><input required aria-label={'Texto da alternativa '+(i+1)} value={o} onChange={e=>setLesson(l=>({...l,quiz_options:l.quiz_options.map((v,j)=>i===j?e.target.value:v)}))} className={input}/></div>)}<div className="flex gap-3"><button type="button" disabled={lesson.quiz_options.length>=5} onClick={()=>setLesson(l=>({...l,quiz_options:[...l.quiz_options,'']}))} className="min-h-10 text-xs font-semibold text-[#246554]">Adicionar alternativa</button><button type="button" disabled={lesson.quiz_options.length<=2} onClick={()=>setLesson(l=>({...l,quiz_options:l.quiz_options.slice(0,-1),quiz_answer:Math.min(l.quiz_answer,l.quiz_options.length-2)}))} className="min-h-10 text-xs text-[#5c7167]">Remover última</button></div></fieldset>
