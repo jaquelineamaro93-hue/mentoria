@@ -27,6 +27,6 @@ jobs:
       - run: node scripts/test-help-center.cjs
       - run: node --test tests/rankings-contracts.test.mjs
       - run: node --test tests/certificado-sintese.test.mjs
-      - run: node --test tests/learning-library.test.mjs tests/learning-games.test.mjs tests/learning-arcade.test.mjs
+      - run: node --test tests/learning-library.test.mjs tests/learning-games.test.mjs tests/learning-arcade.test.mjs tests/minigames-newsletter.test.mjs
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run build
