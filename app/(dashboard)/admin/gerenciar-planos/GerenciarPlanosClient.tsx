@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { posthog } from '@/lib/posthog';
+import { manualPlanDates } from '@/lib/manual-plan-dates';
 import type { Profile, PlanoMentoria, TipoPacote } from '@/lib/types';
 
 interface Edicao {
@@ -30,6 +31,7 @@ export default function GerenciarPlanosClient({
   const [mentorados, setMentorados] = useState(mentoradosIniciais);
   const [planos, setPlanos] = useState(planosIniciais);
   const [edicao, setEdicao] = useState<Record<string, Edicao>>({});
+  const explicitDates = useRef<Record<string, Set<string>>>({});
   const [salvando, setSalvando] = useState<string | null>(null);
   const [mostrarFormPlano, setMostrarFormPlano] = useState(false);
   const [criandoPlano, setCriandoPlano] = useState(false);
@@ -208,6 +210,7 @@ export default function GerenciarPlanosClient({
 
       if (!error) {
         posthog.capture('admin_plano_atualizado', { mentoradoId, ...changes });
+        delete explicitDates.current[mentoradoId];
         setMentorados(
           mentorados.map((m) => {
             if (m.id !== mentoradoId) return m;
@@ -230,10 +233,23 @@ export default function GerenciarPlanosClient({
   }
 
   function handleChange(mentoradoId: string, field: keyof Edicao, value: string) {
-    setEdicao((prev) => ({
-      ...prev,
-      [mentoradoId]: { ...prev[mentoradoId], [field]: value },
-    }));
+    if (field === 'data_fim_acesso' || field === 'proxima_cobranca') {
+      (explicitDates.current[mentoradoId] ??= new Set()).add(field);
+    }
+    setEdicao((prev) => {
+      const current = mentorados.find(m => m.id === mentoradoId);
+      const draft = prev[mentoradoId] ?? {};
+      const next = { ...draft, [field]: value };
+      const plan = planoMap.get(next.plano_id || current?.plano_id || '');
+      const origin = next.origem_assinatura || current?.origem_assinatura || 'manual';
+      if (plan && origin === 'manual' && ['plano_id', 'origem_assinatura', 'forma_pagamento_escolhida'].includes(field)) {
+        const dates = manualPlanDates(plan.duracao_meses, next.forma_pagamento_escolhida ?? current?.forma_pagamento_escolhida);
+        // Explicit date edits take precedence. Merely changing origin never renews existing access.
+        if (!explicitDates.current[mentoradoId]?.has('data_fim_acesso') && (field === 'plano_id' || !current?.data_fim_acesso)) next.data_fim_acesso = dates.data_fim_acesso;
+        if (!explicitDates.current[mentoradoId]?.has('proxima_cobranca') && (field === 'plano_id' || field === 'forma_pagamento_escolhida' || !current?.proxima_cobranca)) next.proxima_cobranca = dates.proxima_cobranca;
+      }
+      return { ...prev, [mentoradoId]: next };
+    });
   }
 
   return (
@@ -253,6 +269,9 @@ export default function GerenciarPlanosClient({
       <p className="text-sm text-gray-text mb-6">
         Troque o plano, tipo, origem, forma de pagamento, data de fim de acesso e status de cada
         mentorado. O valor mostrado é calculado a partir do plano + forma de pagamento escolhida.
+        {' '}Ao atribuir um plano manual, as datas são sugeridas a partir de hoje. Na forma recorrente,
+        a próxima cobrança é mensal; nas demais formas, indica a renovação ao fim do plano.
+        Confira as datas antes de salvar. Esse cadastro não realiza uma cobrança.
       </p>
 
       {mostrarFormPlano && (
