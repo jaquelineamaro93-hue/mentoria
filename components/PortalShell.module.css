@@ -98,3 +98,17 @@
   .breadcrumb { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .sidebar, .workspace, .navLink, .groupToggle > svg { transition: none; } }
+
+/* Botanical surface only: navigation structure, access, sizing and behavior stay intact. */
+.shell { --sidebar-bg: #123d35; --sidebar-active: #2b574b; --sidebar-text: #e1ebe5; background: #f8f7f2; }
+.sidebar { background-color: var(--sidebar-bg); background-image: linear-gradient(180deg, #123d3500 20%, #123d3599 100%), url('/images/learning/botanical-leaves.svg'); background-repeat: no-repeat; background-position: center bottom; background-size: cover, 100% auto; border-right-color: #2b574b; }
+.navigation { background: #123d354d; }
+.navLink:hover, .profileLink:hover, .iconButton:hover, .signOut:hover { background: #285345; }
+.navLink > svg { color: #c5dacd; }
+.active > svg { color: var(--soma-accent); }
+.brandCaption, .groupToggle, .iconButton { color: #bdcec3; }
+.groupRule { background: #547567; }
+.supportLinks, .sidebarFooter { border-color: #416252; }
+.supportLinks .navLink { color: #d5e3da; }
+.sidebarFooter { background: #123d35f5; }
+.compact .navGroup { border-color: #416252; }
