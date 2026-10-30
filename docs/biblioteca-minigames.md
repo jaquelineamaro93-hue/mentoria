@@ -33,3 +33,17 @@ A migração de produção NÃO foi aplicada: a revisão automática exigiu auto
 Backup remoto do código: backup/pre-minigames-botanical-20261030, SHA e4152cf5d5a071997852708e2fe2a8ed989208d1. A referência Git não é backup integral do banco.
 
 Reversão: reverter somente o commit do recurso via PR. Manter a coluna e os conteúdos cadastrados, preservando progresso e pontos. Não usar reset de main, force push ou apagar dados para reverter.
+
+## Correção de escopo: jogos de arcade
+
+A usuária esclareceu que esperava jogos reais como o benchmark Engage, não exercícios em formato de formulário. A implementação passa a incluir caça-palavras e corte de vírus com Canvas 2D.
+
+Caça-palavras: tabuleiro gerado por partida, palavras horizontais/verticais/diagonais, seleção por arraste, toque no começo/fim ou teclado, cronômetro de cinco minutos, pausa, pontuação local, vitória e nova partida. Acentos são normalizados. Algoritmo com tentativas limitadas e fallback garante um tabuleiro válido.
+
+Corte de vírus: objetos em trajetória balística, colisão por segmento (inclusive movimentos rápidos), aliados verdes protegidos, três vidas, pontos, combo, partículas, rastro de corte, som opcional iniciado por interação, pausa e nova partida. Ritmo tranquilo com mais tempo e menor velocidade. Setas movem a mira e espaço corta para uso por teclado.
+
+O objetivo é cortar 12 vírus e reconhecer todos os obstáculos da aula. As palavras e os rótulos variam conforme autoconhecimento, PDI, Ikigai e storytelling. Pontos são somente da partida. Não altera Impulsos, conclusão, contas, permissões nem sidebar. Não copia código, imagens ou áudios proprietários do benchmark; mecânicas equivalentes com arte procedural autoral.
+
+Publicar primeiro o código com suporte aos tipos wordsearch/slice, preservando os tipos anteriores para compatibilidade. Somente após o deployment READY executar scripts/learning-arcade-content.sql, que substitui os jogos iniciais nessas quatro aulas, preservando jogos cadastrados manualmente. Não exige alteração de esquema ou privilégios. O histórico individual por partida continua sem persistência.
+
+Validação: testes de geração do tabuleiro em 100 seeds, fallback, seleção, colisões e validação de respostas; partidas em navegador Chromium em fixture local com os componentes reais. Verificar fluxo de vitória e erro, mouse/toque/teclado, pausa e ausência de overflow. Não confundir fixture local com teste autenticado de produção.
