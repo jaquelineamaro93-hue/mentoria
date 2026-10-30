@@ -3,18 +3,34 @@ import {useRef,useState} from 'react';
 import {ArrowDown,ArrowUp,CheckCircle2,Gamepad2,RotateCcw} from 'lucide-react';
 import {GAME_LABELS,type PublicGame} from '@/lib/learning/games';
 import styles from './LearningGames.module.css';
+import WordSearch from './arcade/WordSearch';
+import SliceGame from './arcade/SliceGame';
 type Feedback={correct:boolean;explanation:string};
 export default function LearningGames({lessonId,games,onReview,preview,onSolved}:{lessonId:string;games:PublicGame[];onReview?:()=>void;preview?:(game:PublicGame,answers:string[])=>Feedback;onSolved?:()=>void}){
  const [index,setIndex]=useState(0),[solved,setSolved]=useState<string[]>([]);
  if(!games.length)return null;
  const game=games[index];
  return <section className={styles.section} aria-label="Minigames da aula">
-  <header className={styles.heading}><div><p className={styles.eyebrow}><Gamepad2 size={17}/> Aprender, testar, aplicar</p><h3>Seu próximo passo vira prática</h3><p>Explore os conceitos desta aula. Você pode tentar novamente para aprender.</p></div><span className={styles.badge}>{solved.length} de {games.length} desafios resolvidos</span></header>
+  <header className={styles.heading}><div><p className={styles.eyebrow}><Gamepad2 size={17}/> Aprender, testar, aplicar</p><h3>Escolha seu jogo</h3><p>Entre na partida e explore os conceitos desta aula.</p></div><span className={styles.badge}>{solved.length} de {games.length} desafios resolvidos</span></header>
   <div className={styles.tabs} role="group" aria-label="Escolher desafio">{games.map((g,i)=><button key={g.id} type="button" aria-pressed={i===index} onClick={()=>setIndex(i)}>{solved.includes(g.id)&&<CheckCircle2 size={16}/>}<span>{GAME_LABELS[g.kind]}<small>{g.title}</small></span></button>)}</div>
-  <Challenge key={game.id} game={game} lessonId={lessonId} number={index+1} total={games.length} preview={preview} onReview={onReview} onCorrect={()=>{setSolved(s=>s.includes(game.id)?s:[...s,game.id]);onSolved?.();}}/>
+  <GamePlayer key={game.id} game={game} lessonId={lessonId} number={index+1} total={games.length} preview={preview} onReview={onReview} onCorrect={()=>{setSolved(s=>s.includes(game.id)?s:[...s,game.id]);onSolved?.();}}/>
   <p className={styles.note}>Os jogos são uma prática complementar. A conclusão da aula e os Impulsos continuam na atividade de aplicação, uma vez por aula.</p>
  </section>;
 }
+type PlayerProps={game:PublicGame;lessonId:string;number:number;total:number;onCorrect:()=>void;onReview?:()=>void;preview?:(game:PublicGame,answers:string[])=>Feedback};
+function GamePlayer(props:PlayerProps){
+ const {game,lessonId,preview,onCorrect}=props;
+ async function finish(answers:string[]):Promise<Feedback>{
+  let result:Feedback;
+  if(preview)result=preview(game,answers);
+  else{const response=await fetch('/api/aprender/jogo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lesson_id:lessonId,game_id:game.id,answers})});const body=await response.json();if(!response.ok)throw new Error(body.error||'Não foi possível conferir a partida.');result=body;}
+  if(result.correct)onCorrect();return result;
+ }
+ if(game.kind==='wordsearch')return <WordSearch game={game} onFinish={finish}/>;
+ if(game.kind==='slice')return <SliceGame game={game} onFinish={finish}/>;
+ return <Challenge {...props}/>;
+}
+
 function Challenge({game,lessonId,number,total,onCorrect,onReview,preview}:{game:PublicGame;lessonId:string;number:number;total:number;onCorrect:()=>void;onReview?:()=>void;preview?:(game:PublicGame,answers:string[])=>Feedback}){
  const [answers,setAnswers]=useState<string[]>(game.kind==='sequence'?[...game.items]:Array(game.kind==='decision'?1:game.items.length).fill(''));
  const [feedback,setFeedback]=useState<Feedback|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
