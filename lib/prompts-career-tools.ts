@@ -118,6 +118,14 @@ ${limitar(input.vagas, 30000)}
 
 Não invente métricas, certificações, ferramentas, competências ou experiências. Se um dado importante estiver ausente, marque [PREENCHER].
 
+HABILIDADES TÉCNICAS:
+- Compare ferramentas, linguagens, métodos e conhecimentos exigidos com evidências do currículo. Exemplos: Excel, HubSpot, Python, análise de dados e escrita profissional.
+- Separe habilidade demonstrada, habilidade mencionada sem contexto e requisito não demonstrado. Ausência no currículo não prova que a pessoa não saiba fazer.
+- Sugira a nomenclatura da vaga quando corresponder à experiência real, sem prometer que palavras idênticas garantam reconhecimento. Não afirme que sinônimos são ignorados ou que uma escrita diferente causa eliminação automática.
+- Informe nível de domínio apenas quando declarado ou sustentado pelo material; caso contrário, peça confirmação. Relacione a habilidade a uma aplicação concreta.
+- Priorize habilidades relevantes e verdadeiras. Não recomende completar uma quantidade por obrigação, não invente um limite atual de campos e não prometa pontos por habilidade.
+- Idiomas podem ser revisados no campo apropriado, com o nível informado pela pessoa. Não invente fluência.
+
 Entregue em Markdown:
 
 ## 1. Diagnóstico de aderência

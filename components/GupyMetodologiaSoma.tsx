@@ -2,6 +2,12 @@ import { Award, BadgeCheck, BookOpenCheck, Layers3, ListFilter, RefreshCcw } fro
 
 const estrategias = [
   {
+    nome: 'Habilidades técnicas com contexto',
+    Icon: BookOpenCheck,
+    pratica: 'Ferramentas, linguagens, métodos e conhecimentos ficam mais claros quando acompanhados de uma aplicação real. Exemplos: Excel, HubSpot, Python e análise de dados.',
+    aplicar: 'Compare os requisitos com o que você sabe fazer. Use termos da vaga quando forem fiéis à sua experiência e informe o nível que consegue demonstrar. Priorize relevância, sem preencher habilidades apenas para atingir uma quantidade. Isso não garante pontuação ou aprovação.',
+  },
+  {
     nome: 'Candidaturas com foco',
     Icon: ListFilter,
     pratica: 'Nos testes documentados no Guia GUPY da SOMA, candidaturas simultâneas a várias vagas da mesma empresa puderam diminuir as chances de avanço.',
