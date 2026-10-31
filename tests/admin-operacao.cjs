@@ -31,6 +31,22 @@ for (const [label, count, ids] of [['Em teste (trial)',1,['trial']],['Encerrados
   assert.deepEqual(nodes(tree).filter(n=>n.type==='details' && n.key).map(n=>n.key),ids);
 }
 console.log('PASS trial, expired, closed and overdue filters use account status, not activity; converted paid accounts stay out of expired');
+
+slots = [];
+const current = Date.now();
+props.linhas = [
+  { ...row('recent','Nova Conta',true,false), profile: { ...row('recent','Nova Conta',true,false).profile, created_at: new Date(current - 2 * 86400000).toISOString(), is_admin: false } },
+  { ...row('old','Conta Antiga',true,false), profile: { ...row('old','Conta Antiga',true,false).profile, created_at: new Date(current - 9 * 86400000).toISOString(), is_admin: false } },
+  { ...row('admin','Conta Admin',true,false), profile: { ...row('admin','Conta Admin',true,false).profile, created_at: new Date(current - 1 * 86400000).toISOString(), is_admin: true } },
+];
+tree = render();
+const recentFilter = nodes(tree).find(n => n.type === 'button' && text(n).includes('Novos usuários (7 dias)'));
+assert(recentFilter && text(recentFilter).includes('1Novos usuários (7 dias)'), 'recent user count excludes old accounts and admins');
+recentFilter.props.onClick();
+tree = render();
+assert.deepEqual(nodes(tree).filter(n => n.type === 'details' && n.key).map(n => n.key), ['recent']);
+console.log('PASS new users filter uses profile creation timestamp over trailing seven days; excludes admins');
+
 (async () => {
   slots=[]; const Users=compile(base+'/app/(dashboard)/admin/usuarios/UsuariosClient.tsx').UsuariosClient;
   const renderUsers=()=>{ index=0; return Users(); };
