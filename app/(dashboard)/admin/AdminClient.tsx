@@ -24,7 +24,7 @@ export default function AdminClient({
   const supabase = createClient();
   const [linhas, setLinhas] = useState(linhasIniciais);
   const [buscaMentorado, setBuscaMentorado] = useState('');
-  const [filtroAtividade, setFiltroAtividade] = useState<'todos' | 'ativos7' | 'inativos7' | 'nunca' | 'email' | 'onboarding' | 'trial' | 'encerrados' | 'inadimplentes'>('todos');
+  const [filtroAtividade, setFiltroAtividade] = useState<'todos' | 'ativos7' | 'inativos7' | 'nunca' | 'email' | 'onboarding' | 'trial' | 'encerrados' | 'inadimplentes' | 'novos'>('todos');
   const [entrandoComoId, setEntrandoComoId] = useState<string | null>(null);
   const [resetandoId, setResetandoId] = useState<string | null>(null);
   const [deletandoId, setDeletandoId] = useState<string | null>(null);
@@ -199,6 +199,11 @@ export default function AdminClient({
     return 'outro';
   };
   const total = linhasDeMentorados.length;
+  // Cadastro recente é medido pela criação da conta, não por acesso, trial ou onboarding.
+  const novoUsuario = (p: Profile) => {
+    const cadastro = new Date(p.created_at).getTime();
+    return !p.is_admin && Number.isFinite(cadastro) && cadastro <= agora && cadastro >= agora - 7 * 86400000;
+  };
   const diasDesdeAtividade = (data: string | null | undefined) =>
     data ? Math.max(0, Math.floor((agora - new Date(data).getTime()) / 86400000)) : null;
 
@@ -239,12 +244,14 @@ export default function AdminClient({
     if (filtroAtividade === 'nunca') return dias === null;
     if (filtroAtividade === 'email') return !l.emailConfirmado;
     if (filtroAtividade === 'onboarding') return !l.profile.onboarding_concluido;
+    if (filtroAtividade === 'novos') return novoUsuario(l.profile);
     if (['trial', 'encerrados', 'inadimplentes'].includes(filtroAtividade)) return statusGestao(l.profile) === filtroAtividade;
 
     return true;
   });
   const filtros = [
     { value: 'todos', title: 'Todos', count: total },
+    { value: 'novos', title: 'Novos usuários (7 dias)', count: linhasDeMentorados.filter(l => novoUsuario(l.profile)).length },
     { value: 'trial', title: 'Em teste (trial)', count: linhasDeMentorados.filter(l => statusGestao(l.profile) === 'trial').length },
     { value: 'encerrados', title: 'Encerrados', count: linhasDeMentorados.filter(l => statusGestao(l.profile) === 'encerrados').length },
     { value: 'inadimplentes', title: 'Inadimplentes', count: linhasDeMentorados.filter(l => statusGestao(l.profile) === 'inadimplentes').length },
@@ -279,7 +286,7 @@ export default function AdminClient({
         <summary className="cursor-pointer p-4 focus-visible:outline-2 focus-visible:-outline-offset-2">
           <span className="inline-grid w-[calc(100%_-_1.5rem)] gap-3 align-top sm:grid-cols-[minmax(0,1fr)_12rem]">
             <span className="min-w-0"><span className="block break-words font-semibold">{l.profile.nome || 'Sem nome'}{l.profile.is_admin && <span className="ml-2 text-xs font-normal text-[#53685e]">Conta de teste · admin</span>}</span><span className="mt-1 block break-all text-sm text-[#53685e]">{l.profile.email}</span>
-              <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#53685e]">{statusGestao(l.profile) === 'trial' && <span>Em teste (trial)</span>}{statusGestao(l.profile) === 'encerrados' && <span>Acesso encerrado</span>}{statusGestao(l.profile) === 'inadimplentes' && <span>Inadimplente</span>}{!l.emailConfirmado && <span className="text-amber-800">E-mail não confirmado</span>}{!l.profile.onboarding_concluido && <span>Onboarding pendente</span>}</span>
+              <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#53685e]">{statusGestao(l.profile) === 'trial' && <span>Em teste (trial)</span>}{statusGestao(l.profile) === 'encerrados' && <span>Acesso encerrado</span>}{statusGestao(l.profile) === 'inadimplentes' && <span>Inadimplente</span>}{!l.emailConfirmado && <span className="text-amber-800">E-mail não confirmado</span>}{!l.profile.onboarding_concluido && <span>Onboarding pendente</span>}{novoUsuario(l.profile) && <span>Novo usuário</span>}</span>
             </span>
             <span className="text-sm text-[#53685e]"><span className="block">{l.profile.last_activity_at ? 'Última atividade: ' + new Date(l.profile.last_activity_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'Sem acesso registrado'}</span><span className="mt-2 block font-medium text-[#24594b] group-open:hidden">Ver acompanhamento</span><span className="mt-2 hidden font-medium text-[#24594b] group-open:block">Recolher detalhes</span></span>
           </span>
